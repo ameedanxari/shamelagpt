@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild:*)",
+      "Bash(tee:*)",
+      "Bash(./gradlew clean build:*)",
+      "Bash(./gradlew clean:*)",
+      "Bash(./gradlew build:*)",
+      "Bash(./gradlew assembleDebug:*)",
+      "Bash(./gradlew lintDebug:*)",
+      "Bash(cat:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(find:*)",
+      "Bash(open:*)",
+      "Bash(xargs cat:*)",
+      "Bash(xcrun simctl:*)",
+      "Bash(./gradlew:*)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before proceeding with the user's request, check if it involves implementing features, fixing bugs, or making code changes to the ShamelaGPT apps. If so, remind yourself to read .claude/cross-platform-instructions.md which contains critical guidelines about applying changes to BOTH Android and iOS apps. Return 'PROCEED' if you understand."
+          }
+        ]
+      }
+    ]
+  }
+}

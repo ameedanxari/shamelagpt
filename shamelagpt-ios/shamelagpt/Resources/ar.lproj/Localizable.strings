@@ -1,0 +1,262 @@
+/*
+  Localizable.strings (Arabic)
+  ShamelaGPT
+
+  Created by Ameed Khalid on 05/11/2025.
+*/
+
+// MARK: - Navigation & Tabs
+
+"chat" = "المحادثة";
+"history" = "السجل";
+"settings" = "الإعدادات";
+"shamelaGPT" = "شاملة جي بي تي";
+"back" = "رجوع";
+"done" = "تم";
+"common.cancel" = "إلغاء";
+
+// MARK: - Chat Screen
+
+"chat.placeholder" = "اسأل سؤالاً عن الإسلام...";
+"chat.send" = "إرسال الرسالة";
+"chat.voiceInput" = "الإدخال الصوتي";
+"chat.imageTextRecognition" = "التعرف على النص من الصورة";
+"chat.recording" = "جاري التسجيل...";
+"chat.extractingText" = "جاري استخراج النص...";
+"chat.thinking" = "جاري التفكير...";
+"chat.loadingMessages" = "جاري تحميل الرسائل...";
+"chat.startConversation" = "ابدأ محادثة";
+"chat.noMessagesYet" = "لا توجد رسائل بعد";
+"chat.newConversation" = "محادثة جديدة";
+"chat.newConversationWarningTitle" = "بدء محادثة جديدة؟";
+"chat.newConversationWarningMessage" = "سيتم إخفاء محادثتك الحالية ولن تتمكن من العودة إليها.";
+"chat.newConversationWarningMessageLoggedIn" = "سيتم إخفاء محادثتك الحالية، ويمكنك فتحها مرة أخرى من السجل.";
+"chat.newConversationWarningMessageLoggedOut" = "سيتم إخفاء محادثتك الحالية، وبصفتك ضيفًا لن تتمكن من العودة إليها.";
+"chat.viewHistory" = "عرض السجل";
+
+// MARK: - History Screen
+
+"history.clearAll" = "مسح الكل";
+"history.newChat" = "محادثة جديدة";
+"history.noConversations" = "لا توجد محادثات";
+"history.startNewChatToBegin" = "ابدأ محادثة جديدة للبدء";
+"history.deleteConversation" = "حذف المحادثة؟";
+"history.deleteConversationMessage" = "لا يمكن التراجع عن هذا الإجراء.";
+"history.deleteConversationMessageWithTitle" = "هل أنت متأكد أنك تريد حذف \"%@\"؟ لا يمكن التراجع عن هذا الإجراء.";
+"history.deleteAllConversations" = "حذف جميع المحادثات؟";
+"history.deleteAllConversationsMessage" = "سيؤدي هذا إلى حذف جميع المحادثات بشكل دائم. لا يمكن التراجع عن هذا الإجراء.";
+"history.loadFailed" = "تعذر تحميل المحادثات.";
+"history.deleteFailed" = "تعذر حذف المحادثة.";
+"history.deleteAllFailed" = "تعذر حذف جميع المحادثات.";
+"history.loadingConversations" = "جاري تحميل المحادثات...";
+"common.share" = "مشاركة";
+"common.delete" = "حذف";
+"history.localOnly" = "محلي فقط";
+
+// MARK: - Settings Screen
+
+"settings.general" = "عام";
+"settings.support" = "الدعم";
+"settings.about" = "حول";
+"settings.language" = "اللغة";
+"language.english" = "الإنجليزية";
+"language.arabic" = "العربية";
+"language.urdu" = "الأردية";
+"language.current" = "العربية";
+"settings.supportShamelaGPT" = "دعم شاملة جي بي تي";
+"settings.aboutShamelaGPT" = "حول شاملة جي بي تي";
+"settings.privacyPolicy" = "سياسة الخصوصية";
+"privacy.intro" = "المقدمة";
+"privacy.info" = "المعلومات التي نجمعها";
+"privacy.usage" = "كيف نستخدم معلوماتك";
+"privacy.security" = "أمان البيانات";
+"privacy.rights" = "حقوقك";
+"privacy.contact" = "تواصل معنا";
+"settings.termsOfService" = "شروط الخدمة";
+"terms.acceptance" = "قبول الشروط";
+"terms.description" = "وصف الخدمة";
+"terms.responsibilities" = "مسؤوليات المستخدم";
+"terms.disclaimer" = "إخلاء المسؤولية";
+"terms.ip" = "الملكية الفكرية";
+"terms.liability" = "تحديد المسؤولية";
+"terms.changes" = "التغييرات على الشروط";
+"terms.contact" = "معلومات الاتصال";
+"language.fontRestartNote" = "ملاحظة: بعد تغيير اللغة، أغلق التطبيق من مبدل المهام وأعد تشغيله لتطبيق تغييرات الخط.";
+"settings.version" = "الإصدار";
+"settings.aiPreferences" = "تفضيلات الذكاء الاصطناعي";
+"settings.aiPreferencesLockedTitle" = "تخصيص تجربتك";
+"settings.aiPreferencesLockedMessage" = "سجل الدخول لتخصيص ردود الذكاء الاصطناعي بالطول والأسلوب والتركيز المفضل لديك.";
+"settings.signInButton" = "تسجيل الدخول";
+"settings.refreshPreferences" = "تحديث التفضيلات";
+"settings.signOut" = "تسجيل الخروج";
+"settings.sendFeedback" = "إرسال ملاحظات";
+"settings.deleteAccount" = "حذف الحساب";
+"settings.deleteAccountMessage" = "سيتم حذف حسابك نهائياً وإزالة محادثاتك من الخادم. لا يمكن التراجع عن هذا الإجراء.";
+"settings.deleteAccountError" = "فشل حذف الحساب. يرجى المحاولة مرة أخرى.";
+"settings.preferencesLoadFailed" = "تعذر تحميل التفضيلات.";
+"settings.preferencesSaveFailed" = "تعذر حفظ التفضيلات.";
+"settings.deleteAccountServiceUnavailable" = "الخدمة غير متاحة.";
+"settings.customPrompt.title" = "موجه النظام المخصص";
+"settings.customPrompt.placeholder" = "اضغط لإضافة موجه نظام مخصص.";
+"settings.customPrompt.editTitle" = "تعديل الموجه";
+"settings.pref.current" = "القيمة الحالية";
+"feedback.promptTitle" = "إرسال ملاحظات";
+"feedback.promptMessage" = "هل ترغب في إرسال ملاحظات إلى الفريق؟";
+"feedback.emailSubject" = "ملاحظات حول شاملة جي بي تي";
+"feedback.send" = "إرسال";
+
+// History
+"history.lockedTitle" = "احفظ محادثاتك";
+"history.lockedMessage" = "سجل الدخول للاحتفاظ بسجل محادثاتك، وتصديرها، والوصول إليها عبر الأجهزة.";
+
+// MARK: - Welcome Screen
+
+"welcome.title" = "مرحباً بك في شاملة جي بي تي";
+"welcome.intro" = "تم بناء شاملة جي بي تي على المكتبة الشاملة الموثوقة من موقع Shamela.ws، لتقريب المعرفة الإسلامية الأصيلة للجميع. مهمتنا هي جعل المعلومات الموثوقة والمستندة إلى المراجع متاحة بطريقة طبيعية وحوارية — عبر اللغات والخلفيات ومستويات الفهم.\n\nسواء كنت تبحث عن رؤى أعمق، أو توضيحات سريعة، أو إجابات مدعومة بالأدلة على المفاهيم الخاطئة الشائعة، فإن شاملة جي بي تي يساعدك على استكشاف التراث الإسلامي الغني بدقة واحترام وسهولة.\n\n\"اطلبوا العلم من المهد إلى اللحد.\" — لتكن هذه رفيقك في تلك الرحلة.";
+"welcome.signInTitle" = "سجل الدخول لتجربة أفضل";
+"welcome.signInMessage" = "سجل الدخول لحفظ محادثاتك، وإعادة زيارة أسئلتك السابقة، ومشاركة النقاشات الهادفة مع الآخرين. إنشاء حساب يساعدنا أيضاً على تحسين تجربة التعلم الخاصة بك — من خلال تخصيص الرؤى وتفضيلات اللغة ومسارات المراجع لك.\n\nسجل الدخول الآن وواصل رحلتك في طلب العلم بثبات ووضوح.";
+"welcome.getStarted" = "ابدأ الآن";
+"welcome.skipToChat" = "الانتقال للمحادثة";
+
+// MARK: - Startup Restore
+
+"startup.restoringTitle" = "جارٍ استعادة جلستك";
+"startup.restoringMessage" = "نُعِد مساحتك بشكل آمن...";
+"startup.quote1" = "\"وَقُل رَّبِّ زِدْنِي عِلْمًا\" (طه: 114)";
+"startup.quote2" = "\"من سلك طريقًا يلتمس فيه علمًا سهّل الله له به طريقًا إلى الجنة.\"";
+"startup.quote3" = "الصبر نور. جارٍ إعادة ربطك برحلتك المحفوظة.";
+
+// MARK: - Empty States
+
+"empty.description" = "اسأل أي سؤال عن الإسلام أو استخدم الكاميرا للتحقق من صحة النص. جميع الإجابات مستندة إلى المصادر الإسلامية الموثوقة من مكتبة الشاملة.";
+"empty.tryAsking" = "جرب السؤال:";
+"empty.suggestion1" = "ما هي أركان الإسلام؟";
+"empty.suggestion2" = "أخبرني عن أهمية الصلاة";
+"empty.suggestion3" = "ماذا يقول الإسلام عن الصدقة؟";
+
+// MARK: - Error Messages
+
+"error.title" = "خطأ";
+"error.noInternetConnection" = "لا يوجد اتصال بالإنترنت";
+"error.unableToConnect" = "غير قادر على الاتصال";
+"error.permissionRequired" = "الإذن مطلوب";
+"error.somethingWentWrong" = "حدث خطأ ما";
+"error.codeFormat" = "رمز الخطأ: %@";
+"error.supportSuffix" = "إذا بدا هذا غير متوقع، يرجى هز جهازك أو الذهاب إلى الإعدادات للإبلاغ لفريق الدعم الخاص بنا.";
+"error.retry" = "إعادة المحاولة";
+"error.openSettings" = "فتح الإعدادات";
+"error.tryAgain" = "حاول مرة أخرى";
+"common.ok" = "موافق";
+"common.save" = "حفظ";
+
+// MARK: - Network Errors
+
+"network.invalidURL" = "تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقاً.";
+"network.invalidResponse" = "تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقاً.";
+"network.noConnection" = "لا يوجد اتصال بالإنترنت. يرجى التحقق من إعدادات الشبكة.";
+"network.timeout" = "انتهت مهلة الطلب. يرجى التحقق من اتصالك والمحاولة مرة أخرى.";
+"network.unknownError" = "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.";
+"network.invalidRequest" = "طلب غير صالح. يرجى التحقق من إدخالك.";
+"network.authRequired" = "المصادقة مطلوبة. يرجى تسجيل الدخول.";
+"network.accessForbidden" = "الوصول محظور.";
+"network.resourceNotFound" = "المورد غير موجود.";
+"network.tooManyRequests" = "طلبات كثيرة جداً. يرجى المحاولة مرة أخرى لاحقاً.";
+"network.serverError" = "خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقاً.";
+"network.genericError" = "حدث خطأ. يرجى المحاولة مرة أخرى.";
+"network.decodingError" = "تعذر معالجة استجابة الخادم. يرجى المحاولة مرة أخرى.";
+"network.checkConnection" = "يرجى التحقق من اتصالك والمحاولة مرة أخرى";
+"network.unexpectedError" = "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.";
+
+// MARK: - OCR
+"ocr.invalidImage" = "الصورة غير مدعومة أو غير واضحة. يرجى المحاولة بصورة أوضح.";
+"ocr.noTextFound" = "لم يتم العثور على نص في الصورة.";
+"ocr.recognitionFailed" = "فشل التعرف على النص. يرجى المحاولة مرة أخرى.";
+"ocr.imageDataMissing" = "بيانات الصورة مفقودة. يرجى اختيار الصورة مرة أخرى.";
+"ocr.sendForFactCheck" = "إرسال للتحقق من الحقائق";
+"history.factCheckBadge" = "تحقق من الحقائق";
+
+// MARK: - About Screen
+
+"about.content" = "شاملة جي بي تي هو مساعد معرفي إسلامي مدعوم بالذكاء الاصطناعي تم بناؤه على المكتبة الشاملة الموثوقة من موقع Shamela.ws. مهمتنا هي جعل المعرفة الإسلامية الموثوقة والمستندة إلى المراجع متاحة للجميع بطريقة طبيعية وحوارية.\n\nنحن نجمع بين تقنية الذكاء الاصطناعي المتطورة والمصادر الإسلامية الموثوقة لتقديم إجابات دقيقة، مدعومة بالمراجع الصحيحة من العلماء الإسلاميين الكلاسيكيين والمعاصرين.";
+"about.missionTitle" = "مهمتنا";
+"about.mission" = "توفير وصول موثوق مدعوم بالذكاء الاصطناعي إلى المعرفة الإسلامية الأصيلة لأغراض البحث والتعليم والتحقق من المعلومات—دون أن يكون بديلاً عن العلماء أو المرجعيات الشرعية.";
+"about.mission.pointSupport" = "دعم طلبة العلم والباحثين والمربين والمطورين";
+"about.mission.pointCombatMisinformation" = "مكافحة التضليل وتشويه صورة الإسلام على الإنترنت";
+"about.mission.pointEthicalAI" = "تمكين الاستخدام الأخلاقي للذكاء الاصطناعي في أنظمة المعرفة الإسلامية";
+"about.mission.pointPreserveTrust" = "تعزيز الثقة عبر التركيز على المصادر والإحالات والسياق";
+"about.visionTitle" = "رؤيتنا";
+"about.visionIntro" = "نتطلع إلى مستقبل يكون فيه:";
+"about.vision.pointSources" = "المصدر الإسلامي الأصيل هو أساس أدوات المعرفة المعتمدة على الذكاء الاصطناعي";
+"about.vision.pointVerifiable" = "المعلومات الإسلامية على الإنترنت قابلة للتحقق، موثقة، وواعية بالسياق";
+"about.vision.pointUnderrepresented" = "للمجتمعات واللغات الأقل تمثيلاً وصول أفضل إلى معرفة موثوقة";
+"about.vision.pointChildren" = "للأطفال والمهتدين الجدد شروحات مبسطة ومراعية للسن والاحتياج";
+"about.vision.pointDevelopers" = "للمطورين والمؤسسات بنية تحتية معرفية قابلة للتدقيق والبناء المسؤول";
+"about.goalTitle" = "هدفنا";
+"about.goal" = "جاءت شامِلة جي بي تي لتُسهم في سد هذه الفجوة عبر أدوات ذكاء اصطناعي مرتكزة على مصادر أصيلة مع شفافية وإحالة للمصادر وسياق.";
+"about.dataSourceTitle" = "مصدر البيانات";
+"about.dataSource" = "جميع الإجابات مستمدة من المكتبة الشاملة من موقع Shamela.ws، وهي واحدة من أكثر المكتبات الإسلامية الرقمية الموثوقة والشاملة المتاحة اليوم.";
+"about.dataHandlingTitle" = "كيفية تعاملنا مع بياناتك";
+"about.dataHandling" = "يتم إرسال الرسائل والإدخال الصوتي والصور التي تختارها لـ OCR بشكل آمن إلى خوادمنا لتوليد الإجابات. يتم تخزين المحادثات محلياً ويمكن حذفها من السجل؛ ويمكنك حذف حسابك (وبيانات الخادم) من الإعدادات.";
+"about.companyTitle" = "من يقف وراء شاملة جي بي تي؟";
+"about.companyDescription" = "شاملة جي بي تي يتم تطويره وصيانته بواسطة Neural Lines، فريق يركز على منتجات ذكاء اصطناعي مسؤولة مبنية على مصادر أصيلة.";
+"about.companyLink" = "زيارة Neural Lines";
+
+// MARK: - Accessibility
+
+"accessibility.logo" = "شعار شاملة جي بي تي";
+"accessibility.getStartedHint" = "إغلاق شاشة الترحيب والبدء في استخدام شاملة جي بي تي";
+"accessibility.skipToChatHint" = "تخطي شاشة الترحيب والذهاب مباشرة إلى المحادثة";
+"accessibility.chatTabHint" = "المحادثة مع مساعد شاملة جي بي تي";
+"accessibility.historyTabHint" = "عرض سجل المحادثات";
+"accessibility.settingsTabHint" = "ضبط إعدادات التطبيق والتفضيلات";
+"accessibility.sendMessageHint" = "إرسال رسالتك إلى شاملة جي بي تي";
+"accessibility.camera" = "الكاميرا";
+"accessibility.cameraHint" = "التقاط صورة أو تحديد صورة لاستخراج النص";
+"accessibility.microphoneStart" = "بدء الإدخال الصوتي";
+"accessibility.microphoneStop" = "إيقاف التسجيل";
+"accessibility.microphoneStartHint" = "اضغط لبدء تسجيل الإدخال الصوتي";
+"accessibility.microphoneStopHint" = "اضغط لإيقاف التسجيل وتحويل كلامك إلى نص";
+"accessibility.microphoneRecordingValue" = "جاري التسجيل";
+"accessibility.microphoneNotRecordingValue" = "غير مسجل";
+"accessibility.openSettingsHint" = "فتح تطبيق الإعدادات لتمكين إذن %@";
+"accessibility.tryAgainHint" = "إعادة محاولة العملية الفاشلة";
+
+// MARK: - Permission Messages
+
+"permission.message" = "يحتاج شاملة جي بي تي إلى إذن %@ لاستخدام هذه الميزة. يمكنك تمكينها في الإعدادات.";
+
+// MARK: - Common
+
+"common.deleteAll" = "حذف الكل";
+
+// MARK: - Image Picker
+
+"imagePicker.addImage" = "إضافة صورة";
+"imagePicker.takePhoto" = "التقاط صورة";
+"imagePicker.chooseFromLibrary" = "اختيار من المكتبة";
+
+// MARK: - Auth Screen
+
+"auth.signIn" = "تسجيل الدخول";
+"auth.signUp" = "إنشاء حساب";
+"auth.createAccount" = "إنشاء حساب";
+"auth.email" = "البريد الإلكتروني";
+"auth.password" = "كلمة المرور";
+"auth.displayName" = "الاسم المعروض (اختياري)";
+"auth.continueAsGuest" = "المتابعة كضيف";
+"auth.needAccount" = "ليس لديك حساب؟ إنشاء حساب";
+"auth.haveAccount" = "لديك حساب؟ تسجيل الدخول";
+"auth.signInButton" = "تسجيل الدخول";
+
+"settings.pref.length.title" = "طول الإجابة";
+"settings.pref.length.short" = "قصيرة";
+"settings.pref.length.medium" = "متوسطة";
+"settings.pref.length.detailed" = "مفصلة";
+"settings.pref.style.title" = "أسلوب الإجابة";
+"settings.pref.style.conversational" = "محادثي";
+"settings.pref.style.academic" = "أكاديمي";
+"settings.pref.style.technical" = "تقني";
+"settings.pref.focus.title" = "تركيز الإجابة";
+"settings.pref.focus.practical" = "عملي";
+"settings.pref.focus.theoretical" = "نظري";
+"settings.pref.focus.historical" = "تاريخي";

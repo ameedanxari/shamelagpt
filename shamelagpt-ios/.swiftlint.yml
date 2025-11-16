@@ -1,0 +1,29 @@
+disabled_rules:
+  - trailing_whitespace
+  - line_length
+  - function_body_length
+
+opt_in_rules:
+  - force_unwrapping
+  - empty_count
+  - vertical_whitespace
+
+included:
+  - shamelagpt
+
+excluded:
+  - Pods
+  - DerivedData
+  - shamelagptTests
+  - shamelagptUITests
+
+force_unwrapping: error
+empty_count: warning
+vertical_whitespace: warning
+
+custom_rules:
+  no_print:
+    name: "No Print"
+    regex: "print\\("
+    message: "Use AppLogger instead of print."
+    severity: warning

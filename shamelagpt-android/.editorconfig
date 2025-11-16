@@ -1,0 +1,6 @@
+[*.kt]
+indent_size=4
+insert_final_newline=true
+max_line_length=120
+no-wildcard-imports=true
+indent_style=space

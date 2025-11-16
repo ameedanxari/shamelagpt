@@ -1,0 +1,39 @@
+App Store Listing — English
+Last updated: 2026-02-02
+
+App Name:
+ShamelaGPT
+
+Subtitle (<=30 chars, optional):
+Authentic Islamic answers, AI
+
+Promotional Text (<=170 chars):
+Ask clear, authentic answers about Islam with AI tuned to the trusted Shamela library—now with OCR, voice, and bilingual support.
+
+Description:
+بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ
+ShamelaGPT brings the trusted Shamela.ws library into a respectful AI assistant so you can explore Islam with clarity.
+Built for English and Arabic learners, students, converts, and curious minds.
+
+What you can do:
+- Ask questions across Qur'an, Hadith, fiqh, history, and daily practice.
+- Get answers grounded in classical texts from the Shamela library.
+- Scan screenshots/photos for instant OCR fact-checking.
+- Speak or type in English or Arabic with voice input support.
+- Review past chats as you continue learning.
+- Support the project optionally; no features are locked behind donations.
+
+Donation (optional):
+https://www.paypal.com/donate/?hosted_button_id=MSBDG5ESU2AMU
+
+Keywords (<=100 chars, comma-separated):
+Islam,Muslim,Quran,Hadith,Shamela,Islamic,Ask Islam,Learn Islam,Faith,Arabic,OCR,Voice
+
+Support URL:
+https://shamelagpt.com/terms
+
+Marketing URL:
+https://shamelagpt.com/
+
+Copyright:
+Meenorio Inc.

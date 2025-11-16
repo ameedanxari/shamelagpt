@@ -1,0 +1,264 @@
+/*
+  Localizable.strings (Urdu)
+  ShamelaGPT
+*/
+
+// MARK: - Navigation & Tabs
+
+"chat" = "گفتگو";
+"history" = "تاریخچہ";
+"settings" = "ترتیبات";
+"shamelaGPT" = "شاملہ جی پی ٹی";
+"back" = "واپس";
+"done" = "ہو گیا";
+"common.cancel" = "منسوخ کریں";
+
+// MARK: - Chat Screen
+
+"chat.placeholder" = "اسلام کے بارے میں کوئی سوال پوچھیں...";
+"chat.send" = "پیغام بھیجیں";
+"chat.voiceInput" = "آواز کے ذریعے اندراج";
+"chat.imageTextRecognition" = "تصویر سے متن شناخت";
+"chat.recording" = "ریکارڈنگ جاری ہے...";
+"chat.extractingText" = "متن نکالا جا رہا ہے...";
+"chat.thinking" = "سوچا جا رہا ہے...";
+"chat.loadingMessages" = "پیغامات لوڈ ہو رہے ہیں...";
+"chat.startConversation" = "گفتگو شروع کریں";
+"chat.noMessagesYet" = "ابھی تک کوئی پیغام نہیں";
+"chat.newConversation" = "نئی گفتگو";
+"chat.newConversationWarningTitle" = "نئی گفتگو شروع کریں؟";
+"chat.newConversationWarningMessage" = "نئی گفتگو شروع کرنے سے آپ کی موجودہ گفتگو چھپ جائے گی اور آپ واپس نہیں جا سکیں گے۔";
+"chat.newConversationWarningMessageLoggedIn" = "نئی گفتگو شروع کرنے سے آپ کی موجودہ گفتگو چھپ جائے گی، لیکن آپ اسے تاریخچہ سے دوبارہ کھول سکتے ہیں۔";
+"chat.newConversationWarningMessageLoggedOut" = "نئی گفتگو شروع کرنے سے آپ کی موجودہ گفتگو چھپ جائے گی، اور بطور مہمان آپ اس پر واپس نہیں جا سکیں گے۔";
+"chat.viewHistory" = "تاریخچہ دیکھیں";
+
+// MARK: - History Screen
+
+"history.clearAll" = "سب صاف کریں";
+"history.newChat" = "نئی گفتگو";
+"history.noConversations" = "کوئی گفتگو نہیں";
+"history.startNewChatToBegin" = "آغاز کے لیے نئی گفتگو شروع کریں";
+"history.deleteConversation" = "گفتگو حذف کریں؟";
+"history.deleteConversationMessage" = "یہ عمل واپس نہیں ہو سکتا۔";
+"history.deleteConversationMessageWithTitle" = "کیا آپ واقعی \"%@\" کو حذف کرنا چاہتے ہیں؟ یہ عمل واپس نہیں ہو سکتا۔";
+"history.deleteAllConversations" = "تمام گفتگوئیں حذف کریں؟";
+"history.deleteAllConversationsMessage" = "یہ تمام گفتگوئیں مستقل طور پر حذف کر دے گا۔ یہ عمل واپس نہیں ہو سکتا۔";
+"history.loadFailed" = "مکالمات لوڈ نہیں ہو سکے۔";
+"history.deleteFailed" = "مکالمہ حذف نہیں ہو سکا۔";
+"history.deleteAllFailed" = "تمام مکالمات حذف نہیں ہو سکے۔";
+"history.loadingConversations" = "گفتگوئیں لوڈ ہو رہی ہیں...";
+"common.share" = "شیئر کریں";
+"common.delete" = "حذف کریں";
+"history.localOnly" = "صرف مقامی";
+
+// MARK: - Settings Screen
+
+"settings.general" = "عمومی";
+"settings.support" = "مدد";
+"settings.about" = "متعلق";
+"settings.language" = "زبان";
+"language.english" = "انگریزی";
+"language.arabic" = "عربی";
+"language.urdu" = "اردو";
+"language.current" = "اردو";
+"settings.supportShamelaGPT" = "شاملہ جی پی ٹی کی مدد کریں";
+"settings.aboutShamelaGPT" = "شاملہ جی پی ٹی کے بارے میں";
+"settings.privacyPolicy" = "رازداری کی پالیسی";
+"privacy.intro" = "تعارف";
+"privacy.info" = "ہم کیا معلومات جمع کرتے ہیں";
+"privacy.usage" = "ہم آپ کی معلومات کیسے استعمال کرتے ہیں";
+"privacy.security" = "ڈیٹا کا تحفظ";
+"privacy.rights" = "آپ کے حقوق";
+"privacy.contact" = "ہم سے رابطہ کریں";
+"settings.termsOfService" = "سروس کی شرائط";
+"terms.acceptance" = "شرائط کی منظوری";
+"terms.description" = "سروس کی وضاحت";
+"terms.responsibilities" = "صارف کی ذمہ داریاں";
+"terms.disclaimer" = "اعلانِ لاتعلقی";
+"terms.ip" = "دانشورانہ ملکیت";
+"terms.liability" = "حدِ ذمہ داری";
+"terms.changes" = "شرائط میں تبدیلیاں";
+"terms.contact" = "رابطے کی معلومات";
+"language.fontRestartNote" = "نوٹ: زبان تبدیل کرنے کے بعد، ایپ کو ٹاسک سوئچر سے بند کر کے دوبارہ کھولیں تاکہ فونٹ تبدیلیاں لاگو ہوں۔";
+"settings.version" = "ورژن";
+"settings.aiPreferences" = "اے آئی ترجیحات";
+"settings.aiPreferencesLockedTitle" = "اپنا تجربہ ذاتی بنائیں";
+"settings.aiPreferencesLockedMessage" = "اپنی پسند کی لمبائی، انداز، اور توجہ کے ساتھ AI جوابات کو حسبِ خواہش بنانے کے لیے سائن ان کریں۔";
+"settings.signInButton" = "سائن اِن";
+"settings.signOut" = "سائن آؤٹ";
+"settings.sendFeedback" = "فیڈبیک بھیجیں";
+"settings.deleteAccount" = "اکاؤنٹ حذف کریں";
+"settings.deleteAccountMessage" = "اس سے آپ کا اکاؤنٹ مستقل طور پر حذف ہو جائے گا اور آپ کی گفتگوئیں سرور سے ہٹا دی جائیں گی۔ یہ عمل واپس نہیں ہو سکتا۔";
+"settings.deleteAccountError" = "اکاؤنٹ حذف کرنے میں ناکام۔ دوبارہ کوشش کریں۔";
+"settings.preferencesLoadFailed" = "ترجیحات لوڈ نہیں ہو سکیں۔";
+"settings.preferencesSaveFailed" = "ترجیحات محفوظ نہیں ہو سکیں۔";
+"settings.deleteAccountServiceUnavailable" = "سروس دستیاب نہیں ہے۔";
+"settings.refreshPreferences" = "ترجیحات تازہ کریں";
+"settings.customPrompt.title" = "حسبِ خواہش سسٹم پرامپٹ";
+"settings.customPrompt.placeholder" = "اپنا کسٹم سسٹم پرامپٹ شامل کرنے کے لیے تھپتھپائیں۔";
+"settings.customPrompt.editTitle" = "پرامپٹ میں ترمیم کریں";
+"settings.pref.current" = "موجودہ قدر";
+"feedback.promptTitle" = "فیڈبیک بھیجیں";
+"feedback.promptMessage" = "کیا آپ ٹیم کو فیڈبیک بھیجنا چاہتے ہیں؟";
+"feedback.emailSubject" = "شاملہ جی پی ٹی فیڈبیک";
+"feedback.send" = "بھیجیں";
+
+// History
+"history.lockedTitle" = "اپنی گفتگوئیں محفوظ کریں";
+"history.lockedMessage" = "سائن ان کریں تاکہ اپنی گفتگوئیں محفوظ رکھ سکیں، برآمد کر سکیں، اور انہیں مختلف ڈیوائسز پر استعمال کر سکیں۔";
+
+// MARK: - Welcome Screen
+
+"welcome.title" = "شاملہ جی پی ٹی میں خوش آمدید";
+"welcome.intro" = "شاملہ جی پی ٹی قابلِ اعتماد Shamela.ws لائبریری پر مبنی ہے، تاکہ مستند اسلامی علم سب کے قریب لایا جا سکے۔ ہمارا مقصد یہ ہے کہ مستند، حوالہ شدہ معلومات کو قدرتی اور مکالماتی انداز میں—زبانوں، پس منظر اور سمجھ کے مختلف درجات میں—دستیاب کیا جائے۔\n\nچاہے آپ گہری بصیرت چاہتے ہوں، تیز وضاحتیں، یا عام غلط فہمیوں پر دلائل کے ساتھ جواب، شاملہ جی پی ٹی آپ کو اسلامی ورثہ احترام، دقت اور آسانی کے ساتھ دریافت کرنے میں مدد دیتا ہے۔\n\n\"گہوارے سے گور تک علم حاصل کرو\"—یہ ایپ اس سفر میں آپ کی رفیق بنے۔";
+"welcome.signInTitle" = "بہتر تجربے کے لیے سائن اِن کریں";
+"welcome.signInMessage" = "اپنی گفتگوئیں محفوظ کرنے، سابقہ سوالات دوبارہ دیکھنے، اور بامعنی مباحث شیئر کرنے کے لیے لاگ اِن کریں۔\n\nاکاؤنٹ بنانے سے ہم آپ کے سیکھنے کے تجربے کو بہتر بنا سکتے ہیں—بصیرت، زبان کی ترجیحات، اور حوالہ جاتی راستوں کو آپ کے لیے ذاتی بنا کر۔\n\nابھی سائن اِن کریں اور علم کی اس راہ پر مستقل مزاجی اور وضاحت کے ساتھ چلتے رہیں۔";
+"welcome.getStarted" = "شروع کریں";
+"welcome.skipToChat" = "گفتگو پر جائیں";
+
+// MARK: - Startup Restore
+
+"startup.restoringTitle" = "آپ کی نشست بحال کی جا رہی ہے";
+"startup.restoringMessage" = "آپ کی ورک اسپیس محفوظ انداز میں تیار کی جا رہی ہے...";
+"startup.quote1" = "\"اور کہو: اے میرے رب! میرے علم میں اضافہ فرما۔\" (سورۃ طہٰ: 114)";
+"startup.quote2" = "\"جو شخص علم کی تلاش میں کسی راستے پر چلتا ہے، اللہ اس کے لیے جنت کا راستہ آسان فرما دیتا ہے۔\"";
+"startup.quote3" = "صبر روشنی ہے۔ آپ کی محفوظ علمی سفر سے دوبارہ ربط قائم کیا جا رہا ہے۔";
+
+// MARK: - Empty States
+
+"empty.description" = "اسلام کے بارے میں کوئی بھی سوال کریں یا متن کی تصدیق کے لیے کیمرہ استعمال کریں۔ تمام جوابات شامیلا لائبریری کے مستند اسلامی ذرائع پر مبنی ہیں۔";
+"empty.tryAsking" = "یہ پوچھ کر دیکھیں:";
+"empty.suggestion1" = "اسلام کے ارکان کیا ہیں؟";
+"empty.suggestion2" = "نماز کی اہمیت کے بارے میں بتائیں";
+"empty.suggestion3" = "صدقہ کے بارے میں اسلام کیا کہتا ہے؟";
+
+// MARK: - Error Messages
+
+"error.title" = "خرابی";
+"error.noInternetConnection" = "انٹرنیٹ کنکشن نہیں ہے";
+"error.unableToConnect" = "رابطہ ممکن نہیں";
+"error.permissionRequired" = "اجازت درکار ہے";
+"error.somethingWentWrong" = "کچھ غلط ہو گیا";
+"error.codeFormat" = "خرابی کا کوڈ: %@";
+"error.supportSuffix" = "اگر یہ غیر متوقع لگتا ہے، تو اپنے ڈیوائس کو ہلائیں یا ہماری سپورٹ ٹیم کو رپورٹ کرنے کے لیے سیٹنگز پر جائیں۔";
+"error.retry" = "دوبارہ کوشش کریں";
+"error.openSettings" = "سیٹنگز کھولیں";
+"error.tryAgain" = "دوبارہ کوشش کریں";
+"common.ok" = "ٹھیک ہے";
+"common.save" = "محفوظ کریں";
+
+// MARK: - Network Errors
+
+"network.invalidURL" = "سرور سے جڑنے میں مسئلہ۔ براہ کرم بعد میں کوشش کریں۔";
+"network.invalidResponse" = "سرور سے جڑنے میں مسئلہ۔ براہ کرم بعد میں کوشش کریں۔";
+"network.noConnection" = "انٹرنیٹ کنکشن نہیں۔ براہ کرم نیٹ ورک سیٹنگز چیک کریں۔";
+"network.timeout" = "درخواست کا وقت ختم ہو گیا۔ کنکشن چیک کریں اور دوبارہ کوشش کریں۔";
+"network.unknownError" = "غیر متوقع خرابی پیش آئی۔ دوبارہ کوشش کریں۔";
+"network.invalidRequest" = "غلط درخواست۔ براہ کرم اپنے اندراج کی جانچ کریں۔";
+"network.authRequired" = "توثیق درکار ہے۔ براہ کرم سائن اِن کریں۔";
+"network.accessForbidden" = "رسائی ممنوع ہے۔";
+"network.resourceNotFound" = "وسیلہ نہیں ملا۔";
+"network.tooManyRequests" = "درخواستیں بہت زیادہ ہیں۔ بعد میں کوشش کریں۔";
+"network.serverError" = "سرور میں خرابی ہے۔ براہ کرم بعد میں کوشش کریں۔";
+"network.genericError" = "کوئی خرابی پیش آئی۔ دوبارہ کوشش کریں۔";
+"network.decodingError" = "سرور کا جواب پڑھا نہیں جا سکا۔ براہ کرم دوبارہ کوشش کریں۔";
+"network.checkConnection" = "براہ کرم اپنا کنکشن چیک کریں اور دوبارہ کوشش کریں";
+"network.unexpectedError" = "غیر متوقع خرابی پیش آئی۔ براہ کرم دوبارہ کوشش کریں۔";
+
+// MARK: - OCR
+"ocr.invalidImage" = "غیر معاون یا دھندلی تصویر۔ براہ کرم واضح تصویر دوبارہ آزمائیں۔";
+"ocr.noTextFound" = "تصویر میں کوئی متن نہیں ملا۔";
+"ocr.recognitionFailed" = "متن شناخت نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔";
+"ocr.imageDataMissing" = "تصویری ڈیٹا دستیاب نہیں۔ براہ کرم تصویر دوبارہ منتخب کریں۔";
+"ocr.sendForFactCheck" = "حقائق کی جانچ کے لیے بھیجیں";
+"history.factCheckBadge" = "فیکٹ چیک";
+
+// MARK: - About Screen
+
+"about.content" = "شاملہ جی پی ٹی ایک AI سے مدد یافتہ اسلامی علمی معاون ہے جو معتبر Shamela.ws لائبریری پر مبنی ہے۔ ہمارا مقصد مستند اور حوالہ شدہ اسلامی علم کو ہر کسی کے لیے قدرتی اور مکالماتی انداز میں دستیاب کرنا ہے۔\n\nہم جدید AI ٹیکنالوجی کو مستند اسلامی ذرائع کے ساتھ ملاتے ہیں تاکہ درست جوابات فراہم کریں جو کلاسیکی اور معاصر علمی حوالوں سے مضبوط ہوں۔";
+"about.missionTitle" = "ہمارا مشن";
+"about.mission" = "تحقیق، تعلیم اور معلومات کی تصدیق کے لیے مستند اسلامی علم تک قابلِ اعتماد، AI سے مدد یافتہ رسائی فراہم کرنا—بغیر اس کے کہ علمائے دین یا شرعی اتھارٹی کی جگہ لے۔";
+"about.mission.pointSupport" = "طلبہ، محققین، اساتذہ اور ڈویلپرز کی مدد کرنا";
+"about.mission.pointCombatMisinformation" = "آن لائن اسلام کی غلط تصویر اور گمراہ کن معلومات کا مقابلہ کرنا";
+"about.mission.pointEthicalAI" = "اسلامی علمی نظاموں میں اخلاقی AI کے استعمال کو ممکن بنانا";
+"about.mission.pointPreserveTrust" = "ماخذ، حوالہ اور سیاق کو ترجیح دے کر اعتماد قائم رکھنا";
+"about.visionTitle" = "ہماری وژن";
+"about.visionIntro" = "ہم ایسے مستقبل کا تصور کرتے ہیں جہاں:";
+"about.vision.pointSources" = "مستند اسلامی مصادر AI پر مبنی علمی ٹولز کی بنیاد ہوں";
+"about.vision.pointVerifiable" = "آن لائن اسلامی معلومات قابلِ تصدیق، باحوالہ اور ذمہ دارانہ انداز میں پیش کی جائیں";
+"about.vision.pointUnderrepresented" = "کم نمائندگی رکھنے والی زبانوں اور برادریوں کو مستند علم تک مساوی رسائی ملے";
+"about.vision.pointChildren" = "بچوں اور نئے مسلم ہونے والوں کو عمر کے مطابق اور نرم لہجے میں وضاحتیں ملیں";
+"about.vision.pointDevelopers" = "ڈویلپرز اور ادارے کھلے، قابلِ جانچ علمی انفراسٹرکچر پر اعتماد سے تعمیر کر سکیں";
+"about.goalTitle" = "ہمارا ہدف";
+"about.goal" = "شاملہ جی پی ٹی اس خلا کو کم کرنے کے لیے بنایا گیا ہے، مستند مصادر پر مبنی AI ٹولز کے ذریعے جن کی بنیاد شفافیت، سراغ رسانی اور سیاق ہو۔";
+"about.dataSourceTitle" = "ڈیٹا کا ماخذ";
+"about.dataSource" = "تمام جوابات Shamela.ws کی جامع لائبریری سے تیار ہوتے ہیں، جو آج دستیاب معتبر اور وسیع ترین اسلامی ڈیجیٹل لائبریریوں میں سے ایک ہے۔";
+"about.dataHandlingTitle" = "ہم آپ کے ڈیٹا کو کیسے سنبھالتے ہیں";
+"about.dataHandling" = "پیغامات، آواز کا اندراج، اور وہ تصاویر جو آپ OCR کے لیے منتخب کرتے ہیں، محفوظ طریقے سے ہمارے سرورز کو بھیجی جاتی ہیں تاکہ جوابات تیار کیے جا سکیں۔ گفتگوئیں مقامی طور پر محفوظ ہوتی ہیں اور تاریخچہ سے حذف کی جا سکتی ہیں؛ آپ اپنا اکاؤنٹ (اور سرور کا ڈیٹا) ترتیبات سے حذف کر سکتے ہیں۔";
+"about.companyTitle" = "شاملہ جی پی ٹی کس نے بنایا؟";
+"about.companyDescription" = "شاملہ جی پی ٹی کو Neural Lines نے تیار اور برقرار رکھا ہے—ایک ٹیم جو مستند ذرائع پر مبنی ذمہ دار AI مصنوعات پر توجہ رکھتی ہے۔";
+"about.companyLink" = "Neural Lines ملاحظہ کریں";
+
+// MARK: - Accessibility
+
+"accessibility.logo" = "شاملہ جی پی ٹی کا لوگو";
+"accessibility.getStartedHint" = "ویلکم اسکرین بند کر کے شاملہ جی پی ٹی استعمال کرنا شروع کریں";
+"accessibility.skipToChatHint" = "ویلکم اسکرین چھوڑ کر براہ راست گفتگو پر جائیں";
+"accessibility.chatTabHint" = "شاملہ جی پی ٹی معاون کے ساتھ گفتگو";
+"accessibility.historyTabHint" = "اپنی گفتگو کا تاریخچہ دیکھیں";
+"accessibility.settingsTabHint" = "ایپ کی ترتیبات اور ترجیحات ترتیب دیں";
+"accessibility.sendMessageHint" = "آپ کا پیغام شاملہ جی پی ٹی کو بھیجتا ہے";
+"accessibility.camera" = "کیمرہ";
+"accessibility.cameraHint" = "متن نکالنے کے لیے تصویر کھینچیں یا منتخب کریں";
+"accessibility.microphoneStart" = "آواز کا اندراج شروع کریں";
+"accessibility.microphoneStop" = "ریکارڈنگ روکیں";
+"accessibility.microphoneStartHint" = "آواز کا اندراج شروع کرنے کے لیے تھپتھپائیں";
+"accessibility.microphoneStopHint" = "ریکارڈنگ روک کر آپ کی آواز کو متن میں بدلیں";
+"accessibility.microphoneRecordingValue" = "ریکارڈنگ ہو رہی ہے";
+"accessibility.microphoneNotRecordingValue" = "ریکارڈنگ نہیں";
+"accessibility.openSettingsHint" = "اس فیچر کے لیے %@ کی اجازت دینے کو سیٹنگز کھولیں";
+"accessibility.tryAgainHint" = "ناکام عمل کو دوبارہ آزمائیں";
+
+// MARK: - Permission Messages
+
+"permission.message" = "شاملہ جی پی ٹی کو اس فیچر کے استعمال کے لیے %@ کی اجازت درکار ہے۔ آپ اسے سیٹنگز میں فعال کر سکتے ہیں۔";
+
+// MARK: - Common
+
+"common.deleteAll" = "سب حذف کریں";
+
+// MARK: - Image Picker
+
+"imagePicker.addImage" = "تصویر شامل کریں";
+"imagePicker.takePhoto" = "تصویر کھینچیں";
+"imagePicker.chooseFromLibrary" = "لائبریری سے منتخب کریں";
+
+// MARK: - Auth Screen
+
+"auth.signIn" = "سائن اِن";
+"auth.signUp" = "اکاؤنٹ بنائیں";
+"auth.createAccount" = "اکاؤنٹ بنائیں";
+"auth.email" = "ای میل";
+"auth.password" = "پاس ورڈ";
+"auth.displayName" = "ظاہر ہونے والا نام (اختیاری)";
+"auth.continueAsGuest" = "بطور مہمان جاری رکھیں";
+"auth.needAccount" = "اکاؤنٹ نہیں ہے؟ نیا بنائیں";
+"auth.haveAccount" = "اکاؤنٹ ہے؟ سائن اِن کریں";
+"auth.signInButton" = "سائن اِن";
+
+// MARK: - AI Preference Options
+
+"settings.pref.length.title" = "جواب کی لمبائی";
+"settings.pref.length.short" = "مختصر";
+"settings.pref.length.medium" = "درمیانہ";
+"settings.pref.length.detailed" = "تفصیلی";
+
+"settings.pref.style.title" = "جواب کا انداز";
+"settings.pref.style.conversational" = "مکالماتی";
+"settings.pref.style.academic" = "علمی";
+"settings.pref.style.technical" = "تکنیکی";
+
+"settings.pref.focus.title" = "جواب کی توجہ";
+"settings.pref.focus.practical" = "عملی";
+"settings.pref.focus.theoretical" = "نظری";
+"settings.pref.focus.historical" = "تاریخی";

@@ -1,0 +1,913 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E22B21562F162DA100FF9C77 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2D28BB12EF3E47500AB186F /* UniformTypeIdentifiers.framework */; };
+		E22B21612F162DA100FF9C77 /* FactCheckAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E22B21552F162DA000FF9C77 /* FactCheckAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E2D28BB22EF3E47600AB186F /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2D28BB12EF3E47500AB186F /* UniformTypeIdentifiers.framework */; };
+		E2D28BBE2EF3E47600AB186F /* FactCheckShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E2D28BAF2EF3E47500AB186F /* FactCheckShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E22B215F2F162DA100FF9C77 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E24643CD2EBAF683008F6234 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E22B21542F162DA000FF9C77;
+			remoteInfo = FactCheckAction;
+		};
+		E24643E32EBAF687008F6234 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E24643CD2EBAF683008F6234 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E24643D42EBAF683008F6234;
+			remoteInfo = shamelagpt;
+		};
+		E24643ED2EBAF687008F6234 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E24643CD2EBAF683008F6234 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E24643D42EBAF683008F6234;
+			remoteInfo = shamelagpt;
+		};
+		E2D28BBC2EF3E47600AB186F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E24643CD2EBAF683008F6234 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E2D28BAE2EF3E47500AB186F;
+			remoteInfo = FactCheckAction;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E2D28BC32EF3E47600AB186F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E2D28BBE2EF3E47600AB186F /* FactCheckShareExtension.appex in Embed Foundation Extensions */,
+				E22B21612F162DA100FF9C77 /* FactCheckAction.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		E22B21552F162DA000FF9C77 /* FactCheckAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FactCheckAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E24643D52EBAF683008F6234 /* ShamelaGPT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShamelaGPT.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E24643E22EBAF687008F6234 /* ShamelaGPTTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShamelaGPTTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E24643EC2EBAF687008F6234 /* ShamelaGPTUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShamelaGPTUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E2926EDE2F0095C3006A4E37 /* ShamelaGPT.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ShamelaGPT.xctestplan; sourceTree = "<group>"; };
+		E2D28BAF2EF3E47500AB186F /* FactCheckShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FactCheckShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E2D28BB12EF3E47500AB186F /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
+		E2F0A1B12F00C00100A1B2C3 /* StoreScreenshots.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreScreenshots.xctestplan; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+	/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E1F3A9013B5A9D0F00A1BEEF /* Exceptions for "shamelagpt" folder in "ShamelaGPT" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E24643D42EBAF683008F6234 /* ShamelaGPT */;
+		};
+		E22B21622F162DA100FF9C77 /* Exceptions for "FactCheckAction" folder in "FactCheckAction" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E22B21542F162DA000FF9C77 /* FactCheckAction */;
+		};
+		E2D28BBF2EF3E47600AB186F /* Exceptions for "FactCheckShareExtension" folder in "FactCheckShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E2D28BAE2EF3E47500AB186F /* FactCheckShareExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		E22B21572F162DA100FF9C77 /* FactCheckAction */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E22B21622F162DA100FF9C77 /* Exceptions for "FactCheckAction" folder in "FactCheckAction" target */,
+			);
+			path = FactCheckAction;
+			sourceTree = "<group>";
+		};
+		E24643D72EBAF683008F6234 /* shamelagpt */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E1F3A9013B5A9D0F00A1BEEF /* Exceptions for "shamelagpt" folder in "ShamelaGPT" target */,
+			);
+			path = shamelagpt;
+			sourceTree = "<group>";
+		};
+		E24643E52EBAF687008F6234 /* shamelagptTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = shamelagptTests;
+			sourceTree = "<group>";
+		};
+		E24643EF2EBAF687008F6234 /* shamelagptUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = shamelagptUITests;
+			sourceTree = "<group>";
+		};
+		E2D28BB32EF3E47600AB186F /* FactCheckShareExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E2D28BBF2EF3E47600AB186F /* Exceptions for "FactCheckShareExtension" folder in "FactCheckShareExtension" target */,
+			);
+			path = FactCheckShareExtension;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E22B21522F162DA000FF9C77 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E22B21562F162DA100FF9C77 /* UniformTypeIdentifiers.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E24643D22EBAF683008F6234 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E24643DF2EBAF687008F6234 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E24643E92EBAF687008F6234 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E2D28BAC2EF3E47500AB186F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E2D28BB22EF3E47600AB186F /* UniformTypeIdentifiers.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E24643CC2EBAF683008F6234 = {
+			isa = PBXGroup;
+			children = (
+				E2926EDE2F0095C3006A4E37 /* ShamelaGPT.xctestplan */,
+				E2F0A1B12F00C00100A1B2C3 /* StoreScreenshots.xctestplan */,
+				E24643D72EBAF683008F6234 /* shamelagpt */,
+				E24643E52EBAF687008F6234 /* shamelagptTests */,
+				E24643EF2EBAF687008F6234 /* shamelagptUITests */,
+				E2D28BB32EF3E47600AB186F /* FactCheckShareExtension */,
+				E22B21572F162DA100FF9C77 /* FactCheckAction */,
+				E2D28BB02EF3E47500AB186F /* Frameworks */,
+				E24643D62EBAF683008F6234 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E24643D62EBAF683008F6234 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E24643D52EBAF683008F6234 /* ShamelaGPT.app */,
+				E24643E22EBAF687008F6234 /* ShamelaGPTTests.xctest */,
+				E24643EC2EBAF687008F6234 /* ShamelaGPTUITests.xctest */,
+				E2D28BAF2EF3E47500AB186F /* FactCheckShareExtension.appex */,
+				E22B21552F162DA000FF9C77 /* FactCheckAction.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E2D28BB02EF3E47500AB186F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E2D28BB12EF3E47500AB186F /* UniformTypeIdentifiers.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E22B21542F162DA000FF9C77 /* FactCheckAction */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E22B21632F162DA100FF9C77 /* Build configuration list for PBXNativeTarget "FactCheckAction" */;
+			buildPhases = (
+				E22B21512F162DA000FF9C77 /* Sources */,
+				E22B21522F162DA000FF9C77 /* Frameworks */,
+				E22B21532F162DA000FF9C77 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E22B21572F162DA100FF9C77 /* FactCheckAction */,
+			);
+			name = FactCheckAction;
+			packageProductDependencies = (
+			);
+			productName = FactCheckAction;
+			productReference = E22B21552F162DA000FF9C77 /* FactCheckAction.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		E24643D42EBAF683008F6234 /* ShamelaGPT */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E24643F62EBAF687008F6234 /* Build configuration list for PBXNativeTarget "ShamelaGPT" */;
+			buildPhases = (
+				E24643D12EBAF683008F6234 /* Sources */,
+				E24643D22EBAF683008F6234 /* Frameworks */,
+				E24643D32EBAF683008F6234 /* Resources */,
+				E2D28BC32EF3E47600AB186F /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E2D28BBD2EF3E47600AB186F /* PBXTargetDependency */,
+				E22B21602F162DA100FF9C77 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E24643D72EBAF683008F6234 /* shamelagpt */,
+			);
+			name = ShamelaGPT;
+			packageProductDependencies = (
+			);
+			productName = shamelagpt;
+			productReference = E24643D52EBAF683008F6234 /* ShamelaGPT.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E24643E12EBAF687008F6234 /* ShamelaGPTTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E24643F92EBAF687008F6234 /* Build configuration list for PBXNativeTarget "ShamelaGPTTests" */;
+			buildPhases = (
+				E24643DE2EBAF687008F6234 /* Sources */,
+				E24643DF2EBAF687008F6234 /* Frameworks */,
+				E24643E02EBAF687008F6234 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E24643E42EBAF687008F6234 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E24643E52EBAF687008F6234 /* shamelagptTests */,
+			);
+			name = ShamelaGPTTests;
+			packageProductDependencies = (
+			);
+			productName = shamelagptTests;
+			productReference = E24643E22EBAF687008F6234 /* ShamelaGPTTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E24643EB2EBAF687008F6234 /* ShamelaGPTUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E24643FC2EBAF687008F6234 /* Build configuration list for PBXNativeTarget "ShamelaGPTUITests" */;
+			buildPhases = (
+				E24643E82EBAF687008F6234 /* Sources */,
+				E24643E92EBAF687008F6234 /* Frameworks */,
+				E24643EA2EBAF687008F6234 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E24643EE2EBAF687008F6234 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E24643EF2EBAF687008F6234 /* shamelagptUITests */,
+			);
+			name = ShamelaGPTUITests;
+			packageProductDependencies = (
+			);
+			productName = shamelagptUITests;
+			productReference = E24643EC2EBAF687008F6234 /* ShamelaGPTUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		E2D28BAE2EF3E47500AB186F /* FactCheckShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E2D28BC02EF3E47600AB186F /* Build configuration list for PBXNativeTarget "FactCheckShareExtension" */;
+			buildPhases = (
+				E2D28BAB2EF3E47500AB186F /* Sources */,
+				E2D28BAC2EF3E47500AB186F /* Frameworks */,
+				E2D28BAD2EF3E47500AB186F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E2D28BB32EF3E47600AB186F /* FactCheckShareExtension */,
+			);
+			name = FactCheckShareExtension;
+			packageProductDependencies = (
+			);
+			productName = FactCheckAction;
+			productReference = E2D28BAF2EF3E47500AB186F /* FactCheckShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E24643CD2EBAF683008F6234 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					E22B21542F162DA000FF9C77 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					E24643D42EBAF683008F6234 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					E24643E12EBAF687008F6234 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = E24643D42EBAF683008F6234;
+					};
+					E24643EB2EBAF687008F6234 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = E24643D42EBAF683008F6234;
+					};
+					E2D28BAE2EF3E47500AB186F = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+				};
+			};
+			buildConfigurationList = E24643D02EBAF683008F6234 /* Build configuration list for PBXProject "ShamelaGPT" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				ar,
+				ur,
+			);
+			mainGroup = E24643CC2EBAF683008F6234;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = E24643D62EBAF683008F6234 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E24643D42EBAF683008F6234 /* ShamelaGPT */,
+				E24643E12EBAF687008F6234 /* ShamelaGPTTests */,
+				E24643EB2EBAF687008F6234 /* ShamelaGPTUITests */,
+				E2D28BAE2EF3E47500AB186F /* FactCheckShareExtension */,
+				E22B21542F162DA000FF9C77 /* FactCheckAction */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E22B21532F162DA000FF9C77 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E24643D32EBAF683008F6234 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E24643E02EBAF687008F6234 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E24643EA2EBAF687008F6234 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E2D28BAD2EF3E47500AB186F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E22B21512F162DA000FF9C77 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E24643D12EBAF683008F6234 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E24643DE2EBAF687008F6234 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E24643E82EBAF687008F6234 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E2D28BAB2EF3E47500AB186F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E22B21602F162DA100FF9C77 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E22B21542F162DA000FF9C77 /* FactCheckAction */;
+			targetProxy = E22B215F2F162DA100FF9C77 /* PBXContainerItemProxy */;
+		};
+		E24643E42EBAF687008F6234 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E24643D42EBAF683008F6234 /* ShamelaGPT */;
+			targetProxy = E24643E32EBAF687008F6234 /* PBXContainerItemProxy */;
+		};
+		E24643EE2EBAF687008F6234 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E24643D42EBAF683008F6234 /* ShamelaGPT */;
+			targetProxy = E24643ED2EBAF687008F6234 /* PBXContainerItemProxy */;
+		};
+		E2D28BBD2EF3E47600AB186F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E2D28BAE2EF3E47500AB186F /* FactCheckShareExtension */;
+			targetProxy = E2D28BBC2EF3E47600AB186F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		E22B21642F162DA100FF9C77 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SSTKXHNR6U;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FactCheckAction/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaGPT";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios.FactCheckAction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E22B21652F162DA100FF9C77 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SSTKXHNR6U;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FactCheckAction/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaGPT";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios.FactCheckAction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E24643F42EBAF687008F6234 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		E24643F52EBAF687008F6234 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E24643F72EBAF687008F6234 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = shamelagpt/ShamelaGPT.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SSTKXHNR6U;
+				ENABLE_PREVIEWS = YES;
+					GENERATE_INFOPLIST_FILE = NO;
+					INFOPLIST_FILE = shamelagpt/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E24643F82EBAF687008F6234 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = shamelagpt/ShamelaGPT.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SSTKXHNR6U;
+				ENABLE_PREVIEWS = YES;
+					GENERATE_INFOPLIST_FILE = NO;
+					INFOPLIST_FILE = shamelagpt/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E24643FA2EBAF687008F6234 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.creatrixe.shamelagptTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ShamelaGPT.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ShamelaGPT";
+			};
+			name = Debug;
+		};
+		E24643FB2EBAF687008F6234 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.creatrixe.shamelagptTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ShamelaGPT.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ShamelaGPT";
+			};
+			name = Release;
+		};
+		E24643FD2EBAF687008F6234 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.creatrixe.shamelagptUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ShamelaGPT;
+			};
+			name = Debug;
+		};
+		E24643FE2EBAF687008F6234 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.creatrixe.shamelagptUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ShamelaGPT;
+			};
+			name = Release;
+		};
+		E2D28BC12EF3E47600AB186F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SSTKXHNR6U;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FactCheckShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaGPT";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios.FactCheckShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E2D28BC22EF3E47600AB186F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SSTKXHNR6U;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FactCheckShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaGPT";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios.FactCheckShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E22B21632F162DA100FF9C77 /* Build configuration list for PBXNativeTarget "FactCheckAction" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E22B21642F162DA100FF9C77 /* Debug */,
+				E22B21652F162DA100FF9C77 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E24643D02EBAF683008F6234 /* Build configuration list for PBXProject "ShamelaGPT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E24643F42EBAF687008F6234 /* Debug */,
+				E24643F52EBAF687008F6234 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E24643F62EBAF687008F6234 /* Build configuration list for PBXNativeTarget "ShamelaGPT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E24643F72EBAF687008F6234 /* Debug */,
+				E24643F82EBAF687008F6234 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E24643F92EBAF687008F6234 /* Build configuration list for PBXNativeTarget "ShamelaGPTTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E24643FA2EBAF687008F6234 /* Debug */,
+				E24643FB2EBAF687008F6234 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E24643FC2EBAF687008F6234 /* Build configuration list for PBXNativeTarget "ShamelaGPTUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E24643FD2EBAF687008F6234 /* Debug */,
+				E24643FE2EBAF687008F6234 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E2D28BC02EF3E47600AB186F /* Build configuration list for PBXNativeTarget "FactCheckShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E2D28BC12EF3E47600AB186F /* Debug */,
+				E2D28BC22EF3E47600AB186F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E24643CD2EBAF683008F6234 /* Project object */;
+}

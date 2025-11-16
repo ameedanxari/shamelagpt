@@ -1,0 +1,36 @@
+{
+  "configurations" : [
+    {
+      "id" : "71507C8D-7F89-4AC8-BEE5-618FD8C54F9F",
+      "name" : "Store Screenshots",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:ShamelaGPT.xcodeproj",
+      "identifier" : "E24643D42EBAF683008F6234",
+      "name" : "ShamelaGPT"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:ShamelaGPT.xcodeproj",
+        "identifier" : "E24643EB2EBAF687008F6234",
+        "name" : "ShamelaGPTUITests"
+      },
+      "selectedTests" : [
+        "StoreScreenshotUITests/test_storeScreenshots_chatAndSettings",
+        "StoreScreenshotUITests/test_storeScreenshots_history",
+        "StoreScreenshotUITests/test_storeScreenshots_welcome",
+        "StoreScreenshotUITests/test_storeScreenshots_auth"
+      ]
+    }
+  ],
+  "version" : 1
+}

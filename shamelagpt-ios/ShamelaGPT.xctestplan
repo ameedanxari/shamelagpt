@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "id" : "6F52E473-E2B6-4551-8621-54F0B2CD1EB8",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:ShamelaGPT.xcodeproj",
+      "identifier" : "E24643D42EBAF683008F6234",
+      "name" : "ShamelaGPT"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:ShamelaGPT.xcodeproj",
+        "identifier" : "E24643E12EBAF687008F6234",
+        "name" : "ShamelaGPTTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:ShamelaGPT.xcodeproj",
+        "identifier" : "E24643EB2EBAF687008F6234",
+        "name" : "ShamelaGPTUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
