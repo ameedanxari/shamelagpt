@@ -1,0 +1,40 @@
+Play Store Listing — English
+Last updated: 2026-02-02
+
+Title (<=50 chars):
+ShamelaGPT - Authentic Islamic Answers
+
+Short Description (<=80 chars):
+Authentic Islamic answers from the Shamela library with AI chat, OCR, and voice.
+
+Full Description:
+بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ
+ShamelaGPT turns the trusted Shamela.ws library into a respectful AI assistant so you can explore Islam with clarity in English or Arabic.
+Built for students, converts, and curious learners who want sources they can trust.
+
+• Trusted sources: answers grounded in classical texts from the Shamela library.
+• Ask anything: Qur'an, Hadith, fiqh, history, ethics, daily practice.
+• OCR fact-check: scan screenshots or photos to verify quotes instantly.
+• Voice or text input in English or Arabic.
+• Review past chats as you keep learning.
+• Privacy-first: no ads; optional donations keep the app free for everyone.
+
+Donation (optional):
+https://www.paypal.com/donate/?hosted_button_id=MSBDG5ESU2AMU
+
+Website / Support URL:
+https://shamelagpt.com/privacy
+
+Data safety + Families commitment (store listing copy):
+ShamelaGPT is committed to Google Play Families Policy requirements.
+The app is designed for learning and does not include ads, ad SDKs, or behavior-based advertising.
+We request microphone access only when you choose voice input, and images only when you choose OCR/fact-check features.
+Messages, optional voice input, and optional OCR images are transmitted securely to our servers to provide responses.
+Users can use guest mode, and account deletion controls are available in-app for signed-in users.
+
+Play Console notes (Data safety form guidance):
+- Data shared with third parties for advertising: No
+- Data collected: User-provided content (messages, optional voice/audio input, optional images), account email (if user signs up)
+- Data handling: Encrypted in transit
+- Account deletion: Available in-app (Settings)
+- Child-directed commitment: Families Policy obligations acknowledged and followed

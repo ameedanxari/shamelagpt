@@ -1,0 +1,81 @@
+name: OpenAPI Contract Drift Check
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Every Monday at 06:00 UTC
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'docs/api/openapi_latest.json'
+      - 'shamelagpt-android/app/src/test/java/com/shamelagpt/android/contract/**'
+      - 'shamelagpt-ios/shamelagptTests/OpenAPIContractMappingTests.swift'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'docs/api/openapi_latest.json'
+      - 'shamelagpt-android/app/src/test/java/com/shamelagpt/android/contract/**'
+      - 'shamelagpt-ios/shamelagptTests/OpenAPIContractMappingTests.swift'
+
+jobs:
+  android-openapi-contract:
+    name: Android OpenAPI Contract Mapping
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x shamelagpt-android/gradlew
+
+      - name: Run Android OpenAPI Contract Test
+        working-directory: shamelagpt-android
+        run: ./gradlew :app:testDebugUnitTest --tests com.shamelagpt.android.contract.OpenApiContractMappingTest
+
+      - name: Upload Android Contract Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-openapi-contract-report
+          path: shamelagpt-android/app/build/reports/tests/testDebugUnitTest/
+
+  ios-openapi-contract:
+    name: iOS OpenAPI Contract Mapping
+    runs-on: macos-14
+    timeout-minutes: 25
+    env:
+      IOS_ARTIFACTS_DIR: artifacts/ios-openapi-contract
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode_15.0.app
+
+      - name: Run iOS OpenAPI Contract Test
+        run: |
+          mkdir -p "$IOS_ARTIFACTS_DIR"
+          xcodebuild test \
+            -project shamelagpt-ios/ShamelaGPT.xcodeproj \
+            -scheme ShamelaGPT \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0' \
+            -only-testing:ShamelaGPTTests/OpenAPIContractMappingTests \
+            CODE_SIGNING_ALLOWED=NO \
+            -resultBundlePath "$IOS_ARTIFACTS_DIR/OpenAPIContractResults.xcresult"
+
+      - name: Upload iOS Contract Test Result Bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-openapi-contract-xcresult
+          path: artifacts/ios-openapi-contract/OpenAPIContractResults.xcresult

@@ -1,0 +1,4 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "aiPromptLibrary.steeringPath": ".vscode/ai-steering"
+}

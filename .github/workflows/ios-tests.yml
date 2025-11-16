@@ -1,0 +1,96 @@
+name: iOS Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['shamelagpt-ios/**']
+  pull_request:
+    branches: [main, develop]
+    paths: ['shamelagpt-ios/**']
+
+jobs:
+  unit-tests:
+    name: iOS Unit & Integration Tests
+    runs-on: macos-14
+    timeout-minutes: 30
+    env:
+      IOS_ARTIFACTS_DIR: artifacts/ios-tests/unit
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Select Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode_15.0.app
+
+      - name: Cache Swift Packages
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+            
+      - name: Run Unit Tests
+        run: |
+          mkdir -p "$IOS_ARTIFACTS_DIR"
+          xcodebuild test \
+            -project shamelagpt-ios/ShamelaGPT.xcodeproj \
+            -scheme ShamelaGPT \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0' \
+            -only-testing:ShamelaGPTTests \
+            CODE_SIGNING_ALLOWED=NO \
+            -resultBundlePath "$IOS_ARTIFACTS_DIR/TestResults.xcresult"
+
+      - name: Generate Unit Coverage Summary
+        if: always()
+        run: |
+          xcrun xccov view --report "$IOS_ARTIFACTS_DIR/TestResults.xcresult" > "$IOS_ARTIFACTS_DIR/unit-coverage-summary.txt" || true
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-unit-test-results
+          path: artifacts/ios-tests/unit/TestResults.xcresult
+
+      - name: Upload Unit Coverage Summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-unit-coverage-summary
+          path: artifacts/ios-tests/unit/unit-coverage-summary.txt
+
+  ui-tests:
+    name: iOS UI Tests
+    runs-on: macos-14
+    timeout-minutes: 45
+    needs: unit-tests
+    env:
+      IOS_ARTIFACTS_DIR: artifacts/ios-tests/ui
+    # UI tests are often slower/flakier, run them only if unit tests pass
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Select Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode_15.0.app
+        
+      - name: Run UI Tests
+        run: |
+          mkdir -p "$IOS_ARTIFACTS_DIR"
+          xcodebuild test \
+            -project shamelagpt-ios/ShamelaGPT.xcodeproj \
+            -scheme ShamelaGPT \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0' \
+            -only-testing:ShamelaGPTUITests \
+            CODE_SIGNING_ALLOWED=NO \
+            -resultBundlePath "$IOS_ARTIFACTS_DIR/UITestResults.xcresult"
+
+      - name: Upload UI Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ui-test-results
+          path: artifacts/ios-tests/ui/UITestResults.xcresult

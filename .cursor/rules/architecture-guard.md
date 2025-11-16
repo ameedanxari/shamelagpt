@@ -1,0 +1,1 @@
+/Users/macintosh/Documents/Projects/ShamelaGPT/.ai-prompts/prompts/steering/architecture-guard.md

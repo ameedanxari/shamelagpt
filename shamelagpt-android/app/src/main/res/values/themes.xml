@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Splash Screen Theme -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/primary</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.ShamelaGpt</item>
+    </style>
+
+    <!-- Main App Theme -->
+    <style name="Theme.ShamelaGpt" parent="Theme.Material3.DayNight.NoActionBar" />
+</resources>

@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "SSTKXHNR6U.com.shamelagpt.ios",
+        "paths": ["/chat", "/chat/*"]
+      }
+    ]
+  }
+}

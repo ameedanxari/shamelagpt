@@ -1,0 +1,205 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">شاملة GPT</string>
+
+    <!-- Welcome Screen -->
+    <string name="welcome_title">مرحبًا بك في شاملة GPT</string>
+    <string name="welcome_message">شاملة GPT مبني على مكتبة شاملة.ws الشاملة والموثوقة، مما يجعل المعرفة الإسلامية الأصيلة أقرب إلى الجميع.\n\nمهمتنا هي جعل المعلومات الموثوقة والمدعومة بالمراجع متاحة بطريقة طبيعية ومحادثة - عبر اللغات والخلفيات ومستويات الفهم.\n\nسواء كنت تسعى للحصول على رؤى أعمق، أو توضيحات سريعة، أو إجابات مدعومة بالأدلة على المفاهيم الخاطئة الشائعة، فإن شاملة GPT يساعدك على استكشاف التراث الإسلامي الغني بدقة واحترام وسهولة.\n\n\"اطلبوا العلم من المهد إلى اللحد.\" - دع هذا يكون رفيقك في هذه الرحلة.</string>
+    <string name="welcome_sign_in_title">سجل الدخول لتجربة أفضل</string>
+    <string name="welcome_sign_in_message">سجل الدخول لحفظ محادثاتك، وإعادة زيارة أسئلتك السابقة، ومشاركة المناقشات الهادفة مع الآخرين.\n\nإنشاء حساب يساعدنا أيضًا على تحسين تجربة التعلم الخاصة بك - تخصيص الرؤى وتفضيلات اللغة ومسارات المراجع لك.\n\nسجل الدخول الآن واستمر في رحلتك المعرفية بثبات ووضوح.</string>
+    <string name="get_started">ابدأ</string>
+    <string name="skip_to_chat">تخطى إلى المحادثة</string>
+
+    <!-- Bottom Navigation -->
+    <string name="chat">محادثة</string>
+    <string name="history">السجل</string>
+    <string name="settings">الإعدادات</string>
+
+    <!-- Auth Screen -->
+    <string name="sign_in">تسجيل الدخول</string>
+    <string name="sign_up">إنشاء حساب</string>
+    <string name="create_account">إنشاء حساب</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="display_name_optional">الاسم المعروض (اختياري)</string>
+    <string name="continue_as_guest">المتابعة كضيف</string>
+    <string name="need_account">ليس لديك حساب؟ إنشاء حساب</string>
+    <string name="have_account">لديك حساب؟ تسجيل الدخول</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_title">شاملة GPT</string>
+    <string name="chat_placeholder">اطرح سؤالاً عن الإسلام...</string>
+    <string name="send">إرسال</string>
+    <string name="typing">الذكاء الاصطناعي يكتب...</string>
+    <string name="copy">نسخ</string>
+    <string name="common_share">مشاركة</string>
+    <string name="copied">تم النسخ إلى الحافظة</string>
+    <string name="start_conversation">ابدأ محادثة</string>
+    <string name="ask_anything">اسألني أي شيء عن الإسلام أو استخدم الكاميرا للتحقق من صحة النص</string>
+    <string name="sources">المصادر:</string>
+    <string name="try_asking">جرب السؤال:</string>
+    <string name="suggestion_1">ما هي أركان الإسلام؟</string>
+    <string name="suggestion_2">أخبرني عن أهمية الصلاة</string>
+    <string name="suggestion_3">ماذا يقول الإسلام عن الصدقة؟</string>
+
+    <!-- History Screen -->
+    <string name="no_conversations">لا توجد محادثات</string>
+    <string name="start_new_chat">ابدأ محادثة جديدة للبدء</string>
+    <string name="delete_conversation">حذف المحادثة؟</string>
+    <string name="delete_confirmation">لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="delete_confirmation_with_title">هل أنت متأكد أنك تريد حذف "%1$s"؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="common_delete">حذف</string>
+    <string name="common_cancel">إلغاء</string>
+    <string name="new_chat">محادثة جديدة</string>
+    <string name="new_chat_warning_title">بدء محادثة جديدة؟</string>
+    <string name="new_chat_warning_message_logged_in">سيتم إخفاء محادثتك الحالية، ويمكنك فتحها مرة أخرى من السجل.</string>
+    <string name="new_chat_warning_message_logged_out">سيتم إخفاء محادثتك الحالية، وبصفتك ضيفًا لن تتمكن من العودة إليها.</string>
+    <string name="just_now">الآن</string>
+    <string name="history_locked_title">احفظ محادثاتك</string>
+    <string name="history_locked_message">سجل الدخول للاحتفاظ بسجل محادثاتك، وتصديرها، والوصول إليها عبر الأجهزة.</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_general">عام</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_ai_preferences">تفضيلات الذكاء الاصطناعي</string>
+    <string name="settings_support">الدعم</string>
+    <string name="settings_support_shamelagpt">ادعم شاملة GPT</string>
+    <string name="settings_about">حول</string>
+    <string name="about_shamelagpt_intro">شاملة جي بي تي هو مساعد معرفي إسلامي مدعوم بالذكاء الاصطناعي تم بناؤه على المكتبة الشاملة الموثوقة من موقع Shamela.ws. مهمتنا هي جعل المعرفة الإسلامية الموثوقة والمستندة إلى المراجع متاحة للجميع بطريقة طبيعية وحوارية.\n\nنحن نجمع بين تقنية الذكاء الاصطناعي المتطورة والمصادر الإسلامية الموثوقة لتقديم إجابات دقيقة، مدعومة بالمراجع الصحيحة من العلماء الإسلاميين الكلاسيكيين والمعاصرين.</string>
+    <string name="about_mission_title">مهمتنا</string>
+    <string name="about_mission">توفير وصول موثوق مدعوم بالذكاء الاصطناعي إلى المعرفة الإسلامية الأصيلة لأغراض البحث والتعليم والتحقق من المعلومات—دون أن يكون بديلاً عن العلماء أو المرجعيات الشرعية.</string>
+    <string name="about_mission_point_support">دعم طلبة العلم والباحثين والمربين والمطورين</string>
+    <string name="about_mission_point_combat_misinformation">مكافحة التضليل وتشويه صورة الإسلام على الإنترنت</string>
+    <string name="about_mission_point_ethical_ai">تمكين الاستخدام الأخلاقي للذكاء الاصطناعي في أنظمة المعرفة الإسلامية</string>
+    <string name="about_mission_point_preserve_trust">تعزيز الثقة عبر التركيز على المصادر والإحالات والسياق</string>
+    <string name="about_vision_title">رؤيتنا</string>
+    <string name="about_vision_intro">نتطلع إلى مستقبل يكون فيه:</string>
+    <string name="about_vision_point_sources">المصدر الإسلامي الأصيل هو أساس أدوات المعرفة المعتمدة على الذكاء الاصطناعي</string>
+    <string name="about_vision_point_verifiable">المعلومات الإسلامية على الإنترنت قابلة للتحقق، موثقة، وواعية بالسياق</string>
+    <string name="about_vision_point_underrepresented">للمجتمعات واللغات الأقل تمثيلاً وصول أفضل إلى معرفة موثوقة</string>
+    <string name="about_vision_point_children">للأطفال والمهتدين الجدد شروحات مبسطة ومراعية للسن والاحتياج</string>
+    <string name="about_vision_point_developers">للمطورين والمؤسسات بنية تحتية معرفية قابلة للتدقيق والبناء المسؤول</string>
+    <string name="about_goal_title">هدفنا</string>
+    <string name="about_goal">جاءت شامِلة جي بي تي لتُسهم في سد هذه الفجوة عبر أدوات ذكاء اصطناعي مرتكزة على مصادر أصيلة مع شفافية وإحالة للمصادر وسياق.</string>
+    <string name="about_data_source_title">مصدر البيانات</string>
+    <string name="about_data_source">جميع الإجابات مستمدة من المكتبة الشاملة من موقع Shamela.ws، وهي واحدة من أكثر المكتبات الإسلامية الرقمية الموثوقة والشاملة المتاحة اليوم.</string>
+    <string name="about_data_handling_title">كيفية تعاملنا مع بياناتك</string>
+    <string name="about_data_handling">يتم إرسال الرسائل والإدخال الصوتي والصور التي تختارها لـ OCR بشكل آمن إلى خوادمنا لتوليد الإجابات. يتم تخزين المحادثات محلياً ويمكن حذفها من السجل؛ ويمكنك حذف حسابك (وبيانات الخادم) من الإعدادات.</string>
+    <string name="about_company_title">من يقف وراء شاملة جي بي تي؟</string>
+    <string name="about_company_description">شاملة جي بي تي يتم تطويره وصيانته بواسطة Neural Lines، فريق يركز على منتجات ذكاء اصطناعي مسؤولة مبنية على مصادر أصيلة.</string>
+    <string name="about_company_link">زيارة Neural Lines</string>
+    <string name="history_fact_check_badge">تحقق من الحقائق</string>
+    <string name="history_local_only_badge">محلي</string>
+    <string name="history_server_synced_badge">الخادم</string>
+    <string name="support">الدعم</string>
+    <string name="support_shamelagpt">ادعم شاملة GPT</string>
+    <string name="about">حول</string>
+    <string name="settings_about_shamelagpt">حول شاملة جي بي تي</string>
+    <string name="settings_privacy_policy">سياسة الخصوصية</string>
+    <string name="settings_terms_of_service">شروط الخدمة</string>
+    <string name="settings_version">الإصدار</string>
+    <string name="settings_ai_preferences_locked_title">تخصيص تجربتك</string>
+    <string name="settings_ai_preferences_locked_message">سجل الدخول لتخصيص ردود الذكاء الاصطناعي بالطول والأسلوب والتركيز المفضل لديك.</string>
+    <string name="settings_sign_in_button">تسجيل الدخول</string>
+    <string name="settings_custom_prompt">موجه النظام المخصص</string>
+    <string name="settings_custom_prompt_optional">اختياري</string>
+    <string name="settings_not_set">غير محدد</string>
+    <string name="settings_save_preferences">حفظ التفضيلات</string>
+    <string name="settings_sign_out">تسجيل الخروج</string>
+    <string name="sign_out_confirmation_title">تسجيل الخروج؟</string>
+    <string name="sign_out_confirmation_message">هل أنت متأكد أنك تريد تسجيل الخروج؟</string>
+    <string name="settings_support_subtitle">ساعدنا في الحفاظ على هذا المشروع</string>
+    <string name="settings_style_formal">رسمي</string>
+    <string name="settings_pref_length_title">طول الرد</string>
+    <string name="settings_pref_length_short">قصير</string>
+    <string name="settings_pref_length_medium">متوسط</string>
+    <string name="settings_pref_length_detailed">مفصل</string>
+    <string name="settings_pref_style_title">أسلوب الرد</string>
+    <string name="settings_pref_style_conversational">محادثة</string>
+    <string name="settings_pref_style_academic">أكاديمي</string>
+    <string name="settings_pref_style_technical">تقني</string>
+    <string name="settings_pref_focus_title">تركيز الرد</string>
+    <string name="settings_pref_focus_practical">عملي</string>
+    <string name="settings_pref_focus_theoretical">نظري</string>
+    <string name="settings_pref_focus_historical">تاريخي</string>
+    <string name="send_feedback">إرسال ملاحظات</string>
+    <string name="feedback_prompt_title">إرسال ملاحظات</string>
+    <string name="feedback_prompt_message">هل ترغب في إرسال ملاحظات عبر البريد إلى فريقنا؟</string>
+    <string name="feedback_email_subject">ملاحظات حول شاملة جي بي تي</string>
+
+    <!-- Language Selection -->
+    <string name="select_language">اختر اللغة</string>
+    <string name="english">English</string>
+    <string name="arabic">العربية</string>
+    <string name="urdu">اردو</string>
+
+    <!-- Voice Input -->
+    <string name="voice_input">إدخال صوتي</string>
+    <string name="listening">الاستماع...</string>
+    <string name="tap_to_speak">اضغط للتحدث</string>
+    <string name="permission_required">الإذن مطلوب</string>
+    <string name="microphone_permission">مطلوب إذن الميكروفون للإدخال الصوتي.</string>
+    <string name="voice_setup_required_message">الإدخال الصوتي غير متاح على هذا الجهاز. فعِّل أو ثبّت خدمة التعرف على الكلام من إعدادات النظام.</string>
+    <string name="voice_open_settings_action">فتح الإعدادات</string>
+    <string name="voice_help_title">تفعيل الإدخال الصوتي</string>
+    <string name="voice_help_intro">الإدخال الصوتي يحتاج إلى خدمة التعرف على الكلام من الجهاز أو النظام البيئي للتطبيقات.</string>
+    <string name="voice_help_step_1">افتح إعدادات الجهاز.</string>
+    <string name="voice_help_step_2">ابحث عن إعدادات \"الإدخال الصوتي\" أو \"الكلام\" أو \"اللغة والإدخال\".</string>
+    <string name="voice_help_step_3">فعِّل أو ثبّت خدمة التعرف على الكلام، ثم عُد وجرب مرة أخرى.</string>
+    <string name="voice_setup_no_settings_fallback">قد لا يتضمن هذا الجهاز خدمة تعرف على الكلام بشكل افتراضي. ثبّت خدمة مناسبة (إن كانت متاحة لجهازك) واجعلها الافتراضية.</string>
+
+    <!-- Image Input -->
+    <string name="image_input">إدخال صورة</string>
+    <string name="processing_image">معالجة الصورة...</string>
+    <string name="take_photo">التقاط صورة</string>
+    <string name="choose_from_gallery">اختر من المعرض</string>
+    <string name="camera_permission">مطلوب إذن الكاميرا لالتقاط الصور.</string>
+    <string name="storage_permission">مطلوب إذن التخزين لاختيار الصور.</string>
+    <string name="select_image_source">اختر مصدر الصورة</string>
+
+    <!-- Errors -->
+    <string name="no_email_client_error">لم يتم العثور على تطبيق بريد إلكتروني. يرجى تثبيت واحد لإرسال الملاحظات.</string>
+    <string name="error_occurred">حدث خطأ</string>
+    <string name="error_generic_message">حدث خطأ ما</string>
+    <string name="error_code_format">رمز الخطأ: %1$s</string>
+    <string name="error_support_suffix">إذا بدا هذا غير متوقع، يرجى هز جهازك أو الذهاب إلى الإعدادات للإبلاغ لفريق الدعم الخاص بنا.</string>
+    <string name="no_internet">لا يوجد اتصال بالإنترنت</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="dismiss">رفض</string>
+    <string name="no_text_found">لم يتم العثور على نص في الصورة</string>
+    <string name="voice_recognition_failed">فشل التعرف على الصوت</string>
+    <string name="ocr_error_invalid_image">الصورة غير مدعومة أو غير واضحة. يرجى المحاولة بصورة أوضح.</string>
+    <string name="ocr_error_no_text">لم يتم العثور على نص في الصورة</string>
+    <string name="ocr_error_failed">فشل التعرف على النص. يرجى المحاولة مرة أخرى.</string>
+    <string name="ocr_error_image_data_missing">بيانات الصورة مفقودة. يرجى اختيار الصورة مرة أخرى.</string>
+    <string name="offline_mode">أنت غير متصل. سيتم إرسال الرسائل عند استعادة الاتصال.</string>
+    
+    <!-- Network Error Messages (user-friendly) -->
+    <string name="network_no_connection">لا يوجد اتصال بالإنترنت. يرجى التحقق من إعدادات الشبكة.</string>
+    <string name="network_timeout">انتهت مهلة الطلب. يرجى التحقق من اتصالك والمحاولة مرة أخرى.</string>
+    <string name="network_server_error">خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقاً.</string>
+    <string name="network_auth_required">المصادقة مطلوبة. يرجى تسجيل الدخول.</string>
+    <string name="network_access_forbidden">الوصول محظور.</string>
+    <string name="network_not_found">المورد غير موجود.</string>
+    <string name="network_too_many_requests">طلبات كثيرة جداً. يرجى المحاولة مرة أخرى لاحقاً.</string>
+    <string name="network_invalid_request">طلب غير صالح. يرجى التحقق من إدخالك والمحاولة مرة أخرى.</string>
+    <string name="network_generic_error">حدث خطأ. يرجى المحاولة مرة أخرى.</string>
+    <string name="network_connection_error">تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقاً.</string>
+    <string name="network_decoding_error">تعذرت معالجة استجابة الخادم. يرجى المحاولة مرة أخرى.</string>
+    <string name="network_unexpected_error">حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.</string>
+
+    <!-- Content Descriptions -->
+    <string name="send_message">إرسال رسالة</string>
+    <string name="voice_input_button">إدخال صوتي</string>
+    <string name="image_input_button">إدخال صورة</string>
+    <string name="menu">القائمة</string>
+    <string name="back">رجوع</string>
+
+    <!-- Time formats -->
+    <string name="minutes_ago">منذ %d دقيقة</string>
+    <string name="hours_ago">منذ %d ساعة</string>
+    <string name="days_ago">منذ %d يوم</string>
+
+    <!-- Loading -->
+    <string name="loading">جاري التحميل...</string>
+</resources>

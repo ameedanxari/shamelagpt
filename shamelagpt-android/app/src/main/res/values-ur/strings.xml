@@ -1,0 +1,206 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">شاملہ GPT</string>
+
+    <!-- Welcome Screen -->
+    <string name="welcome_title">شاملہ جی پی ٹی میں خوش آمدید</string>
+    <string name="welcome_message">شاملہ جی پی ٹی قابلِ اعتماد Shamela.ws لائبریری پر مبنی ہے، تاکہ مستند اسلامی علم سب کے قریب لایا جا سکے.\n\nہمارا مقصد یہ ہے کہ مستند، حوالہ شدہ معلومات کو قدرتی اور مکالماتی انداز میں — زبانوں، پس منظر اور سمجھ کے مختلف درجات میں — دستیاب کیا جائے.\n\nچاہے آپ گہری بصیرت چاہتے ہوں، تیز وضاحتیں، یا عام غلط فہمیوں پر دلائل کے ساتھ جواب، شاملہ جی پی ٹی آپ کو اسلامی ورثہ احترام، دقت اور آسانی کے ساتھ دریافت کرنے میں مدد دیتا ہے.\n\n\"گہوارے سے گور تک علم حاصل کرو\" — یہ ایپ اس سفر میں آپ کی رفیق بنے.</string>
+    <string name="welcome_sign_in_title">بہتر تجربے کے لیے سائن اِن کریں</string>
+    <string name="welcome_sign_in_message">اپنی گفتگوئیں محفوظ کرنے، سابقہ سوالات دوبارہ دیکھنے، اور بامعنی مباحث شیئر کرنے کے لیے لاگ اِن کریں.\n\nاکاؤنٹ بنانے سے ہم آپ کے سیکھنے کے تجربے کو بہتر بنا سکتے ہیں — بصیرت، زبان کی ترجیحات، اور حوالہ جاتی راستوں کو آپ کے لیے ذاتی بنا کر.\n\nابھی سائن اِن کریں اور علم کی اس راہ پر مستقل مزاجی اور وضاحت کے ساتھ چلتے رہیں.</string>
+    <string name="get_started">شروع کریں</string>
+    <string name="skip_to_chat">گفتگو پر جائیں</string>
+
+    <!-- Bottom Navigation -->
+    <string name="chat">گفتگو</string>
+    <string name="history">تاریخچہ</string>
+    <string name="settings">ترتیبات</string>
+
+    <!-- Auth Screen -->
+    <string name="sign_in">سائن اِن</string>
+    <string name="sign_up">اکاؤنٹ بنائیں</string>
+    <string name="create_account">اکاؤنٹ بنائیں</string>
+    <string name="email">ای میل</string>
+    <string name="password">پاس ورڈ</string>
+    <string name="display_name_optional">ظاہر ہونے والا نام (اختیاری)</string>
+    <string name="continue_as_guest">بطور مہمان جاری رکھیں</string>
+    <string name="need_account">اکاؤنٹ نہیں ہے؟ نیا بنائیں</string>
+    <string name="have_account">اکاؤنٹ ہے؟ سائن اِن کریں</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_title">شاملہ GPT</string>
+    <string name="chat_placeholder">اسلام کے بارے میں کوئی سوال پوچھیں...</string>
+    <string name="send">بھیجیں</string>
+    <string name="typing">AI جواب تیار کر رہا ہے...</string>
+    <string name="copy">کاپی کریں</string>
+    <string name="common_share">شیئر کریں</string>
+    <string name="copied">کاپی کلپ بورڈ پر ہو گئی</string>
+    <string name="start_conversation">گفتگو شروع کریں</string>
+    <string name="ask_anything">اسلام کے بارے میں کچھ بھی پوچھیں یا متن کی تصدیق کے لیے کیمرہ استعمال کریں</string>
+    <string name="sources">ماخذ:</string>
+    <string name="try_asking">یہ پوچھ کر دیکھیں:</string>
+    <string name="suggestion_1">اسلام کے ارکان کیا ہیں؟</string>
+    <string name="suggestion_2">نماز کی اہمیت کے بارے میں بتائیں</string>
+    <string name="suggestion_3">صدقہ کے بارے میں اسلام کیا کہتا ہے؟</string>
+
+    <!-- History Screen -->
+    <string name="no_conversations">کوئی گفتگو نہیں</string>
+    <string name="start_new_chat">آغاز کے لیے نئی گفتگو شروع کریں</string>
+    <string name="delete_conversation">گفتگو حذف کریں؟</string>
+    <string name="delete_confirmation">یہ عمل واپس نہیں ہو سکتا.</string>
+    <string name="common_delete">حذف کریں</string>
+    <string name="common_cancel">منسوخ کریں</string>
+    <string name="new_chat">نئی گفتگو</string>
+    <string name="new_chat_warning_title">نئی گفتگو شروع کریں؟</string>
+    <string name="new_chat_warning_message_logged_in">نئی گفتگو شروع کرنے سے آپ کی موجودہ گفتگو چھپ جائے گی، لیکن آپ اسے تاریخچہ سے دوبارہ کھول سکتے ہیں۔</string>
+    <string name="new_chat_warning_message_logged_out">نئی گفتگو شروع کرنے سے آپ کی موجودہ گفتگو چھپ جائے گی، اور بطور مہمان آپ اس پر واپس نہیں جا سکیں گے۔</string>
+    <string name="just_now">ابھی</string>
+    <string name="history_locked_title">اپنی گفتگوئیں محفوظ کریں</string>
+    <string name="history_locked_message">سائن ان کریں تاکہ اپنی گفتگوئیں محفوظ رکھ سکیں، برآمد کر سکیں، اور انہیں مختلف ڈیوائسز پر استعمال کر سکیں.</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_general">عمومی</string>
+    <string name="settings_language">زبان</string>
+    <string name="settings_ai_preferences">اے آئی ترجیحات</string>
+    <string name="settings_support">مدد</string>
+    <string name="settings_support_shamelagpt">شاملہ جی پی ٹی کی مدد کریں</string>
+    <string name="settings_about">متعلق</string>
+    <string name="support">مدد</string>
+    <string name="support_shamelagpt">شاملہ جی پی ٹی کی مدد کریں</string>
+    <string name="about">متعلق</string>
+    <string name="settings_about_shamelagpt">شاملہ جی پی ٹی کے بارے میں</string>
+    <string name="settings_privacy_policy">رازداری کی پالیسی</string>
+    <string name="settings_terms_of_service">سروس کی شرائط</string>
+    <string name="settings_version">ورژن</string>
+    <string name="settings_ai_preferences_locked_title">اپنا تجربہ ذاتی بنائیں</string>
+    <string name="settings_ai_preferences_locked_message">اپنی پسند کی لمبائی، انداز، اور توجہ کے ساتھ AI جوابات کو حسبِ خواہش بنانے کے لیے سائن ان کریں.</string>
+    <string name="settings_sign_in_button">سائن اِن</string>
+    <string name="settings_custom_prompt">مخصوص سسٹم پرامپٹ</string>
+    <string name="settings_custom_prompt_optional">اختیاری</string>
+    <string name="settings_not_set">سیٹ نہیں ہے</string>
+    <string name="settings_save_preferences">ترجیحات محفوظ کریں</string>
+    <string name="settings_sign_out">سائن آؤٹ</string>
+    <string name="sign_out_confirmation_title">سائن آؤٹ؟</string>
+    <string name="sign_out_confirmation_message">کیا آپ واقعی سائن آؤٹ کرنا چاہتے ہیں؟</string>
+    <string name="settings_support_subtitle">اس منصوبے کو جاری رکھنے میں ہماری مدد کریں</string>
+    <string name="settings_style_formal">رسمی</string>
+    <string name="settings_pref_length_title">جواب کی لمبائی</string>
+    <string name="settings_pref_length_short">مختصر</string>
+    <string name="settings_pref_length_medium">درمیانہ</string>
+    <string name="settings_pref_length_detailed">تفصیلی</string>
+    <string name="settings_pref_style_title">جواب کا انداز</string>
+    <string name="settings_pref_style_conversational">گفتگو کا انداز</string>
+    <string name="settings_pref_style_academic">علمی</string>
+    <string name="settings_pref_style_technical">تکنیکی</string>
+    <string name="settings_pref_focus_title">جواب کی توجہ</string>
+    <string name="settings_pref_focus_practical">عملی</string>
+    <string name="settings_pref_focus_theoretical">نظریاتی</string>
+    <string name="settings_pref_focus_historical">تاریخی</string>
+    <string name="send_feedback">فیڈبیک بھیجیں</string>
+    <string name="feedback_prompt_title">فیڈبیک بھیجیں</string>
+    <string name="feedback_prompt_message">کیا آپ ہماری ٹیم کو ای میل کے ذریعے فیڈبیک بھیجنا چاہتے ہیں؟</string>
+    <string name="feedback_email_subject">شاملہ جی پی ٹی فیڈبیک</string>
+
+    <!-- Language Selection -->
+    <string name="select_language">زبان منتخب کریں</string>
+    <string name="english">English</string>
+    <string name="arabic">العربية</string>
+    <string name="urdu">اردو</string>
+
+    <!-- Voice Input -->
+    <string name="voice_input">آواز کا اندراج</string>
+    <string name="listening">سن رہے ہیں...</string>
+    <string name="tap_to_speak">بولنے کے لیے تھپتھپائیں</string>
+    <string name="permission_required">اجازت درکار ہے</string>
+    <string name="microphone_permission">آواز کے اندراج کے لیے مائیکروفون کی اجازت ضروری ہے.</string>
+    <string name="voice_setup_required_message">اس ڈیوائس پر آواز کا اندراج دستیاب نہیں ہے۔ سسٹم سیٹنگز میں اسپیچ سروس کو فعال کریں یا انسٹال کریں۔</string>
+    <string name="voice_open_settings_action">سیٹنگز کھولیں</string>
+    <string name="voice_help_title">آواز کا اندراج فعال کریں</string>
+    <string name="voice_help_intro">آواز کے اندراج کے لیے ڈیوائس یا ایپ ایکوسسٹم کی اسپیچ ریکگنیشن سروس درکار ہوتی ہے۔</string>
+    <string name="voice_help_step_1">اپنے ڈیوائس کی سیٹنگز کھولیں۔</string>
+    <string name="voice_help_step_2">\"Voice input\"، \"Speech\" یا \"Language &amp; input\" کی سیٹنگز تلاش کریں۔</string>
+    <string name="voice_help_step_3">اسپیچ ریکگنیشن سروس کو فعال یا انسٹال کریں، پھر واپس آکر دوبارہ کوشش کریں۔</string>
+    <string name="voice_setup_no_settings_fallback">ممکن ہے اس ڈیوائس میں اسپیچ سروس پہلے سے موجود نہ ہو۔ اگر دستیاب ہو تو مناسب سروس انسٹال کریں اور اسے ڈیفالٹ بنائیں۔</string>
+
+    <!-- Image Input -->
+    <string name="image_input">تصویری اندراج</string>
+    <string name="processing_image">تصویر پر کام ہو رہا ہے...</string>
+    <string name="take_photo">تصویر کھینچیں</string>
+    <string name="choose_from_gallery">گیلری سے منتخب کریں</string>
+    <string name="camera_permission">تصویر کھینچنے کے لیے کیمرہ اجازت درکار ہے.</string>
+    <string name="storage_permission">تصاویر منتخب کرنے کے لیے اسٹوریج کی اجازت درکار ہے.</string>
+    <string name="select_image_source">تصویر کا ذریعہ منتخب کریں</string>
+
+    <!-- Errors -->
+    <string name="no_email_client_error">کوئی ای میل ایپ نہیں ملی۔ براہ کرم فیڈبیک بھیجنے کے لیے ایک انسٹال کریں۔</string>
+    <string name="error_occurred">خرابی پیش آئی</string>
+    <string name="error_generic_message">کچھ غلط ہو گیا</string>
+    <string name="error_code_format">خرابی کا کوڈ: %1$s</string>
+    <string name="error_support_suffix">اگر یہ غیر متوقع لگتا ہے، تو اپنے ڈیوائس کو ہلائیں یا ہماری سپورٹ ٹیم کو رپورٹ کرنے کے لیے سیٹنگز پر جائیں۔</string>
+    <string name="no_internet">انٹرنیٹ کنکشن نہیں</string>
+    <string name="retry">دوبارہ کوشش کریں</string>
+    <string name="dismiss">بند کریں</string>
+    <string name="no_text_found">تصویر میں کوئی متن نہیں ملا</string>
+    <string name="voice_recognition_failed">آواز شناخت کرنے میں ناکامی</string>
+    <string name="ocr_error_invalid_image">غیر معاون یا دھندلی تصویر۔ براہ کرم واضح تصویر دوبارہ آزمائیں۔</string>
+    <string name="ocr_error_no_text">تصویر میں کوئی متن نہیں ملا</string>
+    <string name="ocr_error_failed">متن شناخت نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="ocr_error_image_data_missing">تصویری ڈیٹا دستیاب نہیں۔ براہ کرم تصویر دوبارہ منتخب کریں۔</string>
+    <string name="offline_mode">آپ آف لائن ہیں۔ کنکشن بحال ہونے پر پیغامات بھیجے جائیں گے.</string>
+
+    <!-- Network Error Messages (user-friendly) -->
+    <string name="network_no_connection">انٹرنیٹ کنکشن نہیں۔ براہ کرم نیٹ ورک سیٹنگز چیک کریں.</string>
+    <string name="network_timeout">درخواست کا وقت ختم ہو گیا۔ کنکشن چیک کریں اور دوبارہ کوشش کریں.</string>
+    <string name="network_server_error">سرور میں خرابی ہے۔ براہ کرم بعد میں کوشش کریں۔</string>
+    <string name="network_auth_required">توثیق درکار ہے۔ براہ کرم سائن اِن کریں۔</string>
+    <string name="network_access_forbidden">رسائی ممنوع ہے۔</string>
+    <string name="network_not_found">وسیلہ نہیں ملا۔</string>
+    <string name="network_too_many_requests">درخواستیں بہت زیادہ ہیں۔ بعد میں کوشش کریں۔</string>
+    <string name="network_invalid_request">غلط درخواست۔ براہ کرم اپنے اندراج کی جانچ کریں۔</string>
+    <string name="network_generic_error">کوئی خرابی پیش آئی۔ دوبارہ کوشش کریں۔</string>
+    <string name="network_connection_error">سرور سے جڑنے میں مسئلہ۔ براہ کرم بعد میں کوشش کریں۔</string>
+    <string name="network_decoding_error">سرور کا جواب پڑھا نہیں جا سکا۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="network_unexpected_error">غیر متوقع خرابی پیش آئی۔ براہ کرم دوبارہ کوشش کریں۔</string>
+
+    <!-- Content Descriptions -->
+    <string name="send_message">پیغام بھیجیں</string>
+    <string name="voice_input_button">آواز کا اندراج</string>
+    <string name="image_input_button">تصویری اندراج</string>
+    <string name="menu">مینو</string>
+    <string name="back">واپس</string>
+
+    <!-- Time formats -->
+    <string name="minutes_ago">%d منٹ پہلے</string>
+    <string name="hours_ago">%d گھنٹے پہلے</string>
+    <string name="days_ago">%d دن پہلے</string>
+
+    <!-- Loading -->
+    <string name="loading">لوڈ ہو رہا ہے...</string>
+
+    <!-- About -->
+    <string name="about_shamelagpt_intro">شاملہ جی پی ٹی ایک AI سے مدد یافتہ اسلامی علمی معاون ہے جو معتبر Shamela.ws لائبریری پر مبنی ہے۔ ہمارا مقصد مستند اور حوالہ شدہ اسلامی علم کو ہر کسی کے لیے قدرتی اور مکالماتی انداز میں دستیاب کرنا ہے۔\n\nہم جدید AI ٹیکنالوجی کو مستند اسلامی ذرائع کے ساتھ ملاتے ہیں تاکہ درست جوابات فراہم کریں جو کلاسیکی اور معاصر علمی حوالوں سے مضبوط ہوں۔</string>
+    <string name="about_mission_title">ہمارا مشن</string>
+    <string name="about_mission">تحقیق، تعلیم اور معلومات کی تصدیق کے لیے مستند اسلامی علم تک قابلِ اعتماد، AI سے مدد یافتہ رسائی فراہم کرنا—بغیر اس کے کہ علمائے دین یا شرعی اتھارٹی کی جگہ لے۔</string>
+    <string name="about_mission_point_support">طلبہ، محققین، اساتذہ اور ڈویلپرز کی مدد کرنا</string>
+    <string name="about_mission_point_combat_misinformation">آن لائن اسلام کی غلط تصویر اور گمراہ کن معلومات کا مقابلہ کرنا</string>
+    <string name="about_mission_point_ethical_ai">اسلامی علمی نظاموں میں اخلاقی AI کے استعمال کو ممکن بنانا</string>
+    <string name="about_mission_point_preserve_trust">ماخذ، حوالہ اور سیاق کو ترجیح دے کر اعتماد قائم رکھنا</string>
+    <string name="about_vision_title">ہماری وژن</string>
+    <string name="about_vision_intro">ہم ایسے مستقبل کا تصور کرتے ہیں جہاں:</string>
+    <string name="about_vision_point_sources">مستند اسلامی مصادر AI پر مبنی علمی ٹولز کی بنیاد ہوں</string>
+    <string name="about_vision_point_verifiable">آن لائن اسلامی معلومات قابلِ تصدیق، باحوالہ اور ذمہ دارانہ انداز میں پیش کی جائیں</string>
+    <string name="about_vision_point_underrepresented">کم نمائندگی رکھنے والی زبانوں اور برادریوں کو مستند علم تک مساوی رسائی ملے</string>
+    <string name="about_vision_point_children">بچوں اور نئے مسلم ہونے والوں کو عمر کے مطابق اور نرم لہجے میں وضاحتیں ملیں</string>
+    <string name="about_vision_point_developers">ڈویلپرز اور ادارے کھلے، قابلِ جانچ علمی انفراسٹرکچر پر اعتماد سے تعمیر کر سکیں</string>
+    <string name="about_goal_title">ہمارا ہدف</string>
+    <string name="about_goal">شاملہ جی پی ٹی اس خلا کو کم کرنے کے لیے بنایا گیا ہے، مستند مصادر پر مبنی AI ٹولز کے ذریعے جن کی بنیاد شفافیت، سراغ رسانی اور سیاق ہو.</string>
+    <string name="about_data_source_title">ڈیٹا کا ماخذ</string>
+    <string name="about_data_source">تمام جوابات Shamela.ws کی جامع لائبریری سے تیار ہوتے ہیں، جو آج دستیاب معتبر اور وسیع ترین اسلامی ڈیجیٹل لائبریریوں میں سے ایک ہے.</string>
+    <string name="about_data_handling_title">ہم آپ کے ڈیٹا کو کیسے سنبھالتے ہیں</string>
+    <string name="about_data_handling">پیغامات، آواز کا اندراج، اور وہ تصاویر جو آپ OCR کے لیے منتخب کرتے ہیں، محفوظ طریقے سے ہمارے سرورز کو بھیجی جاتی ہیں تاکہ جوابات تیار کیے جا سکیں۔ گفتگوئیں مقامی طور پر محفوظ ہوتی ہیں اور تاریخچہ سے حذف کی جا سکتی ہیں؛ آپ اپنا اکاؤنٹ (اور سرور کا ڈیٹا) ترتیبات سے حذف کر سکتے ہیں.</string>
+    <string name="about_company_title">شاملہ جی پی ٹی کس نے بنایا؟</string>
+    <string name="about_company_description">شاملہ جی پی ٹی کو Neural Lines نے تیار اور برقرار رکھا ہے — ایک ٹیم جو مستند ذرائع پر مبنی ذمہ دار AI مصنوعات پر توجہ رکھتی ہے.</string>
+    <string name="about_company_link">Neural Lines ملاحظہ کریں</string>
+    <string name="history_fact_check_badge">فیکٹ چیک</string>
+    <string name="history_local_only_badge">مقامی</string>
+    <string name="history_server_synced_badge">سرور</string>
+</resources>

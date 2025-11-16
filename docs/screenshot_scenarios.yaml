@@ -1,0 +1,23 @@
+# Store/QA screenshot scenarios
+# Each entry describes the state to render and locale/device coverage hints.
+# This file is read by humans and mirrored in platform-specific test code.
+scenarios:
+  - id: chat_happy
+    title: "Chat - happy path"
+    locales: [en, ar, ur]
+    devices: [phone_large, phone_medium]
+    instructions: |
+      Open Chat tab, send canned question, wait for mocked answer.
+      Use primary theme and default settings.
+  - id: chat_error
+    title: "Chat - error state"
+    locales: [en]
+    devices: [phone_medium]
+    instructions: |
+      Open Chat tab, trigger mocked network error banner/toast.
+  - id: settings_main
+    title: "Settings"
+    locales: [en, ar]
+    devices: [phone_medium]
+    instructions: |
+      Open Settings tab with toggles visible.
