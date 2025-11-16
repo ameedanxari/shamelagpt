@@ -1,0 +1,96 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">شاملة GPT</string>
+
+    <!-- Welcome Screen -->
+    <string name="welcome_title">مرحبًا بك في شاملة GPT</string>
+    <string name="welcome_message">شاملة GPT مبني على مكتبة شاملة.ws الشاملة والموثوقة، مما يجعل المعرفة الإسلامية الأصيلة أقرب إلى الجميع.\n\nمهمتنا هي جعل المعلومات الموثوقة والمدعومة بالمراجع متاحة بطريقة طبيعية ومحادثة - عبر اللغات والخلفيات ومستويات الفهم.\n\nسواء كنت تسعى للحصول على رؤى أعمق، أو توضيحات سريعة، أو إجابات مدعومة بالأدلة على المفاهيم الخاطئة الشائعة، فإن شاملة GPT يساعدك على استكشاف التراث الإسلامي الغني بدقة واحترام وسهولة.\n\n\"اطلبوا العلم من المهد إلى اللحد.\" - دع هذا يكون رفيقك في هذه الرحلة.</string>
+    <string name="welcome_sign_in_title">سجل الدخول لتجربة أفضل</string>
+    <string name="welcome_sign_in_message">سجل الدخول لحفظ محادثاتك، وإعادة زيارة أسئلتك السابقة، ومشاركة المناقشات الهادفة مع الآخرين.\n\nإنشاء حساب يساعدنا أيضًا على تحسين تجربة التعلم الخاصة بك - تخصيص الرؤى وتفضيلات اللغة ومسارات المراجع لك.\n\nسجل الدخول الآن واستمر في رحلتك المعرفية بثبات ووضوح.</string>
+    <string name="get_started">ابدأ</string>
+    <string name="skip_to_chat">تخطى إلى المحادثة</string>
+
+    <!-- Bottom Navigation -->
+    <string name="chat">محادثة</string>
+    <string name="history">السجل</string>
+    <string name="settings">الإعدادات</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_title">شاملة GPT</string>
+    <string name="chat_placeholder">اطرح سؤالاً عن الإسلام...</string>
+    <string name="send">إرسال</string>
+    <string name="typing">الذكاء الاصطناعي يكتب...</string>
+    <string name="copy">نسخ</string>
+    <string name="share">مشاركة</string>
+    <string name="copied">تم النسخ إلى الحافظة</string>
+    <string name="start_conversation">ابدأ محادثة</string>
+    <string name="ask_anything">اسألني أي شيء عن الإسلام أو استخدم الكاميرا للتحقق من صحة النص</string>
+    <string name="sources">المصادر:</string>
+
+    <!-- History Screen -->
+    <string name="no_conversations">لا توجد محادثات</string>
+    <string name="start_new_chat">ابدأ محادثة جديدة للبدء</string>
+    <string name="delete_conversation">حذف المحادثة؟</string>
+    <string name="delete_confirmation">لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="delete">حذف</string>
+    <string name="cancel">إلغاء</string>
+    <string name="new_chat">محادثة جديدة</string>
+    <string name="just_now">الآن</string>
+
+    <!-- Settings Screen -->
+    <string name="general">عام</string>
+    <string name="language">اللغة</string>
+    <string name="support">الدعم</string>
+    <string name="support_shamelagpt">ادعم شاملة GPT</string>
+    <string name="about">حول</string>
+    <string name="about_shamelagpt">حول شاملة GPT</string>
+    <string name="privacy_policy">سياسة الخصوصية</string>
+    <string name="terms_of_service">شروط الخدمة</string>
+    <string name="version">الإصدار %s</string>
+
+    <!-- Language Selection -->
+    <string name="select_language">اختر اللغة</string>
+    <string name="english">English</string>
+    <string name="arabic">العربية</string>
+
+    <!-- Voice Input -->
+    <string name="voice_input">إدخال صوتي</string>
+    <string name="listening">الاستماع...</string>
+    <string name="tap_to_speak">اضغط للتحدث</string>
+    <string name="permission_required">الإذن مطلوب</string>
+    <string name="microphone_permission">مطلوب إذن الميكروفون للإدخال الصوتي.</string>
+
+    <!-- Image Input -->
+    <string name="image_input">إدخال صورة</string>
+    <string name="processing_image">معالجة الصورة...</string>
+    <string name="take_photo">التقاط صورة</string>
+    <string name="choose_from_gallery">اختر من المعرض</string>
+    <string name="camera_permission">مطلوب إذن الكاميرا لالتقاط الصور.</string>
+    <string name="storage_permission">مطلوب إذن التخزين لاختيار الصور.</string>
+    <string name="select_image_source">اختر مصدر الصورة</string>
+
+    <!-- Errors -->
+    <string name="error_occurred">حدث خطأ</string>
+    <string name="no_internet">لا يوجد اتصال بالإنترنت</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="dismiss">رفض</string>
+    <string name="no_text_found">لم يتم العثور على نص في الصورة</string>
+    <string name="voice_recognition_failed">فشل التعرف على الصوت</string>
+    <string name="offline_mode">أنت غير متصل. سيتم إرسال الرسائل عند استعادة الاتصال.</string>
+
+    <!-- Content Descriptions -->
+    <string name="send_message">إرسال رسالة</string>
+    <string name="voice_input_button">إدخال صوتي</string>
+    <string name="image_input_button">إدخال صورة</string>
+    <string name="menu">القائمة</string>
+    <string name="back">رجوع</string>
+    <string name="delete_button">حذف</string>
+
+    <!-- Time formats -->
+    <string name="minutes_ago">منذ %d دقيقة</string>
+    <string name="hours_ago">منذ %d ساعة</string>
+    <string name="days_ago">منذ %d يوم</string>
+
+    <!-- Loading -->
+    <string name="loading">جاري التحميل...</string>
+</resources>
