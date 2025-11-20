@@ -1,0 +1,145 @@
+/*
+  Localizable.strings (English)
+  ShamelaGPT
+
+  Created by Ameed Khalid on 05/11/2025.
+*/
+
+// MARK: - Navigation & Tabs
+
+"chat" = "Chat";
+"history" = "History";
+"settings" = "Settings";
+"shamelaGPT" = "ShamelaGPT";
+"back" = "Back";
+"done" = "Done";
+"cancel" = "Cancel";
+
+// MARK: - Chat Screen
+
+"chat.placeholder" = "Ask a question about Islam...";
+"chat.send" = "Send message";
+"chat.voiceInput" = "Voice input";
+"chat.imageTextRecognition" = "Image text recognition";
+"chat.recording" = "Recording...";
+"chat.extractingText" = "Extracting text...";
+"chat.startConversation" = "Start a conversation";
+"chat.noMessagesYet" = "No messages yet";
+"chat.newConversation" = "New Conversation";
+"chat.viewHistory" = "View History";
+
+// MARK: - History Screen
+
+"history.clearAll" = "Clear All";
+"history.newChat" = "New Chat";
+"history.noConversations" = "No Conversations";
+"history.startNewChatToBegin" = "Start a new chat to begin";
+"history.deleteConversation" = "Delete Conversation?";
+"history.deleteConversationMessage" = "This action cannot be undone.";
+"history.deleteAllConversations" = "Delete All Conversations?";
+"history.deleteAllConversationsMessage" = "This will delete all conversations permanently. This action cannot be undone.";
+"history.loadingConversations" = "Loading conversations...";
+"history.share" = "Share";
+"common.delete" = "Delete";
+
+// MARK: - Settings Screen
+
+"settings.general" = "General";
+"settings.support" = "Support";
+"settings.about" = "About";
+"settings.language" = "Language";
+"settings.supportShamelaGPT" = "Support ShamelaGPT";
+"settings.aboutShamelaGPT" = "About ShamelaGPT";
+"settings.privacyPolicy" = "Privacy Policy";
+"settings.termsOfService" = "Terms of Service";
+"settings.version" = "Version";
+
+// MARK: - Welcome Screen
+
+"welcome.title" = "Welcome to ShamelaGPT";
+"welcome.intro" = "ShamelaGPT is built upon the vast and trusted library of Shamela.ws, bringing authentic Islamic knowledge closer to everyone. Our mission is to make reliable, reference-based information accessible in a natural and conversational way — across languages, backgrounds, and levels of understanding.\n\nWhether you seek deeper insight, quick clarifications, or evidence-backed answers to common misconceptions, ShamelaGPT helps you explore Islam's rich heritage with accuracy, respect, and ease.\n\n\"Seek knowledge from the cradle to the grave.\" — Let this be your companion on that journey.";
+"welcome.signInTitle" = "Sign In for a Better Experience";
+"welcome.signInMessage" = "Log in to save your conversations, revisit your past questions, and share meaningful discussions with others. Creating an account also helps us improve your learning experience — personalizing insights, language preferences, and reference trails for you.\n\nSign in now and continue your journey of knowledge with consistency and clarity.";
+"welcome.getStarted" = "Get Started";
+"welcome.skipToChat" = "Skip to Chat";
+
+// MARK: - Empty States
+
+"empty.description" = "Ask any question about Islam or use the camera to fact-check text. All answers are based on authentic Islamic sources from the Shamela library.";
+"empty.tryAsking" = "Try asking:";
+"empty.suggestion1" = "What are the pillars of Islam?";
+"empty.suggestion2" = "Tell me about the importance of prayer";
+"empty.suggestion3" = "What does Islam say about charity?";
+
+// MARK: - Error Messages
+
+"error.title" = "Error";
+"error.noInternetConnection" = "No Internet Connection";
+"error.unableToConnect" = "Unable to Connect";
+"error.permissionRequired" = "Permission Required";
+"error.somethingWentWrong" = "Something went wrong";
+"error.failedToLoadData" = "Failed to load data";
+"error.tryAgain" = "Try Again";
+"error.openSettings" = "Open Settings";
+"error.retry" = "Retry";
+"common.ok" = "OK";
+
+// MARK: - Network Errors
+
+"network.invalidURL" = "Unable to connect to the server. Please try again later.";
+"network.invalidResponse" = "Unable to connect to the server. Please try again later.";
+"network.noConnection" = "No internet connection. Please check your network settings.";
+"network.timeout" = "Request timed out. Please check your connection and try again.";
+"network.unknownError" = "An unexpected error occurred. Please try again.";
+"network.invalidRequest" = "Invalid request. Please check your input.";
+"network.authRequired" = "Authentication required. Please sign in.";
+"network.accessForbidden" = "Access forbidden.";
+"network.resourceNotFound" = "Resource not found.";
+"network.tooManyRequests" = "Too many requests. Please try again later.";
+"network.serverError" = "Server error. Please try again later.";
+"network.genericError" = "An error occurred. Please try again.";
+"network.decodingError" = "Unable to process server response. Please try again.";
+"network.checkConnection" = "Please check your connection and try again";
+"network.unexpectedError" = "An unexpected error occurred. Please try again.";
+
+// MARK: - About Screen
+
+"about.content" = "ShamelaGPT is an AI-powered Islamic knowledge assistant built upon the vast and trusted library of Shamela.ws. Our mission is to make reliable, reference-based Islamic knowledge accessible to everyone in a natural and conversational way.\n\nWe combine cutting-edge AI technology with authentic Islamic sources to provide accurate answers, backed by proper references from classical and contemporary Islamic scholarship.";
+"about.missionTitle" = "Our Mission";
+"about.mission" = "To democratize access to authentic Islamic knowledge across languages, backgrounds, and levels of understanding. Whether you seek deeper insight, quick clarifications, or evidence-backed answers to common misconceptions, ShamelaGPT is your companion on the journey of seeking knowledge.";
+"about.dataSourceTitle" = "Data Source";
+"about.dataSource" = "All responses are generated using the comprehensive library of Shamela.ws, one of the most trusted and extensive digital Islamic libraries available today.";
+
+// MARK: - Accessibility
+
+"accessibility.logo" = "ShamelaGPT Logo";
+"accessibility.getStartedHint" = "Dismisses the welcome screen and starts using ShamelaGPT";
+"accessibility.skipToChatHint" = "Skips the welcome screen and goes directly to chat";
+"accessibility.chatTabHint" = "Chat with ShamelaGPT assistant";
+"accessibility.historyTabHint" = "View your conversation history";
+"accessibility.settingsTabHint" = "Adjust app settings and preferences";
+"accessibility.sendMessageHint" = "Sends your message to ShamelaGPT";
+"accessibility.camera" = "Camera";
+"accessibility.cameraHint" = "Takes a photo or selects an image to extract text";
+"accessibility.microphoneStart" = "Start voice input";
+"accessibility.microphoneStop" = "Stop recording";
+"accessibility.microphoneStartHint" = "Tap to start recording voice input";
+"accessibility.microphoneStopHint" = "Tap to stop recording and transcribe your speech";
+"accessibility.microphoneRecordingValue" = "Recording";
+"accessibility.microphoneNotRecordingValue" = "Not recording";
+"accessibility.openSettingsHint" = "Opens the Settings app to enable %@ permission";
+"accessibility.tryAgainHint" = "Retries the failed operation";
+
+// MARK: - Permission Messages
+
+"permission.message" = "ShamelaGPT needs %@ permission to use this feature. You can enable it in Settings.";
+
+// MARK: - Common
+
+"common.deleteAll" = "Delete All";
+
+// MARK: - Image Picker
+
+"imagePicker.addImage" = "Add Image";
+"imagePicker.takePhoto" = "Take Photo";
+"imagePicker.chooseFromLibrary" = "Choose from Library";

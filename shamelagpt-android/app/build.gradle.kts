@@ -97,12 +97,31 @@ dependencies {
     // Splash Screen
     implementation("androidx.core:core-splashscreen:1.0.1")
 
-    // Testing
+    // Testing - Unit Tests
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockk.agent)
+    testImplementation(libs.turbine)
+    testImplementation(libs.truth)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.arch.core.testing)
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.room.testing)
+    testImplementation(libs.mockwebserver)
+
+    // Testing - Instrumented Tests
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.arch.core.testing)
+    androidTestImplementation(libs.koin.test)
+    androidTestImplementation(libs.koin.test.junit4)
+    androidTestImplementation(libs.room.testing)
+    androidTestImplementation(libs.truth)
 
     // Debug
     debugImplementation(libs.androidx.compose.ui.tooling)

@@ -7,7 +7,11 @@
       "Bash(./gradlew clean:*)",
       "Bash(./gradlew build:*)",
       "Bash(./gradlew assembleDebug:*)",
-      "Bash(./gradlew lintDebug:*)"
+      "Bash(./gradlew lintDebug:*)",
+      "Bash(cat:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(find:*)",
+      "Bash(open:*)"
     ],
     "deny": [],
     "ask": []

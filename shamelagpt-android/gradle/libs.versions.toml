@@ -17,6 +17,12 @@ room = "2.6.1"
 kotlinxSerialization = "1.6.2"
 coroutines = "1.7.3"
 richtext = "0.17.0"
+mockk = "1.13.8"
+turbine = "1.0.0"
+truth = "1.1.5"
+coroutinesTest = "1.7.3"
+mockwebserver = "4.12.0"
+koinTest = "3.5.3"
 
 [libraries]
 # Core
@@ -63,6 +69,17 @@ richtext-commonmark = { group = "com.halilibo.compose-richtext", name = "richtex
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockk" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "mockwebserver" }
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koinTest" }
+koin-test-junit4 = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "koinTest" }
+androidx-arch-core-testing = { group = "androidx.arch.core", name = "core-testing", version = "2.2.0" }
+room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
