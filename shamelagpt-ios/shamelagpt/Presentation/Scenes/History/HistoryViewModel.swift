@@ -23,16 +23,16 @@ final class HistoryViewModel: ObservableObject {
 
     // MARK: - Private Properties
 
-    private let getConversationsUseCase: GetConversationsUseCase
-    private let deleteConversationUseCase: DeleteConversationUseCase
+    private let getConversationsUseCase: GetConversationsUseCaseProtocol
+    private let deleteConversationUseCase: DeleteConversationUseCaseProtocol
     private let chatRepository: ChatRepository
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
 
     init(
-        getConversationsUseCase: GetConversationsUseCase,
-        deleteConversationUseCase: DeleteConversationUseCase,
+        getConversationsUseCase: GetConversationsUseCaseProtocol,
+        deleteConversationUseCase: DeleteConversationUseCaseProtocol,
         chatRepository: ChatRepository
     ) {
         self.getConversationsUseCase = getConversationsUseCase
@@ -176,7 +176,7 @@ final class HistoryViewModel: ObservableObject {
             return "No messages"
         }
 
-        return conversation.preview
+        return conversation.previewText
     }
 
     /// Gets the display title for a conversation

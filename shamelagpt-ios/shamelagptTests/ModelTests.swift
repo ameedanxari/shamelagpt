@@ -223,10 +223,10 @@ final class ModelTests: XCTestCase {
         let convEmpty = Conversation(title: "Test", messages: [])
 
         // Then
-        XCTAssertEqual(convWithShort.preview, "Short message", "Should return full content when short")
-        XCTAssertTrue(convWithLong.preview.hasSuffix("..."), "Should truncate long messages")
-        XCTAssertEqual(convWithLong.preview.count, 103, "Should truncate to 100 chars + '...'")
-        XCTAssertEqual(convEmpty.preview, "No messages", "Should return default for empty conversation")
+        XCTAssertEqual(convWithShort.previewText, "Short message", "Should return full content when short")
+        XCTAssertTrue(convWithLong.previewText.hasSuffix("..."), "Should truncate long messages")
+        XCTAssertEqual(convWithLong.previewText.count, 103, "Should truncate to 100 chars + '...'")
+        XCTAssertEqual(convEmpty.previewText, "No messages", "Should return default for empty conversation")
     }
 
     func testConversationWithMessages() throws {

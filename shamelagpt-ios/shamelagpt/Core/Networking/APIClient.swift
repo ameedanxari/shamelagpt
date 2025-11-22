@@ -223,7 +223,7 @@ extension APIClient {
 
 // MARK: - Mock Client for Testing
 #if DEBUG
-final class MockAPIClient: APIClientProtocol {
+final class PreviewMockAPIClient: APIClientProtocol {
     var shouldFail = false
     var mockHealthResponse = HealthResponse(status: "ok", service: "shamelagpt-api")
     var mockChatResponse = ChatResponse(

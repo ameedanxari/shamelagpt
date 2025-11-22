@@ -9,6 +9,7 @@ import XCTest
 import UIKit
 @testable import ShamelaGPT
 
+@MainActor
 final class FactCheckIntegrationTests: XCTestCase {
 
     var chatRepository: ChatRepositoryImpl!
@@ -102,7 +103,7 @@ final class FactCheckIntegrationTests: XCTestCase {
         let testImage = try createTestImage(withText: "Test text for fact checking")
 
         // Perform OCR (this is the real OCR manager)
-        let ocrResult = try await ocrManager.recognizeText(from: testImage)
+        let ocrResult = try await ocrManager.recognizeTextWithLanguage(from: testImage)
 
         // Convert image to data
         let imageData = testImage.jpegData(compressionQuality: 0.8)

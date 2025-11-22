@@ -7,6 +7,8 @@
 
 import Foundation
 import Combine
+import Speech
+import UIKit
 @testable import ShamelaGPT
 
 // MARK: - Mock API Client
@@ -209,18 +211,39 @@ class MockChatRepository: ChatRepository {
 
 // MARK: - Mock Network Monitor
 
-class MockNetworkMonitor: NetworkMonitor {
+class MockNetworkMonitor: NetworkMonitorProtocol {
     var mockIsConnected = true
-
-    override var isConnected: Bool {
+    var mockConnectionType: NetworkMonitor.ConnectionType = .wifi
+    
+    var isConnected: Bool {
         return mockIsConnected
+    }
+    
+    var connectionType: NetworkMonitor.ConnectionType {
+        return mockConnectionType
+    }
+    
+    var isConnectedPublisher: AnyPublisher<Bool, Never> {
+        Just(mockIsConnected).eraseToAnyPublisher()
+    }
+    
+    var connectionTypePublisher: AnyPublisher<NetworkMonitor.ConnectionType, Never> {
+        Just(mockConnectionType).eraseToAnyPublisher()
+    }
+    
+    func startMonitoring() {
+        // Mock implementation - do nothing
+    }
+    
+    func stopMonitoring() {
+        // Mock implementation - do nothing
     }
 }
 
 // MARK: - Mock SendMessageUseCase
 
 @MainActor
-class MockSendMessageUseCase: SendMessageUseCase {
+class MockSendMessageUseCase: SendMessageUseCaseProtocol {
     var shouldSucceed = true
     var errorToThrow: Error = NSError(domain: "test", code: -1, userInfo: nil)
     var mockThreadId: String?
@@ -231,21 +254,12 @@ class MockSendMessageUseCase: SendMessageUseCase {
     var lastQuestion: String?
     var lastConversationId: String?
 
-    init() {
-        let mockAPIClient = MockAPIClient()
-        let mockChatRepository = MockChatRepository()
-        let mockNetworkMonitor = MockNetworkMonitor()
-
-        super.init(
-            chatRepository: mockChatRepository,
-            apiClient: mockAPIClient,
-            networkMonitor: mockNetworkMonitor
-        )
-    }
-
-    override func execute(
+    func execute(
         conversationId: String,
         message: String,
+        imageData: Data? = nil,
+        detectedLanguage: String? = nil,
+        isFactCheckMessage: Bool = false,
         saveUserMessage: Bool = true
     ) async throws -> SendMessageUseCase.Result {
         executeCallCount += 1
@@ -263,7 +277,10 @@ class MockSendMessageUseCase: SendMessageUseCase {
                 content: message,
                 isUserMessage: true,
                 timestamp: Date(),
-                sources: []
+                sources: [],
+                imageData: imageData,
+                detectedLanguage: detectedLanguage,
+                isFactCheckMessage: isFactCheckMessage
             )
 
             let assistantMessage = Message(
@@ -291,6 +308,34 @@ class MockSendMessageUseCase: SendMessageUseCase {
             throw errorToThrow
         }
     }
+    
+    func executePublisher(
+        conversationId: String,
+        message: String,
+        imageData: Data? = nil,
+        detectedLanguage: String? = nil,
+        isFactCheckMessage: Bool = false,
+        saveUserMessage: Bool = true
+    ) -> AnyPublisher<SendMessageUseCase.Result, Error> {
+        Future { promise in
+            Task {
+                do {
+                    let result = try await self.execute(
+                        conversationId: conversationId,
+                        message: message,
+                        imageData: imageData,
+                        detectedLanguage: detectedLanguage,
+                        isFactCheckMessage: isFactCheckMessage,
+                        saveUserMessage: saveUserMessage
+                    )
+                    promise(.success(result))
+                } catch {
+                    promise(.failure(error))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 
     func reset() {
         executeCallCount = 0
@@ -304,48 +349,66 @@ class MockSendMessageUseCase: SendMessageUseCase {
 // MARK: - Mock Voice Input Manager
 
 @MainActor
-class MockVoiceInputManager: VoiceInputManager {
-    var mockTranscribedText: String = ""
-    var mockIsRecording: Bool = false
-    var mockError: VoiceInputError?
-
-    override var transcribedText: String {
-        return mockTranscribedText
+class MockVoiceInputManager: VoiceInputManagerProtocol {
+    @Published var transcribedText: String = ""
+    @Published var isRecording: Bool = false
+    @Published var authorizationStatus: SFSpeechRecognizerAuthorizationStatus = .authorized
+    @Published var error: VoiceInputError?
+    
+    var transcribedTextPublisher: Published<String>.Publisher { $transcribedText }
+    var isRecordingPublisher: Published<Bool>.Publisher { $isRecording }
+    var authorizationStatusPublisher: Published<SFSpeechRecognizerAuthorizationStatus>.Publisher { $authorizationStatus }
+    var errorPublisher: Published<VoiceInputError?>.Publisher { $error }
+    
+    func requestPermission() async -> Bool {
+        return authorizationStatus == .authorized
     }
-
-    override var isRecording: Bool {
-        return mockIsRecording
+    
+    func startRecording(locale: Locale) async throws {
+        isRecording = true
     }
-
-    override var error: VoiceInputError? {
-        return mockError
+    
+    func stopRecording() {
+        isRecording = false
+    }
+    
+    func clearTranscription() {
+        transcribedText = ""
+    }
+    
+    func clearError() {
+        error = nil
     }
 }
 
 // MARK: - Mock OCR Manager
 
 @MainActor
-class MockOCRManager: OCRManager {
-    var mockExtractedText: String = ""
-    var mockIsProcessing: Bool = false
-    var mockError: OCRError?
-
-    override var extractedText: String {
-        return mockExtractedText
+class MockOCRManager: OCRManagerProtocol {
+    @Published var extractedText: String = ""
+    @Published var isProcessing: Bool = false
+    @Published var error: OCRError?
+    
+    var extractedTextPublisher: Published<String>.Publisher { $extractedText }
+    var isProcessingPublisher: Published<Bool>.Publisher { $isProcessing }
+    var errorPublisher: Published<OCRError?>.Publisher { $error }
+    
+    func recognizeText(from image: UIImage) async throws -> String {
+        return extractedText
     }
-
-    override var isProcessing: Bool {
-        return mockIsProcessing
+    
+    func recognizeTextWithLanguage(from image: UIImage) async throws -> OCRResult {
+        return OCRResult(text: extractedText, detectedLanguage: "en")
     }
-
-    override var error: OCRError? {
-        return mockError
+    
+    func clearError() {
+        error = nil
     }
 }
 
 // MARK: - Mock GetConversationsUseCase
 
-class MockGetConversationsUseCase: GetConversationsUseCase {
+class MockGetConversationsUseCase: GetConversationsUseCaseProtocol {
     var mockConversations: [Conversation] = []
     var shouldThrowError = false
     var errorToThrow: Error = NSError(domain: "test", code: -1, userInfo: nil)
@@ -356,12 +419,7 @@ class MockGetConversationsUseCase: GetConversationsUseCase {
 
     private let conversationsSubject = PassthroughSubject<[Conversation], Never>()
 
-    init() {
-        let mockRepository = MockChatRepository()
-        super.init(chatRepository: mockRepository)
-    }
-
-    override func execute() async throws -> [Conversation] {
+    func execute() async throws -> [Conversation] {
         executeCallCount += 1
 
         if shouldThrowError {
@@ -371,8 +429,22 @@ class MockGetConversationsUseCase: GetConversationsUseCase {
         // Sort by updatedAt descending (most recent first)
         return mockConversations.sorted { $0.updatedAt > $1.updatedAt }
     }
+    
+    func executePublisher() -> AnyPublisher<[Conversation], Error> {
+        Future { promise in
+            Task {
+                do {
+                    let result = try await self.execute()
+                    promise(.success(result))
+                } catch {
+                    promise(.failure(error))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 
-    override func observeConversations() -> AnyPublisher<[Conversation], Never> {
+    func observeConversations() -> AnyPublisher<[Conversation], Never> {
         observeConversationsCallCount += 1
 
         // Return a publisher that emits the mock conversations
@@ -394,7 +466,7 @@ class MockGetConversationsUseCase: GetConversationsUseCase {
 
 // MARK: - Mock DeleteConversationUseCase
 
-class MockDeleteConversationUseCase: DeleteConversationUseCase {
+class MockDeleteConversationUseCase: DeleteConversationUseCaseProtocol {
     var shouldThrowError = false
     var errorToThrow: Error = NSError(domain: "test", code: -1, userInfo: nil)
 
@@ -403,12 +475,7 @@ class MockDeleteConversationUseCase: DeleteConversationUseCase {
     var executeDeleteAllCallCount = 0
     var lastDeletedId: String?
 
-    init() {
-        let mockRepository = MockChatRepository()
-        super.init(chatRepository: mockRepository)
-    }
-
-    override func execute(id: String) async throws {
+    func execute(id: String) async throws {
         executeCallCount += 1
         lastDeletedId = id
 
@@ -417,12 +484,40 @@ class MockDeleteConversationUseCase: DeleteConversationUseCase {
         }
     }
 
-    override func executeDeleteAll() async throws {
+    func executeDeleteAll() async throws {
         executeDeleteAllCallCount += 1
 
         if shouldThrowError {
             throw errorToThrow
         }
+    }
+    
+    func executePublisher(id: String) -> AnyPublisher<Void, Error> {
+        Future { promise in
+            Task {
+                do {
+                    try await self.execute(id: id)
+                    promise(.success(()))
+                } catch {
+                    promise(.failure(error))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func executeDeleteAllPublisher() -> AnyPublisher<Void, Error> {
+        Future { promise in
+            Task {
+                do {
+                    try await self.executeDeleteAll()
+                    promise(.success(()))
+                } catch {
+                    promise(.failure(error))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
     }
 
     func reset() {

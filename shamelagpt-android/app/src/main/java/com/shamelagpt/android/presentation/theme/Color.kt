@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 // Material Design 3 Color Scheme
 
 // Primary Colors - Deep Green
-val Primary = Color(0xFF1B5E20)
+val Primary = Color(0xFF10B981) // Emerald-500
 val PrimaryContainer = Color(0xFF4C8C4A)
 val OnPrimary = Color(0xFFFFFFFF)
 val OnPrimaryContainer = Color(0xFFFFFFFF)
@@ -17,7 +17,7 @@ val OnSecondary = Color(0xFFFFFFFF)
 val OnSecondaryContainer = Color(0xFF000000)
 
 // Tertiary Colors - Gold Accent
-val Tertiary = Color(0xFFD4AF37)
+val Tertiary = Color(0xFFF59E0B) // Amber-500
 val TertiaryContainer = Color(0xFFFFF8DC)
 val OnTertiary = Color(0xFF000000)
 val OnTertiaryContainer = Color(0xFF1C1B1F)

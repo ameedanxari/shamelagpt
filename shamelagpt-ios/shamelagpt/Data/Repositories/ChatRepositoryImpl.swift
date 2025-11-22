@@ -13,21 +13,21 @@ import Combine
 final class ChatRepositoryImpl: ChatRepository {
 
     // MARK: - Properties
-    private let coreDataStack: CoreDataStack
+    private let coreDataStack: CoreDataStackProtocol
     private let conversationDAO: ConversationDAO
     private let messageDAO: MessageDAO
     private let apiClient: APIClientProtocol?
-    private let networkMonitor: NetworkMonitor?
+    private let networkMonitor: NetworkMonitorProtocol?
 
     private let conversationsSubject = CurrentValueSubject<[Conversation], Never>([])
 
     // MARK: - Initialization
     init(
-        coreDataStack: CoreDataStack = .shared,
+        coreDataStack: CoreDataStackProtocol = CoreDataStack.shared,
         conversationDAO: ConversationDAO = ConversationDAO(),
         messageDAO: MessageDAO = MessageDAO(),
         apiClient: APIClientProtocol? = nil,
-        networkMonitor: NetworkMonitor? = nil
+        networkMonitor: NetworkMonitorProtocol? = nil
     ) {
         self.coreDataStack = coreDataStack
         self.conversationDAO = conversationDAO

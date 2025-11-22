@@ -115,9 +115,9 @@ struct RoundedCorner: Shape {
 
 // MARK: - Color Extensions
 extension Color {
-    static let primaryGreen = Color(hex: "#1B5E20")
+    static let primaryGreen = Color(hex: "#10B981") // Emerald-500
     static let primaryLight = Color(hex: "#4C8C4A")
-    static let accentGold = Color(hex: "#D4AF37")
+    static let accentGold = Color(hex: "#F59E0B") // Amber-500
 
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

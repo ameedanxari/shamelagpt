@@ -42,8 +42,8 @@ class ChatViewModelTest {
 
     @Before
     fun setup() {
-        mockChatRepository = MockChatRepository()
         mockConversationRepository = MockConversationRepository()
+        mockChatRepository = MockChatRepository(mockConversationRepository)
         mockVoiceInputManager = mockk(relaxed = true)
         mockOCRManager = mockk(relaxed = true)
         mockContext = mockk(relaxed = true)

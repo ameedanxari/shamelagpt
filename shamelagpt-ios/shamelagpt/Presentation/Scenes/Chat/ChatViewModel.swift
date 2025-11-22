@@ -43,20 +43,20 @@ final class ChatViewModel: ObservableObject {
 
     // MARK: - Private Properties
 
-    private let sendMessageUseCase: SendMessageUseCase
+    private let sendMessageUseCase: SendMessageUseCaseProtocol
     private let chatRepository: ChatRepository
-    private let voiceInputManager: VoiceInputManager
-    private let ocrManager: OCRManager
+    private let voiceInputManager: VoiceInputManagerProtocol
+    private let ocrManager: OCRManagerProtocol
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
 
     init(
         conversationId: String,
-        sendMessageUseCase: SendMessageUseCase,
+        sendMessageUseCase: SendMessageUseCaseProtocol,
         chatRepository: ChatRepository,
-        voiceInputManager: VoiceInputManager,
-        ocrManager: OCRManager
+        voiceInputManager: VoiceInputManagerProtocol,
+        ocrManager: OCRManagerProtocol
     ) {
         self.conversationId = conversationId
         self.sendMessageUseCase = sendMessageUseCase
@@ -70,7 +70,7 @@ final class ChatViewModel: ObservableObject {
         }
 
         // Observe voice input transcription
-        voiceInputManager.$transcribedText
+        voiceInputManager.transcribedTextPublisher
             .sink { [weak self] text in
                 guard let self = self, !text.isEmpty else { return }
                 self.inputText = text
@@ -78,28 +78,28 @@ final class ChatViewModel: ObservableObject {
             .store(in: &cancellables)
 
         // Observe voice input recording state
-        voiceInputManager.$isRecording
+        voiceInputManager.isRecordingPublisher
             .sink { [weak self] isRecording in
                 self?.isRecording = isRecording
             }
             .store(in: &cancellables)
 
         // Observe voice input errors
-        voiceInputManager.$error
+        voiceInputManager.errorPublisher
             .sink { [weak self] error in
                 self?.voiceInputError = error
             }
             .store(in: &cancellables)
 
         // Observe OCR processing state
-        ocrManager.$isProcessing
+        ocrManager.isProcessingPublisher
             .sink { [weak self] isProcessing in
                 self?.isProcessingOCR = isProcessing
             }
             .store(in: &cancellables)
 
         // Observe OCR errors
-        ocrManager.$error
+        ocrManager.errorPublisher
             .sink { [weak self] error in
                 self?.ocrError = error
             }
@@ -482,7 +482,7 @@ extension ChatViewModel {
 
         return ChatViewModel(
             conversationId: "preview-conversation",
-            sendMessageUseCase: mockSendMessageUseCase as! SendMessageUseCase,
+            sendMessageUseCase: mockSendMessageUseCase,
             chatRepository: mockChatRepository,
             voiceInputManager: voiceInputManager,
             ocrManager: ocrManager
@@ -491,8 +491,26 @@ extension ChatViewModel {
 }
 
 // Mock implementations for previews
-class MockSendMessageUseCase {
-    func execute(conversationId: String, message: String) async throws -> SendMessageUseCase.Result {
+class MockSendMessageUseCase: SendMessageUseCaseProtocol {
+    func execute(
+        conversationId: String,
+        message: String,
+        imageData: Data? = nil,
+        detectedLanguage: String? = nil,
+        isFactCheckMessage: Bool = false,
+        saveUserMessage: Bool = true
+    ) async throws -> SendMessageUseCase.Result {
+        fatalError("Mock implementation - not for production use")
+    }
+    
+    func executePublisher(
+        conversationId: String,
+        message: String,
+        imageData: Data? = nil,
+        detectedLanguage: String? = nil,
+        isFactCheckMessage: Bool = false,
+        saveUserMessage: Bool = true
+    ) -> AnyPublisher<SendMessageUseCase.Result, Error> {
         fatalError("Mock implementation - not for production use")
     }
 }

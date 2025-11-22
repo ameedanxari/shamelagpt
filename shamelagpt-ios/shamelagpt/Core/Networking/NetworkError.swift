@@ -8,10 +8,12 @@
 import Foundation
 
 /// Errors that can occur during network operations
-enum NetworkError: LocalizedError {
+enum NetworkError: LocalizedError, Equatable {
     case invalidURL
     case invalidResponse
     case httpError(statusCode: Int)
+    case badRequest
+    case serverError(Int)
     case decodingError(Error)
     case noConnection
     case timeout
@@ -25,6 +27,10 @@ enum NetworkError: LocalizedError {
             return LocalizationKeys.networkInvalidResponse.localized
         case .httpError(let statusCode):
             return "HTTP error with status code: \(statusCode)."
+        case .badRequest:
+            return LocalizationKeys.networkInvalidRequest.localized
+        case .serverError(let code):
+            return "Server error with status code: \(code)."
         case .decodingError(let error):
             return "Failed to decode response: \(error.localizedDescription)"
         case .noConnection:
@@ -58,6 +64,10 @@ enum NetworkError: LocalizedError {
             default:
                 return LocalizationKeys.networkGenericError.localized
             }
+        case .badRequest:
+            return LocalizationKeys.networkInvalidRequest.localized
+        case .serverError:
+            return LocalizationKeys.networkServerError.localized
         case .decodingError:
             return LocalizationKeys.networkDecodingError.localized
         case .noConnection:
@@ -77,6 +87,27 @@ enum NetworkError: LocalizedError {
         case .httpError(let code):
             // Retry on 5xx server errors
             return code >= 500
+        default:
+            return false
+        }
+    }
+
+    static func == (lhs: NetworkError, rhs: NetworkError) -> Bool {
+        switch (lhs, rhs) {
+        case (.invalidURL, .invalidURL),
+             (.invalidResponse, .invalidResponse),
+             (.noConnection, .noConnection),
+             (.timeout, .timeout),
+             (.badRequest, .badRequest):
+            return true
+        case (.serverError(let l), .serverError(let r)):
+            return l == r
+        case (.httpError(let lhsCode), .httpError(let rhsCode)):
+            return lhsCode == rhsCode
+        case (.decodingError(let lhsError), .decodingError(let rhsError)):
+            return lhsError.localizedDescription == rhsError.localizedDescription
+        case (.unknown(let lhsError), .unknown(let rhsError)):
+            return lhsError.localizedDescription == rhsError.localizedDescription
         default:
             return false
         }

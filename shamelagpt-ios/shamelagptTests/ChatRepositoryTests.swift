@@ -201,9 +201,10 @@ final class ChatRepositoryTests: XCTestCase {
         let conversation = try await sut.createConversation(title: "Test")
         let imageData = "test image data".data(using: .utf8)
         let source = Source(
-            bookName: "Test Book",
-            volume: "1",
-            page: "10",
+            bookTitle: "Test Book",
+            volumeNumber: 1,
+            pageNumber: 10,
+            text: "Sample text",
             sourceUrl: "https://example.com"
         )
 
@@ -486,11 +487,10 @@ final class ChatRepositoryTests: XCTestCase {
 // MARK: - Test Core Data Stack
 
 /// In-memory Core Data stack for testing
-final class TestCoreDataStack: CoreDataStack {
+/// In-memory Core Data stack for testing
+final class TestCoreDataStack: CoreDataStackProtocol {
 
-    override init() {
-        super.init()
-    }
+    init() {}
 
     private lazy var inMemoryContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "ShamelaGPT")
@@ -512,14 +512,49 @@ final class TestCoreDataStack: CoreDataStack {
         return container
     }()
 
-    override var viewContext: NSManagedObjectContext {
+    var viewContext: NSManagedObjectContext {
         return inMemoryContainer.viewContext
     }
 
-    override func newBackgroundContext() -> NSManagedObjectContext {
+    func newBackgroundContext() -> NSManagedObjectContext {
         let context = inMemoryContainer.newBackgroundContext()
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         return context
+    }
+    
+    func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
+        inMemoryContainer.performBackgroundTask(block)
+    }
+    
+    func saveContext() throws {
+        try save(context: viewContext)
+    }
+    
+    func save(context: NSManagedObjectContext) throws {
+        guard context.hasChanges else { return }
+        do {
+            try context.save()
+        } catch {
+            throw CoreDataError.saveFailed(error)
+        }
+    }
+    
+    func deleteAllData() throws {
+        let entities = inMemoryContainer.managedObjectModel.entities
+        
+        for entity in entities {
+            guard let entityName = entity.name else { continue }
+            
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+            
+            do {
+                try viewContext.execute(deleteRequest)
+                try saveContext()
+            } catch {
+                throw CoreDataError.deleteFailed(error)
+            }
+        }
     }
 }
 

@@ -459,7 +459,11 @@ final class SendMessageUseCaseTests: XCTestCase {
         mockNetworkMonitor.mockIsConnected = true
         mockChatRepository.mockConversation = testConversation
         mockAPIClient.shouldFail = true
-        mockAPIClient.errorToThrow = NetworkError.decodingError
+        
+        // Create a sample decoding error
+        struct DecodingTestError: Error {}
+        let decodingError = NetworkError.decodingError(DecodingTestError())
+        mockAPIClient.errorToThrow = decodingError
 
         // When/Then
         do {
@@ -469,7 +473,12 @@ final class SendMessageUseCaseTests: XCTestCase {
             )
             XCTFail("Should throw NetworkError.decodingError")
         } catch let error as NetworkError {
-            XCTAssertEqual(error, NetworkError.decodingError)
+            // Check that it's a decodingError case
+            if case .decodingError = error {
+                // Success
+            } else {
+                XCTFail("Expected decodingError, got \(error)")
+            }
         } catch {
             XCTFail("Unexpected error: \(error)")
         }

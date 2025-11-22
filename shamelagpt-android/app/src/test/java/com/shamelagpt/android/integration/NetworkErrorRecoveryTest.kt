@@ -30,8 +30,8 @@ class NetworkErrorRecoveryTest {
 
     @Before
     fun setup() {
-        mockChatRepository = MockChatRepository()
         mockConversationRepository = MockConversationRepository()
+        mockChatRepository = MockChatRepository(mockConversationRepository)
         sendMessageUseCase = SendMessageUseCase(
             chatRepository = mockChatRepository,
             conversationRepository = mockConversationRepository

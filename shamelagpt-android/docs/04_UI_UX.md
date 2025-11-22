@@ -44,7 +44,7 @@
 
 ```kotlin
 // Color.kt
-val md_theme_light_primary = Color(0xFF1B5E20) // Deep Green
+val md_theme_light_primary = Color(0xFF10B981) // Emerald-500 (Islamic color)
 val md_theme_light_onPrimary = Color(0xFFFFFFFF)
 val md_theme_light_primaryContainer = Color(0xFF4C8C4A)
 val md_theme_light_onPrimaryContainer = Color(0xFF000000)
@@ -54,7 +54,7 @@ val md_theme_light_onSecondary = Color(0xFFFFFFFF)
 val md_theme_light_secondaryContainer = Color(0xFF6D6D6D)
 val md_theme_light_onSecondaryContainer = Color(0xFFFFFFFF)
 
-val md_theme_light_tertiary = Color(0xFFD4AF37) // Gold accent
+val Accent = Color(0xFFF59E0B) // Amber-500 (for highlights)
 val md_theme_light_onTertiary = Color(0xFF000000)
 
 val md_theme_light_error = Color(0xFFB00020)

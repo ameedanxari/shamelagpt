@@ -23,14 +23,14 @@ final class SendMessageUseCase {
 
     private let chatRepository: ChatRepository
     private let apiClient: APIClientProtocol
-    private let networkMonitor: NetworkMonitor
+    private let networkMonitor: NetworkMonitorProtocol
 
     // MARK: - Initialization
 
     init(
         chatRepository: ChatRepository,
         apiClient: APIClientProtocol,
-        networkMonitor: NetworkMonitor
+        networkMonitor: NetworkMonitorProtocol
     ) {
         self.chatRepository = chatRepository
         self.apiClient = apiClient
@@ -43,10 +43,20 @@ final class SendMessageUseCase {
     /// - Parameters:
     ///   - conversationId: The ID of the conversation to send the message to
     ///   - message: The message content from the user
+    ///   - imageData: Optional image data for fact-check messages
+    ///   - detectedLanguage: Optional detected language code
+    ///   - isFactCheckMessage: Whether this is a fact-check message
     ///   - saveUserMessage: Whether to save the user message (false for fact-check messages where it's already saved)
     /// - Returns: Result containing the user message, assistant response, and updated conversation
     /// - Throws: NetworkError or repository errors
-    func execute(conversationId: String, message: String, saveUserMessage: Bool = true) async throws -> Result {
+    func execute(
+        conversationId: String,
+        message: String,
+        imageData: Data? = nil,
+        detectedLanguage: String? = nil,
+        isFactCheckMessage: Bool = false,
+        saveUserMessage: Bool = true
+    ) async throws -> Result {
         AppLogger.chat.logInfo("SendMessageUseCase.execute called with conversationId: \(conversationId)")
 
         // Check network connectivity
@@ -69,12 +79,25 @@ final class SendMessageUseCase {
         let userMessage: Message
         if saveUserMessage {
             AppLogger.chat.logDebug("Saving user message locally")
-            userMessage = try await chatRepository.addMessage(
-                toConversation: conversationId,
-                content: message,
-                isUserMessage: true,
-                sources: []
-            )
+            
+            if isFactCheckMessage || imageData != nil {
+                userMessage = try await chatRepository.addFactCheckMessage(
+                    toConversation: conversationId,
+                    content: message,
+                    isUserMessage: true,
+                    sources: [],
+                    imageData: imageData,
+                    detectedLanguage: detectedLanguage,
+                    isFactCheckMessage: isFactCheckMessage
+                )
+            } else {
+                userMessage = try await chatRepository.addMessage(
+                    toConversation: conversationId,
+                    content: message,
+                    isUserMessage: true,
+                    sources: []
+                )
+            }
             AppLogger.chat.logInfo("User message saved with ID: \(userMessage.id)")
         } else {
             AppLogger.chat.logDebug("Skipping user message save (already saved with metadata)")
@@ -86,7 +109,10 @@ final class SendMessageUseCase {
                 content: message,
                 isUserMessage: true,
                 timestamp: Date(),
-                sources: []
+                sources: [],
+                imageData: imageData,
+                detectedLanguage: detectedLanguage,
+                isFactCheckMessage: isFactCheckMessage
             )
         }
 
@@ -159,15 +185,28 @@ final class SendMessageUseCase {
     /// - Parameters:
     ///   - conversationId: The ID of the conversation
     ///   - message: The message content
+    ///   - imageData: Optional image data for fact-check messages
+    ///   - detectedLanguage: Optional detected language code
+    ///   - isFactCheckMessage: Whether this is a fact-check message
     ///   - saveUserMessage: Whether to save the user message (false for fact-check messages)
     /// - Returns: Publisher that emits the result or an error
-    func executePublisher(conversationId: String, message: String, saveUserMessage: Bool = true) -> AnyPublisher<Result, Error> {
+    func executePublisher(
+        conversationId: String,
+        message: String,
+        imageData: Data? = nil,
+        detectedLanguage: String? = nil,
+        isFactCheckMessage: Bool = false,
+        saveUserMessage: Bool = true
+    ) -> AnyPublisher<Result, Error> {
         Future { promise in
             Task {
                 do {
                     let result = try await self.execute(
                         conversationId: conversationId,
                         message: message,
+                        imageData: imageData,
+                        detectedLanguage: detectedLanguage,
+                        isFactCheckMessage: isFactCheckMessage,
                         saveUserMessage: saveUserMessage
                     )
                     promise(.success(result))

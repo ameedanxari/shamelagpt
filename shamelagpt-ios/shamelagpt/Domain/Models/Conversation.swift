@@ -57,7 +57,7 @@ struct Conversation: Identifiable, Equatable {
     }
 
     /// Returns a preview of the last message content (truncated to 100 characters)
-    var preview: String {
+    var previewText: String {
         guard let lastMessage = lastMessage else {
             return "No messages"
         }

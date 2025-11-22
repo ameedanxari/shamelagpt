@@ -13,8 +13,13 @@ import java.util.UUID
 
 /**
  * Mock implementation of ChatRepository for testing.
+ *
+ * This mock mimics the real ChatRepositoryImpl behavior by actually saving
+ * messages to the provided ConversationRepository, just like the real implementation does.
  */
-class MockChatRepository : ChatRepository {
+class MockChatRepository(
+    private val conversationRepository: ConversationRepository? = null
+) : ChatRepository {
 
     var sendMessageResult: Result<ChatResponse> = Result.success(TestData.sampleChatResponse)
     var checkHealthResult: Result<HealthResponse> = Result.success(HealthResponse("OK", "ShamelaGPT"))
@@ -39,6 +44,38 @@ class MockChatRepository : ChatRepository {
 
         if (delayMs > 0) {
             kotlinx.coroutines.delay(delayMs)
+        }
+
+        // Mimic real ChatRepositoryImpl behavior: save user message if requested
+        if (saveUserMessage && conversationRepository != null) {
+            val userMessage = Message(
+                id = UUID.randomUUID().toString(),
+                content = question,
+                isUserMessage = true,
+                timestamp = System.currentTimeMillis(),
+                sources = null
+            )
+            conversationRepository.saveMessage(userMessage, conversationId)
+        }
+
+        // If API call succeeded, save AI response (mimicking real behavior)
+        sendMessageResult.onSuccess { response ->
+            if (conversationRepository != null) {
+                // Parse response to extract sources (using simplified logic for mock)
+                val (cleanContent, sources) = com.shamelagpt.android.data.remote.ResponseParser.parseAnswer(response.answer)
+
+                val aiMessage = Message(
+                    id = UUID.randomUUID().toString(),
+                    content = cleanContent,
+                    isUserMessage = false,
+                    timestamp = System.currentTimeMillis(),
+                    sources = sources.ifEmpty { null }
+                )
+                conversationRepository.saveMessage(aiMessage, conversationId)
+
+                // Update thread ID
+                conversationRepository.updateConversationThread(conversationId, response.threadId)
+            }
         }
 
         return sendMessageResult

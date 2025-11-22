@@ -46,7 +46,7 @@
 ```swift
 extension Color {
     // Primary
-    static let primary = Color(hex: "#1B5E20") // Deep Green (Islamic color)
+    static let primary = Color(hex: "#10B981") // Emerald-500 (Islamic color)
     static let primaryLight = Color(hex: "#4C8C4A")
     static let primaryDark = Color(hex: "#003300")
 
@@ -55,7 +55,7 @@ extension Color {
     static let secondaryLight = Color(hex: "#6D6D6D")
 
     // Accent
-    static let accent = Color(hex: "#D4AF37") // Gold (for highlights)
+    static let accent = Color(hex: "#F59E0B") // Amber-500 (for highlights)
 }
 ```
 

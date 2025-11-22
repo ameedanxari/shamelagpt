@@ -12,10 +12,10 @@ import CoreData
 final class ConversationDAO {
 
     // MARK: - Properties
-    private let coreDataStack: CoreDataStack
+    private let coreDataStack: CoreDataStackProtocol
 
     // MARK: - Initialization
-    init(coreDataStack: CoreDataStack = .shared) {
+    init(coreDataStack: CoreDataStackProtocol = CoreDataStack.shared) {
         self.coreDataStack = coreDataStack
     }
 

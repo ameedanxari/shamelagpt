@@ -1,0 +1,502 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project ShamelaGPT.xcodeproj -scheme ShamelaGPT -destination "platform=iOS Simulator,id=05207062-EDE4-45F8-95BB-239825544F63" "-only-testing:ShamelaGPTTests"
+
+2025-11-21 10:16:35.968 xcodebuild[3321:6723087] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (3 targets)
+    Target 'ShamelaGPTTests' in project 'ShamelaGPT'
+        ➜ Explicit dependency on target 'ShamelaGPT' in project 'ShamelaGPT'
+    Target 'ShamelaGPTUITests' in project 'ShamelaGPT'
+        ➜ Explicit dependency on target 'ShamelaGPT' in project 'ShamelaGPT'
+    Target 'ShamelaGPT' in project 'ShamelaGPT' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/momc --dry-run --action generate --swift-version 5.0 --sdkroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk --iphonesimulator-deployment-target 15.6 --module ShamelaGPT /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagpt/Data/CoreData/ShamelaGPT.xcdatamodeld /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/DerivedSources/CoreDataGenerated/ShamelaGPT
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagpt/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+Build description signature: b68fdab4b451660d674598ca9b033dd8
+Build description path: /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/XCBuildData/b68fdab4b451660d674598ca9b033dd8.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk /Users/macintosh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/ShamelaGPT.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -o /Users/macintosh/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache
+
+ProcessProductPackaging "" /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.app-Simulated.xcent (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    
+    Entitlements:
+    
+    {
+    "application-identifier" = "6AL4956WSP.com.shamelagpt.ios";
+}
+    
+    builtin-productPackagingUtility -entitlements -format xml -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.app-Simulated.xcent
+
+ProcessProductPackagingDER /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.app-Simulated.xcent /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.app-Simulated.xcent.der (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    /usr/bin/derq query -f xml -i /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.app-Simulated.xcent -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.app-Simulated.xcent.der --raw
+
+Ld /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/__preview.dylib normal (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target x86_64-apple-ios15.6-simulator -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -O0 -L/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator -F/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator -install_name @rpath/ShamelaGPT.debug.dylib -dead_strip -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/Objects-normal/x86_64/ShamelaGPT_dependency_info.dat -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.app-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.app-Simulated.xcent.der -Xlinker -no_adhoc_codesign -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/__preview.dylib
+
+Ld /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT.debug.dylib normal (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target x86_64-apple-ios15.6-simulator -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -O0 -L/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator -F/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator -filelist /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/Objects-normal/x86_64/ShamelaGPT.LinkFileList -install_name @rpath/ShamelaGPT.debug.dylib -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/Objects-normal/x86_64/ShamelaGPT_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/Objects-normal/x86_64/ShamelaGPT_dependency_info.dat -fobjc-link-runtime -fprofile-instr-generate -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/Objects-normal/x86_64/ShamelaGPT.swiftmodule @/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/Objects-normal/x86_64/ShamelaGPT-linker-args.resp -Xlinker -alias -Xlinker _main -Xlinker ___debug_main_executable_dylib_entry_point -Xlinker -no_adhoc_codesign -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT.debug.dylib
+
+ProcessInfoPlistFile /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/Info.plist /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/empty-ShamelaGPT.plist (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    builtin-infoPlistUtility /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/empty-ShamelaGPT.plist -producttype com.apple.product-type.application -genpkginfo /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/assetcatalog_generated_info.plist -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/Info.plist
+
+ConstructStubExecutorLinkFileList /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT-ExecutorLinkFileList-normal-x86_64.txt (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    construct-stub-executor-link-file-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT.debug.dylib /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor_no_swift_entry_point.a /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor.a --output /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT-ExecutorLinkFileList-normal-x86_64.txt
+note: Using stub executor library with Swift entry point. (in target 'ShamelaGPT' from project 'ShamelaGPT')
+
+Ld /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT normal (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target x86_64-apple-ios15.6-simulator -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -O0 -L/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator -F/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator -Xlinker -rpath -Xlinker @executable_path -Xlinker -rpath -Xlinker @executable_path/Frameworks -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -e ___debug_blank_executor_main -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_dylib -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT-DebugDylibPath-normal-x86_64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_instlnm -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT-DebugDylibInstallName-normal-x86_64.txt -Xlinker -filelist -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT-ExecutorLinkFileList-normal-x86_64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.app-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.app-Simulated.xcent.der /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT.debug.dylib -Xlinker -no_adhoc_codesign -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT
+
+ExtractAppIntentsMetadata (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name ShamelaGPT --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk --xcode-version 17A400 --platform-family iOS --deployment-target 15.6 --bundle-identifier com.shamelagpt.ios --output /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app --target-triple x86_64-apple-ios15.6-simulator --binary-file /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT --dependency-file /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/Objects-normal/x86_64/ShamelaGPT_dependency_info.dat --stringsdata-file /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/Objects-normal/x86_64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/Objects-normal/x86_64/ShamelaGPT.SwiftFileList --metadata-file-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.DependencyMetadataFileList --static-metadata-file-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/ShamelaGPT.DependencyStaticMetadataFileList --swift-const-vals-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/Objects-normal/x86_64/ShamelaGPT.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2025-11-21 10:16:46.895 appintentsmetadataprocessor[3453:6725314] Starting appintentsmetadataprocessor export
+2025-11-21 10:16:46.901 appintentsmetadataprocessor[3453:6725314] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CopySwiftLibs /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT.debug.dylib --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/Frameworks --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/SystemExtensions --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPT.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os --back-deploy-swift-span
+
+Ld /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest/ShamelaGPTTests normal (in target 'ShamelaGPTTests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target x86_64-apple-ios18.5-simulator -bundle -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -O0 -L/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator -L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk/Developer/Library/Frameworks -filelist /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/Objects-normal/x86_64/ShamelaGPTTests.LinkFileList -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @loader_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -bundle_loader /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT -Xlinker -object_path_lto -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/Objects-normal/x86_64/ShamelaGPTTests_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/Objects-normal/x86_64/ShamelaGPTTests_dependency_info.dat -fobjc-link-runtime -fprofile-instr-generate -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/Objects-normal/x86_64/ShamelaGPTTests.swiftmodule @/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/Objects-normal/x86_64/ShamelaGPTTests-linker-args.resp -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT.debug.dylib -Xlinker -no_adhoc_codesign -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest/ShamelaGPTTests
+
+ExtractAppIntentsMetadata (in target 'ShamelaGPTTests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name ShamelaGPTTests --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk --xcode-version 17A400 --platform-family iOS --deployment-target 18.5 --bundle-identifier com.creatrixe.shamelagptTests --output /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest --target-triple x86_64-apple-ios18.5-simulator --binary-file /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest/ShamelaGPTTests --dependency-file /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/Objects-normal/x86_64/ShamelaGPTTests_dependency_info.dat --stringsdata-file /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/Objects-normal/x86_64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/Objects-normal/x86_64/ShamelaGPTTests.SwiftFileList --metadata-file-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/ShamelaGPTTests.DependencyMetadataFileList --static-metadata-file-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/ShamelaGPTTests.DependencyStaticMetadataFileList --swift-const-vals-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/Objects-normal/x86_64/ShamelaGPTTests.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2025-11-21 10:16:47.651 appintentsmetadataprocessor[3457:6725361] Starting appintentsmetadataprocessor export
+2025-11-21 10:16:47.656 appintentsmetadataprocessor[3457:6725361] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CopySwiftLibs /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest (in target 'ShamelaGPTTests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest/ShamelaGPTTests --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest/Frameworks --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest/PlugIns --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest/SystemExtensions --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os --back-deploy-swift-span
+
+ProcessProductPackaging "" /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/ShamelaGPTUITests.xctest-Simulated.xcent (in target 'ShamelaGPTUITests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    
+    Entitlements:
+    
+    {
+    "application-identifier" = "6AL4956WSP.com.creatrixe.shamelagptUITests.xctrunner";
+    "keychain-access-groups" =     (
+        "6AL4956WSP.com.creatrixe.shamelagptUITests.xctrunner"
+    );
+}
+    
+    builtin-productPackagingUtility -entitlements -format xml -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/ShamelaGPTUITests.xctest-Simulated.xcent
+
+ProcessInfoPlistFile /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest/Info.plist /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/empty-ShamelaGPTTests.plist (in target 'ShamelaGPTTests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    builtin-infoPlistUtility /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTTests.build/empty-ShamelaGPTTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest/Info.plist
+
+ProcessProductPackagingDER /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/ShamelaGPTUITests.xctest-Simulated.xcent /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/ShamelaGPTUITests.xctest-Simulated.xcent.der (in target 'ShamelaGPTUITests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    /usr/bin/derq query -f xml -i /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/ShamelaGPTUITests.xctest-Simulated.xcent -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/ShamelaGPTUITests.xctest-Simulated.xcent.der --raw
+
+CodeSign /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest (in target 'ShamelaGPTTests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/PlugIns/ShamelaGPTTests.xctest
+
+CodeSign /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT.debug.dylib (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/ShamelaGPT.debug.dylib
+
+CodeSign /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/__preview.dylib (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/__preview.dylib
+
+CodeSign /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app
+
+Validate /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app (in target 'ShamelaGPT' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    builtin-validationUtility /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app -shallow-bundle -infoplist-subpath Info.plist
+
+ProcessInfoPlistFile /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest/Info.plist /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/empty-ShamelaGPTUITests.plist (in target 'ShamelaGPTUITests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    builtin-infoPlistUtility /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/empty-ShamelaGPTUITests.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/ProductTypeInfoPlistAdditions.plist -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest/Info.plist
+
+Ld /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest/ShamelaGPTUITests normal (in target 'ShamelaGPTUITests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target x86_64-apple-ios18.5-simulator -bundle -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -O0 -L/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator -L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk/Developer/Library/Frameworks -filelist /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/Objects-normal/x86_64/ShamelaGPTUITests.LinkFileList -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @loader_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/Objects-normal/x86_64/ShamelaGPTUITests_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/Objects-normal/x86_64/ShamelaGPTUITests_dependency_info.dat -fobjc-link-runtime -fprofile-instr-generate -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/Objects-normal/x86_64/ShamelaGPTUITests.swiftmodule @/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/Objects-normal/x86_64/ShamelaGPTUITests-linker-args.resp -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/ShamelaGPTUITests.xctest-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/ShamelaGPTUITests.xctest-Simulated.xcent.der -Xlinker -no_adhoc_codesign -o /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest/ShamelaGPTUITests
+
+CopySwiftLibs /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest (in target 'ShamelaGPTUITests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest/ShamelaGPTUITests --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest/Frameworks --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest/PlugIns --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest/SystemExtensions --scan-folder /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os --back-deploy-swift-span
+
+ExtractAppIntentsMetadata (in target 'ShamelaGPTUITests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name ShamelaGPTUITests --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk --xcode-version 17A400 --platform-family iOS --deployment-target 18.5 --bundle-identifier com.creatrixe.shamelagptUITests --output /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest --target-triple x86_64-apple-ios18.5-simulator --binary-file /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest/ShamelaGPTUITests --dependency-file /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/Objects-normal/x86_64/ShamelaGPTUITests_dependency_info.dat --stringsdata-file /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/Objects-normal/x86_64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/Objects-normal/x86_64/ShamelaGPTUITests.SwiftFileList --metadata-file-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/ShamelaGPTUITests.DependencyMetadataFileList --static-metadata-file-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/ShamelaGPTUITests.DependencyStaticMetadataFileList --swift-const-vals-list /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Intermediates.noindex/ShamelaGPT.build/Debug-iphonesimulator/ShamelaGPTUITests.build/Objects-normal/x86_64/ShamelaGPTUITests.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2025-11-21 10:16:48.610 appintentsmetadataprocessor[3465:6725510] Starting appintentsmetadataprocessor export
+2025-11-21 10:16:48.614 appintentsmetadataprocessor[3465:6725510] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CodeSign /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest (in target 'ShamelaGPTUITests' from project 'ShamelaGPT')
+    cd /Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPTUITests-Runner.app/PlugIns/ShamelaGPTUITests.xctest
+
+Testing started
+Test suite 'OCRManagerTests' started on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)'
+Test case 'OCRManagerTests.testClearErrorWorks()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.143 seconds)
+Test case 'OCRManagerTests.testClearExtractedTextWorks()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (3.858 seconds)
+Test case 'OCRManagerTests.testErrorClearedOnNewRecognition()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (1.780 seconds)
+Test case 'OCRManagerTests.testErrorSetOnFailure()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.004 seconds)
+Test case 'OCRManagerTests.testExtractedTextUpdatedAfterRecognition()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (1.839 seconds)
+Test case 'OCRManagerTests.testInvalidImageErrorDescription()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.003 seconds)
+Test case 'OCRManagerTests.testIsProcessingFalseAfterCompletion()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (1.730 seconds)
+Test case 'OCRManagerTests.testIsProcessingTrueDuringRecognition()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (1.645 seconds)
+Test case 'OCRManagerTests.testNoTextFoundErrorDescription()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.002 seconds)
+Test case 'OCRManagerTests.testOCRErrorEquality()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.003 seconds)
+Test case 'OCRManagerTests.testRecognitionFailedErrorDescription()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.002 seconds)
+Test case 'OCRManagerTests.testRecognizeTextFromArabicImage()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (1.781 seconds)
+Test case 'OCRManagerTests.testRecognizeTextFromImageWithNoText()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.797 seconds)
+Test case 'OCRManagerTests.testRecognizeTextFromInvalidImage()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.003 seconds)
+Test case 'OCRManagerTests.testRecognizeTextFromMixedLanguageImage()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (1.725 seconds)
+Test case 'OCRManagerTests.testRecognizeTextFromValidImage()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (1.793 seconds)
+Test case 'OCRManagerTests.testRecognizeTextFromVerySmallImage()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (1.676 seconds)
+Test case 'OCRManagerTests.testRecognizeTextWithLanguageDetection()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (2.526 seconds)
+Test suite 'ChatViewModelTests' started on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)'
+Test case 'ChatViewModelTests.testAPIErrorDisplaysCorrectMessage()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.225 seconds)
+Test case 'ChatViewModelTests.testCannotSendMessageWhenInputIsEmpty()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.003 seconds)
+Test case 'ChatViewModelTests.testCannotSendMessageWhenLoading()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.006 seconds)
+Test case 'ChatViewModelTests.testCannotSendMessageWhileProcessingOCR()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.007 seconds)
+Test case 'ChatViewModelTests.testCannotSendMessageWhileRecording()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.006 seconds)
+Test case 'ChatViewModelTests.testCanSendMessageWhenInputIsNotEmpty()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.003 seconds)
+Test case 'ChatViewModelTests.testClearErrorResetsErrorState()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.003 seconds)
+Test case 'ChatViewModelTests.testClearOCRError()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.004 seconds)
+Test case 'ChatViewModelTests.testClearVoiceInputError()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.004 seconds)
+Test case 'ChatViewModelTests.testConfirmFactCheckClearsOCRState()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4469)' (0.000 seconds)
+Test case 'ChatViewModelTests.testConfirmFactCheckSendsMessage()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4872)' (0.448 seconds)
+Test case 'ChatViewModelTests.testConfirmFactCheckWithDetectedLanguage()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4872)' (0.208 seconds)
+Test case 'ChatViewModelTests.testConfirmFactCheckWithImageData()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4872)' (0.217 seconds)
+Test case 'ChatViewModelTests.testConversationNotFoundError()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4872)' (0.011 seconds)
+Test case 'ChatViewModelTests.testDismissOCRConfirmationClearsState()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4872)' (0.004 seconds)
+Test case 'ChatViewModelTests.testFactCheckMessageFailureHandling()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4872)' (0.000 seconds)
+Test case 'ChatViewModelTests.testFactCheckMessageWithEmptyText()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.323 seconds)
+Test case 'ChatViewModelTests.testHandleCameraButtonTapShowsSheet()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.003 seconds)
+Test case 'ChatViewModelTests.testLoadMessagesEmptyConversation()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'ChatViewModelTests.testLoadMessagesOrderedByTimestamp()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.518 seconds)
+Test case 'ChatViewModelTests.testLoadMessagesPopulatesMessages()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.012 seconds)
+Test case 'ChatViewModelTests.testLoadMessagesUpdatesThreadId()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'ChatViewModelTests.testLoadMessagesWithError()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.010 seconds)
+Test case 'ChatViewModelTests.testMultipleSendMessagesInSequence()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.613 seconds)
+Test case 'ChatViewModelTests.testNetworkErrorDisplaysCorrectMessage()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.212 seconds)
+Test case 'ChatViewModelTests.testProcessImageWithOCRFailure()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.008 seconds)
+Test case 'ChatViewModelTests.testProcessImageWithOCRSuccess()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.021 seconds)
+Test case 'ChatViewModelTests.testSelectCameraShowsCameraPicker()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.004 seconds)
+Test case 'ChatViewModelTests.testSelectPhotoLibraryShowsPhotoPicker()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.003 seconds)
+Test suite 'FactCheckIntegrationTests' started on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)'
+Test case 'ChatViewModelTests.testSendMessageClearsInputText()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.022 seconds)
+Test case 'ChatViewModelTests.testSendMessageCreatesOptimisticMessage()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.060 seconds)
+Test case 'ChatViewModelTests.testSendMessageFailureRemovesOptimisticMessage()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.306 seconds)
+Test case 'ChatViewModelTests.testSendMessageFailureRestoresInputText()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.323 seconds)
+Test case 'ChatViewModelTests.testSendMessageSuccess()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.306 seconds)
+Test case 'ChatViewModelTests.testSendMessageUpdatesThreadId()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.208 seconds)
+Test case 'ChatViewModelTests.testSendMessageWithNetworkError()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (1.169 seconds)
+Test case 'ChatViewModelTests.testSendMessageWithWhitespaceOnlyIsIgnored()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.107 seconds)
+Test case 'ChatViewModelTests.testStartVoiceInputWithPermissionDenied()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.007 seconds)
+Test case 'ChatViewModelTests.testStartVoiceInputWithPermissionGranted()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'ChatViewModelTests.testToggleVoiceInputStartsRecording()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'ChatViewModelTests.testToggleVoiceInputStopsRecording()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.007 seconds)
+Test case 'ChatViewModelTests.testUpdateInputTextUpdatesState()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.004 seconds)
+Test case 'ChatViewModelTests.testVoiceInputTranscriptionUpdatesInputText()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test suite 'VoiceInputManagerTests' started on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)'
+Test case 'VoiceInputManagerTests.testAuthorizationStatusTypes()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.937 seconds)
+Test case 'VoiceInputManagerTests.testAuthorizationStatusUpdatedAfterRequest()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.024 seconds)
+Test case 'VoiceInputManagerTests.testClearErrorWorks()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.006 seconds)
+Test case 'VoiceInputManagerTests.testClearTranscriptionWorks()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.006 seconds)
+Test case 'VoiceInputManagerTests.testErrorNilInitially()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.006 seconds)
+Test case 'VoiceInputManagerTests.testInitialState()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.006 seconds)
+Test case 'VoiceInputManagerTests.testMicrophonePermissionDeniedErrorDescription()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'VoiceInputManagerTests.testMultipleClearErrorCalls()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.006 seconds)
+Test case 'VoiceInputManagerTests.testMultipleClearTranscriptionCalls()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'VoiceInputManagerTests.testMultipleStopRecordingCalls()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.294 seconds)
+Test case 'VoiceInputManagerTests.testPermissionDeniedErrorDescription()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'VoiceInputManagerTests.testRecognitionFailedErrorDescription()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.006 seconds)
+Test case 'VoiceInputManagerTests.testRecognitionFailedErrorEquality()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.006 seconds)
+Test case 'VoiceInputManagerTests.testRecognizerNotAvailableErrorDescription()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.004 seconds)
+Test case 'VoiceInputManagerTests.testRequestPermissionSpeechAuthorized()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.007 seconds)
+Test case 'VoiceInputManagerTests.testStartRecordingRequiresAuthorization()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.007 seconds)
+Test case 'VoiceInputManagerTests.testStopRecordingClearsRecordingState()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'VoiceInputManagerTests.testStopRecordingWhenNotRecording()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'VoiceInputManagerTests.testTranscriptionStartsEmpty()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'VoiceInputManagerTests.testUnableToCreateRequestErrorDescription()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.006 seconds)
+Test case 'VoiceInputManagerTests.testVoiceInputErrorEquality()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test suite 'APIClientTests' started on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)'
+Test case 'APIClientTests.testDecodingErrorHandled()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.020 seconds)
+Test case 'APIClientTests.testHealthCheckEndpoint()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.015 seconds)
+Test case 'APIClientTests.testHealthCheckMethod()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'APIClientTests.testHealthCheckSuccess()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'APIClientTests.testMockClientSendMessageSuccess()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.005 seconds)
+Test case 'FactCheckIntegrationTests.testCompleteFactCheckFlow()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (5.437 seconds)
+Test case 'FactCheckIntegrationTests.testFactCheckAPICallFormatted()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.059 seconds)
+Test case 'FactCheckIntegrationTests.testFactCheckMessageWithImageData()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.047 seconds)
+Test case 'FactCheckIntegrationTests.testFactCheckMessageWithLanguage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.056 seconds)
+Test suite 'ModelTests' started on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)'
+Test case 'ModelTests.testConversationHasMessages()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'ModelTests.testConversationInitWithDefaults()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.005 seconds)
+Test case 'ModelTests.testConversationLastMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'ModelTests.testConversationMessageCount()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.003 seconds)
+Test case 'ModelTests.testConversationPreview()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'ModelTests.testConversationTypeEquality()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.003 seconds)
+Test case 'ModelTests.testConversationWithConversationType()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'ModelTests.testConversationWithMessages()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'ModelTests.testConversationWithTitle()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'ModelTests.testMessageEquality()' failed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (1.612 seconds)
+Test case 'ModelTests.testMessageFactCheckProperties()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.008 seconds)
+Test case 'ModelTests.testMessageHasSources()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.006 seconds)
+Test case 'ModelTests.testMessageInitWithDefaults()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.009 seconds)
+Test case 'ModelTests.testMessageIsAssistantMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.027 seconds)
+Test case 'ModelTests.testMessageLanguageDisplayName()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.007 seconds)
+Test case 'ModelTests.testSourceCitationFormatting()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'ModelTests.testSourceCitationWithNoVolumeOrPage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.003 seconds)
+Test case 'ModelTests.testSourceCitationWithoutAuthor()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.003 seconds)
+Test case 'ModelTests.testSourceCitationWithPageOnly()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.003 seconds)
+Test case 'ModelTests.testSourceCitationWithVolumeAndPage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.003 seconds)
+Test case 'ModelTests.testSourceEquality()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'ModelTests.testSourceInitWithDefaults()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.003 seconds)
+Test suite 'HistoryViewModelTests' started on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)'
+Test case 'HistoryViewModelTests.testCancelDeleteClearsState()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.008 seconds)
+Test case 'HistoryViewModelTests.testConfirmDeleteRemovesConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.107 seconds)
+Test case 'HistoryViewModelTests.testConversationObserverUpdatesInRealTime()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.107 seconds)
+Test case 'HistoryViewModelTests.testCreateNewConversationReturnsId()' failed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.013 seconds)
+Test case 'HistoryViewModelTests.testCreateNewConversationSuccess()' failed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.008 seconds)
+Test case 'HistoryViewModelTests.testCreateNewConversationWithError()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.005 seconds)
+Test case 'HistoryViewModelTests.testDeleteAllConversationsSuccess()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.107 seconds)
+Test case 'HistoryViewModelTests.testDeleteAllConversationsWithError()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.105 seconds)
+Test case 'HistoryViewModelTests.testDeleteConversationWithError()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.106 seconds)
+Test case 'HistoryViewModelTests.testDisplayTitleForConversationWithTitle()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'HistoryViewModelTests.testDisplayTitleForEmptyTitle()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.003 seconds)
+Test case 'HistoryViewModelTests.testDisplayTitleGeneratedFromFirstMessage()' failed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.008 seconds)
+Test case 'HistoryViewModelTests.testExportConversationFormatting()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.005 seconds)
+Test case 'HistoryViewModelTests.testExportConversationWithSources()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'HistoryViewModelTests.testExportEmptyConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'HistoryViewModelTests.testGenerateTitleFromEmptyMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.003 seconds)
+Test case 'HistoryViewModelTests.testGenerateTitleFromMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'HistoryViewModelTests.testGenerateTitleTruncatesLongMessage()' failed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.010 seconds)
+Test case 'HistoryViewModelTests.testLoadConversationsFiltersEmptyConversations()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.106 seconds)
+Test case 'HistoryViewModelTests.testLoadConversationsOrderedByUpdatedAt()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.106 seconds)
+Test case 'HistoryViewModelTests.testLoadConversationsSuccess()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.112 seconds)
+Test case 'HistoryViewModelTests.testLoadConversationsWithError()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.106 seconds)
+Test case 'HistoryViewModelTests.testMessagePreviewForConversationWithMessages()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'HistoryViewModelTests.testMessagePreviewForEmptyConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.003 seconds)
+Test case 'HistoryViewModelTests.testRelativeTimeForOldConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.006 seconds)
+Test case 'HistoryViewModelTests.testRelativeTimeForRecentConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test case 'HistoryViewModelTests.testRequestDeleteShowsConfirmation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.004 seconds)
+Test suite 'ChatRepositoryTests' started on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)'
+Test case 'ChatRepositoryTests.testAddFactCheckMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.045 seconds)
+Test case 'ChatRepositoryTests.testAddMessageToConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.017 seconds)
+Test case 'ChatRepositoryTests.testAddMessageToNonExistentConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.011 seconds)
+Test case 'ChatRepositoryTests.testConversationsPublisherEmitsUpdates()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.021 seconds)
+Test case 'ChatRepositoryTests.testConversationsPublisherOnCreate()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.015 seconds)
+Test case 'ChatRepositoryTests.testConversationsPublisherOnDelete()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.027 seconds)
+Test case 'ChatRepositoryTests.testConversationsPublisherOnUpdate()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.022 seconds)
+Test case 'ChatRepositoryTests.testCreateConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.013 seconds)
+Test case 'APIClientTests.testRequestEncodingSnakeCaseCorrect()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (4977)' (0.000 seconds)
+Test case 'ChatRepositoryTests.testDeleteAllConversations()' failed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (4978)' (0.000 seconds)
+Test case 'APIClientTests.testResponseDecodingSnakeCaseCorrect()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (2.283 seconds)
+Test case 'APIClientTests.testSendMessage400Error()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (0.022 seconds)
+Test case 'APIClientTests.testSendMessage401Error()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (0.009 seconds)
+Test case 'APIClientTests.testSendMessage404Error()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (0.013 seconds)
+Test case 'APIClientTests.testSendMessage500Error()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (0.015 seconds)
+Test case 'APIClientTests.testSendMessage503Error()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (0.024 seconds)
+Test case 'APIClientTests.testSendMessageBadServerResponse()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (0.010 seconds)
+Test case 'APIClientTests.testSendMessageEndpoint()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (0.079 seconds)
+Test case 'APIClientTests.testSendMessageInvalidURL()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (0.009 seconds)
+Test case 'APIClientTests.testSendMessageMethod()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (0.010 seconds)
+Test case 'APIClientTests.testSendMessageNoConnection()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (0.008 seconds)
+Test case 'ChatRepositoryTests.testDeleteConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.201 seconds)
+Test case 'ChatRepositoryTests.testDeleteMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.030 seconds)
+Test case 'ChatRepositoryTests.testDeleteMessageCascadesFromConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.031 seconds)
+Test case 'ChatRepositoryTests.testDeleteNonExistentConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.012 seconds)
+Test case 'ChatRepositoryTests.testFetchAllConversations()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.031 seconds)
+Test case 'ChatRepositoryTests.testFetchConversationById()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.031 seconds)
+Test case 'ChatRepositoryTests.testFetchConversationByThreadId()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.021 seconds)
+Test case 'ChatRepositoryTests.testFetchConversationNotFound()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.012 seconds)
+Test case 'ChatRepositoryTests.testFetchMessagesForConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.032 seconds)
+Test case 'ChatRepositoryTests.testFetchMessagesOrderedByTimestamp()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.130 seconds)
+Test case 'ChatRepositoryTests.testFetchMostRecentEmptyConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.236 seconds)
+Test case 'ChatRepositoryTests.testUpdateConversationThreadId()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.020 seconds)
+Test case 'ChatRepositoryTests.testUpdateConversationTitle()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.020 seconds)
+Test case 'ChatRepositoryTests.testUpdateMessageContent()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.025 seconds)
+Test case 'ChatRepositoryTests.testUpdateNonExistentConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.010 seconds)
+Test suite 'MessageFlowIntegrationTests' started on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)'
+Test case 'MessageFlowIntegrationTests.testCompleteMessageFlow()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.038 seconds)
+Test case 'MessageFlowIntegrationTests.testConversationUpdatedAfterMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.152 seconds)
+Test case 'MessageFlowIntegrationTests.testMessagePersistence()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.035 seconds)
+Test case 'MessageFlowIntegrationTests.testMessageWithSourcesPersistence()' failed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.829 seconds)
+Test case 'MessageFlowIntegrationTests.testMultipleMessagesInConversation()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.074 seconds)
+Test case 'MessageFlowIntegrationTests.testThreadIdPersistsAcrossMessages()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.050 seconds)
+Test suite 'NetworkErrorRecoveryTests' started on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)'
+Test case 'NetworkErrorRecoveryTests.testAPITimeoutRecovery()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.050 seconds)
+Test case 'NetworkErrorRecoveryTests.testMultipleNetworkFailuresWithRecovery()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.038 seconds)
+Test case 'NetworkErrorRecoveryTests.testOfflineModeMessageQueuing()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.026 seconds)
+Test case 'NetworkErrorRecoveryTests.testReconnectionResendsPendingMessages()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.039 seconds)
+Test case 'NetworkErrorRecoveryTests.testRecoveryAfterNetworkError()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.042 seconds)
+Test suite 'SendMessageUseCaseTests' started on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)'
+Test case 'SendMessageUseCaseTests.testExecuteExtractsSourcesCorrectly()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.011 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteKeepsUserMessageOnAPIFailure()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.007 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteParsesResponseCorrectly()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.011 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteSavesAssistantMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.010 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteSavesUserMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.010 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteUpdatesThreadIdOnFirstMessage()' failed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.020 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithAPI4xxError()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.006 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithAPI5xxError()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.006 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithAPITimeout()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.006 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithArabicText()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.010 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithConversationNotFound()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.007 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithDecodingError()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.011 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithEmptyMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.010 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithExistingThreadId()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.009 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithFactCheckMessageSkipsSaveUserMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.010 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithInvalidResponse()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.006 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithMixedLanguages()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.009 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithNoNetworkConnection()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.005 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithSpecialCharacters()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.007 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithValidMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.008 seconds)
+Test case 'SendMessageUseCaseTests.testExecuteWithVeryLongMessage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.008 seconds)
+Test suite 'LanguageManagerTests' started on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)'
+Test case 'LanguageManagerTests.testCurrentLanguageDisplayName()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.016 seconds)
+Test case 'LanguageManagerTests.testDefaultLanguageIsEnglish()' failed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.016 seconds)
+Test case 'LanguageManagerTests.testLanguageAllCases()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'LanguageManagerTests.testLanguageAppStorageInit()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.003 seconds)
+Test case 'LanguageManagerTests.testLanguageAppStorageValue()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.003 seconds)
+Test case 'LanguageManagerTests.testLanguageChangeNotification()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.010 seconds)
+Test case 'LanguageManagerTests.testLanguageDisplayNames()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'LanguageManagerTests.testLanguageIdentifiable()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'LanguageManagerTests.testLanguageLocaleIdentifiers()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'LanguageManagerTests.testLanguagePersistence()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.008 seconds)
+Test case 'LanguageManagerTests.testLanguageRawValues()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.003 seconds)
+Test case 'LanguageManagerTests.testSetLanguageToArabic()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.007 seconds)
+Test case 'LanguageManagerTests.testSetLanguageToEnglish()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.009 seconds)
+Test suite 'ResponseParserTests' started on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)'
+Test case 'ResponseParserTests.testCleanContentExcludesSourcesSection()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testCleanContentPreservesMarkdown()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.003 seconds)
+Test case 'ResponseParserTests.testCleanContentTrimsWhitespace()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.003 seconds)
+Test case 'ResponseParserTests.testCleanContentWithCodeBlocks()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testParseEmptyResponse()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testParseResponsePreservesNewlines()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testParseResponseWithArabicBookNames()' pas2025-11-21 10:21:10.517 xcodebuild[3321:6765186]  iOSSimulator: 3A18AC8F-B7CD-4E3B-A297-2D09BF2705AB: Failed to launch app with identifier: com.shamelagpt.ios and options: {
+    "activate_suspended" = 0;
+    arguments =     (
+    );
+    environment =     {
+        "APP_DISTRIBUTOR_ID_OVERRIDE" = "com.apple.AppStore";
+        "CA_ASSERT_MAIN_THREAD_TRANSACTIONS" = 0;
+        "CA_DEBUG_TRANSACTIONS" = 0;
+        "DYLD_FRAMEWORK_PATH" = "/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator:/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks";
+        "DYLD_INSERT_LIBRARIES" = "/usr/lib/libRPAC.dylib:/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/Frameworks/libXCTestBundleInject.dylib:/Library/Developer/CoreSimulator/Volumes/iOS_22G86/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 18.6.simruntime/Contents/Resources/RuntimeRoot/usr/lib/libMainThreadChecker.dylib";
+        "DYLD_LIBRARY_PATH" = "/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator:/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib";
+        "LLVM_PROFILE_FILE" = "/var/folders/jy/829rdpdd7h319kmz977nr0rc0000gn/T/com.shamelagpt.ios/327A4563-777B-406A-8B1F-8C12CCA5F995-3321-000109FB72EDA91C/D39CADE2-F3BC-4C58-9D35-0223CBED1584-%p%c.profraw";
+        NSApplicationQuitWithoutSuddenTermination = YES;
+        NSUnbufferedIO = YES;
+        "OS_ACTIVITY_DT_MODE" = YES;
+        "PERFC_ENABLE_EXTENDED_DIAGNOSTIC_FORMAT" = 1;
+        "PERFC_ENABLE_PROFILE_MODE" = 1;
+        "PERFC_RESET_INSERT_LIBRARIES" = 1;
+        "PERFC_SUPPRESS_SYSTEM_REPORTS" = 1;
+        "RUN_DESTINATION_DEVICE_NAME" = "Clone 3 of iPhone 16 Pro";
+        "RUN_DESTINATION_DEVICE_PLATFORM_IDENTIFIER" = "com.apple.platform.iphonesimulator";
+        "RUN_DESTINATION_DEVICE_UDID" = "3A18AC8F-B7CD-4E3B-A297-2D09BF2705AB";
+        "SQLITE_ENABLE_THREAD_ASSERTIONS" = 1;
+        TERM = dumb;
+        XCInjectBundleInto = unused;
+        "XCODE_SCHEME_NAME" = ShamelaGPT;
+        "XCODE_TEST_PLAN_NAME" = ShamelaGPT;
+        XCTestBundleInjectPath = "/usr/lib/libRPAC.dylib:/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator/ShamelaGPT.app/Frameworks/libXCTestBundleInject.dylib:/Library/Developer/CoreSimulator/Volumes/iOS_22G86/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 18.6.simruntime/Contents/Resources/RuntimeRoot/usr/lib/libMainThreadChecker.dylib";
+        XCTestBundlePath = "PlugIns/ShamelaGPTTests.xctest";
+        XCTestConfigurationFilePath = "";
+        XCTestSessionIdentifier = "9A0926E3-7C54-42FE-8724-BCF36EBFB1E7";
+        "__XCODE_BUILT_PRODUCTS_DIR_PATHS" = "/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator";
+        "__XPC_DYLD_FRAMEWORK_PATH" = "/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator";
+        "__XPC_DYLD_LIBRARY_PATH" = "/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Build/Products/Debug-iphonesimulator";
+        "__XPC_LLVM_PROFILE_FILE" = "/var/folders/jy/829rdpdd7h319kmz977nr0rc0000gn/T/com.shamelagpt.ios/327A4563-777B-406A-8B1F-8C12CCA5F995-3321-000109FB72EDA91C/D39CADE2-F3BC-4C58-9D35-0223CBED1584-%p%c.profraw";
+    };
+    stderr = "/dev/ttys002";
+    stdout = "/dev/ttys002";
+    "terminate_running_process" = 1;
+    "wait_for_debugger" = 1;
+} (error = Error Domain=FBSOpenApplicationServiceErrorDomain Code=1 "Simulator device failed to launch com.shamelagpt.ios." UserInfo={NSLocalizedDescription=Simulator device failed to launch com.shamelagpt.ios., NSUnderlyingError=0x7fd9c3410230 {Error Domain=FBSOpenApplicationServiceErrorDomain Code=1 "The request to open "com.shamelagpt.ios" failed." UserInfo={BSErrorCodeDescription=RequestDenied, NSLocalizedDescription=The request to open "com.shamelagpt.ios" failed., NSUnderlyingError=0x7fd9c3411b80 {Error Domain=FBProcessExit Code=64 "The process failed to launch." UserInfo={NSUnderlyingError=0x7fd9c3411e30 {Error Domain=RBSRequestErrorDomain Code=5 "Launch failed." UserInfo=0x7fd9c2566a60 (not displayed)}, BSErrorCodeDescription=launch-failed, NSLocalizedFailureReason=The process failed to launch.}}, FBSOpenApplicationRequestID=0xe046, NSLocalizedFailureReason=The request was denied by service delegate (SBMainWorkspace).}}, NSLocalizedFailureReason=The request was denied by service delegate (SBMainWorkspace)., FBSOpenApplicationRequestID=0xe046, SimCallingSelector=launchApplicationWithID:options:pid:error:, BSErrorCodeDescription=RequestDenied})
+2025-11-21 10:22:05.220 xcodebuild[3321:6723087] [MT] IDETestOperationsObserverDebug: 316.549 elapsed -- Testing started completed.
+2025-11-21 10:22:05.220 xcodebuild[3321:6723087] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2025-11-21 10:22:05.220 xcodebuild[3321:6723087] [MT] IDETestOperationsObserverDebug: 316.549 sec, +316.549 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/macintosh/Library/Developer/Xcode/DerivedData/ShamelaGPT-gfmgygkizfykobahpbvplkyensjf/Logs/Test/Test-ShamelaGPT-2025.11.21_10-16-36--0800.xcresult
+
+** TEST FAILED **
+
+sed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testParseResponseWithComplexURL()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testParseResponseWithEmptyBookName()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.011 seconds)
+Test case 'ResponseParserTests.testParseResponseWithHTTPURL()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testParseResponseWithIncompleteSourceData()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testParseResponseWithMalformedMarkdown()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testParseResponseWithMalformedSources()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testParseResponseWithMissingBookName()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testParseResponseWithMissingSourceURL()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.005 seconds)
+Test case 'ResponseParserTests.testParseResponseWithMultipleSources()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.007 seconds)
+Test case 'ResponseParserTests.testParseResponseWithMultipleSourcesSections()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.005 seconds)
+Test case 'ResponseParserTests.testParseResponseWithoutSources()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.004 seconds)
+Test case 'ResponseParserTests.testParseResponseWithPageOnly()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.005 seconds)
+Test case 'ResponseParserTests.testParseResponseWithSources()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.005 seconds)
+Test case 'ResponseParserTests.testParseResponseWithSpecialCharacters()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.008 seconds)
+Test case 'ResponseParserTests.testParseResponseWithVolumeAndPage()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.007 seconds)
+Test case 'ResponseParserTests.testParseResponseWithWhitespaceInSources()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.007 seconds)
+Test suite 'shamelagptTests' started on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)'
+Test case 'shamelagptTests/example()' passed on 'Clone 2 of iPhone 16 Pro - ShamelaGPT (5228)' (0.000 seconds)
+Test case 'APIClientTests.testSendMessageRequestBodySerialization()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5154)' (0.000 seconds)
+Test case 'APIClientTests.testSendMessageReturnsThreadId()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5402)' (0.369 seconds)
+Test case 'APIClientTests.testSendMessageSuccess()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5402)' (0.015 seconds)
+Test case 'APIClientTests.testSendMessageTimeout()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5402)' (0.004 seconds)
+Test case 'APIClientTests.testSendMessageWithLongQuestion()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5402)' (0.011 seconds)
+Test case 'APIClientTests.testSendMessageWithoutThreadId()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5402)' (0.000 seconds)
+Test case 'APIClientTests.testSendMessageWithSpecialCharacters()' passed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5529)' (0.082 seconds)
+Test case 'APIClientTests.testSendMessageWithThreadId()' failed on 'Clone 1 of iPhone 16 Pro - ShamelaGPT (5529)' (0.000 seconds)
