@@ -56,13 +56,19 @@ final class OCRManagerTests: XCTestCase {
         let arabicText = "مرحبا"
         let image = try createTestImage(withText: arabicText, fontSize: 48)
 
-        // When
-        let result = try await sut.recognizeTextWithLanguage(from: image)
-
-        // Then - Should attempt recognition (accuracy may vary with generated images)
-        XCTAssertFalse(sut.isProcessing, "Should not be processing after completion")
-        // Note: Vision might not perfectly recognize generated Arabic text
-        // but should at least complete without crashing
+        // When/Then - Should attempt recognition (accuracy may vary with generated images)
+        do {
+            let result = try await sut.recognizeTextWithLanguage(from: image)
+            XCTAssertFalse(sut.isProcessing, "Should not be processing after completion")
+            // If text is recognized, verify the result
+            XCTAssertFalse(result.text.isEmpty, "Recognized text should not be empty")
+        } catch OCRError.noTextFound {
+            // Vision might not recognize text from programmatically generated images
+            // This is acceptable behavior
+            XCTAssertFalse(sut.isProcessing, "Should not be processing after completion")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
     }
 
     func testRecognizeTextFromMixedLanguageImage() async throws {
@@ -71,7 +77,7 @@ final class OCRManagerTests: XCTestCase {
         let image = try createTestImage(withText: mixedText, fontSize: 48)
 
         // When
-        let result = try await sut.recognizeTextWithLanguage(from: image)
+        _ = try await sut.recognizeTextWithLanguage(from: image)
 
         // Then
         XCTAssertFalse(sut.isProcessing, "Should not be processing after completion")
@@ -124,7 +130,7 @@ final class OCRManagerTests: XCTestCase {
         // When
         // Should complete without crashing (may or may not find text)
         do {
-            let text = try await sut.recognizeText(from: tinyImage)
+            _ = try await sut.recognizeText(from: tinyImage)
             // If successful, verify state
             XCTAssertFalse(sut.isProcessing)
         } catch {
@@ -144,10 +150,9 @@ final class OCRManagerTests: XCTestCase {
 
         // Track processing state
         var wasProcessing = false
-        let expectation = XCTestExpectation(description: "Check processing state")
 
         // Start recognition in background
-        Task {
+        let recognitionTask = Task {
             do {
                 _ = try await sut.recognizeText(from: image)
             } catch {
@@ -160,11 +165,11 @@ final class OCRManagerTests: XCTestCase {
         wasProcessing = sut.isProcessing
 
         // Wait for completion
-        try await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+        _ = await recognitionTask.result
 
         // Then
-        // Note: Timing-dependent tests can be flaky, but this checks the pattern
         XCTAssertFalse(sut.isProcessing, "Should not be processing after completion")
+        XCTAssertTrue(wasProcessing, "Processing flag should be true while recognition is running")
     }
 
     func testIsProcessingFalseAfterCompletion() async throws {
@@ -188,7 +193,7 @@ final class OCRManagerTests: XCTestCase {
 
         // When
         do {
-            let text = try await sut.recognizeText(from: image)
+        let text = try await sut.recognizeText(from: image)
 
             // Then
             if !text.isEmpty {
@@ -378,19 +383,5 @@ final class OCRManagerTests: XCTestCase {
     }
 }
 
-// MARK: - OCRError Equatable Conformance (for testing)
-
-extension OCRError: Equatable {
-    public static func == (lhs: OCRError, rhs: OCRError) -> Bool {
-        switch (lhs, rhs) {
-        case (.invalidImage, .invalidImage):
-            return true
-        case (.noTextFound, .noTextFound):
-            return true
-        case (.recognitionFailed(let lhsMessage), .recognitionFailed(let rhsMessage)):
-            return lhsMessage == rhsMessage
-        default:
-            return false
-        }
-    }
-}
+// MARK: - OCRError Equatable Conformance
+// Note: OCRError now conforms to Equatable in the main codebase

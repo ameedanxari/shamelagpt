@@ -12,7 +12,9 @@
       "Bash(./gradlew test:*)",
       "Bash(find:*)",
       "Bash(open:*)",
-      "Bash(xargs cat:*)"
+      "Bash(xargs cat:*)",
+      "Bash(xcrun simctl:*)",
+      "Bash(./gradlew:*)"
     ],
     "deny": [],
     "ask": []

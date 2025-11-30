@@ -10,6 +10,7 @@ import UIKit
 import Combine
 
 /// Protocol for OCR management
+@MainActor
 protocol OCRManagerProtocol: AnyObject, ObservableObject {
     var extractedText: String { get }
     var isProcessing: Bool { get }

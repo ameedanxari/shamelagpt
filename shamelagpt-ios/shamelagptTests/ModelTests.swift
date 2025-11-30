@@ -14,25 +14,30 @@ final class ModelTests: XCTestCase {
 
     func testMessageEquality() throws {
         // Given
+        let timestamp = Date()
+
         let message1 = Message(
             id: "msg-1",
             conversationId: "conv-1",
             content: "Hello",
-            isUserMessage: true
+            isUserMessage: true,
+            timestamp: timestamp
         )
 
         let message2 = Message(
             id: "msg-1",
             conversationId: "conv-1",
             content: "Hello",
-            isUserMessage: true
+            isUserMessage: true,
+            timestamp: timestamp
         )
 
         let message3 = Message(
             id: "msg-2",
             conversationId: "conv-1",
             content: "Hello",
-            isUserMessage: true
+            isUserMessage: true,
+            timestamp: timestamp
         )
 
         // Then

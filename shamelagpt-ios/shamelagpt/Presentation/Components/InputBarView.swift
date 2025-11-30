@@ -112,6 +112,7 @@ struct InputBarView: View {
         .scaleEffect(isCameraEnabled ? 1.0 : 0.9)
         .animation(AppTheme.Animation.quick, value: isCameraEnabled)
         .accessibilityLabel(LocalizationKeys.cameraAccessibilityLabel.localized)
+        .accessibilityIdentifier("CameraButton")
         .accessibilityHint(LocalizationKeys.cameraAccessibilityHint.localized)
         .accessibilityAddTraits(.isButton)
     }
@@ -143,6 +144,7 @@ struct InputBarView: View {
         .scaleEffect(!isProcessingOCR ? 1.0 : 0.9)
         .animation(AppTheme.Animation.quick, value: isProcessingOCR)
         .accessibilityLabel(isRecording ? LocalizationKeys.microphoneStopAccessibilityLabel.localized : LocalizationKeys.microphoneStartAccessibilityLabel.localized)
+        .accessibilityIdentifier("MicrophoneButton")
         .accessibilityHint(isRecording ? LocalizationKeys.microphoneStopAccessibilityHint.localized : LocalizationKeys.microphoneStartAccessibilityHint.localized)
         .accessibilityValue(isRecording ? LocalizationKeys.microphoneRecordingValue.localized : LocalizationKeys.microphoneNotRecordingValue.localized)
         .onAppear {
@@ -169,6 +171,7 @@ struct InputBarView: View {
         .disabled(!isEnabled)
         .animation(AppTheme.Animation.quick, value: isEnabled)
         .accessibilityLabel(LocalizationKeys.sendMessage.localized)
+        .accessibilityIdentifier("SendMessageButton")
         .accessibilityHint(LocalizationKeys.sendMessageAccessibilityHint.localized)
         .accessibilityAddTraits(.isButton)
     }

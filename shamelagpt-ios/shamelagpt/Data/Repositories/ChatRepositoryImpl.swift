@@ -10,7 +10,7 @@ import CoreData
 import Combine
 
 /// Implementation of ChatRepository using Core Data
-final class ChatRepositoryImpl: ChatRepository {
+final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
     // MARK: - Properties
     private let coreDataStack: CoreDataStackProtocol
@@ -61,8 +61,8 @@ final class ChatRepositoryImpl: ChatRepository {
     func fetchAllConversations() async throws -> [Conversation] {
         let context = coreDataStack.viewContext
 
-        return try await context.perform {
-            let entities = try self.conversationDAO.fetchAll(from: context)
+        return try await context.perform { [conversationDAO] in
+            let entities = try conversationDAO.fetchAll(from: context)
             return ConversationMapper.toDomainModels(entities, includeMessages: false)
         }
     }
@@ -71,8 +71,8 @@ final class ChatRepositoryImpl: ChatRepository {
         AppLogger.database.logDebug("Fetching conversation by ID: \(id)")
         let context = coreDataStack.viewContext
 
-        return try await context.perform {
-            guard let entity = try self.conversationDAO.fetch(byId: id, from: context) else {
+        return try await context.perform { [conversationDAO] in
+            guard let entity = try conversationDAO.fetch(byId: id, from: context) else {
                 AppLogger.database.logWarning("Conversation not found in database: \(id)")
                 return nil
             }
@@ -84,8 +84,8 @@ final class ChatRepositoryImpl: ChatRepository {
     func fetchConversation(byThreadId threadId: String) async throws -> Conversation? {
         let context = coreDataStack.viewContext
 
-        return try await context.perform {
-            guard let entity = try self.conversationDAO.fetch(byThreadId: threadId, from: context) else {
+        return try await context.perform { [conversationDAO] in
+            guard let entity = try conversationDAO.fetch(byThreadId: threadId, from: context) else {
                 return nil
             }
             return ConversationMapper.toDomainModel(entity, includeMessages: true)
@@ -96,8 +96,8 @@ final class ChatRepositoryImpl: ChatRepository {
         AppLogger.database.logDebug("Fetching most recent empty conversation")
         let context = coreDataStack.viewContext
 
-        return try await context.perform {
-            guard let entity = try self.conversationDAO.fetchMostRecentEmpty(from: context) else {
+        return try await context.perform { [conversationDAO] in
+            guard let entity = try conversationDAO.fetchMostRecentEmpty(from: context) else {
                 AppLogger.database.logInfo("No empty conversations found")
                 return nil
             }
@@ -109,13 +109,13 @@ final class ChatRepositoryImpl: ChatRepository {
     func updateConversationTitle(id: String, title: String) async throws {
         let context = coreDataStack.viewContext
 
-        try await context.perform {
-            guard let entity = try self.conversationDAO.fetch(byId: id, from: context) else {
+        try await context.perform { [conversationDAO, coreDataStack] in
+            guard let entity = try conversationDAO.fetch(byId: id, from: context) else {
                 throw CoreDataError.notFound
             }
 
-            self.conversationDAO.updateTitle(entity, title: title)
-            try self.coreDataStack.save(context: context)
+            conversationDAO.updateTitle(entity, title: title)
+            try coreDataStack.save(context: context)
             self.notifyConversationsChanged()
         }
     }
@@ -123,22 +123,22 @@ final class ChatRepositoryImpl: ChatRepository {
     func updateConversationThreadId(id: String, threadId: String) async throws {
         let context = coreDataStack.viewContext
 
-        try await context.perform {
-            guard let entity = try self.conversationDAO.fetch(byId: id, from: context) else {
+        try await context.perform { [conversationDAO, coreDataStack] in
+            guard let entity = try conversationDAO.fetch(byId: id, from: context) else {
                 throw CoreDataError.notFound
             }
 
-            self.conversationDAO.updateThreadId(entity, threadId: threadId)
-            try self.coreDataStack.save(context: context)
+            conversationDAO.updateThreadId(entity, threadId: threadId)
+            try coreDataStack.save(context: context)
         }
     }
 
     func deleteConversation(id: String) async throws {
         let context = coreDataStack.viewContext
 
-        try await context.perform {
-            try self.conversationDAO.delete(byId: id, from: context)
-            try self.coreDataStack.save(context: context)
+        try await context.perform { [conversationDAO, coreDataStack] in
+            try conversationDAO.delete(byId: id, from: context)
+            try coreDataStack.save(context: context)
             self.notifyConversationsChanged()
         }
     }
@@ -146,9 +146,9 @@ final class ChatRepositoryImpl: ChatRepository {
     func deleteAllConversations() async throws {
         let context = coreDataStack.viewContext
 
-        try await context.perform {
-            try self.conversationDAO.deleteAll(from: context)
-            try self.coreDataStack.save(context: context)
+        try await context.perform { [conversationDAO, coreDataStack] in
+            try conversationDAO.deleteAll(from: context)
+            try coreDataStack.save(context: context)
             self.notifyConversationsChanged()
         }
     }
@@ -163,8 +163,8 @@ final class ChatRepositoryImpl: ChatRepository {
     ) async throws -> Message {
         let context = coreDataStack.viewContext
 
-        return try await context.perform {
-            guard let conversationEntity = try self.conversationDAO.fetch(
+        return try await context.perform { [conversationDAO, messageDAO, coreDataStack, self] in
+            guard let conversationEntity = try conversationDAO.fetch(
                 byId: conversationId,
                 from: context
             ) else {
@@ -175,7 +175,7 @@ final class ChatRepositoryImpl: ChatRepository {
             let timestamp = Date()
             let sourcesJSON = MessageMapper.sourcesToJSON(sources)
 
-            let entity = self.messageDAO.create(
+            let entity = messageDAO.create(
                 id: id,
                 conversationId: conversationId,
                 content: content,
@@ -187,9 +187,9 @@ final class ChatRepositoryImpl: ChatRepository {
             )
 
             // Update conversation's updatedAt timestamp
-            self.conversationDAO.markAsUpdated(conversationEntity)
+            conversationDAO.markAsUpdated(conversationEntity)
 
-            try self.coreDataStack.save(context: context)
+            try coreDataStack.save(context: context)
 
             self.notifyConversationsChanged()
             return MessageMapper.toDomainModel(entity)
@@ -246,8 +246,8 @@ final class ChatRepositoryImpl: ChatRepository {
     func fetchMessages(forConversation conversationId: String) async throws -> [Message] {
         let context = coreDataStack.viewContext
 
-        return try await context.perform {
-            let entities = try self.messageDAO.fetchAll(
+        return try await context.perform { [messageDAO] in
+            let entities = try messageDAO.fetchAll(
                 forConversationId: conversationId,
                 from: context
             )
@@ -258,22 +258,22 @@ final class ChatRepositoryImpl: ChatRepository {
     func updateMessageContent(id: String, content: String) async throws {
         let context = coreDataStack.viewContext
 
-        try await context.perform {
-            guard let entity = try self.messageDAO.fetch(byId: id, from: context) else {
+        try await context.perform { [messageDAO, coreDataStack] in
+            guard let entity = try messageDAO.fetch(byId: id, from: context) else {
                 throw CoreDataError.notFound
             }
 
-            self.messageDAO.updateContent(entity, content: content)
-            try self.coreDataStack.save(context: context)
+            messageDAO.updateContent(entity, content: content)
+            try coreDataStack.save(context: context)
         }
     }
 
     func deleteMessage(id: String) async throws {
         let context = coreDataStack.viewContext
 
-        try await context.perform {
-            try self.messageDAO.delete(byId: id, from: context)
-            try self.coreDataStack.save(context: context)
+        try await context.perform { [messageDAO, coreDataStack] in
+            try messageDAO.delete(byId: id, from: context)
+            try coreDataStack.save(context: context)
         }
     }
 
@@ -380,11 +380,12 @@ final class ChatRepositoryImpl: ChatRepository {
     // MARK: - Private Helpers
 
     private func notifyConversationsChanged() {
-        Task {
+        Task { [weak self] in
+            guard let self = self else { return }
             do {
                 let conversations = try await fetchAllConversations()
                 await MainActor.run {
-                    conversationsSubject.send(conversations)
+                    self.conversationsSubject.send(conversations)
                 }
             } catch {
                 print("Error fetching conversations for publisher: \(error)")

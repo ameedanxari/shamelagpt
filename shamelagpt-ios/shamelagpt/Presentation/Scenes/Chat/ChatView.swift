@@ -25,19 +25,20 @@ struct ChatView: View {
 
     var body: some View {
         contentView
-            .alert(isPresented: $showingErrorAlert) {
-                Alert(
-                    title: Text(LocalizationKeys.error.localized),
-                    message: viewModel.error.map { Text(errorMessage(for: $0)) },
-                    primaryButton: .default(Text(LocalizationKeys.retry.localized)) {
-                        viewModel.clearError()
-                        viewModel.sendMessage()
-                    },
-                    secondaryButton: .cancel(Text(LocalizationKeys.cancel.localized)) {
-                        viewModel.clearError()
-                    }
-                )
-            }
+            // Main error alert disabled - using ErrorBannerView instead for better UX
+            // .alert(isPresented: $showingErrorAlert) {
+            //     Alert(
+            //         title: Text(LocalizationKeys.error.localized),
+            //         message: viewModel.error.map { Text(errorMessage(for: $0)) },
+            //         primaryButton: .default(Text(LocalizationKeys.retry.localized)) {
+            //             viewModel.clearError()
+            //             viewModel.sendMessage()
+            //         },
+            //         secondaryButton: .cancel(Text(LocalizationKeys.cancel.localized)) {
+            //             viewModel.clearError()
+            //         }
+            //     )
+            // }
             .alert(isPresented: .constant(viewModel.voiceInputError != nil)) {
                 Alert(
                     title: Text(LocalizationKeys.error.localized),
@@ -79,8 +80,16 @@ struct ChatView: View {
                 sourceType: .photoLibrary
             )
         }
-        .onChange(of: viewModel.error?.localizedDescription) { _ in
-            showingErrorAlert = viewModel.error != nil
+        // Disabled - using ErrorBannerView instead of Alert
+        // .onChange(of: viewModel.error?.localizedDescription) { _ in
+        //     showingErrorAlert = viewModel.error != nil
+        // }
+        .onChange(of: viewModel.errorMessage) { newMessage in
+            if let msg = newMessage {
+                AppLogger.app.logInfo("ErrorMessage changed, showing ErrorBannerView with message: \(msg)")
+            } else {
+                AppLogger.app.logInfo("ErrorMessage cleared, ErrorBannerView will be hidden")
+            }
         }
         .onChange(of: viewModel.messages.count) { _ in
             scrollToBottom()
@@ -117,6 +126,26 @@ struct ChatView: View {
                         onCameraTap: viewModel.handleCameraButtonTap
                     )
                     .transition(.move(edge: .bottom))
+                }
+            }
+
+            // Error banner at top of ZStack for proper accessibility
+            if let message = viewModel.errorMessage {
+                VStack {
+                    ErrorBannerView(
+                        message: message,
+                        onRetry: {
+                            viewModel.clearError()
+                            viewModel.sendMessage()
+                        },
+                        onDismiss: {
+                            viewModel.clearError()
+                        }
+                    )
+                    .padding(.horizontal, AppTheme.Spacing.md)
+                    .padding(.top, AppTheme.Spacing.sm)
+
+                    Spacer()
                 }
             }
         }
@@ -231,4 +260,68 @@ struct ChatView: View {
     let viewModel = ChatViewModel.preview
     // Note: In actual preview, we would populate messages
     return ChatView(viewModel: viewModel)
+}
+
+// MARK: - Supporting Views
+
+private struct ErrorBannerView: View {
+    let message: String
+    let onRetry: () -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        HStack(alignment: .top, spacing: AppTheme.Spacing.sm) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundColor(.white)
+
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+                Group {
+                    Text(LocalizationKeys.error.localized)
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+                .accessibilityIdentifier("ErrorBannerTitle")
+                .accessibilityLabel("Error")
+                .accessibilityAddTraits(.isStaticText)
+
+                Group {
+                    Text(message)
+                        .font(.subheadline)
+                        .foregroundColor(.white)
+                }
+                .accessibilityIdentifier("ErrorBannerMessage")
+                .accessibilityLabel(message)
+                .accessibilityAddTraits(.isStaticText)
+
+                HStack(spacing: AppTheme.Spacing.sm) {
+                    Button(action: onRetry) {
+                        Text(LocalizationKeys.retry.localized)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(.white)
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, AppTheme.Spacing.sm)
+                            .background(Color.white.opacity(0.2))
+                            .cornerRadius(AppTheme.Layout.cornerRadius)
+                    }
+                    .accessibilityIdentifier("ErrorBannerRetryButton")
+                    .accessibilityLabel("Retry")
+
+                    Button(action: onDismiss) {
+                        Text(LocalizationKeys.cancel.localized)
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.9))
+                    }
+                    .accessibilityIdentifier("ErrorBannerCancelButton")
+                    .accessibilityLabel("Cancel")
+                }
+            }
+
+            Spacer()
+        }
+        .padding()
+        .background(Color.red.opacity(0.9))
+        .cornerRadius(AppTheme.Layout.cornerRadius)
+        .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+        .accessibilityIdentifier("ErrorBanner")
+    }
 }

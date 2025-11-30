@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Vision
+@preconcurrency import Vision
 import UIKit
 import Combine
 
@@ -68,6 +68,7 @@ final class OCRManager: ObservableObject {
                     if let error = error {
                         let ocrError = OCRError.recognitionFailed(error.localizedDescription)
                         self.error = ocrError
+                        self.isProcessing = false
                         continuation.resume(throwing: ocrError)
                         return
                     }
@@ -75,6 +76,7 @@ final class OCRManager: ObservableObject {
                     guard let observations = request.results as? [VNRecognizedTextObservation] else {
                         let ocrError = OCRError.noTextFound
                         self.error = ocrError
+                        self.isProcessing = false
                         continuation.resume(throwing: ocrError)
                         return
                     }
@@ -92,6 +94,7 @@ final class OCRManager: ObservableObject {
                     if recognizedTexts.isEmpty {
                         let ocrError = OCRError.noTextFound
                         self.error = ocrError
+                        self.isProcessing = false
                         continuation.resume(throwing: ocrError)
                         return
                     }
@@ -104,6 +107,7 @@ final class OCRManager: ObservableObject {
                     let detectedLanguage = self.detectLanguage(from: fullText)
 
                     let result = OCRResult(text: fullText, detectedLanguage: detectedLanguage)
+                    self.isProcessing = false
                     continuation.resume(returning: result)
                 }
             }
@@ -125,6 +129,7 @@ final class OCRManager: ObservableObject {
                     Task { @MainActor in
                         let ocrError = OCRError.recognitionFailed(error.localizedDescription)
                         self.error = ocrError
+                        self.isProcessing = false
                         continuation.resume(throwing: ocrError)
                     }
                 }
@@ -192,7 +197,7 @@ final class OCRManager: ObservableObject {
 
 // MARK: - Error Types
 
-enum OCRError: LocalizedError {
+enum OCRError: LocalizedError, Equatable {
     case invalidImage
     case noTextFound
     case recognitionFailed(String)
@@ -205,6 +210,19 @@ enum OCRError: LocalizedError {
             return "No text was found in the image. Please try a different image."
         case .recognitionFailed(let message):
             return "Text recognition failed: \(message)"
+        }
+    }
+
+    static func == (lhs: OCRError, rhs: OCRError) -> Bool {
+        switch (lhs, rhs) {
+        case (.invalidImage, .invalidImage):
+            return true
+        case (.noTextFound, .noTextFound):
+            return true
+        case (.recognitionFailed(let lhsMessage), .recognitionFailed(let rhsMessage)):
+            return lhsMessage == rhsMessage
+        default:
+            return false
         }
     }
 }

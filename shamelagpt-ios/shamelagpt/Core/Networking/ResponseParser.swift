@@ -26,31 +26,42 @@ struct ResponseParser {
     /// * **book_name:** Book Title, **source_url:** https://shamela.ws/book/123/45
     /// ```
     static func parseMarkdownResponse(_ markdown: String) -> ParsedResponse {
-        // Split by "Sources:" section
-        let components = markdown.components(separatedBy: "\nSources:\n")
+        // Locate the first "Sources:" marker (with or without markdown heading)
+        if let range = markdown.range(of: "Sources:", options: [.caseInsensitive]) {
+            let contentPart = markdown[..<range.lowerBound]
+            let sourcesPartFull = markdown[range.upperBound...]
 
-        // Get clean content (everything before Sources section)
-        let cleanContent = components.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? markdown
+            // Limit parsing to the first sources section (ignore subsequent "Sources:" blocks)
+            let nextSourcesRange = sourcesPartFull.range(
+                of: "\n\\s*Sources:",
+                options: [.regularExpression, .caseInsensitive]
+            )
+            let sourcesSlice = nextSourcesRange.map { sourcesPartFull[..<$0.lowerBound] } ?? sourcesPartFull
+            let sourcesPart = sourcesSlice
 
-        // Parse sources if they exist
-        var sources: [Source] = []
-        if components.count > 1 {
-            let sourcesSection = components[1]
-            sources = parseSources(from: sourcesSection)
+            let cleanContent = contentPart
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let sources = parseSources(from: String(sourcesPart))
+
+            return ParsedResponse(cleanContent: cleanContent, sources: sources)
         }
 
-        return ParsedResponse(cleanContent: cleanContent, sources: sources)
+        // Fallback when no sources marker found
+        let cleanContent = markdown.trimmingCharacters(in: .whitespacesAndNewlines)
+        return ParsedResponse(cleanContent: cleanContent, sources: [])
     }
 
     /// Parses sources from the sources section
-    /// Format: * **book_name:** Book Title, **source_url:** https://shamela.ws/book/123/45
+    /// Supports formats:
+    /// 1. * **book_name:** Book Title, **source_url:** https://shamela.ws/book/123/45
+    /// 2. - **[Book Title](https://shamela.ws/book/123/45)** - Author Name
     private static func parseSources(from sourcesText: String) -> [Source] {
         var sources: [Source] = []
 
-        // Split by lines that start with "* "
+        // Split by lines that start with "* " or "- "
         let lines = sourcesText.components(separatedBy: "\n")
             .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { $0.hasPrefix("*") }
+            .filter { $0.hasPrefix("*") || $0.hasPrefix("-") }
 
         for line in lines {
             // Remove the leading "* " or "- "
@@ -68,7 +79,31 @@ struct ResponseParser {
 
     /// Extracts a Source object from a line
     private static func extractSource(from line: String) -> Source? {
-        // Pattern: **book_name:** Book Title, **source_url:** https://shamela.ws/book/123/45
+        // Try markdown link format first: **[Title](URL)** - Author
+        // Pattern: **[Title](URL)** - Author
+        let markdownLinkPattern = "\\*\\*\\[(.*?)\\]\\((.*?)\\)\\*\\*\\s*-\\s*(.*)"
+        
+        if let regex = try? NSRegularExpression(pattern: markdownLinkPattern, options: []),
+           let match = regex.firstMatch(in: line, options: [], range: NSRange(location: 0, length: (line as NSString).length)) {
+            
+            let nsString = line as NSString
+            let title = nsString.substring(with: match.range(at: 1))
+            let url = nsString.substring(with: match.range(at: 2))
+            let author = nsString.substring(with: match.range(at: 3))
+            
+            let (volumeNumber, pageNumber) = extractVolumeAndPage(from: url)
+            
+            return Source(
+                bookTitle: title,
+                author: author,
+                volumeNumber: volumeNumber,
+                pageNumber: pageNumber,
+                text: line,
+                sourceUrl: url
+            )
+        }
+        
+        // Fallback to structured format: **book_name:** Book Title, **source_url:** https://shamela.ws/book/123/45
         let bookNamePattern = "\\*\\*book_name:\\*\\*\\s*([^,]+)"
         let sourceUrlPattern = "\\*\\*source_url:\\*\\*\\s*(https?://[^\\s]+)"
 
@@ -100,7 +135,7 @@ struct ResponseParser {
 
         return Source(
             bookTitle: title,
-            author: nil, // Author not provided in API response
+            author: nil, // Author not provided in structured format
             volumeNumber: volumeNumber,
             pageNumber: pageNumber,
             text: line, // Store the full citation line as text

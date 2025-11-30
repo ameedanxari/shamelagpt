@@ -12,8 +12,5 @@ struct ChatResponse: Codable {
     let answer: String
     let threadId: String?
 
-    enum CodingKeys: String, CodingKey {
-        case answer
-        case threadId = "thread_id"
-    }
+    // CodingKeys removed to allow JSONDecoder keyDecodingStrategy to handle snake_case conversion automatically
 }

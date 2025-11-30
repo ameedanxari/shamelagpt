@@ -14,8 +14,7 @@ final class AccessibilityUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        app.launchArguments = ["UI-Testing"]
-        app.launch()
+        UITestLauncher.launch(app: app)
 
         // Skip welcome screen if present
         if app.buttons["Skip to Chat"].waitForExistence(timeout: 5) {
@@ -49,12 +48,12 @@ final class AccessibilityUITests: XCTestCase {
     }
 
     func testMicrophoneButtonAccessibilityLabel() throws {
-        let micButton = app.buttons["Voice input"]
+        let micButton = app.buttons["MicrophoneButton"]
         XCTAssertTrue(micButton.waitForExistence(timeout: 5), "Microphone button should exist")
 
         // Verify accessibility label
         XCTAssertNotNil(micButton.label, "Microphone button should have accessibility label")
-        XCTAssertTrue(micButton.label.contains("Voice") || micButton.label.contains("input") || micButton.label.contains("microphone"),
+        XCTAssertTrue(micButton.label.contains("voice") || micButton.label.contains("input") || micButton.label.contains("microphone") || micButton.label.contains("Start"),
                      "Microphone button label should be descriptive")
 
         // Verify button is accessible
@@ -62,12 +61,12 @@ final class AccessibilityUITests: XCTestCase {
     }
 
     func testCameraButtonAccessibilityLabel() throws {
-        let cameraButton = app.buttons["Image text recognition"]
+        let cameraButton = app.buttons["CameraButton"]
         XCTAssertTrue(cameraButton.waitForExistence(timeout: 5), "Camera button should exist")
 
         // Verify accessibility label
         XCTAssertNotNil(cameraButton.label, "Camera button should have accessibility label")
-        XCTAssertTrue(cameraButton.label.contains("Image") || cameraButton.label.contains("text") || cameraButton.label.contains("recognition"),
+        XCTAssertTrue(cameraButton.label.contains("Camera") || cameraButton.label.contains("camera") || cameraButton.label.contains("image") || cameraButton.label.contains("photo"),
                      "Camera button label should be descriptive")
 
         // Verify button is accessible
@@ -76,21 +75,27 @@ final class AccessibilityUITests: XCTestCase {
 
     func testMessageBubblesAccessible() throws {
         // Send a test message to create message bubbles
+        UITestLauncher.relaunch(app: app)
         let textField = app.textViews.firstMatch
         XCTAssertTrue(textField.waitForExistence(timeout: 5))
 
+        // Tap to focus
         textField.tap()
-        textField.typeText("Test accessibility message")
+        sleep(1)  // Wait for keyboard
 
-        let sendButton = app.buttons["Send message"]
-        if sendButton.isEnabled {
+        // Type text
+        let testMessage = "Test message"
+        textField.typeText(testMessage)
+
+        let sendButton = app.buttons["SendMessageButton"]
+        if sendButton.waitForExistence(timeout: 2) && sendButton.isEnabled {
             sendButton.tap()
 
             // Wait for message to appear
             sleep(2)
 
             // Verify message bubbles have accessibility
-            let messageText = app.staticTexts["Test accessibility message"]
+            let messageText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", testMessage)).firstMatch
             if messageText.waitForExistence(timeout: 5) {
                 XCTAssertTrue(messageText.exists, "Message should be accessible")
 
@@ -102,32 +107,35 @@ final class AccessibilityUITests: XCTestCase {
     }
 
     func testSourceLinksAccessible() throws {
-        // This test requires a message with sources
-        // In UI-Testing mode, we can simulate this
-        app.launchEnvironment["SIMULATE_MESSAGE_WITH_SOURCES"] = "true"
+        // Relaunch with mocks (sources already present in base mock)
+        UITestLauncher.relaunch(app: app)
 
         // Send a message
         let textField = app.textViews.firstMatch
         if textField.waitForExistence(timeout: 5) {
+            // Tap and type
             textField.tap()
-            textField.typeText("Show sources")
+            sleep(1)
 
-            let sendButton = app.buttons["Send message"]
-            if sendButton.isEnabled {
+            let testMessage = "Show sources"
+            textField.typeText(testMessage)
+
+            let sendButton = app.buttons["SendMessageButton"]
+            if sendButton.waitForExistence(timeout: 2) && sendButton.isEnabled {
                 sendButton.tap()
 
                 // Wait for response with sources
                 sleep(3)
 
-                // Look for source links
-                let sourceLinks = app.links
-                if sourceLinks.count > 0 {
-                    let firstLink = sourceLinks.firstMatch
-                    XCTAssertTrue(firstLink.exists, "Source links should exist")
+                // Look for source buttons (sources are buttons, not links)
+                let sourceButtons = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "SourceLink-"))
+                if sourceButtons.count > 0 {
+                    let firstButton = sourceButtons.element(boundBy: 0)
+                    XCTAssertTrue(firstButton.exists, "Source buttons should exist")
 
-                    // Verify link is accessible
-                    XCTAssertNotNil(firstLink.label, "Source link should have accessibility label")
-                    XCTAssertTrue(firstLink.label.count > 0, "Source link label should be descriptive")
+                    // Verify button is accessible
+                    XCTAssertNotNil(firstButton.label, "Source button should have accessibility label")
+                    XCTAssertTrue(firstButton.label.count > 0, "Source button label should be descriptive")
                 }
             }
         }
@@ -137,21 +145,14 @@ final class AccessibilityUITests: XCTestCase {
 
     func testUIScalesWithLargeText() throws {
         // Set large text size
-        app.launchEnvironment["UIPreferredContentSizeCategory"] = "UICTContentSizeCategoryAccessibilityExtraExtraExtraLarge"
-        app.terminate()
-        app.launch()
-
-        // Skip welcome
-        if app.buttons["Skip to Chat"].waitForExistence(timeout: 5) {
-            app.buttons["Skip to Chat"].tap()
-        }
-
-        // Navigate to chat
-        let chatTab = app.tabBars.buttons["Chat"]
-        chatTab.tap()
+        UITestLauncher.relaunch(
+            app: app,
+            overrides: ["UIPreferredContentSizeCategory": "UICTContentSizeCategoryAccessibilityExtraExtraExtraLarge"]
+        )
+        navigateToChat()
 
         // Verify UI elements exist and are accessible with large text
-        let sendButton = app.buttons["Send message"]
+        let sendButton = app.buttons["SendMessageButton"]
         XCTAssertTrue(sendButton.waitForExistence(timeout: 5), "Send button should exist with large text")
 
         let textField = app.textViews.firstMatch
@@ -160,24 +161,17 @@ final class AccessibilityUITests: XCTestCase {
         // Verify buttons are still hittable (not clipped)
         XCTAssertTrue(sendButton.isHittable || !sendButton.isEnabled, "Send button should be accessible with large text")
 
-        let micButton = app.buttons["Voice input"]
+        let micButton = app.buttons["MicrophoneButton"]
         XCTAssertTrue(micButton.isHittable, "Microphone button should be accessible with large text")
     }
 
     func testUIScalesWithSmallText() throws {
         // Set small text size
-        app.launchEnvironment["UIPreferredContentSizeCategory"] = "UICTContentSizeCategoryExtraSmall"
-        app.terminate()
-        app.launch()
-
-        // Skip welcome
-        if app.buttons["Skip to Chat"].waitForExistence(timeout: 5) {
-            app.buttons["Skip to Chat"].tap()
-        }
-
-        // Navigate to chat
-        let chatTab = app.tabBars.buttons["Chat"]
-        chatTab.tap()
+        UITestLauncher.relaunch(
+            app: app,
+            overrides: ["UIPreferredContentSizeCategory": "UICTContentSizeCategoryExtraSmall"]
+        )
+        navigateToChat()
 
         // Verify UI elements exist and are accessible with small text
         let sendButton = app.buttons["Send message"]
@@ -190,20 +184,24 @@ final class AccessibilityUITests: XCTestCase {
         XCTAssertTrue(sendButton.isHittable || !sendButton.isEnabled, "Send button should be accessible with small text")
     }
 
-    func testMessagesReadableWithLargeType() throws {
-        // Set large text
-        app.launchEnvironment["UIPreferredContentSizeCategory"] = "UICTContentSizeCategoryAccessibilityLarge"
-        app.terminate()
-        app.launch()
+    // MARK: - Helpers
 
-        // Skip welcome
-        if app.buttons["Skip to Chat"].waitForExistence(timeout: 5) {
+    private func navigateToChat() {
+        if app.buttons["Skip to Chat"].waitForExistence(timeout: 3) {
             app.buttons["Skip to Chat"].tap()
         }
+        if app.tabBars.buttons["Chat"].waitForExistence(timeout: 3) {
+            app.tabBars.buttons["Chat"].tap()
+        }
+    }
 
-        // Navigate to chat
-        let chatTab = app.tabBars.buttons["Chat"]
-        chatTab.tap()
+    func testMessagesReadableWithLargeType() throws {
+        // Set large text
+        UITestLauncher.relaunch(
+            app: app,
+            overrides: ["UIPreferredContentSizeCategory": "UICTContentSizeCategoryAccessibilityLarge"]
+        )
+        navigateToChat()
 
         // Send a test message
         let textField = app.textViews.firstMatch
@@ -270,7 +268,7 @@ final class AccessibilityUITests: XCTestCase {
 
                     // Verify Arabic message appears with RTL layout
                     let arabicMessage = app.staticTexts["مرحبا"]
-                    XCTAssertTrue(arabicMessage.exists || true, "RTL layout should support Arabic text")
+                    XCTAssertTrue(arabicMessage.waitForExistence(timeout: 3), "RTL layout should support and display Arabic text")
                 }
             }
         }
@@ -309,7 +307,7 @@ final class AccessibilityUITests: XCTestCase {
                         // Assistant messages should be aligned to the left
                         // We verify the message exists
                         let message = app.staticTexts["اختبار المحاذاة"]
-                        XCTAssertTrue(message.exists || true, "Message bubbles should support RTL alignment")
+                        XCTAssertTrue(message.waitForExistence(timeout: 3), "Message bubbles should support RTL alignment and display Arabic text")
                     }
                 }
             }

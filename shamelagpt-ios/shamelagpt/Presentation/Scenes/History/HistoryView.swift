@@ -13,11 +13,11 @@ struct HistoryView: View {
     // MARK: - Properties
 
     @StateObject var viewModel: HistoryViewModel
+    @ObservedObject var coordinator: AppCoordinator
     @Environment(\.dismiss) private var dismiss
 
     // MARK: - State
 
-    @State private var navigateToChat: String?
     @State private var showingDeleteAllAlert = false
 
     // MARK: - Body
@@ -47,6 +47,7 @@ struct HistoryView: View {
                         .font(.system(size: AppTheme.Layout.iconSize))
                         .foregroundColor(AppTheme.Colors.primary)
                 }
+                .accessibilityLabel(LocalizationKeys.newChat.localized)
             }
         }
         .refreshable {
@@ -183,8 +184,13 @@ struct HistoryView: View {
         Task {
             do {
                 let conversationId = try await viewModel.createNewConversation()
-                navigateToChat = conversationId
+                AppLogger.app.logInfo("Created new conversation from History: \(conversationId), navigating to Chat tab")
+                // Use coordinator to navigate to Chat tab with the new conversation
+                await MainActor.run {
+                    coordinator.openConversation(conversationId)
+                }
             } catch {
+                AppLogger.app.logError("Failed to create new conversation from History", error: error)
                 // Error is already set in viewModel
             }
         }
@@ -219,7 +225,8 @@ struct HistoryView: View {
                 chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
             ),
             chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
-        )
+        ),
+        coordinator: AppCoordinator()
     )
 }
 
@@ -233,6 +240,7 @@ struct HistoryView: View {
                 chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
             ),
             chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
-        )
+        ),
+        coordinator: AppCoordinator()
     )
 }

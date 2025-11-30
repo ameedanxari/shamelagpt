@@ -102,7 +102,7 @@ final class ChatRepositoryTests: XCTestCase {
 
     func testFetchMostRecentEmptyConversation() async throws {
         // Given - Create conversations with delays to ensure ordering
-        let conv1 = try await sut.createConversation(title: "Old Empty")
+        _ = try await sut.createConversation(title: "Old Empty")
         try await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
 
         let conv2 = try await sut.createConversation(title: "Recent Empty")
@@ -487,12 +487,11 @@ final class ChatRepositoryTests: XCTestCase {
 // MARK: - Test Core Data Stack
 
 /// In-memory Core Data stack for testing
-/// In-memory Core Data stack for testing
 final class TestCoreDataStack: CoreDataStackProtocol {
 
     init() {}
 
-    private lazy var inMemoryContainer: NSPersistentContainer = {
+    nonisolated(unsafe) private lazy var inMemoryContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "ShamelaGPT")
 
         // Use in-memory store for testing
@@ -545,36 +544,14 @@ final class TestCoreDataStack: CoreDataStackProtocol {
         for entity in entities {
             guard let entityName = entity.name else { continue }
             
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
-            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            
             do {
-                try viewContext.execute(deleteRequest)
+                let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: entityName)
+                let objects = try viewContext.fetch(fetchRequest)
+                objects.forEach { viewContext.delete($0) }
                 try saveContext()
             } catch {
                 throw CoreDataError.deleteFailed(error)
             }
-        }
-    }
-}
-
-// MARK: - CoreDataError Equatable Extension for Testing
-
-extension CoreDataError: Equatable {
-    public static func == (lhs: CoreDataError, rhs: CoreDataError) -> Bool {
-        switch (lhs, rhs) {
-        case (.notFound, .notFound):
-            return true
-        case (.invalidData, .invalidData):
-            return true
-        case (.saveFailed, .saveFailed):
-            return true
-        case (.fetchFailed, .fetchFailed):
-            return true
-        case (.deleteFailed, .deleteFailed):
-            return true
-        default:
-            return false
         }
     }
 }

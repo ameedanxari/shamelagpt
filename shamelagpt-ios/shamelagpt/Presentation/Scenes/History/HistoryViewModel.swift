@@ -49,9 +49,27 @@ final class HistoryViewModel: ObservableObject {
         getConversationsUseCase.observeConversations()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] conversations in
-                // Filter out empty conversations (those with no messages)
-                // Only show conversations that have at least one message
-                self?.conversations = conversations.filter { !$0.messages.isEmpty }
+                AppLogger.app.logDebug("HistoryViewModel received \(conversations.count) conversations from observer")
+
+                // Smart filter: show conversations with messages OR recent empty conversations
+                // Only hide empty conversations older than 5 minutes (likely abandoned)
+                let filtered = conversations.filter { conversation in
+                    // Show conversations with messages
+                    if !conversation.messages.isEmpty {
+                        AppLogger.app.logDebug("Conversation \(conversation.id) has \(conversation.messages.count) messages - INCLUDED")
+                        return true
+                    }
+
+                    // Show empty conversations that are recent (within 5 minutes)
+                    // These are likely active conversations waiting for first message
+                    let ageInSeconds = Date().timeIntervalSince(conversation.createdAt)
+                    let isRecent = ageInSeconds < 300 // 5 minutes
+                    AppLogger.app.logDebug("Conversation \(conversation.id) is empty, age: \(ageInSeconds)s - \(isRecent ? "INCLUDED (recent)" : "FILTERED (old)")")
+                    return isRecent
+                }
+
+                AppLogger.app.logDebug("HistoryViewModel filtered to \(filtered.count) conversations")
+                self?.conversations = filtered
             }
             .store(in: &cancellables)
     }
@@ -66,8 +84,19 @@ final class HistoryViewModel: ObservableObject {
 
             do {
                 let conversations = try await getConversationsUseCase.execute()
-                // Filter out empty conversations (those with no messages)
-                self.conversations = conversations.filter { !$0.messages.isEmpty }
+                // Smart filter: show conversations with messages OR recent empty conversations
+                // Only hide empty conversations older than 5 minutes (likely abandoned)
+                self.conversations = conversations.filter { conversation in
+                    // Show conversations with messages
+                    if !conversation.messages.isEmpty {
+                        return true
+                    }
+
+                    // Show empty conversations that are recent (within 5 minutes)
+                    // These are likely active conversations waiting for first message
+                    let ageInSeconds = Date().timeIntervalSince(conversation.createdAt)
+                    return ageInSeconds < 300 // 5 minutes
+                }
             } catch {
                 self.error = "Failed to load conversations: \(error.localizedDescription)"
             }

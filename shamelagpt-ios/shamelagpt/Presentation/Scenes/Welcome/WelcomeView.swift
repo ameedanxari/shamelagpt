@@ -57,6 +57,7 @@ struct WelcomeView: View {
                             .cornerRadius(AppTheme.Layout.cornerRadius)
                     }
                     .accessibilityLabel(LocalizationKeys.getStarted.localized)
+                    .accessibilityIdentifier("GetStartedButton")
                     .accessibilityHint(LocalizationKeys.getStartedAccessibilityHint.localized)
 
                     // Skip to Chat Button
@@ -70,6 +71,7 @@ struct WelcomeView: View {
                             .foregroundColor(AppTheme.Colors.primary)
                     }
                     .accessibilityLabel(LocalizationKeys.skipToChat.localized)
+                    .accessibilityIdentifier("SkipToChatButton")
                     .accessibilityHint(LocalizationKeys.skipToChatAccessibilityHint.localized)
                 }
                 .padding(.horizontal, AppTheme.Spacing.lg)

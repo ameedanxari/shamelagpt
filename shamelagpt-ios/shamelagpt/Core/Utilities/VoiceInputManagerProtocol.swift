@@ -10,6 +10,7 @@ import Speech
 import Combine
 
 /// Protocol for voice input management
+@MainActor
 protocol VoiceInputManagerProtocol: AnyObject, ObservableObject {
     var transcribedText: String { get }
     var isRecording: Bool { get }

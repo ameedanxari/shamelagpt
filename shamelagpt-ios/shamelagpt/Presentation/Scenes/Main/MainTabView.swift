@@ -19,6 +19,7 @@ struct MainTabView: View {
 
     @State private var currentConversationId: String?
     @State private var isInitialized = false
+    @State private var needsValidation = false
 
     // MARK: - Body
 
@@ -211,6 +212,7 @@ struct MainTabView: View {
         .onAppear {
             // Re-check conversation exists when tab appears
             // This handles the case where user deleted all conversations
+            // NOTE: We always validate to ensure conversation exists
             Task {
                 await validateCurrentConversation()
             }
@@ -220,7 +222,10 @@ struct MainTabView: View {
     /// Validates that the current conversation still exists
     /// If not, creates a new one
     private func validateCurrentConversation() async {
+        AppLogger.app.logDebug("validateCurrentConversation called - current ID: \(currentConversationId ?? "nil")")
+
         guard let conversationId = currentConversationId else {
+            AppLogger.app.logDebug("No current conversation ID, calling ensureConversationExists")
             await ensureConversationExists()
             return
         }
@@ -232,8 +237,8 @@ struct MainTabView: View {
 
         do {
             // Check if conversation still exists
-            if let _ = try await chatRepo.fetchConversation(byId: conversationId) {
-                AppLogger.app.logDebug("Current conversation is valid: \(conversationId)")
+            if let conversation = try await chatRepo.fetchConversation(byId: conversationId) {
+                AppLogger.app.logDebug("Current conversation is valid: \(conversationId), has \(conversation.messages.count) messages")
                 return
             }
 
@@ -252,7 +257,8 @@ struct MainTabView: View {
     private var historyTab: some View {
         NavigationView {
             HistoryView(
-                viewModel: container.makeHistoryViewModel()
+                viewModel: container.makeHistoryViewModel(),
+                coordinator: coordinator
             )
         }
         .navigationViewStyle(.stack)

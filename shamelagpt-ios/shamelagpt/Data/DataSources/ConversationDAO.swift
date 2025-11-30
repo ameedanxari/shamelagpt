@@ -9,7 +9,7 @@ import Foundation
 import CoreData
 
 /// Data Access Object for ConversationEntity CRUD operations
-final class ConversationDAO {
+final class ConversationDAO: @unchecked Sendable {
 
     // MARK: - Properties
     private let coreDataStack: CoreDataStackProtocol
@@ -173,11 +173,10 @@ final class ConversationDAO {
     /// - Parameter context: The managed object context to use
     /// - Throws: CoreDataError if deletion fails
     func deleteAll(from context: NSManagedObjectContext) throws {
-        let request: NSFetchRequest<NSFetchRequestResult> = ConversationEntity.fetchRequest()
-        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: request)
-
+        let request: NSFetchRequest<ConversationEntity> = ConversationEntity.fetchRequest()
         do {
-            try context.execute(batchDeleteRequest)
+            let conversations = try context.fetch(request)
+            conversations.forEach { context.delete($0) }
         } catch {
             throw CoreDataError.deleteFailed(error)
         }

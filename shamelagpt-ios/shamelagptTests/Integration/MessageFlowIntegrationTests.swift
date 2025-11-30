@@ -102,7 +102,7 @@ final class MessageFlowIntegrationTests: XCTestCase {
         )
 
         // When - Send message
-        let result = try await sendMessageUseCase.execute(
+        _ = try await sendMessageUseCase.execute(
             conversationId: conversation.id,
             message: "Test persistence",
             saveUserMessage: true

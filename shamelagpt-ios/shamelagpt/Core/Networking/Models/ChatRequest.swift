@@ -17,8 +17,5 @@ struct ChatRequest: Codable {
         self.threadId = threadId
     }
 
-    enum CodingKeys: String, CodingKey {
-        case question
-        case threadId = "thread_id"
-    }
+    // CodingKeys removed to allow JSONEncoder/Decoder keyEncodingStrategy to handle snake_case conversion automatically
 }

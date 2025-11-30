@@ -9,7 +9,7 @@ import Foundation
 import CoreData
 
 /// Data Access Object for MessageEntity CRUD operations
-final class MessageDAO {
+final class MessageDAO: @unchecked Sendable {
 
     // MARK: - Properties
     private let coreDataStack: CoreDataStackProtocol

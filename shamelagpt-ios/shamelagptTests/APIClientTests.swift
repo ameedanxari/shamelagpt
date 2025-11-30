@@ -177,7 +177,25 @@ final class APIClientTests: XCTestCase {
         let responseData = try encoder.encode(ChatResponse(answer: "Response", threadId: nil))
 
         MockURLProtocol.requestHandler = { urlRequest in
-            capturedRequestBody = urlRequest.httpBody
+            if let body = urlRequest.httpBody {
+                capturedRequestBody = body
+            } else if let stream = urlRequest.httpBodyStream {
+                stream.open()
+                let bufferSize = 1024
+                let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+                defer { buffer.deallocate() }
+                var data = Data()
+                while true {
+                    let read = stream.read(buffer, maxLength: bufferSize)
+                    if read > 0 {
+                        data.append(buffer, count: read)
+                    } else {
+                        break
+                    }
+                }
+                stream.close()
+                capturedRequestBody = data
+            }
             let response = HTTPURLResponse(url: urlRequest.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
             return (response, responseData)
         }
@@ -186,10 +204,12 @@ final class APIClientTests: XCTestCase {
         _ = try await sut.sendMessage(request)
 
         // Then
-        XCTAssertNotNil(capturedRequestBody)
+        XCTAssertNotNil(capturedRequestBody, "Request body should not be nil")
+        guard let requestBody = capturedRequestBody else { return }
+        
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
-        let decodedRequest = try decoder.decode(ChatRequest.self, from: capturedRequestBody!)
+        let decodedRequest = try decoder.decode(ChatRequest.self, from: requestBody)
         XCTAssertEqual(decodedRequest.question, "What is Islam?")
         XCTAssertEqual(decodedRequest.threadId, "thread-456")
     }
@@ -204,7 +224,25 @@ final class APIClientTests: XCTestCase {
 
         var capturedRequestBody: Data?
         MockURLProtocol.requestHandler = { urlRequest in
-            capturedRequestBody = urlRequest.httpBody
+            if let body = urlRequest.httpBody {
+                capturedRequestBody = body
+            } else if let stream = urlRequest.httpBodyStream {
+                stream.open()
+                let bufferSize = 1024
+                let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+                defer { buffer.deallocate() }
+                var data = Data()
+                while true {
+                    let read = stream.read(buffer, maxLength: bufferSize)
+                    if read > 0 {
+                        data.append(buffer, count: read)
+                    } else {
+                        break
+                    }
+                }
+                stream.close()
+                capturedRequestBody = data
+            }
             let response = HTTPURLResponse(url: urlRequest.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
             return (response, responseData)
         }
@@ -214,9 +252,11 @@ final class APIClientTests: XCTestCase {
 
         // Then
         XCTAssertNotNil(capturedRequestBody)
+        guard let requestBody = capturedRequestBody else { return }
+        
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
-        let decodedRequest = try decoder.decode(ChatRequest.self, from: capturedRequestBody!)
+        let decodedRequest = try decoder.decode(ChatRequest.self, from: requestBody)
         XCTAssertEqual(decodedRequest.threadId, threadId)
         XCTAssertEqual(response.threadId, threadId)
     }
@@ -230,7 +270,25 @@ final class APIClientTests: XCTestCase {
 
         var capturedRequestBody: Data?
         MockURLProtocol.requestHandler = { urlRequest in
-            capturedRequestBody = urlRequest.httpBody
+            if let body = urlRequest.httpBody {
+                capturedRequestBody = body
+            } else if let stream = urlRequest.httpBodyStream {
+                stream.open()
+                let bufferSize = 1024
+                let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+                defer { buffer.deallocate() }
+                var data = Data()
+                while true {
+                    let read = stream.read(buffer, maxLength: bufferSize)
+                    if read > 0 {
+                        data.append(buffer, count: read)
+                    } else {
+                        break
+                    }
+                }
+                stream.close()
+                capturedRequestBody = data
+            }
             let response = HTTPURLResponse(url: urlRequest.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
             return (response, responseData)
         }
@@ -240,9 +298,11 @@ final class APIClientTests: XCTestCase {
 
         // Then
         XCTAssertNotNil(capturedRequestBody)
+        guard let requestBody = capturedRequestBody else { return }
+        
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
-        let decodedRequest = try decoder.decode(ChatRequest.self, from: capturedRequestBody!)
+        let decodedRequest = try decoder.decode(ChatRequest.self, from: requestBody)
         XCTAssertNil(decodedRequest.threadId)
     }
 
@@ -480,12 +540,34 @@ final class APIClientTests: XCTestCase {
         // Given
         var capturedRequestBody: Data?
         let request = ChatRequest(question: "Test", threadId: "thread-123")
+
+        // Mock response MUST include thread_id per API spec
+        // ✅ CORRECT: API always returns thread_id (never nil)
+        let mockResponse = ChatResponse(answer: "Response", threadId: "thread_456")
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
-        let responseData = try encoder.encode(ChatResponse(answer: "Response", threadId: nil))
+        let responseData = try encoder.encode(mockResponse)
 
         MockURLProtocol.requestHandler = { urlRequest in
-            capturedRequestBody = urlRequest.httpBody
+            if let body = urlRequest.httpBody {
+                capturedRequestBody = body
+            } else if let stream = urlRequest.httpBodyStream {
+                stream.open()
+                let bufferSize = 1024
+                let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+                defer { buffer.deallocate() }
+                var data = Data()
+                while true {
+                    let read = stream.read(buffer, maxLength: bufferSize)
+                    if read > 0 {
+                        data.append(buffer, count: read)
+                    } else {
+                        break
+                    }
+                }
+                stream.close()
+                capturedRequestBody = data
+            }
             let response = HTTPURLResponse(url: urlRequest.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
             return (response, responseData)
         }
@@ -494,9 +576,17 @@ final class APIClientTests: XCTestCase {
         _ = try await sut.sendMessage(request)
 
         // Then
-        XCTAssertNotNil(capturedRequestBody)
-        let jsonObject = try JSONSerialization.jsonObject(with: capturedRequestBody!, options: []) as? [String: Any]
-        XCTAssertNotNil(jsonObject?["thread_id"]) // Should be snake_case
+        XCTAssertNotNil(capturedRequestBody, "Request body should be captured by MockURLProtocol")
+        guard let requestBody = capturedRequestBody else {
+            XCTFail("Failed to capture request body")
+            return
+        }
+
+        let jsonObject = try JSONSerialization.jsonObject(with: requestBody, options: []) as? [String: Any]
+        XCTAssertNotNil(jsonObject, "Request body should be valid JSON")
+        XCTAssertNotNil(jsonObject?["thread_id"], "Request should use snake_case thread_id, not camelCase threadId")
+        XCTAssertEqual(jsonObject?["thread_id"] as? String, "thread-123", "Thread ID value should match")
+        XCTAssertEqual(jsonObject?["question"] as? String, "Test", "Question should be included")
     }
 
     func testResponseDecodingSnakeCaseCorrect() async throws {

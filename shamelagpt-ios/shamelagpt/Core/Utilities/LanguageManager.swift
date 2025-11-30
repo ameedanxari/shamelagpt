@@ -46,6 +46,9 @@ class LanguageManager: ObservableObject {
     }
 
     private let languageKey = "selectedLanguage"
+    private static var isRunningUnitTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
 
     private init() {
         // Load saved language or default to English

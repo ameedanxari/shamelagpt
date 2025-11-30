@@ -9,7 +9,7 @@ import Foundation
 import CoreData
 
 /// Protocol for Core Data stack
-protocol CoreDataStackProtocol {
+protocol CoreDataStackProtocol: AnyObject, Sendable {
     var viewContext: NSManagedObjectContext { get }
     
     func newBackgroundContext() -> NSManagedObjectContext

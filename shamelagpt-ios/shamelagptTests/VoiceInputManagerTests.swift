@@ -44,7 +44,7 @@ final class VoiceInputManagerTests: XCTestCase {
         // It verifies the method completes and updates authorization status
 
         // When
-        let result = await sut.requestPermission()
+        _ = await sut.requestPermission()
 
         // Then - Method should complete without crashing
         // Result depends on system state and user interaction
@@ -54,9 +54,6 @@ final class VoiceInputManagerTests: XCTestCase {
     }
 
     func testAuthorizationStatusUpdatedAfterRequest() async throws {
-        // Given
-        let initialStatus = sut.authorizationStatus
-
         // When
         _ = await sut.requestPermission()
 
@@ -288,27 +285,6 @@ final class VoiceInputManagerTests: XCTestCase {
         for status in statuses {
             // Just verify the enum values exist
             XCTAssertNotNil(status)
-        }
-    }
-}
-
-// MARK: - VoiceInputError Equatable Conformance (for testing)
-
-extension VoiceInputError: Equatable {
-    public static func == (lhs: VoiceInputError, rhs: VoiceInputError) -> Bool {
-        switch (lhs, rhs) {
-        case (.permissionDenied, .permissionDenied):
-            return true
-        case (.microphonePermissionDenied, .microphonePermissionDenied):
-            return true
-        case (.recognizerNotAvailable, .recognizerNotAvailable):
-            return true
-        case (.unableToCreateRequest, .unableToCreateRequest):
-            return true
-        case (.recognitionFailed(let lhsMessage), .recognitionFailed(let rhsMessage)):
-            return lhsMessage == rhsMessage
-        default:
-            return false
         }
     }
 }

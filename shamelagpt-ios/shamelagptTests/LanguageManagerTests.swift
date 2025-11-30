@@ -16,6 +16,7 @@ final class LanguageManagerTests: XCTestCase {
         languageManager = LanguageManager.shared
         // Reset to default
         UserDefaults.standard.removeObject(forKey: "selectedLanguage")
+        languageManager.setLanguage(.english)
     }
 
     override func tearDownWithError() throws {

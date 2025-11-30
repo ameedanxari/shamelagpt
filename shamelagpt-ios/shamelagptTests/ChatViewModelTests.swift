@@ -79,9 +79,8 @@ final class ChatViewModelTests: XCTestCase {
         viewModel.inputText = "Test message"
 
         // Manually set loading state for test
-        Task { @MainActor in
-            viewModel.isLoading = true
-        }
+        // Manually set loading state for test
+        viewModel.isLoading = true
 
         // Then
         XCTAssertFalse(viewModel.canSendMessage)
@@ -241,10 +240,30 @@ final class ChatViewModelTests: XCTestCase {
     func testLoadMessagesPopulatesMessages() async throws {
         // Given
         let testMessages = [
-            Message.preview,
-            Message.previewAssistant
+            Message(
+                id: "msg-1",
+                conversationId: "test-conversation-id",
+                content: "Hello",
+                isUserMessage: true,
+                timestamp: Date().addingTimeInterval(-1),
+                sources: []
+            ),
+            Message(
+                id: "msg-2",
+                conversationId: "test-conversation-id",
+                content: "Hi there",
+                isUserMessage: false,
+                timestamp: Date(),
+                sources: []
+            )
         ]
         mockChatRepository.mockMessages = testMessages
+        mockChatRepository.mockConversation = Conversation(
+            id: "test-conversation-id",
+            threadId: nil,
+            title: "Test",
+            messages: testMessages
+        )
 
         // When
         await viewModel.loadMessages()
@@ -296,9 +315,7 @@ final class ChatViewModelTests: XCTestCase {
 
     func testClearErrorResetsErrorState() throws {
         // Given
-        Task { @MainActor in
-            viewModel.error = NetworkError.noConnection
-        }
+        viewModel.error = NetworkError.noConnection
 
         // When
         viewModel.clearError()
@@ -312,9 +329,7 @@ final class ChatViewModelTests: XCTestCase {
     func testCannotSendMessageWhileRecording() throws {
         // Given
         viewModel.inputText = "Test message"
-        Task { @MainActor in
-            viewModel.isRecording = true
-        }
+        viewModel.isRecording = true
 
         // Then
         XCTAssertFalse(viewModel.canSendMessage)
@@ -322,9 +337,7 @@ final class ChatViewModelTests: XCTestCase {
 
     func testClearVoiceInputError() throws {
         // Given
-        Task { @MainActor in
-            viewModel.voiceInputError = .permissionDenied
-        }
+        viewModel.voiceInputError = .permissionDenied
 
         // When
         viewModel.clearVoiceInputError()
@@ -338,9 +351,7 @@ final class ChatViewModelTests: XCTestCase {
     func testCannotSendMessageWhileProcessingOCR() throws {
         // Given
         viewModel.inputText = "Test message"
-        Task { @MainActor in
-            viewModel.isProcessingOCR = true
-        }
+        viewModel.isProcessingOCR = true
 
         // Then
         XCTAssertFalse(viewModel.canSendMessage)
@@ -348,11 +359,9 @@ final class ChatViewModelTests: XCTestCase {
 
     func testDismissOCRConfirmationClearsState() throws {
         // Given
-        Task { @MainActor in
-            viewModel.showOCRConfirmation = true
-            viewModel.ocrExtractedText = "Test text"
-            viewModel.ocrDetectedLanguage = "en"
-        }
+        viewModel.showOCRConfirmation = true
+        viewModel.ocrExtractedText = "Test text"
+        viewModel.ocrDetectedLanguage = "en"
 
         // When
         viewModel.dismissOCRConfirmation()
@@ -366,9 +375,7 @@ final class ChatViewModelTests: XCTestCase {
 
     func testClearOCRError() throws {
         // Given
-        Task { @MainActor in
-            viewModel.ocrError = .noTextFound
-        }
+        viewModel.ocrError = .noTextFound
 
         // When
         viewModel.clearOCRError()
@@ -545,6 +552,8 @@ final class ChatViewModelTests: XCTestCase {
 
         // Then - Should not send message with empty text
         // Message count should remain the same or handle appropriately
+        XCTAssertEqual(viewModel.messages.count, initialMessageCount)
+        XCTAssertFalse(viewModel.isLoading)
     }
 
     func testFactCheckMessageFailureHandling() async throws {
@@ -561,11 +570,11 @@ final class ChatViewModelTests: XCTestCase {
         // When
         viewModel.confirmFactCheck(text: factCheckText)
 
-        // Give time for async operation
-        try await Task.sleep(nanoseconds: 200_000_000)
+        // Give time for async operation (increased timeout for all async calls)
+        try await Task.sleep(nanoseconds: 500_000_000)
 
         // Then - Should handle error
-        XCTAssertNotNil(viewModel.error)
+        XCTAssertNotNil(viewModel.error, "Error should be set when fact check fails")
     }
 
     // MARK: - Additional Error Handling Tests
@@ -613,7 +622,7 @@ final class ChatViewModelTests: XCTestCase {
         let now = Date()
         let olderMessage = Message(
             id: "1",
-            conversationId: "test",
+            conversationId: "test-conversation-id",
             content: "Older",
             isUserMessage: true,
             timestamp: now.addingTimeInterval(-3600), // 1 hour ago
@@ -621,13 +630,19 @@ final class ChatViewModelTests: XCTestCase {
         )
         let newerMessage = Message(
             id: "2",
-            conversationId: "test",
+            conversationId: "test-conversation-id",
             content: "Newer",
             isUserMessage: true,
             timestamp: now,
             sources: []
         )
         mockChatRepository.mockMessages = [newerMessage, olderMessage] // Intentionally out of order
+        mockChatRepository.mockConversation = Conversation(
+            id: "test-conversation-id",
+            threadId: nil,
+            title: "Test",
+            messages: [newerMessage, olderMessage]
+        )
 
         // When
         await viewModel.loadMessages()

@@ -51,13 +51,26 @@ final class APIClient: APIClientProtocol {
         }
 
         // Configure URLSession
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = Configuration.timeoutInterval
-        configuration.timeoutIntervalForResource = Configuration.timeoutInterval * 2
-        configuration.httpAdditionalHeaders = Configuration.defaultHeaders
-        configuration.waitsForConnectivity = true
-
-        self.session = session ?? URLSession(configuration: configuration)
+        let isUITesting = Self.isUITestEnvironment()
+        if let providedSession = session {
+            self.session = providedSession
+        } else if isUITesting {
+            let configuration = URLSessionConfiguration.ephemeral
+            configuration.timeoutIntervalForRequest = Configuration.timeoutInterval
+            configuration.timeoutIntervalForResource = Configuration.timeoutInterval * 2
+            configuration.httpAdditionalHeaders = Configuration.defaultHeaders
+            configuration.waitsForConnectivity = true
+            configuration.protocolClasses = [MockURLProtocol.self]
+            AppLogger.network.logInfo("APIClient init - using MockURLProtocol because UI-Testing is enabled, args: \(CommandLine.arguments), env has XCTestConfig: \(ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil)")
+            self.session = URLSession(configuration: configuration)
+        } else {
+            let configuration = URLSessionConfiguration.default
+            configuration.timeoutIntervalForRequest = Configuration.timeoutInterval
+            configuration.timeoutIntervalForResource = Configuration.timeoutInterval * 2
+            configuration.httpAdditionalHeaders = Configuration.defaultHeaders
+            configuration.waitsForConnectivity = true
+            self.session = URLSession(configuration: configuration)
+        }
 
         // Configure JSON encoder/decoder
         self.jsonEncoder = JSONEncoder()
@@ -65,6 +78,16 @@ final class APIClient: APIClientProtocol {
 
         self.jsonDecoder = JSONDecoder()
         self.jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+    }
+
+    /// Detects UI test environment (arguments, env, or runner bundle path)
+    private static func isUITestEnvironment() -> Bool {
+        let argsContainFlag = CommandLine.arguments.contains("UI-Testing")
+        let env = ProcessInfo.processInfo.environment
+        let hasXCTestConfig = env["XCTestConfigurationFilePath"] != nil
+        let bundlePathContainsRunner = Bundle.main.bundlePath.contains("ShamelaGPTUITests-Runner")
+        let hasUITestingEnv = env["UI_TESTING"] == "1"
+        return argsContainFlag || hasXCTestConfig || bundlePathContainsRunner || hasUITestingEnv || UserDefaults.standard.bool(forKey: "isUITesting")
     }
 
     // MARK: - API Endpoints
@@ -147,6 +170,9 @@ final class APIClient: APIClientProtocol {
     /// Performs the actual data task with proper error handling
     private func performDataTask(request: URLRequest) async throws -> (Data, URLResponse) {
         do {
+            let protocolClasses = session.configuration.protocolClasses ?? []
+            AppLogger.network.logDebug("URLSession configuration protocol classes: \(protocolClasses)")
+            AppLogger.network.logDebug("URLSession configuration type: \(type(of: session))")
             let (data, response) = try await session.data(for: request)
             return (data, response)
         } catch {

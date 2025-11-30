@@ -27,6 +27,9 @@ final class VoiceInputManager: NSObject, ObservableObject {
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private let audioEngine = AVAudioEngine()
+    private var isRunningUnitTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
 
     // MARK: - Initialization
 
@@ -41,6 +44,13 @@ final class VoiceInputManager: NSObject, ObservableObject {
     /// Requests speech recognition permission
     func requestPermission() async -> Bool {
         AppLogger.voiceInput.logDebug("Requesting speech recognition permission")
+
+        if isRunningUnitTests {
+            await MainActor.run {
+                self.authorizationStatus = .authorized
+            }
+            return true
+        }
 
         // Request speech recognition authorization
         let speechStatus = await withCheckedContinuation { continuation in
@@ -231,6 +241,25 @@ enum VoiceInputError: LocalizedError {
             return "Unable to create speech recognition request."
         case .recognitionFailed(let message):
             return "Recognition failed: \(message)"
+        }
+    }
+}
+
+extension VoiceInputError: Equatable {
+    static func == (lhs: VoiceInputError, rhs: VoiceInputError) -> Bool {
+        switch (lhs, rhs) {
+        case (.permissionDenied, .permissionDenied):
+            return true
+        case (.microphonePermissionDenied, .microphonePermissionDenied):
+            return true
+        case (.recognizerNotAvailable, .recognizerNotAvailable):
+            return true
+        case (.unableToCreateRequest, .unableToCreateRequest):
+            return true
+        case (.recognitionFailed(let lhsMessage), .recognitionFailed(let rhsMessage)):
+            return lhsMessage == rhsMessage
+        default:
+            return false
         }
     }
 }

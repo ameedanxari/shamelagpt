@@ -1,0 +1,177 @@
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/AccessibilityUITests.swift:88 testMessageBubblesAccessible(): Failed to synthesize event: Neither element nor any descendant has keyboard focus. Event dispatch snapshot: TextView, {{116.0, 690.7}, {208.7, 40.0}}
+Element debug description:
+Attributes: TextView, 0x104d1df50, {{116.0, 690.7}, {208.7, 40.0}}
+Element subtree:
+ →TextView, 0x104d1df50, {{116.0, 690.7}, {208.7, 40.0}}
+    Other, 0x104d1e070, {{291.7, 690.7}, {30.0, 40.0}}, label: 'Vertical scroll bar, 1 page', value: 0%
+      Other, 0x104d1e190, {{318.7, 695.7}, {3.0, 32.0}}
+Path to element:
+ →Application, 0x109411be0, pid: 89361, label: 'ShamelaGPT'
+  ↳Window (Main), 0x106d24830, {{0.0, 0.0}, {390.0, 844.0}}
+   ↳Other, 0x106d1e300, {{0.0, 0.0}, {390.0, 844.0}}
+    ↳Other, 0x106f28260, {{0.0, 0.0}, {390.0, 844.0}}
+     ↳Other, 0x106f28800, {{0.0, 0.0}, {390.0, 844.0}}
+      ↳Other, 0x1068141a0, {{0.0, 0.0}, {390.0, 844.0}}
+       ↳Other, 0x10931f280, {{0.0, 0.0}, {390.0, 844.0}}
+        ↳Other, 0x1068142c0, {{0.0, 0.0}, {390.0, 844.0}}
+         ↳Other, 0x1068143e0, {{0.0, 0.0}, {390.0, 844.0}}
+          ↳Other, 0x109130fd0, {{0.0, 0.0}, {390.0, 844.0}}
+           ↳Other, 0x109012ed0, {{0.0, 0.0}, {390.0, 844.0}}
+            ↳Other, 0x109014170, {{0.0, 0.0}, {390.0, 844.0}}
+             ↳Other, 0x109014c70, {{0.0, 0.0}, {390.0, 844.0}}, label: 'Chat'
+              ↳Other, 0x109014d90, {{0.0, 0.0}, {390.0, 844.0}}
+               ↳Other, 0x109014eb0, {{0.0, 0.0}, {390.0, 844.0}}
+                ↳Other, 0x109014fd0, {{0.0, 0.0}, {390.0, 844.0}}
+                 ↳Other, 0x106d1e1b0, {{0.0, 0.0}, {390.0, 844.0}}
+                  ↳TextView, 0x104d1df50, {{116.0, 690.7}, {208.7, 40.0}}
+Query chain:
+ →Find: Target Application 'com.shamelagpt.ios'
+  Output: {
+    Application, 0x109019460, pid: 89361, label: 'ShamelaGPT'
+  }
+  ↪︎Find: Descendants matching type TextView
+    Output: {
+      TextView, 0x109332450, {{116.0, 690.7}, {208.7, 40.0}}
+    }
+    ↪︎Find: First Match
+      Output: {
+        TextView, 0x1095131e0, {{116.0, 690.7}, {208.7, 40.0}}
+      }
+
+
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/AccessibilityUITests.swift:121 testSourceLinksAccessible(): Failed to synthesize event: Neither element nor any descendant has keyboard focus. Event dispatch snapshot: TextView, {{116.0, 690.7}, {208.7, 40.0}}
+Element debug description:
+Attributes: TextView, 0x106e34e50, {{116.0, 690.7}, {208.7, 40.0}}
+Element subtree:
+ →TextView, 0x106e34e50, {{116.0, 690.7}, {208.7, 40.0}}
+    Other, 0x106e34f70, {{291.7, 690.7}, {30.0, 40.0}}, label: 'Vertical scroll bar, 1 page', value: 0%
+      Other, 0x106e35090, {{318.7, 695.7}, {3.0, 32.0}}
+Path to element:
+ →Application, 0x106e32290, pid: 90276, label: 'ShamelaGPT'
+  ↳Window (Main), 0x106e32d50, {{0.0, 0.0}, {390.0, 844.0}}
+   ↳Other, 0x106e33110, {{0.0, 0.0}, {390.0, 844.0}}
+    ↳Other, 0x106e33230, {{0.0, 0.0}, {390.0, 844.0}}
+     ↳Other, 0x106e32e70, {{0.0, 0.0}, {390.0, 844.0}}
+      ↳Other, 0x106e32f90, {{0.0, 0.0}, {390.0, 844.0}}
+       ↳Other, 0x106e33350, {{0.0, 0.0}, {390.0, 844.0}}
+        ↳Other, 0x106e33470, {{0.0, 0.0}, {390.0, 844.0}}
+         ↳Other, 0x106e33590, {{0.0, 0.0}, {390.0, 844.0}}
+          ↳Other, 0x106e336b0, {{0.0, 0.0}, {390.0, 844.0}}
+           ↳Other, 0x106e337d0, {{0.0, 0.0}, {390.0, 844.0}}
+            ↳Other, 0x106e338f0, {{0.0, 0.0}, {390.0, 844.0}}
+             ↳Other, 0x106e33a10, {{0.0, 0.0}, {390.0, 844.0}}, label: 'Chat'
+              ↳Other, 0x106e33b30, {{0.0, 0.0}, {390.0, 844.0}}
+               ↳Other, 0x106e33c50, {{0.0, 0.0}, {390.0, 844.0}}
+                ↳Other, 0x106e33d70, {{0.0, 0.0}, {390.0, 844.0}}
+                 ↳Other, 0x106e33e90, {{0.0, 0.0}, {390.0, 844.0}}
+                  ↳TextView, 0x106e34e50, {{116.0, 690.7}, {208.7, 40.0}}
+Query chain:
+ →Find: Target Application 'com.shamelagpt.ios'
+  Output: {
+    Application, 0x106e38860, pid: 90276, label: 'ShamelaGPT'
+  }
+  ↪︎Find: Descendants matching type TextView
+    Output: {
+      TextView, 0x104d32f50, {{116.0, 690.7}, {208.7, 40.0}}
+    }
+    ↪︎Find: First Match
+      Output: {
+        TextView, 0x10933ae00, {{116.0, 690.7}, {208.7, 40.0}}
+      }
+
+
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/ChatFlowUITests.swift
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/ChatFlowUITests.swift:355 testTapSourceOpensWebView(): Failed to synthesize event: Neither element nor any descendant has keyboard focus. Event dispatch snapshot: TextView, {{116.0, 690.7}, {208.7, 40.0}}
+Element debug description:
+Attributes: TextView, 0x11201f9c0, {{116.0, 690.7}, {208.7, 40.0}}
+Element subtree:
+ →TextView, 0x11201f9c0, {{116.0, 690.7}, {208.7, 40.0}}
+    Other, 0x112020ad0, {{291.7, 690.7}, {30.0, 40.0}}, label: 'Vertical scroll bar, 1 page', value: 0%
+      Other, 0x112020400, {{318.7, 695.7}, {3.0, 32.0}}
+Path to element:
+ →Application, 0x112021f70, pid: 89890, label: 'ShamelaGPT'
+  ↳Window (Main), 0x1120211d0, {{0.0, 0.0}, {390.0, 844.0}}
+   ↳Other, 0x112021c00, {{0.0, 0.0}, {390.0, 844.0}}
+    ↳Other, 0x112019690, {{0.0, 0.0}, {390.0, 844.0}}
+     ↳Other, 0x1120218b0, {{0.0, 0.0}, {390.0, 844.0}}
+      ↳Other, 0x112021530, {{0.0, 0.0}, {390.0, 844.0}}
+       ↳Other, 0x1120170f0, {{0.0, 0.0}, {390.0, 844.0}}
+        ↳Other, 0x112018210, {{0.0, 0.0}, {390.0, 844.0}}
+         ↳Other, 0x11201bf90, {{0.0, 0.0}, {390.0, 844.0}}
+          ↳Other, 0x112019340, {{0.0, 0.0}, {390.0, 844.0}}
+           ↳Other, 0x11201a320, {{0.0, 0.0}, {390.0, 844.0}}
+            ↳Other, 0x112018c70, {{0.0, 0.0}, {390.0, 844.0}}
+             ↳Other, 0x11201fd50, {{0.0, 0.0}, {390.0, 844.0}}, label: 'Chat'
+              ↳Other, 0x11201ad80, {{0.0, 0.0}, {390.0, 844.0}}
+               ↳Other, 0x11201d770, {{0.0, 0.0}, {390.0, 844.0}}
+                ↳Other, 0x11201a6a0, {{0.0, 0.0}, {390.0, 844.0}}
+                 ↳Other, 0x112014780, {{0.0, 0.0}, {390.0, 844.0}}
+                  ↳TextView, 0x11201f9c0, {{116.0, 690.7}, {208.7, 40.0}}
+Query chain:
+ →Find: Target Application 'com.shamelagpt.ios'
+  Output: {
+    Application, 0x10df10de0, pid: 89890, label: 'ShamelaGPT'
+  }
+  ↪︎Find: Descendants matching type TextView
+    Output: {
+      TextView, 0x110c2c5a0, {{116.0, 690.7}, {208.7, 40.0}}
+    }
+    ↪︎Find: First Match
+      Output: {
+        TextView, 0x11203e720, {{116.0, 690.7}, {208.7, 40.0}}
+      }
+
+
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/ChatFlowUITests.swift:759 testOptimisticMessageRemovedOnError(): Failed to synthesize event: Neither element nor any descendant has keyboard focus. Event dispatch snapshot: TextView, {{116.0, 690.7}, {208.7, 40.0}}
+Element debug description:
+Attributes: TextView, 0x10de1bc60, {{116.0, 690.7}, {208.7, 40.0}}
+Element subtree:
+ →TextView, 0x10de1bc60, {{116.0, 690.7}, {208.7, 40.0}}
+    Other, 0x10de1bd80, {{291.7, 690.7}, {30.0, 40.0}}, label: 'Vertical scroll bar, 1 page', value: 0%
+      Other, 0x10de1bea0, {{318.7, 695.7}, {3.0, 32.0}}
+Path to element:
+ →Application, 0x112610230, pid: 88175, label: 'ShamelaGPT'
+  ↳Window (Main), 0x11260fb50, {{0.0, 0.0}, {390.0, 844.0}}
+   ↳Other, 0x112613c80, {{0.0, 0.0}, {390.0, 844.0}}
+    ↳Other, 0x112613da0, {{0.0, 0.0}, {390.0, 844.0}}
+     ↳Other, 0x112613040, {{0.0, 0.0}, {390.0, 844.0}}
+      ↳Other, 0x112613160, {{0.0, 0.0}, {390.0, 844.0}}
+       ↳Other, 0x112613ec0, {{0.0, 0.0}, {390.0, 844.0}}
+        ↳Other, 0x11081b2f0, {{0.0, 0.0}, {390.0, 844.0}}
+         ↳Other, 0x110818010, {{0.0, 0.0}, {390.0, 844.0}}
+          ↳Other, 0x1108047c0, {{0.0, 0.0}, {390.0, 844.0}}
+           ↳Other, 0x110821530, {{0.0, 0.0}, {390.0, 844.0}}
+            ↳Other, 0x11081b600, {{0.0, 0.0}, {390.0, 844.0}}
+             ↳Other, 0x11081c030, {{0.0, 0.0}, {390.0, 844.0}}, label: 'Chat'
+              ↳Other, 0x110821f80, {{0.0, 0.0}, {390.0, 844.0}}
+               ↳Other, 0x110820ad0, {{0.0, 0.0}, {390.0, 844.0}}
+                ↳Other, 0x110820e40, {{0.0, 0.0}, {390.0, 844.0}}
+                 ↳Other, 0x11081abc0, {{0.0, 0.0}, {390.0, 844.0}}
+                  ↳TextView, 0x10de1bc60, {{116.0, 690.7}, {208.7, 40.0}}
+Query chain:
+ →Find: Target Application 'com.shamelagpt.ios'
+  Output: {
+    Application, 0x112618a40, pid: 88175, label: 'ShamelaGPT'
+  }
+  ↪︎Find: Descendants matching type TextView
+    Output: {
+      TextView, 0x10de20fd0, {{116.0, 690.7}, {208.7, 40.0}}
+    }
+    ↪︎Find: First Match
+      Output: {
+        TextView, 0x11250f870, {{116.0, 690.7}, {208.7, 40.0}}
+      }
+
+
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/OCRUITests.swift
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/OCRUITests.swift:52 testTapCameraButtonShowsActionSheet(): XCTAssertTrue failed - Action sheet should appear after tapping camera button
+
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/OCRUITests.swift:141 testCancelImageSelectionWorks(): XCTAssertTrue failed
+
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/OCRUITests.swift:174 testOCRConfirmationDialogAppears(): XCTAssertTrue failed - Should show either OCR confirmation or image selection sheet
+
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/OCRUITests.swift:204 testOCRExtractedTextDisplayed(): XCTAssertTrue failed - Extracted text should be displayed in confirmation dialog
+
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/OCRUITests.swift:229 testOCRDetectedLanguageDisplayed(): XCTAssertTrue failed - Detected language should be displayed in confirmation
+
+/Users/macintosh/Documents/Projects/ShamelaGPT/shamelagpt-ios/shamelagptUITests/OCRUITests.swift:288 testOCRConfirmationSendsMessage(): XCTAssertTrue failed - OCR text should be sent as message after confirmation

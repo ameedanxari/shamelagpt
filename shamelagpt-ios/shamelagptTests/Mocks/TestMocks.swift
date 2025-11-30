@@ -92,6 +92,10 @@ class MockChatRepository: ChatRepository {
         createConversationCallCount += 1
         if shouldThrowError { throw errorToThrow }
 
+        if let mock = mockConversation {
+            return mock
+        }
+
         let conversation = Conversation(
             id: UUID().uuidString,
             threadId: nil,
@@ -123,6 +127,31 @@ class MockChatRepository: ChatRepository {
 
     func updateConversationThreadId(id: String, threadId: String) async throws {
         if shouldThrowError { throw errorToThrow }
+        
+        // Update mockConversation if it matches
+        if mockConversation?.id == id {
+            mockConversation = Conversation(
+                id: mockConversation!.id,
+                threadId: threadId,
+                title: mockConversation!.title,
+                createdAt: mockConversation!.createdAt,
+                updatedAt: mockConversation!.updatedAt,
+                messages: mockConversation!.messages
+            )
+        }
+        
+        // Update in mockConversations array
+        if let index = mockConversations.firstIndex(where: { $0.id == id }) {
+            let conv = mockConversations[index]
+            mockConversations[index] = Conversation(
+                id: conv.id,
+                threadId: threadId,
+                title: conv.title,
+                createdAt: conv.createdAt,
+                updatedAt: conv.updatedAt,
+                messages: conv.messages
+            )
+        }
     }
 
     func deleteConversation(id: String) async throws {
@@ -242,7 +271,6 @@ class MockNetworkMonitor: NetworkMonitorProtocol {
 
 // MARK: - Mock SendMessageUseCase
 
-@MainActor
 class MockSendMessageUseCase: SendMessageUseCaseProtocol {
     var shouldSucceed = true
     var errorToThrow: Error = NSError(domain: "test", code: -1, userInfo: nil)
@@ -348,7 +376,6 @@ class MockSendMessageUseCase: SendMessageUseCaseProtocol {
 
 // MARK: - Mock Voice Input Manager
 
-@MainActor
 class MockVoiceInputManager: VoiceInputManagerProtocol {
     @Published var transcribedText: String = ""
     @Published var isRecording: Bool = false
@@ -383,7 +410,6 @@ class MockVoiceInputManager: VoiceInputManagerProtocol {
 
 // MARK: - Mock OCR Manager
 
-@MainActor
 class MockOCRManager: OCRManagerProtocol {
     @Published var extractedText: String = ""
     @Published var isProcessing: Bool = false

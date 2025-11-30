@@ -59,8 +59,13 @@ struct MessageBubbleView: View {
             removal: .opacity
         ))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(message.isUserMessage ? "You" : "ShamelaGPT") said: \(message.content)")
-        .accessibilityHint(message.hasSources ? "Double tap to view context menu with copy and share options. Contains \(message.sources.count) sources." : "Double tap to view context menu with copy and share options")
+        .accessibilityIdentifier("MessageBubble")
+        .accessibilityLabel(message.content)
+        .accessibilityHint(message.isUserMessage
+                           ? "Your message. Double tap to view context menu with copy and share options."
+                           : (message.hasSources
+                              ? "Assistant message. Contains \(message.sources.count) sources. Double tap for options."
+                              : "Assistant message. Double tap for options."))
         .accessibilityValue(formattedTimestamp)
     }
 
@@ -132,6 +137,7 @@ struct MessageBubbleView: View {
                 .font(AppTheme.Typography.caption)
                 .foregroundColor(AppTheme.Colors.secondaryText)
                 .fontWeight(.semibold)
+                .accessibilityIdentifier("SourcesHeader")
 
             ForEach(message.sources) { source in
                 sourceLink(for: source)
@@ -166,6 +172,7 @@ struct MessageBubbleView: View {
                     .foregroundColor(AppTheme.Colors.secondaryText)
             }
         }
+        .accessibilityIdentifier("SourceLink-\(source.id)")
         .padding(.vertical, AppTheme.Spacing.xxs)
         .accessibilityLabel("Source: \(source.citation)")
         .accessibilityHint("Double tap to open source reference")
@@ -255,24 +262,27 @@ struct MessageBubbleView: View {
 
 // MARK: - Preview Provider
 
-#Preview("User Message") {
-    MessageBubbleView(message: Message.preview)
-        .previewLayout(.sizeThatFits)
-        .padding()
-}
+struct MessageBubbleView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            MessageBubbleView(message: Message.preview)
+                .previewDisplayName("User Message")
+                .previewLayout(.sizeThatFits)
+                .padding()
 
-#Preview("Assistant Message") {
-    MessageBubbleView(message: Message.previewAssistant)
-        .previewLayout(.sizeThatFits)
-        .padding()
-}
+            MessageBubbleView(message: Message.previewAssistant)
+                .previewDisplayName("Assistant Message")
+                .previewLayout(.sizeThatFits)
+                .padding()
 
-#Preview("Long Message") {
-    MessageBubbleView(message: Message(
-        conversationId: "preview",
-        content: "This is a much longer message that spans multiple lines. It demonstrates how the message bubble adapts to different content lengths and maintains proper formatting throughout. The bubble should expand to accommodate all the text while maintaining its rounded corners and proper padding.",
-        isUserMessage: false
-    ))
-    .previewLayout(.sizeThatFits)
-    .padding()
+            MessageBubbleView(message: Message(
+                conversationId: "preview",
+                content: "This is a much longer message that spans multiple lines. It demonstrates how the message bubble adapts to different content lengths and maintains proper formatting throughout. The bubble should expand to accommodate all the text while maintaining its rounded corners and proper padding.",
+                isUserMessage: false
+            ))
+            .previewDisplayName("Long Message")
+            .previewLayout(.sizeThatFits)
+            .padding()
+        }
+    }
 }

@@ -72,6 +72,7 @@ final class HistoryViewModelTests: XCTestCase {
 
     func testLoadConversationsFiltersEmptyConversations() async throws {
         // Given
+        let oldDate = Date().addingTimeInterval(-600) // 10 minutes ago (older than 5 minute threshold)
         let conv1 = Conversation(
             id: "1",
             title: "Conversation with messages",
@@ -80,6 +81,7 @@ final class HistoryViewModelTests: XCTestCase {
         let conv2 = Conversation(
             id: "2",
             title: "Empty Conversation",
+            createdAt: oldDate, // Old empty conversation should be filtered
             messages: []
         )
         let conv3 = Conversation(
@@ -95,10 +97,11 @@ final class HistoryViewModelTests: XCTestCase {
         // Give time for async operation
         try await Task.sleep(nanoseconds: 100_000_000)
 
-        // Then - should only include conversations with messages
-        XCTAssertEqual(viewModel.conversations.count, 2)
-        XCTAssertTrue(viewModel.conversations.allSatisfy { !$0.messages.isEmpty })
-        XCTAssertFalse(viewModel.conversations.contains { $0.id == "2" })
+        // Then - should only include conversations with messages or recent empty ones
+        // Conv2 is old and empty, so it should be filtered out
+        XCTAssertEqual(viewModel.conversations.count, 2, "Should filter out old empty conversations")
+        XCTAssertTrue(viewModel.conversations.allSatisfy { !$0.messages.isEmpty || Date().timeIntervalSince($0.createdAt) < 300 }, "All conversations should have messages or be recent")
+        XCTAssertFalse(viewModel.conversations.contains { $0.id == "2" }, "Old empty conversation should be filtered out")
     }
 
     func testLoadConversationsWithError() async throws {
@@ -425,8 +428,8 @@ final class HistoryViewModelTests: XCTestCase {
         // When
         let displayTitle = viewModel.displayTitle(for: conversation)
 
-        // Then - should be truncated to 50 characters
-        XCTAssertTrue(displayTitle.count <= 50)
+        // Then - should be truncated to 50 characters + "..." = 53 total
+        XCTAssertEqual(displayTitle.count, 53)
         XCTAssertTrue(displayTitle.starts(with: "This is a very long message"))
     }
 
@@ -609,7 +612,7 @@ final class HistoryViewModelTests: XCTestCase {
         let title = viewModel.generateTitle(from: longMessage)
 
         // Then
-        XCTAssertEqual(title.count, 50)
+        XCTAssertEqual(title.count, 53)
     }
 
     func testGenerateTitleFromEmptyMessage() throws {

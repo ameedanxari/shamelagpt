@@ -33,6 +33,7 @@ struct SettingsView: View {
                             .foregroundColor(AppTheme.Colors.tertiaryText)
                     }
                 }
+                .accessibilityIdentifier("LanguageRow")
             }
 
             // Support Section

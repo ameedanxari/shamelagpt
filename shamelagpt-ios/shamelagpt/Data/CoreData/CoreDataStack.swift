@@ -9,7 +9,7 @@ import Foundation
 import CoreData
 
 /// Core Data stack with singleton pattern and background context support
-final class CoreDataStack {
+final class CoreDataStack: @unchecked Sendable {
 
     // MARK: - Singleton
     static let shared = CoreDataStack()
@@ -20,6 +20,13 @@ final class CoreDataStack {
     /// Main persistent container
     private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: modelName)
+
+        // Use in-memory store for UI testing
+        if UserDefaults.standard.bool(forKey: "isUITesting") {
+            let description = NSPersistentStoreDescription()
+            description.type = NSInMemoryStoreType
+            container.persistentStoreDescriptions = [description]
+        }
 
         container.loadPersistentStores { storeDescription, error in
             if let error = error as NSError? {
@@ -132,6 +139,27 @@ enum CoreDataError: LocalizedError {
             return "Requested data not found"
         case .invalidData:
             return "Invalid data provided"
+        }
+    }
+}
+
+// MARK: - Equatable support
+
+extension CoreDataError: Equatable {
+    static func == (lhs: CoreDataError, rhs: CoreDataError) -> Bool {
+        switch (lhs, rhs) {
+        case (.notFound, .notFound):
+            return true
+        case (.invalidData, .invalidData):
+            return true
+        case (.saveFailed, .saveFailed):
+            return true
+        case (.fetchFailed, .fetchFailed):
+            return true
+        case (.deleteFailed, .deleteFailed):
+            return true
+        default:
+            return false
         }
     }
 }

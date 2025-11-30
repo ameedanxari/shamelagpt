@@ -20,6 +20,7 @@ final class ChatViewModel: ObservableObject {
     @Published var inputText: String = ""
     @Published var isLoading: Bool = false
     @Published var error: Error?
+    @Published var errorMessage: String?
     @Published private(set) var conversationId: String
     @Published private(set) var threadId: String?
 
@@ -45,8 +46,8 @@ final class ChatViewModel: ObservableObject {
 
     private let sendMessageUseCase: SendMessageUseCaseProtocol
     private let chatRepository: ChatRepository
-    private let voiceInputManager: VoiceInputManagerProtocol
-    private let ocrManager: OCRManagerProtocol
+    private let voiceInputManager: any VoiceInputManagerProtocol
+    private let ocrManager: any OCRManagerProtocol
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
@@ -55,8 +56,8 @@ final class ChatViewModel: ObservableObject {
         conversationId: String,
         sendMessageUseCase: SendMessageUseCaseProtocol,
         chatRepository: ChatRepository,
-        voiceInputManager: VoiceInputManagerProtocol,
-        ocrManager: OCRManagerProtocol
+        voiceInputManager: any VoiceInputManagerProtocol,
+        ocrManager: any OCRManagerProtocol
     ) {
         self.conversationId = conversationId
         self.sendMessageUseCase = sendMessageUseCase
@@ -120,8 +121,11 @@ final class ChatViewModel: ObservableObject {
 
     /// Sends a message to the assistant
     func sendMessage() {
-        guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            AppLogger.chat.logDebug("Attempted to send empty message, ignoring")
+        guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              !isLoading,
+              !isRecording,
+              !isProcessingOCR else {
+            AppLogger.chat.logDebug("SendMessage ignored: invalid state (empty=\(inputText.isEmpty), loading=\(isLoading), recording=\(isRecording), ocr=\(isProcessingOCR))")
             return
         }
 
@@ -140,10 +144,12 @@ final class ChatViewModel: ObservableObject {
             sources: []
         )
         messages.append(optimisticUserMessage)
-        AppLogger.chat.logDebug("Added optimistic user message to UI")
+        AppLogger.chat.logDebug("Added optimistic user message to UI - Total messages now: \(messages.count)")
+        AppLogger.chat.logDebug("Current messages array: \(messages.map { "\($0.id): \($0.content.prefix(20))..." })")
 
         isLoading = true
         error = nil
+        errorMessage = nil
 
         Task {
             do {
@@ -170,7 +176,7 @@ final class ChatViewModel: ObservableObject {
 
             } catch {
                 AppLogger.chat.logError("Failed to send message", error: error)
-                self.error = error
+                handleError(error)
                 isLoading = false
 
                 // Remove optimistic message and put text back in input field
@@ -205,23 +211,57 @@ final class ChatViewModel: ObservableObject {
     /// Loads messages for the current conversation
     func loadMessages() async {
         AppLogger.chat.logDebug("Loading messages for conversation: \(conversationId)")
+        AppLogger.chat.logDebug("Current message count before load: \(messages.count)")
 
         do {
             let fetchedMessages = try await chatRepository.fetchMessages(
                 forConversation: conversationId
             )
-            messages = fetchedMessages
+            AppLogger.chat.logDebug("Fetched \(fetchedMessages.count) messages from repository")
 
-            AppLogger.chat.logInfo("Loaded \(fetchedMessages.count) messages")
+            let hasOptimisticMessages = messages.contains { $0.id.hasPrefix("temp-") }
+            AppLogger.chat.logDebug("Has optimistic messages: \(hasOptimisticMessages), isLoading: \(isLoading)")
+
+            // ENHANCED: Only skip reload if we're loading AND have optimistic messages
+            // AND the fetch returned fewer messages than we currently have
+            if isLoading && hasOptimisticMessages && fetchedMessages.count < messages.count {
+                AppLogger.chat.logDebug("Skipping reload - preserving \(messages.count) messages, fetch returned \(fetchedMessages.count)")
+                return
+            }
+
+            // ENHANCED: Merge instead of replace when loading with optimistic messages
+            if hasOptimisticMessages && isLoading {
+                var mergedMessages = fetchedMessages
+                for optimisticMsg in messages where optimisticMsg.id.hasPrefix("temp-") {
+                    // Check if this optimistic message was persisted
+                    let isPersisted = fetchedMessages.contains {
+                        $0.content == optimisticMsg.content &&
+                        $0.isUserMessage == optimisticMsg.isUserMessage
+                    }
+                    if !isPersisted {
+                        mergedMessages.append(optimisticMsg)
+                    }
+                }
+                messages = mergedMessages.sorted { $0.timestamp < $1.timestamp }
+                AppLogger.chat.logInfo("Merged messages: \(mergedMessages.count) total (\(fetchedMessages.count) from DB, \(mergedMessages.count - fetchedMessages.count) optimistic)")
+                AppLogger.chat.logDebug("Final messages array: \(messages.map { "\($0.id): \($0.content.prefix(20))..." })")
+            } else {
+                messages = fetchedMessages
+                AppLogger.chat.logInfo("Loaded \(fetchedMessages.count) messages")
+                AppLogger.chat.logDebug("Final messages array: \(messages.map { "\($0.id): \($0.content.prefix(20))..." })")
+            }
+
+            AppLogger.chat.logDebug("Message count after load: \(messages.count)")
 
             // Also update thread ID from conversation
-            if let conversation = try await chatRepository.fetchConversation(byId: conversationId) {
-                threadId = conversation.threadId
-                AppLogger.chat.logDebug("Updated thread ID from conversation: \(conversation.threadId ?? "nil")")
+            if let conversation = try await chatRepository.fetchConversation(byId: conversationId),
+               let fetchedThreadId = conversation.threadId {
+                threadId = fetchedThreadId
+                AppLogger.chat.logDebug("Updated thread ID from conversation: \(fetchedThreadId)")
             }
         } catch {
             AppLogger.chat.logError("Failed to load messages", error: error)
-            self.error = error
+            handleError(error)
         }
     }
 
@@ -233,6 +273,7 @@ final class ChatViewModel: ObservableObject {
     /// Clears the current error
     func clearError() {
         error = nil
+        errorMessage = nil
     }
 
     /// Returns whether the send button should be enabled
@@ -293,6 +334,20 @@ final class ChatViewModel: ObservableObject {
     func clearVoiceInputError() {
         voiceInputError = nil
         voiceInputManager.clearError()
+    }
+
+    // MARK: - Error Handling
+
+    private func handleError(_ error: Error) {
+        AppLogger.chat.logError("handleError called with error: \(error)")
+        self.error = error
+        if let networkError = error as? NetworkError {
+            errorMessage = networkError.userMessage
+            AppLogger.chat.logInfo("Set errorMessage from NetworkError: \(networkError.userMessage)")
+        } else {
+            errorMessage = error.localizedDescription
+            AppLogger.chat.logInfo("Set errorMessage from error.localizedDescription: \(error.localizedDescription)")
+        }
     }
 
     // MARK: - OCR Methods

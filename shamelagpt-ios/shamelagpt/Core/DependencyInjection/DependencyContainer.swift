@@ -22,6 +22,8 @@ class DependencyContainer {
     }
 
     private func registerDependencies() {
+        let isUITesting = UserDefaults.standard.bool(forKey: "isUITesting")
+
         // MARK: - Core Layer
         registerCore()
 
@@ -59,8 +61,32 @@ class DependencyContainer {
         register(NetworkMonitor.self, instance: networkMonitor)
 
         // API Client
-        let apiClient: APIClientProtocol = APIClient()
+        // In UI testing mode, use a mock URLSession
+        let apiClient: APIClientProtocol
+        let isUITesting = Self.isUITestEnvironment()
+        AppLogger.network.logInfo("DependencyContainer.registerNetworkLayer - isUITesting: \(isUITesting)")
+
+        if isUITesting {
+            // Create a URLSession with mock protocol for testing
+            let configuration = URLSessionConfiguration.ephemeral
+            configuration.protocolClasses = [MockURLProtocol.self]
+            let mockSession = URLSession(configuration: configuration)
+            AppLogger.network.logInfo("Using MockURLProtocol for URLSession")
+            apiClient = APIClient(session: mockSession)
+        } else {
+            apiClient = APIClient()
+        }
         register(APIClientProtocol.self, instance: apiClient)
+    }
+
+    /// Detects UI test environment (arguments, env, or runner bundle path)
+    private static func isUITestEnvironment() -> Bool {
+        let argsContainFlag = CommandLine.arguments.contains("UI-Testing")
+        let env = ProcessInfo.processInfo.environment
+        let hasXCTestConfig = env["XCTestConfigurationFilePath"] != nil
+        let bundlePathContainsRunner = Bundle.main.bundlePath.contains("ShamelaGPTUITests-Runner")
+        let hasUITestingEnv = env["UI_TESTING"] == "1"
+        return argsContainFlag || hasXCTestConfig || bundlePathContainsRunner || hasUITestingEnv || UserDefaults.standard.bool(forKey: "isUITesting")
     }
 
     private func registerDataLayer() {
