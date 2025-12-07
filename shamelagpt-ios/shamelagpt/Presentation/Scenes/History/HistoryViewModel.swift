@@ -20,6 +20,7 @@ final class HistoryViewModel: ObservableObject {
     @Published var error: String?
     @Published var showDeleteConfirmation: Bool = false
     @Published var conversationToDelete: Conversation?
+    @Published var includeLocalOnly: Bool = true
 
     // MARK: - Private Properties
 
@@ -50,57 +51,84 @@ final class HistoryViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] conversations in
                 AppLogger.app.logDebug("HistoryViewModel received \(conversations.count) conversations from observer")
+                // Log a compact summary for each conversation to aid debugging
+                for conv in conversations {
+                    AppLogger.app.logDebug("-- conv id:\(conv.id) messages:\(conv.messages.count) threadId:\(conv.threadId ?? "nil") isLocalOnly:\(conv.isLocalOnly) createdAt:\(conv.createdAt)")
+                }
 
-                // Smart filter: show conversations with messages OR recent empty conversations
-                // Only hide empty conversations older than 5 minutes (likely abandoned)
-                let filtered = conversations.filter { conversation in
-                    // Show conversations with messages
-                    if !conversation.messages.isEmpty {
-                        AppLogger.app.logDebug("Conversation \(conversation.id) has \(conversation.messages.count) messages - INCLUDED")
-                        return true
+                let filtered = conversations.filter { [weak self] conversation in
+                    // Drop empty local-only conversations; they will never hydrate remotely
+                    if conversation.isLocalOnly && conversation.messages.isEmpty {
+                        AppLogger.app.logDebug("Conversation \(conversation.id) is local-only & empty - FILTERED from history")
+                        return false
                     }
 
-                    // Show empty conversations that are recent (within 5 minutes)
-                    // These are likely active conversations waiting for first message
-                    let ageInSeconds = Date().timeIntervalSince(conversation.createdAt)
-                    let isRecent = ageInSeconds < 300 // 5 minutes
-                    AppLogger.app.logDebug("Conversation \(conversation.id) is empty, age: \(ageInSeconds)s - \(isRecent ? "INCLUDED (recent)" : "FILTERED (old)")")
-                    return isRecent
+                    // Hide local-only conversations only when not allowed (e.g., guests viewing history)
+                    if conversation.isLocalOnly && (self?.includeLocalOnly == false) {
+                        AppLogger.app.logDebug("Conversation \(conversation.id) is local-only - FILTERED from history")
+                        return false
+                    }
+
+                    // Keep conversations even if messages are not yet hydrated (remote messages fetched separately)
+                    if conversation.messages.isEmpty {
+                        AppLogger.app.logDebug("Conversation \(conversation.id) has no local messages yet - INCLUDED (will hydrate on open)")
+                    } else {
+                        AppLogger.app.logDebug("Conversation \(conversation.id) INCLUDED (messages=\(conversation.messages.count), localOnly=\(conversation.isLocalOnly))")
+                    }
+                    return true
                 }
 
                 AppLogger.app.logDebug("HistoryViewModel filtered to \(filtered.count) conversations")
-                self?.conversations = filtered
+                self?.conversations = filtered.sorted {
+                    // sort in reverse chronological order
+                    $0.createdAt > $1.createdAt
+                }
             }
             .store(in: &cancellables)
     }
 
     // MARK: - Public Methods
 
-    /// Loads all conversations from the repository
+    /// Loads all conversations (used for initial load)
     func loadConversations() {
         Task {
+            await refreshConversations()
+        }
+    }
+
+    /// Async refresh for pull-to-refresh (authenticated only)
+    func refreshConversations() async {
+        await MainActor.run {
             isLoading = true
             error = nil
+        }
 
-            do {
-                let conversations = try await getConversationsUseCase.execute()
-                // Smart filter: show conversations with messages OR recent empty conversations
-                // Only hide empty conversations older than 5 minutes (likely abandoned)
+        do {
+            try await chatRepository.syncRemoteConversations()
+            let conversations = try await getConversationsUseCase.execute()
+            await MainActor.run {
                 self.conversations = conversations.filter { conversation in
-                    // Show conversations with messages
-                    if !conversation.messages.isEmpty {
-                        return true
+                    if conversation.isLocalOnly && conversation.messages.isEmpty {
+                        return false
                     }
-
-                    // Show empty conversations that are recent (within 5 minutes)
-                    // These are likely active conversations waiting for first message
-                    let ageInSeconds = Date().timeIntervalSince(conversation.createdAt)
-                    return ageInSeconds < 300 // 5 minutes
+                    // Hide local-only conversations only when not allowed (e.g., guests viewing history)
+                    if conversation.isLocalOnly && includeLocalOnly == false {
+                        return false
+                    }
+                    // Include conversations even if messages are not yet hydrated
+                    return true
+                }.sorted {
+                    // sort in reverse chronological order
+                    $0.createdAt > $1.createdAt
                 }
-            } catch {
+            }
+        } catch {
+            await MainActor.run {
                 self.error = "Failed to load conversations: \(error.localizedDescription)"
             }
+        }
 
+        await MainActor.run {
             isLoading = false
         }
     }
@@ -167,6 +195,11 @@ final class HistoryViewModel: ObservableObject {
         error = nil
 
         do {
+            if let emptyConversation = try await chatRepository.fetchMostRecentEmptyConversation(includeLocalOnly: includeLocalOnly) {
+                AppLogger.app.logInfo("Reusing existing empty conversation from History: \(emptyConversation.id)")
+                return emptyConversation.id
+            }
+
             // Generate title from timestamp
             let title = "New Conversation"
             let conversation = try await chatRepository.createConversation(title: title)

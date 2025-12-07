@@ -4,6 +4,8 @@ import androidx.room.Room
 import com.shamelagpt.android.core.database.AppDatabase
 import com.shamelagpt.android.data.repository.ConversationRepositoryImpl
 import com.shamelagpt.android.domain.repository.ConversationRepository
+import com.shamelagpt.android.data.remote.datasource.ConversationRemoteDataSource
+import com.shamelagpt.android.core.preferences.SessionManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -39,7 +41,9 @@ val databaseModule = module {
     single<ConversationRepository> {
         ConversationRepositoryImpl(
             conversationDao = get(),
-            messageDao = get()
+            messageDao = get(),
+            conversationRemoteDataSource = getOrNull<ConversationRemoteDataSource>(),
+            sessionManager = getOrNull<SessionManager>()
         )
     }
 }

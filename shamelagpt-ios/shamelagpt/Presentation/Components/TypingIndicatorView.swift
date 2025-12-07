@@ -10,6 +10,8 @@ import SwiftUI
 /// A view that displays an animated typing indicator (three bouncing dots)
 struct TypingIndicatorView: View {
 
+    @Environment(\.colorScheme) private var colorScheme
+
     // MARK: - State
 
     @State private var animationPhase = 0
@@ -31,7 +33,7 @@ struct TypingIndicatorView: View {
             }
             .padding(.horizontal, AppTheme.Spacing.sm)
             .padding(.vertical, AppTheme.Spacing.xs)
-            .background(AppTheme.Colors.aiMessageBackground)
+            .background(DesignSystem.Colors.surface(colorScheme))
             .cornerRadius(AppTheme.Layout.messageBubbleRadius)
 
             Spacer()
@@ -72,22 +74,23 @@ struct TypingIndicatorView: View {
     }
 }
 
-// MARK: - Preview Provider
+struct TypingIndicatorView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            VStack {
+                Spacer()
+                TypingIndicatorView()
+                Spacer()
+            }
+            .background(DesignSystem.Colors.background(.light))
 
-#Preview {
-    VStack {
-        Spacer()
-        TypingIndicatorView()
-        Spacer()
+            VStack {
+                MessageBubbleView(message: Message.preview)
+                TypingIndicatorView()
+                Spacer()
+            }
+            .background(AppTheme.Colors.background)
+            .previewDisplayName("In Chat Context")
+        }
     }
-    .background(AppTheme.Colors.background)
-}
-
-#Preview("In Chat Context") {
-    VStack {
-        MessageBubbleView(message: Message.preview)
-        TypingIndicatorView()
-        Spacer()
-    }
-    .background(AppTheme.Colors.background)
 }

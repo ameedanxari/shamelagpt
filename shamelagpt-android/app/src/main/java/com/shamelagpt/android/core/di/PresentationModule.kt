@@ -10,6 +10,7 @@ import com.shamelagpt.android.presentation.chat.ChatViewModel
 import com.shamelagpt.android.presentation.history.HistoryViewModel
 import com.shamelagpt.android.presentation.settings.SettingsViewModel
 import com.shamelagpt.android.presentation.welcome.WelcomeViewModel
+import com.shamelagpt.android.presentation.auth.AuthViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -84,7 +85,9 @@ val presentationModule = module {
     // SettingsViewModel
     viewModel {
         SettingsViewModel(
-            languageManager = get()
+            languageManager = get(),
+            authRepository = get(),
+            preferencesRepository = get()
         )
     }
 
@@ -92,6 +95,13 @@ val presentationModule = module {
     viewModel {
         WelcomeViewModel(
             preferencesManager = get()
+        )
+    }
+
+    // AuthViewModel
+    viewModel {
+        AuthViewModel(
+            authRepository = get()
         )
     }
 }

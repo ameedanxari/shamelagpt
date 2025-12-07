@@ -15,7 +15,14 @@ interface ChatRemoteDataSource {
      * @param threadId Optional thread ID for continuing conversation
      * @return Result with ChatResponse or error
      */
-    suspend fun sendMessage(question: String, threadId: String?): Result<ChatResponse>
+    suspend fun sendMessage(
+        question: String,
+        threadId: String?,
+        promptConfig: com.google.gson.JsonElement? = null,
+        languagePreference: String? = null,
+        customSystemPrompt: String? = null,
+        enableThinking: Boolean? = null
+    ): Result<ChatResponse>
 
     /**
      * Checks API health status.

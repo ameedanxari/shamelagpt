@@ -14,12 +14,15 @@ struct ChatView: View {
 
     @StateObject var viewModel: ChatViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    var onRequireAuth: () -> Void = {}
 
     // MARK: - State
 
     @State private var scrollProxy: ScrollViewProxy?
     @State private var showingErrorAlert = false
     @State private var isBottomBarVisible = true
+    @State private var isHydrating = false
 
     // MARK: - Body
 
@@ -41,18 +44,18 @@ struct ChatView: View {
             // }
             .alert(isPresented: .constant(viewModel.voiceInputError != nil)) {
                 Alert(
-                    title: Text(LocalizationKeys.error.localized),
+                    title: Text(LocalizationKeys.error.localizedKey),
                     message: viewModel.voiceInputError.map { Text($0.localizedDescription) },
-                    dismissButton: .default(Text(LocalizationKeys.ok.localized)) {
+                    dismissButton: .default(Text(LocalizationKeys.ok.localizedKey)) {
                         viewModel.clearVoiceInputError()
                     }
                 )
             }
             .alert(isPresented: .constant(viewModel.ocrError != nil)) {
                 Alert(
-                    title: Text(LocalizationKeys.error.localized),
+                    title: Text(LocalizationKeys.error.localizedKey),
                     message: viewModel.ocrError.map { Text($0.localizedDescription) },
-                    dismissButton: .default(Text(LocalizationKeys.ok.localized)) {
+                    dismissButton: .default(Text(LocalizationKeys.ok.localizedKey)) {
                         viewModel.clearOCRError()
                     }
                 )
@@ -80,6 +83,30 @@ struct ChatView: View {
                 sourceType: .photoLibrary
             )
         }
+        .sheet(isPresented: $viewModel.showCameraPermissionDenied) {
+            PermissionDeniedView(
+                permissionType: LocalizationKeys.cameraAccessibilityLabel,
+                settingsAction: viewModel.openSettings
+            )
+        }
+        .sheet(isPresented: $viewModel.showPhotoPermissionDenied) {
+            PermissionDeniedView(
+                permissionType: LocalizationKeys.imagePickerChooseFromLibrary,
+                settingsAction: viewModel.openSettings
+            )
+        }
+        .sheet(isPresented: $viewModel.showOCRConfirmation) {
+            OCRConfirmationSheet(
+                text: $viewModel.ocrExtractedText,
+                imageData: viewModel.ocrImageData,
+                onConfirm: { text in
+                    viewModel.confirmFactCheck(text: text)
+                },
+                onCancel: {
+                    viewModel.dismissOCRConfirmation()
+                }
+            )
+        }
         // Disabled - using ErrorBannerView instead of Alert
         // .onChange(of: viewModel.error?.localizedDescription) { _ in
         //     showingErrorAlert = viewModel.error != nil
@@ -95,7 +122,14 @@ struct ChatView: View {
             scrollToBottom()
         }
         .task {
+            isHydrating = true
             await viewModel.loadMessages()
+            isHydrating = false
+        }
+        .onChange(of: viewModel.requiresAuth) { requiresAuth in
+            if requiresAuth {
+                onRequireAuth()
+            }
         }
     }
 
@@ -103,7 +137,7 @@ struct ChatView: View {
 
     private var contentView: some View {
         ZStack {
-            AppTheme.Colors.background
+            DesignSystem.Colors.background(colorScheme)
                 .ignoresSafeArea()
                 .onTapGesture {
                     // Dismiss keyboard when tapping background
@@ -148,6 +182,20 @@ struct ChatView: View {
                     Spacer()
                 }
             }
+
+            // Centered loader overlay during hydration
+            if isHydrating {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                ProgressView(LocalizationKeys.loadingMessages.localizedKey)
+                    .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.primary))
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(DesignSystem.Colors.background(colorScheme).opacity(0.9))
+                    )
+                    .shadow(radius: 10)
+            }
         }
         .navigationBarHidden(true)
         .keyboardAdaptive()
@@ -163,7 +211,7 @@ struct ChatView: View {
 
     private var messagesArea: some View {
         Group {
-            if viewModel.messages.isEmpty && !viewModel.isLoading {
+            if viewModel.messages.isEmpty && !viewModel.isLoading && !isHydrating {
                 // Empty state
                 emptyStateView
             } else {
@@ -193,6 +241,12 @@ struct ChatView: View {
                             .id("typing-indicator")
                     }
 
+                    // Streaming thinking status bubble (guest SSE) shown under the typing indicator
+                    if !viewModel.thinkingMessages.isEmpty {
+                        ThinkingBubbleView(messages: viewModel.thinkingMessages)
+                            .id("thinking-bubble")
+                    }
+
                     // Bottom spacer for padding
                     Color.clear
                         .frame(height: 1)
@@ -202,13 +256,16 @@ struct ChatView: View {
             }
             .onTapGesture {
                 // Toggle bottom bar visibility on tap
+                let newVisibility = !isBottomBarVisible
                 withAnimation(AppTheme.Animation.standard) {
-                    isBottomBarVisible.toggle()
+                    isBottomBarVisible = newVisibility
                 }
+                updateTabBarVisibility(hidden: !newVisibility)
             }
             .onAppear {
                 scrollProxy = proxy
                 scrollToBottom(animated: false)
+                updateTabBarVisibility(hidden: false)
             }
             .onChange(of: viewModel.messages.count) { _ in
                 // Show bottom bar when new message arrives
@@ -217,7 +274,17 @@ struct ChatView: View {
                         isBottomBarVisible = true
                     }
                 }
+                updateTabBarVisibility(hidden: false)
             }
+        }
+    }
+
+    private func updateTabBarVisibility(hidden: Bool) {
+        // Toggle tab bar visibility to match the input bar state
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            windowScene.windows.first?.rootViewController?.tabBarController?.tabBar.isHidden = hidden
+        } else {
+            UITabBar.appearance().isHidden = hidden
         }
     }
 
@@ -252,14 +319,18 @@ struct ChatView: View {
 
 // MARK: - Preview Provider
 
-#Preview("Empty State") {
-    ChatView(viewModel: ChatViewModel.preview)
-}
+struct ChatView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            ChatView(viewModel: ChatViewModel.preview)
+                .previewDisplayName("Empty State")
 
-#Preview("With Messages") {
-    let viewModel = ChatViewModel.preview
-    // Note: In actual preview, we would populate messages
-    return ChatView(viewModel: viewModel)
+            let viewModel = ChatViewModel.preview
+            // Note: In actual preview, we would populate messages
+            ChatView(viewModel: viewModel)
+                .previewDisplayName("With Messages")
+        }
+    }
 }
 
 // MARK: - Supporting Views
@@ -276,7 +347,7 @@ private struct ErrorBannerView: View {
 
             VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                 Group {
-                    Text(LocalizationKeys.error.localized)
+                    Text(LocalizationKeys.error.localizedKey)
                         .font(.headline)
                         .foregroundColor(.white)
                 }
@@ -284,18 +355,18 @@ private struct ErrorBannerView: View {
                 .accessibilityLabel("Error")
                 .accessibilityAddTraits(.isStaticText)
 
-                Group {
-                    Text(message)
-                        .font(.subheadline)
-                        .foregroundColor(.white)
-                }
-                .accessibilityIdentifier("ErrorBannerMessage")
-                .accessibilityLabel(message)
-                .accessibilityAddTraits(.isStaticText)
+                    Group {
+                        Text(message.localizedKey)
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                    }
+                    .accessibilityIdentifier("ErrorBannerMessage")
+                    .accessibilityLabel(Text(message.localizedKey))
+                    .accessibilityAddTraits(.isStaticText)
 
                 HStack(spacing: AppTheme.Spacing.sm) {
                     Button(action: onRetry) {
-                        Text(LocalizationKeys.retry.localized)
+                        Text(LocalizationKeys.retry.localizedKey)
                             .font(.subheadline.weight(.semibold))
                             .foregroundColor(.white)
                             .padding(.vertical, 6)
@@ -307,7 +378,7 @@ private struct ErrorBannerView: View {
                     .accessibilityLabel("Retry")
 
                     Button(action: onDismiss) {
-                        Text(LocalizationKeys.cancel.localized)
+                        Text(LocalizationKeys.cancel.localizedKey)
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.9))
                     }
@@ -323,5 +394,35 @@ private struct ErrorBannerView: View {
         .cornerRadius(AppTheme.Layout.cornerRadius)
         .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
         .accessibilityIdentifier("ErrorBanner")
+    }
+}
+
+/// Lightweight bubble to show streaming "thinking" text beneath the typing indicator.
+private struct ThinkingBubbleView: View {
+    let messages: [String]
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        HStack(alignment: .top, spacing: AppTheme.Spacing.xs) {
+            Image(systemName: "brain.head.profile")
+                .foregroundColor(AppTheme.Colors.secondaryText)
+                .padding(.top, 4)
+
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
+                ForEach(Array(messages.enumerated()), id: \.offset) { _, text in
+                    Text(text)
+                        .font(AppTheme.Typography.caption.italic())
+                        .foregroundColor(AppTheme.Colors.secondaryText.opacity(0.9))
+                        .multilineTextAlignment(.leading)
+                        .transition(.opacity)
+                }
+            }
+            .padding(AppTheme.Spacing.sm)
+            .background(DesignSystem.Colors.surface(colorScheme))
+            .cornerRadius(AppTheme.Layout.messageBubbleRadius)
+
+            Spacer(minLength: 40)
+        }
+        .padding(.horizontal, AppTheme.Spacing.md)
     }
 }

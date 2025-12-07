@@ -16,7 +16,7 @@ protocol ChatRepository {
     /// Creates a new conversation
     /// - Parameter title: The title of the conversation
     /// - Returns: The created Conversation
-    func createConversation(title: String) async throws -> Conversation
+    func createConversation(title: String, isLocalOnly: Bool) async throws -> Conversation
 
     /// Fetches all conversations
     /// - Returns: Array of all conversations ordered by most recent
@@ -34,7 +34,7 @@ protocol ChatRepository {
 
     /// Fetches the most recent empty conversation (with no messages)
     /// - Returns: The most recent empty Conversation if found
-    func fetchMostRecentEmptyConversation() async throws -> Conversation?
+    func fetchMostRecentEmptyConversation(includeLocalOnly: Bool) async throws -> Conversation?
 
     /// Updates a conversation's title
     /// - Parameters:
@@ -54,6 +54,9 @@ protocol ChatRepository {
 
     /// Deletes all conversations
     func deleteAllConversations() async throws
+
+    /// Sync conversations from server when authenticated
+    func syncRemoteConversations() async throws
 
     // MARK: - Message Operations
 
@@ -110,4 +113,16 @@ protocol ChatRepository {
 
     /// Publisher that emits conversation updates
     var conversationsPublisher: AnyPublisher<[Conversation], Never> { get }
+
+}
+
+// Provide convenience overloads that preserve the old default-parameter behavior
+extension ChatRepository {
+    func createConversation(title: String) async throws -> Conversation {
+        return try await createConversation(title: title, isLocalOnly: false)
+    }
+    
+    func fetchMostRecentEmptyConversation() async throws -> Conversation? {
+        return try await fetchMostRecentEmptyConversation(includeLocalOnly: false)
+    }
 }

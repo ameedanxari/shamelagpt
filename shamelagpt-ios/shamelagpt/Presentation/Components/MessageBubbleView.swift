@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 /// A view that displays a message bubble with content, timestamp, and sources
 struct MessageBubbleView: View {
@@ -13,6 +14,7 @@ struct MessageBubbleView: View {
     // MARK: - Properties
 
     let message: Message
+    @Environment(\.colorScheme) private var colorScheme
 
     // MARK: - State
 
@@ -99,7 +101,7 @@ struct MessageBubbleView: View {
             // Message text
             Text(formattedContent)
                 .font(AppTheme.Typography.body)
-                .foregroundColor(message.isUserMessage ? .white : AppTheme.Colors.primaryText)
+                .foregroundColor(DesignSystem.Colors.textPrimary(colorScheme))
         }
         .padding(AppTheme.Spacing.sm)
         .background(bubbleBackground)
@@ -109,10 +111,14 @@ struct MessageBubbleView: View {
         }
     }
 
+    @ViewBuilder
     private var bubbleBackground: some View {
-        message.isUserMessage
-            ? AppTheme.Colors.userMessageBackground
-            : AppTheme.Colors.aiMessageBackground
+        // Minimal styling per website design - subtle background difference for distinction
+        if message.isUserMessage {
+            DesignSystem.Colors.card(colorScheme).opacity(0.8)
+        } else {
+            DesignSystem.Colors.surface(colorScheme)
+        }
     }
 
     private var contextMenuItems: some View {
@@ -144,7 +150,7 @@ struct MessageBubbleView: View {
             }
         }
         .padding(AppTheme.Spacing.xs)
-        .background(AppTheme.Colors.secondaryBackground)
+        .background(DesignSystem.Colors.surface(colorScheme))
         .cornerRadius(AppTheme.Layout.cornerRadius)
         .padding(.horizontal, AppTheme.Spacing.xs)
         .accessibilityElement(children: .contain)
@@ -158,11 +164,11 @@ struct MessageBubbleView: View {
             HStack(spacing: AppTheme.Spacing.xxs) {
                 Image(systemName: "book.fill")
                     .font(.system(size: 12))
-                    .foregroundColor(AppTheme.Colors.accent)
+                    .foregroundColor(DesignSystem.Colors.accent)
 
                 Text(source.citation)
                     .font(AppTheme.Typography.small)
-                    .foregroundColor(AppTheme.Colors.primary)
+                    .foregroundColor(DesignSystem.Colors.accent)
                     .multilineTextAlignment(.leading)
 
                 Spacer()
@@ -243,15 +249,58 @@ struct MessageBubbleView: View {
         // iOS AttributedString handles CommonMark markdown automatically
 
         do {
-            var attributedString = try AttributedString(
-                markdown: text,
+            // Normalize escaped newlines so server responses with "\n" render as real line breaks.
+            let normalized = text
+                .replacingOccurrences(of: "\\r\\n", with: "\n")
+                .replacingOccurrences(of: "\\n", with: "\n")
+                // Also insert a space before capital letters that immediately follow punctuation without spacing (common in streamed text)
+                .replacingOccurrences(of: "([\\.\\!\\?])(\\w)", with: "$1 $2", options: .regularExpression)
+
+            // Parse markdown using Swift's AttributedString API (available on iOS 15+),
+            // then bridge to an NSMutableAttributedString so we can mutate fonts per-range.
+            let swiftAttr = try AttributedString(
+                markdown: normalized,
                 options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .full)
             )
 
-            // Apply theme styling
-            attributedString.font = AppTheme.Typography.body
+            let ns = NSMutableAttributedString(attributedString: NSAttributedString(swiftAttr))
 
-            return attributedString
+            // Use simple script-run segmentation to apply language-aware fonts per range
+            let fullString = ns.string as NSString
+            var index = 0
+            while index < fullString.length {
+                let rangeStart = index
+                // Get single-character substring safely
+                let firstCharRange = NSRange(location: index, length: 1)
+                let firstSubstring = fullString.substring(with: firstCharRange)
+                let isArabic = LanguageDetector.containsArabicScript(in: firstSubstring)
+
+                // Expand range while same script type
+                var j = index + 1
+                while j < fullString.length {
+                    let nextCharRange = NSRange(location: j, length: 1)
+                    let nextSubstring = fullString.substring(with: nextCharRange)
+                    let nextIsArabic = LanguageDetector.containsArabicScript(in: nextSubstring)
+                    if nextIsArabic != isArabic { break }
+                    j += 1
+                }
+
+                let runRange = NSRange(location: rangeStart, length: j - rangeStart)
+                let substring = fullString.substring(with: runRange)
+
+                // Detect language for the run (prefer heuristic)
+                let detected = LanguageDetector.detectLanguage(for: substring)
+
+                // Map to font and apply
+                let uiFont = FontRegistry.shared.uiFont(forLanguage: detected, textStyle: .body)
+                AppLogger.font.logDebug("MessageBubbleView: runRange=\(runRange.location)-\(runRange.length) detected=\(detected ?? "nil") substringPreview=\(substring.prefix(24)) -> uiFont=\(uiFont.fontName)")
+                ns.addAttribute(NSAttributedString.Key.font, value: uiFont, range: runRange)
+
+                index = j
+            }
+
+            // Convert back to AttributedString for SwiftUI (use NSAttributedString bridge)
+            return AttributedString(ns)
         } catch {
             // Fallback to plain text if markdown parsing fails
             AppLogger.ui.logError("Markdown parsing failed, using plain text", error: error)

@@ -30,6 +30,9 @@ final class ChatViewModelTests: XCTestCase {
             conversationId: "test-conversation-id",
             sendMessageUseCase: mockSendMessageUseCase,
             chatRepository: mockChatRepository,
+            apiClient: nil,
+            isGuest: false,
+            guestSessionId: nil,
             voiceInputManager: mockVoiceInputManager,
             ocrManager: mockOCRManager
         )

@@ -23,9 +23,13 @@
 "chat.imageTextRecognition" = "التعرف على النص من الصورة";
 "chat.recording" = "جاري التسجيل...";
 "chat.extractingText" = "جاري استخراج النص...";
+"chat.thinking" = "جاري التفكير...";
+"chat.loadingMessages" = "جاري تحميل الرسائل...";
 "chat.startConversation" = "ابدأ محادثة";
 "chat.noMessagesYet" = "لا توجد رسائل بعد";
 "chat.newConversation" = "محادثة جديدة";
+"chat.newConversationWarningTitle" = "بدء محادثة جديدة؟";
+"chat.newConversationWarningMessage" = "سيتم إخفاء محادثتك الحالية ولن تتمكن من العودة إليها.";
 "chat.viewHistory" = "عرض السجل";
 
 // MARK: - History Screen
@@ -41,6 +45,7 @@
 "history.loadingConversations" = "جاري تحميل المحادثات...";
 "history.share" = "مشاركة";
 "common.delete" = "حذف";
+"history.localOnly" = "محلي فقط";
 
 // MARK: - Settings Screen
 
@@ -51,8 +56,37 @@
 "settings.supportShamelaGPT" = "دعم شاملة جي بي تي";
 "settings.aboutShamelaGPT" = "حول شاملة جي بي تي";
 "settings.privacyPolicy" = "سياسة الخصوصية";
+"privacy.intro" = "المقدمة";
+"privacy.info" = "المعلومات التي نجمعها";
+"privacy.usage" = "كيف نستخدم معلوماتك";
+"privacy.security" = "أمان البيانات";
+"privacy.rights" = "حقوقك";
+"privacy.contact" = "تواصل معنا";
 "settings.termsOfService" = "شروط الخدمة";
+"terms.acceptance" = "قبول الشروط";
+"terms.description" = "وصف الخدمة";
+"terms.responsibilities" = "مسؤوليات المستخدم";
+"terms.disclaimer" = "إخلاء المسؤولية";
+"terms.ip" = "الملكية الفكرية";
+"terms.liability" = "تحديد المسؤولية";
+"terms.changes" = "التغييرات على الشروط";
+"terms.contact" = "معلومات الاتصال";
+"language.fontRestartNote" = "ملاحظة: بعد تغيير اللغة، أغلق التطبيق من مبدل المهام وأعد تشغيله لتطبيق تغييرات الخط.";
 "settings.version" = "الإصدار";
+"settings.aiPreferences" = "تفضيلات الذكاء الاصطناعي";
+"settings.aiPreferencesLockedTitle" = "تخصيص تجربتك";
+"settings.aiPreferencesLockedMessage" = "سجل الدخول لتخصيص ردود الذكاء الاصطناعي بالطول والأسلوب والتركيز المفضل لديك.";
+"settings.signInButton" = "تسجيل الدخول";
+"settings.refreshPreferences" = "تحديث التفضيلات";
+"settings.signOut" = "تسجيل الخروج";
+"settings.customPrompt.title" = "موجه النظام المخصص";
+"settings.customPrompt.placeholder" = "اضغط لإضافة موجه نظام مخصص.";
+"settings.customPrompt.editTitle" = "تعديل الموجه";
+"settings.pref.current" = "القيمة الحالية";
+
+// History
+"history.lockedTitle" = "احفظ محادثاتك";
+"history.lockedMessage" = "سجل الدخول للاحتفاظ بسجل محادثاتك، وتصديرها، والوصول إليها عبر الأجهزة.";
 
 // MARK: - Welcome Screen
 
@@ -83,6 +117,7 @@
 "error.openSettings" = "فتح الإعدادات";
 "error.retry" = "إعادة المحاولة";
 "common.ok" = "حسناً";
+"common.save" = "حفظ";
 
 // MARK: - Network Errors
 
@@ -143,3 +178,29 @@
 "imagePicker.addImage" = "إضافة صورة";
 "imagePicker.takePhoto" = "التقاط صورة";
 "imagePicker.chooseFromLibrary" = "اختيار من المكتبة";
+
+// MARK: - Auth Screen
+
+"auth.signIn" = "تسجيل الدخول";
+"auth.signUp" = "إنشاء حساب";
+"auth.createAccount" = "إنشاء حساب";
+"auth.email" = "البريد الإلكتروني";
+"auth.password" = "كلمة المرور";
+"auth.displayName" = "الاسم المعروض (اختياري)";
+"auth.continueAsGuest" = "المتابعة كضيف";
+"auth.needAccount" = "ليس لديك حساب؟ إنشاء حساب";
+"auth.haveAccount" = "لديك حساب؟ تسجيل الدخول";
+"auth.signInButton" = "تسجيل الدخول";
+
+"settings.pref.length.title" = "طول الإجابة";
+"settings.pref.length.short" = "قصيرة";
+"settings.pref.length.medium" = "متوسطة";
+"settings.pref.length.detailed" = "مفصلة";
+"settings.pref.style.title" = "أسلوب الإجابة";
+"settings.pref.style.conversational" = "محادثي";
+"settings.pref.style.academic" = "أكاديمي";
+"settings.pref.style.technical" = "تقني";
+"settings.pref.focus.title" = "تركيز الإجابة";
+"settings.pref.focus.practical" = "عملي";
+"settings.pref.focus.theoretical" = "نظري";
+"settings.pref.focus.historical" = "تاريخي";

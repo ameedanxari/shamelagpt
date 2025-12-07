@@ -4,23 +4,29 @@
 //
 //  Created by Ameed Khalid on 04/11/2025.
 //
+//  This file provides backward-compatible access to theme values.
+//  New code should prefer using DesignSystem directly.
+//
 
 import SwiftUI
 
 /// App-wide theme configuration
+/// Note: For new code, prefer using `DesignSystem` directly for full light/dark mode support.
 struct AppTheme {
-    // MARK: - Colors
+    // MARK: - Colors (Legacy API - maintained for compatibility)
     struct Colors {
-        static let primary = Color.primaryGreen
-        static let primaryLight = Color.primaryLight
-        static let accent = Color.accentGold
+        static let primary = DesignSystem.Colors.primary
+        static let primaryLight = DesignSystem.Colors.primaryLight
+        static let accent = DesignSystem.Colors.accent
 
-        // Message Bubbles
-        static let userMessageBackground = Color.blue
-        static let aiMessageBackground = Color(.systemGray5)
+        // Message Bubbles - Updated to minimal styling per website design
+        // Note: Website uses no bubble backgrounds, just text on background
+        static let userMessageBackground = Color.clear
+        static let aiMessageBackground = Color.clear
         static let messageText = Color.primary
 
-        // Backgrounds
+        // Backgrounds - These use system colors for automatic light/dark support
+        // For explicit control, use DesignSystem.Colors.background(colorScheme)
         static let background = Color(.systemBackground)
         static let secondaryBackground = Color(.secondarySystemBackground)
 
@@ -28,41 +34,51 @@ struct AppTheme {
         static let primaryText = Color.primary
         static let secondaryText = Color.secondary
         static let tertiaryText = Color(.tertiaryLabel)
+        
+        // Source links (amber color per website)
+        static let sourceLink = DesignSystem.Colors.sourceLink
     }
 
-    // MARK: - Typography
+    // MARK: - Typography (delegated to DesignSystem)
     struct Typography {
-        static let title = Font.system(size: 28, weight: .bold)
-        static let heading = Font.system(size: 20, weight: .semibold)
-        static let body = Font.system(size: 16, weight: .regular)
-        static let caption = Font.system(size: 14, weight: .regular)
-        static let small = Font.system(size: 12, weight: .regular)
+        static let title = DesignSystem.Typography.title
+        static let heading = DesignSystem.Typography.title3
+        static let body = DesignSystem.Typography.body
+        static let caption = DesignSystem.Typography.subheadline
+        static let small = DesignSystem.Typography.caption
     }
 
-    // MARK: - Spacing
+    // MARK: - Spacing (delegated to DesignSystem)
     struct Spacing {
-        static let xxs: CGFloat = 4
-        static let xs: CGFloat = 8
-        static let sm: CGFloat = 12
-        static let md: CGFloat = 16
-        static let lg: CGFloat = 24
-        static let xl: CGFloat = 32
-        static let xxl: CGFloat = 48
+        static let xxs: CGFloat = DesignSystem.Spacing.xxs
+        static let xs: CGFloat = DesignSystem.Spacing.xs
+        static let sm: CGFloat = DesignSystem.Spacing.sm
+        static let md: CGFloat = DesignSystem.Spacing.md
+        static let lg: CGFloat = DesignSystem.Spacing.lg
+        static let xl: CGFloat = DesignSystem.Spacing.xl
+        static let xxl: CGFloat = DesignSystem.Spacing.xxl
     }
 
-    // MARK: - Layout
+    // MARK: - Layout (delegated to DesignSystem)
     struct Layout {
-        static let cornerRadius: CGFloat = 12
-        static let messageBubbleRadius: CGFloat = 18
-        static let buttonHeight: CGFloat = 50
-        static let iconSize: CGFloat = 24
+        static let cornerRadius: CGFloat = DesignSystem.Layout.cornerRadius
+        static let messageBubbleRadius: CGFloat = DesignSystem.Layout.cornerRadiusLarge
+        static let buttonHeight: CGFloat = DesignSystem.Layout.buttonHeight
+        static let iconSize: CGFloat = DesignSystem.Layout.iconSize
         static let largeIconSize: CGFloat = 80
     }
 
-    // MARK: - Animation
+    // MARK: - Animation (delegated to DesignSystem)
     struct Animation {
-        static let standard = SwiftUI.Animation.easeInOut(duration: 0.3)
-        static let quick = SwiftUI.Animation.easeInOut(duration: 0.2)
-        static let slow = SwiftUI.Animation.easeInOut(duration: 0.5)
+        static let standard = DesignSystem.Animation.standard
+        static let quick = DesignSystem.Animation.quick
+        static let slow = DesignSystem.Animation.slow
+    }
+    
+    // MARK: - Gradients
+    struct Gradients {
+        static let primary = DesignSystem.Gradients.primary
+        static let button = DesignSystem.Gradients.button
+        static let vertical = DesignSystem.Gradients.vertical
     }
 }

@@ -42,6 +42,10 @@ class DependencyContainer {
         let coreDataStack = CoreDataStack.shared
         register(CoreDataStack.self, instance: coreDataStack)
 
+        // Session Manager
+        let sessionManager = SessionManager()
+        register(SessionManager.self, instance: sessionManager)
+
         // Network Layer
         registerNetworkLayer()
 
@@ -72,9 +76,14 @@ class DependencyContainer {
             configuration.protocolClasses = [MockURLProtocol.self]
             let mockSession = URLSession(configuration: configuration)
             AppLogger.network.logInfo("Using MockURLProtocol for URLSession")
-            apiClient = APIClient(session: mockSession)
+            apiClient = APIClient(
+                session: mockSession,
+                authTokenProvider: { self.resolve(SessionManager.self)?.token() }
+            )
         } else {
-            apiClient = APIClient()
+            apiClient = APIClient(
+                authTokenProvider: { self.resolve(SessionManager.self)?.token() }
+            )
         }
         register(APIClientProtocol.self, instance: apiClient)
     }
@@ -105,6 +114,21 @@ class DependencyContainer {
             networkMonitor: resolve(NetworkMonitor.self)
         )
         register(ChatRepository.self, instance: chatRepository)
+
+        // Auth Repository
+        if let apiClient = resolve(APIClientProtocol.self), let sessionManager = resolve(SessionManager.self) {
+            let authRepository = AuthRepositoryImpl(
+                apiClient: apiClient,
+                sessionManager: sessionManager
+            )
+            register(AuthRepository.self, instance: authRepository)
+        }
+
+        // Preferences Repository
+        if let apiClient = resolve(APIClientProtocol.self) {
+            let preferencesRepo = PreferencesRepositoryImpl(apiClient: apiClient)
+            register(PreferencesRepository.self, instance: preferencesRepo)
+        }
     }
 
     private func registerDomainLayer() {
@@ -135,10 +159,15 @@ class DependencyContainer {
     /// Factory method to create a ChatViewModel for a specific conversation
     @MainActor
     func makeChatViewModel(conversationId: String) -> ChatViewModel {
+        let sessionManager = resolve(SessionManager.self)
+        let guestSessionId = sessionManager?.getOrCreateGuestSessionId()
         return ChatViewModel(
             conversationId: conversationId,
             sendMessageUseCase: resolve(SendMessageUseCase.self)!,
             chatRepository: resolve(ChatRepository.self)!,
+            apiClient: resolve(APIClientProtocol.self),
+            isGuest: sessionManager?.isGuest() ?? false,
+            guestSessionId: guestSessionId,
             voiceInputManager: VoiceInputManager(),
             ocrManager: OCRManager()
         )

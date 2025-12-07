@@ -23,12 +23,17 @@ struct AboutView: View {
 
                 // App Name and Version
                 VStack(spacing: AppTheme.Spacing.xs) {
-                    Text(LocalizationKeys.shamelaGPT.localized)
+                    Text(LocalizationKeys.shamelaGPT.localizedKey)
                         .font(AppTheme.Typography.title)
                         .fontWeight(.bold)
                         .foregroundColor(AppTheme.Colors.primaryText)
 
-                    Text("\(LocalizationKeys.version.localized) 1.0.0")
+                    HStack(spacing: 4) {
+                        Text(LocalizationKeys.settingsVersion.localizedKey)
+                        Text("1.0.0")
+                            .font(AppTheme.Typography.caption)
+                            .foregroundColor(AppTheme.Colors.tertiaryText)
+                    }
                         .font(AppTheme.Typography.caption)
                         .foregroundColor(AppTheme.Colors.tertiaryText)
                 }
@@ -39,23 +44,23 @@ struct AboutView: View {
 
                 // About Content
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-                    sectionTitle(LocalizationKeys.aboutShamelaGPT.localized)
+                    sectionTitle(LocalizationKeys.aboutShamelaGPT.localizedKey)
 
-                    Text(LocalizationKeys.aboutContent.localized)
+                    Text(LocalizationKeys.aboutContent.localizedKey)
                         .font(AppTheme.Typography.body)
                         .foregroundColor(AppTheme.Colors.secondaryText)
                         .lineSpacing(4)
 
-                    sectionTitle(LocalizationKeys.aboutMissionTitle.localized)
+                    sectionTitle(LocalizationKeys.aboutMissionTitle.localizedKey)
 
-                    Text(LocalizationKeys.aboutMission.localized)
+                    Text(LocalizationKeys.aboutMission.localizedKey)
                         .font(AppTheme.Typography.body)
                         .foregroundColor(AppTheme.Colors.secondaryText)
                         .lineSpacing(4)
 
-                    sectionTitle(LocalizationKeys.aboutDataSourceTitle.localized)
+                    sectionTitle(LocalizationKeys.aboutDataSourceTitle.localizedKey)
 
-                    Text(LocalizationKeys.aboutDataSource.localized)
+                    Text(LocalizationKeys.aboutDataSource.localizedKey)
                         .font(AppTheme.Typography.body)
                         .foregroundColor(AppTheme.Colors.secondaryText)
                         .lineSpacing(4)
@@ -63,12 +68,12 @@ struct AboutView: View {
             }
             .padding(AppTheme.Spacing.lg)
         }
-        .navigationTitle(LocalizationKeys.about.localized)
+        .navigationTitle(LocalizationKeys.about.localizedKey)
         .navigationBarTitleDisplayMode(.inline)
         .background(AppTheme.Colors.background)
     }
 
-    private func sectionTitle(_ title: String) -> some View {
+    private func sectionTitle(_ title: LocalizedStringKey) -> some View {
         Text(title)
             .font(AppTheme.Typography.heading)
             .fontWeight(.semibold)
@@ -76,8 +81,10 @@ struct AboutView: View {
     }
 }
 
-#Preview {
-    NavigationView {
-        AboutView()
+struct AboutView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            AboutView()
+        }
     }
 }

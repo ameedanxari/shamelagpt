@@ -15,12 +15,22 @@ class ChatRemoteDataSourceImpl(
     private val apiService: ApiService
 ) : ChatRemoteDataSource {
 
-    override suspend fun sendMessage(question: String, threadId: String?): Result<ChatResponse> {
+    override suspend fun sendMessage(
+        question: String,
+        threadId: String?,
+        promptConfig: com.google.gson.JsonElement?,
+        languagePreference: String?,
+        customSystemPrompt: String?,
+        enableThinking: Boolean?
+    ): Result<ChatResponse> {
         return safeApiCall {
             val request = ChatRequest(
                 question = question,
                 threadId = threadId,
-                userId = null // Not used currently
+                promptConfig = promptConfig,
+                languagePreference = languagePreference,
+                customSystemPrompt = customSystemPrompt,
+                enableThinking = enableThinking
             )
             apiService.sendMessage(request)
         }

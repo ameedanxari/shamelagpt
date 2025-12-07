@@ -11,7 +11,7 @@ struct TermsOfServiceView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
-                Text("Terms of Service")
+                Text(LocalizationKeys.termsOfService.localizedKey)
                     .font(AppTheme.Typography.title)
                     .fontWeight(.bold)
                     .foregroundColor(AppTheme.Colors.primaryText)
@@ -23,14 +23,14 @@ struct TermsOfServiceView: View {
                 Divider()
 
                 sectionContent(
-                    title: "Acceptance of Terms",
+                    title: LocalizationKeys.termsSectionAcceptance.localizedKey,
                     content: """
 By accessing and using ShamelaGPT, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these terms, please do not use our service.
 """
                 )
 
                 sectionContent(
-                    title: "Description of Service",
+                    title: LocalizationKeys.termsSectionDescription.localizedKey,
                     content: """
 ShamelaGPT provides AI-powered responses to questions about Islamic knowledge, drawing from the Shamela.ws digital library. The service includes:
 
@@ -42,7 +42,7 @@ ShamelaGPT provides AI-powered responses to questions about Islamic knowledge, d
                 )
 
                 sectionContent(
-                    title: "User Responsibilities",
+                    title: LocalizationKeys.termsSectionResponsibilities.localizedKey,
                     content: """
 You agree to:
 
@@ -55,7 +55,7 @@ You agree to:
                 )
 
                 sectionContent(
-                    title: "Disclaimer",
+                    title: LocalizationKeys.termsSectionDisclaimer.localizedKey,
                     content: """
 ShamelaGPT provides information for educational purposes only. While we strive for accuracy:
 
@@ -67,28 +67,28 @@ ShamelaGPT provides information for educational purposes only. While we strive f
                 )
 
                 sectionContent(
-                    title: "Intellectual Property",
+                    title: LocalizationKeys.termsSectionIP.localizedKey,
                     content: """
 The ShamelaGPT application and its original content are owned by us and protected by international copyright laws. The underlying Islamic texts belong to their respective authors and publishers.
 """
                 )
 
                 sectionContent(
-                    title: "Limitation of Liability",
+                    title: LocalizationKeys.termsSectionLiability.localizedKey,
                     content: """
 We shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the service.
 """
                 )
 
                 sectionContent(
-                    title: "Changes to Terms",
+                    title: LocalizationKeys.termsSectionChanges.localizedKey,
                     content: """
 We reserve the right to modify these terms at any time. Continued use of the service after changes constitutes acceptance of the modified terms.
 """
                 )
 
                 sectionContent(
-                    title: "Contact Information",
+                    title: LocalizationKeys.termsSectionContact.localizedKey,
                     content: """
 For questions about these Terms of Service, please contact:
 support@shamelagpt.com
@@ -97,12 +97,12 @@ support@shamelagpt.com
             }
             .padding(AppTheme.Spacing.lg)
         }
-        .navigationTitle("Terms of Service")
+        .navigationTitle(LocalizationKeys.termsOfService.localizedKey)
         .navigationBarTitleDisplayMode(.inline)
         .background(AppTheme.Colors.background)
     }
 
-    private func sectionContent(title: String, content: String) -> some View {
+    private func sectionContent(title: LocalizedStringKey, content: String) -> some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
             Text(title)
                 .font(AppTheme.Typography.heading)
@@ -117,8 +117,10 @@ support@shamelagpt.com
     }
 }
 
-#Preview {
-    NavigationView {
-        TermsOfServiceView()
+struct TermsOfServiceView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            TermsOfServiceView()
+        }
     }
 }

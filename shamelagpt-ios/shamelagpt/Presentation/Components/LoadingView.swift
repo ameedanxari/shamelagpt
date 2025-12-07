@@ -197,36 +197,34 @@ struct SkeletonLoadingView: View {
     }
 }
 
-// MARK: - Preview Provider
+struct LoadingView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            LoadingView()
+                .previewDisplayName("Standard Loading")
 
-#Preview("Standard Loading") {
-    LoadingView()
-}
+            LoadingView(message: "Please wait...", style: .spinner)
+                .previewDisplayName("Spinner Loading")
 
-#Preview("Spinner Loading") {
-    LoadingView(message: "Please wait...", style: .spinner)
-}
+            LoadingView(message: "Processing...", style: .pulsing)
+                .previewDisplayName("Pulsing Loading")
 
-#Preview("Pulsing Loading") {
-    LoadingView(message: "Processing...", style: .pulsing)
-}
+            InlineLoadingView(message: "Syncing...")
+                .previewDisplayName("Inline Loading")
 
-#Preview("Inline Loading") {
-    InlineLoadingView(message: "Syncing...")
-}
+            ZStack {
+                Color.gray.ignoresSafeArea()
+                LoadingOverlay(message: "Sending message...")
+            }
+            .previewDisplayName("Loading Overlay")
 
-#Preview("Loading Overlay") {
-    ZStack {
-        Color.gray.ignoresSafeArea()
-        LoadingOverlay(message: "Sending message...")
+            VStack(spacing: 12) {
+                SkeletonLoadingView()
+                SkeletonLoadingView(height: 80)
+                SkeletonLoadingView(height: 100)
+            }
+            .padding()
+            .previewDisplayName("Skeleton Loading")
+        }
     }
-}
-
-#Preview("Skeleton Loading") {
-    VStack(spacing: 12) {
-        SkeletonLoadingView()
-        SkeletonLoadingView(height: 80)
-        SkeletonLoadingView(height: 100)
-    }
-    .padding()
 }

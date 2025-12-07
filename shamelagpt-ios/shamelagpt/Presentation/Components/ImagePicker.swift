@@ -130,7 +130,7 @@ struct ImageSourceSelectionSheet: View {
                         Image(systemName: "camera.fill")
                             .foregroundColor(AppTheme.Colors.primary)
                             .frame(width: 30)
-                        Text(LocalizationKeys.imagePickerTakePhoto.localized)
+                        Text(LocalizationKeys.imagePickerTakePhoto.localizedKey)
                             .foregroundColor(AppTheme.Colors.primaryText)
                     }
                 }
@@ -143,16 +143,16 @@ struct ImageSourceSelectionSheet: View {
                         Image(systemName: "photo.fill")
                             .foregroundColor(AppTheme.Colors.primary)
                             .frame(width: 30)
-                        Text(LocalizationKeys.imagePickerChooseFromLibrary.localized)
+                        Text(LocalizationKeys.imagePickerChooseFromLibrary.localizedKey)
                             .foregroundColor(AppTheme.Colors.primaryText)
                     }
                 }
             }
-            .navigationTitle(LocalizationKeys.imagePickerAddImage.localized)
+            .navigationTitle(LocalizationKeys.imagePickerAddImage.localizedKey)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(LocalizationKeys.cancel.localized) {
+                    Button(LocalizationKeys.cancel.localizedKey) {
                         dismiss()
                     }
                 }
@@ -161,11 +161,12 @@ struct ImageSourceSelectionSheet: View {
     }
 }
 
-// MARK: - Preview Provider
-
-#Preview("Source Selection") {
-    ImageSourceSelectionSheet(
-        onCameraSelected: {},
-        onPhotoLibrarySelected: {}
-    )
+struct ImageSourceSelectionSheet_Previews: PreviewProvider {
+    static var previews: some View {
+        ImageSourceSelectionSheet(
+            onCameraSelected: {},
+            onPhotoLibrarySelected: {}
+        )
+        .previewDisplayName("Source Selection")
+    }
 }

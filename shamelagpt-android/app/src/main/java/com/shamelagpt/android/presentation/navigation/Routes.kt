@@ -10,6 +10,9 @@ import kotlinx.serialization.Serializable
 object WelcomeRoute
 
 @Serializable
+object AuthRoute
+
+@Serializable
 data class ChatRoute(val conversationId: String? = null)
 
 @Serializable

@@ -8,7 +8,10 @@
 import SwiftUI
 
 struct WelcomeView: View {
-    @ObservedObject var coordinator: AppCoordinator
+    var onGetStarted: () -> Void
+    var onSkipToChat: () -> Void
+
+    @Environment(\.colorScheme) private var colorScheme
     @State private var logoScale: CGFloat = 0.5
     @State private var logoOpacity: Double = 0.0
     @State private var contentOffset: CGFloat = 30
@@ -16,7 +19,7 @@ struct WelcomeView: View {
 
     var body: some View {
         ZStack {
-            AppTheme.Colors.background
+            DesignSystem.Colors.background(colorScheme)
                 .ignoresSafeArea()
 
             VStack(spacing: AppTheme.Spacing.lg) {
@@ -27,7 +30,7 @@ struct WelcomeView: View {
                     .padding(.top, AppTheme.Spacing.xxl)
                     .scaleEffect(logoScale)
                     .opacity(logoOpacity)
-                    .accessibilityLabel(LocalizationKeys.logoAccessibilityLabel.localized)
+                    .accessibilityLabel(Text(LocalizationKeys.logoAccessibilityLabel.localizedKey))
 
                 // Scrollable Welcome Message
                 ScrollView {
@@ -44,35 +47,34 @@ struct WelcomeView: View {
                     // Get Started Button
                     Button(action: {
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
-                            coordinator.dismissWelcome()
+                            onGetStarted()
                         }
                     }) {
-                        Text(LocalizationKeys.getStarted.localized)
+                        Text(LocalizationKeys.getStarted.localizedKey)
                             .font(AppTheme.Typography.body)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: AppTheme.Layout.buttonHeight)
-                            .background(AppTheme.Colors.primary)
-                            .cornerRadius(AppTheme.Layout.cornerRadius)
                     }
-                    .accessibilityLabel(LocalizationKeys.getStarted.localized)
+                    .buttonStyle(.primary)
+                    .accessibilityLabel(Text(LocalizationKeys.getStarted.localizedKey))
                     .accessibilityIdentifier("GetStartedButton")
-                    .accessibilityHint(LocalizationKeys.getStartedAccessibilityHint.localized)
+                    .accessibilityHint(Text(LocalizationKeys.getStartedAccessibilityHint.localizedKey))
 
                     // Skip to Chat Button
                     Button(action: {
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
-                            coordinator.dismissWelcome()
+                            onSkipToChat()
                         }
                     }) {
-                        Text(LocalizationKeys.skipToChat.localized)
+                        Text(LocalizationKeys.skipToChat.localizedKey)
                             .font(AppTheme.Typography.body)
                             .foregroundColor(AppTheme.Colors.primary)
                     }
-                    .accessibilityLabel(LocalizationKeys.skipToChat.localized)
+                    .accessibilityLabel(Text(LocalizationKeys.skipToChat.localizedKey))
                     .accessibilityIdentifier("SkipToChatButton")
-                    .accessibilityHint(LocalizationKeys.skipToChatAccessibilityHint.localized)
+                    .accessibilityHint(Text(LocalizationKeys.skipToChatAccessibilityHint.localizedKey))
                 }
                 .padding(.horizontal, AppTheme.Spacing.lg)
                 .padding(.bottom, AppTheme.Spacing.lg)
@@ -94,34 +96,39 @@ struct WelcomeView: View {
     private var welcomeText: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
             // Welcome Header
-            Text(LocalizationKeys.welcomeTitle.localized)
+            Text(LocalizationKeys.welcomeTitle.localizedKey)
                 .font(AppTheme.Typography.title)
                 .fontWeight(.bold)
-                .foregroundColor(AppTheme.Colors.primaryText)
+                .foregroundColor(DesignSystem.Colors.textPrimary(colorScheme))
 
             // Introduction
-            Text(LocalizationKeys.welcomeIntro.localized)
+            Text(LocalizationKeys.welcomeIntro.localizedKey)
                 .font(AppTheme.Typography.body)
-                .foregroundColor(AppTheme.Colors.secondaryText)
+                .foregroundColor(DesignSystem.Colors.textSecondary(colorScheme))
                 .lineSpacing(4)
 
             Divider()
                 .padding(.vertical, AppTheme.Spacing.xs)
 
             // Sign In Section
-            Text(LocalizationKeys.welcomeSignInTitle.localized)
+            Text(LocalizationKeys.welcomeSignInTitle.localizedKey)
                 .font(AppTheme.Typography.heading)
                 .fontWeight(.semibold)
-                .foregroundColor(AppTheme.Colors.primaryText)
+                .foregroundColor(DesignSystem.Colors.textPrimary(colorScheme))
 
-            Text(LocalizationKeys.welcomeSignInMessage.localized)
+            Text(LocalizationKeys.welcomeSignInMessage.localizedKey)
                 .font(AppTheme.Typography.body)
-                .foregroundColor(AppTheme.Colors.secondaryText)
+                .foregroundColor(DesignSystem.Colors.textSecondary(colorScheme))
                 .lineSpacing(4)
         }
     }
 }
 
-#Preview {
-    WelcomeView(coordinator: AppCoordinator())
+struct WelcomeView_Previews: PreviewProvider {
+    static var previews: some View {
+        WelcomeView(
+            onGetStarted: {},
+            onSkipToChat: {}
+        )
+    }
 }

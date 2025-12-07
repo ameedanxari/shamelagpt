@@ -34,6 +34,9 @@ enum AppLogger {
     /// Logger for general app lifecycle events
     static let app = Logger(subsystem: subsystem, category: "App")
 
+    /// Logger for font / typography selection and registry
+    static let font = Logger(subsystem: subsystem, category: "Font")
+
     // MARK: - Private Properties
 
     private static let subsystem = Bundle.main.bundleIdentifier ?? "com.shamelagpt"

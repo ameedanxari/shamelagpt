@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import android.graphics.BitmapFactory
+import com.shamelagpt.android.core.utils.FontUtils
 
 /**
  * Dialog for confirming OCR-extracted text before submitting for fact-checking.
@@ -142,13 +143,17 @@ fun OCRConfirmationDialog(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    OutlinedTextField(
-                        value = editedText,
-                        onValueChange = { editedText = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp),
-                        textStyle = MaterialTheme.typography.bodyMedium,
+                        val fontFamily = remember(editedText) {
+                            FontUtils.getFontFamilyForLanguage(FontUtils.detectLanguage(editedText))
+                        }
+
+                        OutlinedTextField(
+                            value = editedText,
+                            onValueChange = { editedText = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = fontFamily),
                         placeholder = {
                             Text("Edit the text if needed...")
                         },

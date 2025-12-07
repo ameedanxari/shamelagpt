@@ -41,11 +41,16 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ShamelaGPTTheme {
-                // Check if user has seen welcome screen
-                val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                val hasSeenWelcome = remember {
-                    mutableStateOf(prefs.getBoolean("has_seen_welcome", false))
-                }
+                // Determine if user is logged in
+                val sessionManager: com.shamelagpt.android.core.preferences.SessionManager by org.koin.android.ext.android.inject()
+                val isLoggedIn = sessionManager.isLoggedIn()
+                
+                // Track start destination if coming from Welcome screen
+                val startDestination = remember { mutableStateOf<Any?>(null) }
+                
+                // State to control welcome screen visibility
+                // Show welcome if NOT logged in and no manual start destination set yet
+                val showWelcome = remember { mutableStateOf(!isLoggedIn) }
 
                 // Hide splash after short delay
                 LaunchedEffect(Unit) {
@@ -57,25 +62,22 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (hasSeenWelcome.value) {
-                        // Returning user - show main app
-                        ShamelaGPTApp()
+                    if (!showWelcome.value) {
+                        // Show main app (either auth or chat depending on login state or override)
+                        // If startDestination is set (from Welcome), use it.
+                        ShamelaGPTApp(startDestination = startDestination.value)
                     } else {
-                        // First-time user - show welcome screen
+                        // Not logged in - show welcome screen
                         WelcomeScreen(
                             onGetStarted = {
-                                // Mark welcome as seen
-                                prefs.edit()
-                                    .putBoolean("has_seen_welcome", true)
-                                    .apply()
-                                hasSeenWelcome.value = true
+                                // Set explicit start destination to Auth
+                                startDestination.value = com.shamelagpt.android.presentation.navigation.AuthRoute
+                                showWelcome.value = false
                             },
                             onSkipToChat = {
-                                // Mark welcome as seen
-                                prefs.edit()
-                                    .putBoolean("has_seen_welcome", true)
-                                    .apply()
-                                hasSeenWelcome.value = true
+                                // Set explicit start destination to Chat (Guest mode implied by direct nav)
+                                startDestination.value = com.shamelagpt.android.presentation.navigation.ChatRoute()
+                                showWelcome.value = false
                             }
                         )
                     }

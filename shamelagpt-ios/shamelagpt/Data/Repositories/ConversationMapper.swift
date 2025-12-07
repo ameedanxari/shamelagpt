@@ -35,6 +35,12 @@ struct ConversationMapper {
             conversationType = .regular
         }
 
+        // Read isLocalOnly if present in the Core Data model
+        var isLocalOnly = false
+        if let attributes = entity.entity.attributesByName as? [String: Any], attributes.keys.contains("isLocalOnly") {
+            isLocalOnly = (entity.value(forKey: "isLocalOnly") as? Bool) ?? false
+        }
+
         return Conversation(
             id: entity.id ?? UUID().uuidString,
             threadId: entity.threadId,
@@ -42,7 +48,8 @@ struct ConversationMapper {
             createdAt: entity.createdAt ?? Date(),
             updatedAt: entity.updatedAt ?? Date(),
             messages: messages,
-            conversationType: conversationType
+            conversationType: conversationType,
+            isLocalOnly: isLocalOnly
         )
     }
 

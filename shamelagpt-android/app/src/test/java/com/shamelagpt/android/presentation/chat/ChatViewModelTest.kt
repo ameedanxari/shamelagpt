@@ -1,16 +1,20 @@
 package com.shamelagpt.android.presentation.chat
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.shamelagpt.android.core.util.OCRManager
+import com.shamelagpt.android.core.util.OCRResult
+import com.shamelagpt.android.core.util.VoiceInputManager
 import com.shamelagpt.android.domain.usecase.SendMessageUseCase
 import com.shamelagpt.android.mock.MockChatRepository
 import com.shamelagpt.android.mock.MockConversationRepository
-import com.shamelagpt.android.core.util.OCRManager
-import com.shamelagpt.android.core.util.VoiceInputManager
 import com.shamelagpt.android.mock.TestData
 import com.shamelagpt.android.util.MainCoroutineRule
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -39,6 +43,7 @@ class ChatViewModelTest {
     private lateinit var mockVoiceInputManager: VoiceInputManager
     private lateinit var mockOCRManager: OCRManager
     private lateinit var mockContext: Context
+    private lateinit var mockContentResolver: ContentResolver
 
     @Before
     fun setup() {
@@ -47,6 +52,8 @@ class ChatViewModelTest {
         mockVoiceInputManager = mockk(relaxed = true)
         mockOCRManager = mockk(relaxed = true)
         mockContext = mockk(relaxed = true)
+        mockContentResolver = mockk(relaxed = true)
+        every { mockContext.contentResolver } returns mockContentResolver
 
         sendMessageUseCase = SendMessageUseCase(
             chatRepository = mockChatRepository,
@@ -587,13 +594,128 @@ class ChatViewModelTest {
 
     // MARK: - OCR Tests
 
-    // OCR tests temporarily commented out due to mocking complexity
-    // Will be implemented with proper abstraction or interface
+    @Test
+    fun testProcessImageSuccessShowsConfirmation() = runTest {
+        // Given
+        val imageUri = Uri.parse("content://test/image")
+        val imageBytes = byteArrayOf(1, 2, 3)
+        every { mockContentResolver.openInputStream(imageUri) } returns ByteArrayInputStream(imageBytes)
+        coEvery { mockOCRManager.recognizeTextWithLanguage(imageUri) } returns Result.success(
+            OCRResult(text = "Extracted text", detectedLanguage = "en")
+        )
 
-    // @Test
-    // fun testProcessImageStartsProcessing() = runTest {
-    //     // OCR functionality requires interface abstraction for proper testing
-    // }
+        // When
+        viewModel.processImage(imageUri)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        val imageState = viewModel.uiState.value.imageInputState
+        assertThat(imageState.isProcessing).isFalse()
+        assertThat(imageState.extractedText).isEqualTo("Extracted text")
+        assertThat(imageState.detectedLanguage).isEqualTo("en")
+        assertThat(imageState.imageData).isEqualTo(imageBytes)
+        assertThat(imageState.imageUri).isEqualTo(imageUri)
+        assertThat(imageState.showConfirmationDialog).isTrue()
+        assertThat(imageState.error).isNull()
+    }
+
+    @Test
+    fun testProcessImageFailureUpdatesErrorState() = runTest {
+        // Given
+        val imageUri = Uri.parse("content://test/image")
+        every { mockContentResolver.openInputStream(imageUri) } returns ByteArrayInputStream(
+            byteArrayOf(9, 8, 7)
+        )
+        coEvery { mockOCRManager.recognizeTextWithLanguage(imageUri) } returns Result.failure(
+            Exception("No text found")
+        )
+
+        // When
+        viewModel.processImage(imageUri)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        val imageState = viewModel.uiState.value.imageInputState
+        assertThat(imageState.isProcessing).isFalse()
+        assertThat(imageState.error).isEqualTo("No text found")
+        assertThat(imageState.showConfirmationDialog).isFalse()
+    }
+
+    @Test
+    fun testProcessImageWhenImageLoadFails() = runTest {
+        // Given
+        val imageUri = Uri.parse("content://test/missing")
+        every { mockContentResolver.openInputStream(imageUri) } returns null
+
+        // When
+        viewModel.processImage(imageUri)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        val imageState = viewModel.uiState.value.imageInputState
+        assertThat(imageState.isProcessing).isFalse()
+        assertThat(imageState.error).isEqualTo("Failed to load image data")
+        coVerify(exactly = 0) { mockOCRManager.recognizeTextWithLanguage(any()) }
+    }
+
+    @Test
+    fun testDismissOcrConfirmationClearsState() = runTest {
+        // Given
+        val imageUri = Uri.parse("content://test/image")
+        val imageData = byteArrayOf(4, 5, 6)
+        viewModel.onOcrResult("Preview text", "ar", imageData, imageUri)
+
+        // When
+        viewModel.dismissOcrConfirmation()
+
+        // Then
+        assertThat(viewModel.uiState.value.imageInputState).isEqualTo(ImageInputState())
+    }
+
+    @Test
+    fun testClearOcrErrorResetsErrorState() = runTest {
+        // Given
+        viewModel.onOcrError("OCR failure")
+        testScheduler.advanceUntilIdle()
+        assertThat(viewModel.uiState.value.imageInputState.error).isNotNull()
+
+        // When
+        viewModel.clearOcrError()
+
+        // Then
+        assertThat(viewModel.uiState.value.imageInputState.error).isNull()
+    }
+
+    @Test
+    fun testConfirmFactCheckSendsMessageWithImageData() = runTest {
+        // Given
+        val imageUri = Uri.parse("content://test/image")
+        val imageData = byteArrayOf(1, 2, 3, 4)
+        val extractedText = "Fact check this claim"
+        viewModel.onOcrResult(extractedText, "en", imageData, imageUri)
+
+        // When
+        viewModel.confirmFactCheck(extractedText)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        val imageState = viewModel.uiState.value.imageInputState
+        assertThat(imageState.showConfirmationDialog).isFalse()
+        assertThat(imageState.imageData).isNull()
+        assertThat(imageState.extractedText).isEmpty()
+
+        val conversationId = viewModel.uiState.value.conversationId
+        assertThat(conversationId).isNotNull()
+
+        val conversation = mockConversationRepository.getConversationById(conversationId!!)
+        assertThat(conversation).isNotNull()
+
+        val factCheckMessages = conversation!!.messages.filter { it.isFactCheckMessage }
+        assertThat(factCheckMessages).isNotEmpty()
+        val factCheckMessage = factCheckMessages.first()
+        assertThat(factCheckMessage.imageData).isEqualTo(imageData)
+        assertThat(factCheckMessage.detectedLanguage).isEqualTo("en")
+    }
 
     // MARK: - State Management Tests
 

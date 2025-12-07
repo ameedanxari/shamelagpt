@@ -21,7 +21,11 @@ interface ChatRepository {
         question: String,
         conversationId: String,
         threadId: String?,
-        saveUserMessage: Boolean = true
+        saveUserMessage: Boolean = true,
+        promptConfig: com.google.gson.JsonElement? = null,
+        languagePreference: String? = null,
+        customSystemPrompt: String? = null,
+        enableThinking: Boolean? = null
     ): Result<ChatResponse>
 
     /**

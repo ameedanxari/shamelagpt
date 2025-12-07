@@ -12,6 +12,12 @@ import kotlinx.coroutines.flow.Flow
 class GetConversationsUseCase(
     private val conversationRepository: ConversationRepository
 ) {
+
+    /**
+     * Sync conversations from backend if authenticated.
+     */
+    suspend fun sync(): Result<Unit> = conversationRepository.syncConversations()
+
     /**
      * Retrieves all conversations as a Flow.
      *

@@ -19,4 +19,9 @@ sealed class ChatEvent {
      * Scroll the message list to the bottom.
      */
     object ScrollToBottom : ChatEvent()
+
+    /**
+     * Auth is required; navigate to auth screen.
+     */
+    object RequireAuth : ChatEvent()
 }

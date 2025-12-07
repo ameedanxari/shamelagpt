@@ -1,0 +1,13 @@
+curl 'https://shamelagpt.com/api/conversations/7dba0fc8-aae9-4519-8293-7e3a7fd977c9/messages' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'Accept-Language: en-US,en;q=0.9' \
+  -H 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk1MTg5MTkxMTA3NjA1NDM0NGUxNWUyNTY0MjViYjQyNWVlYjNhNWMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vc2hhbWVsYS1mZTRkMyIsImF1ZCI6InNoYW1lbGEtZmU0ZDMiLCJhdXRoX3RpbWUiOjE3NjUxMTc5NjYsInVzZXJfaWQiOiJFdFF6NWVyNkFUWHlYVnFRWDhKM1pTSFR2ZlYyIiwic3ViIjoiRXRRejVlcjZBVFh5WFZxUVg4SjNaU0hUdmZWMiIsImlhdCI6MTc2NTExNzk2NiwiZXhwIjoxNzY1MTIxNTY2LCJlbWFpbCI6ImFtZWVkLmFuc2FyaUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsiYW1lZWQuYW5zYXJpQGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.jQWo1SM4sXOnVeA7Y3bmeO7dvI63NVnPGDtDfcZ1-AtPX43MkKFFMdif1mHqy5m14JMK_LXTUjyp6uHWJMq4ML1mv3ULVjWRTX8lz1pJn-i6QSXbGjq7-qi1eFSAyvJXAxv6KybMNNbA6hATn35Xi8UBBJGHUdMH71eTQ2t5Tps7W3VtV3sy5RhsGqRBZRNhSA4XQmFfQahJhrdKU12g4fhxaNy1-7orASopmk8ax1E3jW3okl38o2OOBf1t9Kbuip7zyiYxmpTfRLiGQD5gv1-8GNpPgrUzMH3jlan4kWN-g2UUornSvfsd6eAcjpHnJSuhhA554i8QnC9tdftV5Q' \
+  -H 'Connection: keep-alive' \
+  -H 'Referer: https://shamelagpt.com/chat?id=7dba0fc8-aae9-4519-8293-7e3a7fd977c9' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36' \
+  -H 'sec-ch-ua: "Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"'

@@ -12,6 +12,22 @@ import Combine
 protocol APIClientProtocol {
     func healthCheck() async throws -> HealthResponse
     func sendMessage(_ request: ChatRequest) async throws -> ChatResponse
+    func streamMessage(_ request: ChatRequest) async throws -> AsyncThrowingStream<String, Error>
+    func streamGuestMessage(_ request: ChatRequest) async throws -> AsyncThrowingStream<String, Error>
+    func signup(_ request: SignupRequest) async throws -> AuthResponse
+    func login(_ request: LoginRequest) async throws -> AuthResponse
+    func getCurrentUser() async throws -> UserResponse
+    func updateCurrentUser(_ request: UpdateUserRequest) async throws -> UserResponse
+    func deleteCurrentUser() async throws
+    func verifyToken() async throws
+    func getPreferences() async throws -> UserPreferencesRequest
+    func setPreferences(_ request: UserPreferencesRequest) async throws
+    func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data
+    func listConversations() async throws -> [ConversationResponse]
+    func createConversation(_ request: ConversationRequest) async throws -> ConversationResponse
+    func deleteAllConversations() async throws
+    func deleteConversation(id: String) async throws
+    func getMessages(conversationId: String) async throws -> ConversationMessagesResponse
 }
 
 /// Main API client for communicating with the ShamelaGPT backend
@@ -23,11 +39,15 @@ final class APIClient: APIClientProtocol {
     private let session: URLSession
     private let jsonEncoder: JSONEncoder
     private let jsonDecoder: JSONDecoder
+    private let authTokenProvider: (() -> String?)?
+
+    /// Lightweight empty response placeholder
+    private struct EmptyResponse: Decodable {}
 
     // MARK: - Configuration
 
     private struct Configuration {
-        static let baseURLString = "https://api.shamelagpt.com"
+        static let baseURLString = "https://shamelagpt.com"
         static let timeoutInterval: TimeInterval = 30.0
         static let defaultHeaders = [
             "Content-Type": "application/json",
@@ -39,7 +59,8 @@ final class APIClient: APIClientProtocol {
 
     init(
         baseURL: URL? = nil,
-        session: URLSession? = nil
+        session: URLSession? = nil,
+        authTokenProvider: (() -> String?)? = nil
     ) {
         // Use provided base URL or default
         if let baseURL = baseURL {
@@ -78,6 +99,8 @@ final class APIClient: APIClientProtocol {
 
         self.jsonDecoder = JSONDecoder()
         self.jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        self.authTokenProvider = authTokenProvider
     }
 
     /// Detects UI test environment (arguments, env, or runner bundle path)
@@ -102,12 +125,113 @@ final class APIClient: APIClientProtocol {
     /// Sends a chat message to the API
     /// POST /api/chat
     func sendMessage(_ request: ChatRequest) async throws -> ChatResponse {
-        let endpoint = baseURL.appendingPathComponent("api/chat")
+        // If an auth token is not available, route to the guest chat endpoint
+        let endpointPath = (authTokenProvider?() == nil) ? "api/guest/chat" : "api/chat"
+        let endpoint = baseURL.appendingPathComponent(endpointPath)
         return try await performRequest(
             url: endpoint,
             method: "POST",
             body: request
         )
+    }
+
+    /// Streaming chat via SSE for authenticated users
+    /// POST /api/chat/stream
+    func streamMessage(_ request: ChatRequest) async throws -> AsyncThrowingStream<String, Error> {
+        let endpoint = baseURL.appendingPathComponent("api/chat/stream")
+        return try await streamRequest(url: endpoint, body: request)
+    }
+
+    /// Streaming chat via SSE for guest users
+    /// POST /api/guest/chat/stream
+    func streamGuestMessage(_ request: ChatRequest) async throws -> AsyncThrowingStream<String, Error> {
+        let endpoint = baseURL.appendingPathComponent("api/guest/chat/stream")
+        return try await streamRequest(url: endpoint, body: request)
+    }
+
+    /// Signup
+    func signup(_ request: SignupRequest) async throws -> AuthResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/signup")
+        return try await performRequest(url: endpoint, method: "POST", body: request)
+    }
+
+    /// Login
+    func login(_ request: LoginRequest) async throws -> AuthResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/login")
+        return try await performRequest(url: endpoint, method: "POST", body: request)
+    }
+
+    /// Current user
+    func getCurrentUser() async throws -> UserResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me")
+        return try await performRequest(url: endpoint, method: "GET")
+    }
+
+    /// Update user
+    func updateCurrentUser(_ request: UpdateUserRequest) async throws -> UserResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me")
+        return try await performRequest(url: endpoint, method: "PUT", body: request)
+    }
+
+    /// Delete current user
+    func deleteCurrentUser() async throws {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me")
+        _ = try await performRequest(url: endpoint, method: "DELETE") as EmptyResponse
+    }
+
+    /// Verify token
+    func verifyToken() async throws {
+        let endpoint = baseURL.appendingPathComponent("api/auth/verify")
+        _ = try await performRequest(url: endpoint, method: "GET") as EmptyResponse
+    }
+
+    /// Preferences
+    func getPreferences() async throws -> UserPreferencesRequest {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me/preferences")
+        return try await performRequest(url: endpoint, method: "GET")
+    }
+
+    func setPreferences(_ request: UserPreferencesRequest) async throws {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me/preferences")
+        _ = try await performRequest(url: endpoint, method: "PUT", body: request) as EmptyResponse
+    }
+
+    /// Title generation
+    func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data {
+        let endpoint = baseURL.appendingPathComponent("api/chat/generate-title")
+        return try await performRequest(url: endpoint, method: "POST", body: request)
+    }
+
+    /// Conversations
+    func listConversations() async throws -> [ConversationResponse] {
+        let endpoint = baseURL.appendingPathComponent("api/conversations")
+        return try await performRequest(url: endpoint, method: "GET")
+    }
+
+    func createConversation(_ request: ConversationRequest) async throws -> ConversationResponse {
+        let endpoint = baseURL.appendingPathComponent("api/conversations")
+        return try await performRequest(url: endpoint, method: "POST", body: request)
+    }
+
+    func deleteAllConversations() async throws {
+        let endpoint = baseURL.appendingPathComponent("api/conversations")
+        _ = try await performRequest(url: endpoint, method: "DELETE") as EmptyResponse
+    }
+
+    func deleteConversation(id: String) async throws {
+        let endpoint = baseURL
+            .appendingPathComponent("api/conversations")
+            .appendingPathComponent(id)
+        _ = try await performRequest(url: endpoint, method: "DELETE") as EmptyResponse
+    }
+
+    func getMessages(conversationId: String) async throws -> ConversationMessagesResponse {
+        let endpoint = baseURL
+            .appendingPathComponent("api/conversations")
+            .appendingPathComponent(conversationId)
+            .appendingPathComponent("messages")
+        AppLogger.network.logInfo("Fetching messages for conversation \(conversationId) from API")
+        return try await performRequest(url: endpoint, method: "GET")
     }
 
     // MARK: - Private Methods
@@ -122,6 +246,9 @@ final class APIClient: APIClientProtocol {
         request.httpMethod = method
 
         AppLogger.network.logDebug("Making \(method) request to: \(url.absoluteString)")
+        if let token = authTokenProvider?() {
+            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
 
         // Add body if provided
         if let body = body {
@@ -211,6 +338,69 @@ final class APIClient: APIClientProtocol {
             return .unknown(error)
         }
     }
+
+    /// Streams SSE responses as text chunks
+    private func streamRequest(
+        url: URL,
+        body: Encodable
+    ) async throws -> AsyncThrowingStream<String, Error> {
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        if let token = authTokenProvider?() {
+            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        // Encode body
+        let encodedBody = try jsonEncoder.encode(AnyEncodable(body))
+        request.httpBody = encodedBody
+
+        // Log request details - headers and a preview of the body
+        AppLogger.network.logInfo("Starting SSE stream to: \(url.absoluteString)")
+        AppLogger.network.logDebug("SSE request headers: \(request.allHTTPHeaderFields ?? [:])")
+        if let bodyString = String(data: encodedBody, encoding: .utf8) {
+            AppLogger.network.logDebug("SSE request body (first 2000 chars): \(bodyString.prefix(2000))")
+        }
+
+        let (bytes, response) = try await session.bytes(for: request)
+
+        if let httpResp = response as? HTTPURLResponse {
+            AppLogger.network.logInfo("SSE response status: \(httpResp.statusCode)")
+            AppLogger.network.logDebug("SSE response headers: \(httpResp.allHeaderFields)")
+        }
+
+        try validateResponse(response)
+
+        let stream = AsyncThrowingStream<String, Error> { continuation in
+            Task {
+                do {
+                    for try await line in bytes.lines {
+                        // Log each raw SSE line for debugging truncated to reasonable length
+                        AppLogger.network.logDebug("SSE line (raw): \(String(line.prefix(200)))")
+                        continuation.yield(line)
+                    }
+                    continuation.finish()
+                } catch {
+                    AppLogger.network.logError("SSE stream error", error: error)
+                    continuation.finish(throwing: error)
+                }
+            }
+        }
+
+        return stream
+    }
+}
+
+/// Type-erasing wrapper to encode generic Encodable bodies for streaming
+private struct AnyEncodable: Encodable {
+    private let encodeFunc: (Encoder) throws -> Void
+
+    init(_ encodable: Encodable) {
+        self.encodeFunc = encodable.encode
+    }
+
+    func encode(to encoder: Encoder) throws {
+        try encodeFunc(encoder)
+    }
 }
 
 // MARK: - Combine Support
@@ -256,6 +446,12 @@ final class PreviewMockAPIClient: APIClientProtocol {
         answer: "This is a mock response.\n\nSources:\n\n* **book_name:** صحيح البخاري, **source_url:** https://shamela.ws/book/1234/52",
         threadId: "mock-thread-id"
     )
+    var mockAuthResponse = AuthResponse(
+        token: "mock-token",
+        refreshToken: "mock-refresh",
+        expiresIn: "3600",
+        user: [:]
+    )
 
     func healthCheck() async throws -> HealthResponse {
         if shouldFail {
@@ -269,6 +465,87 @@ final class PreviewMockAPIClient: APIClientProtocol {
             throw NetworkError.timeout
         }
         return mockChatResponse
+    }
+
+    func streamMessage(_ request: ChatRequest) async throws -> AsyncThrowingStream<String, Error> {
+        AsyncThrowingStream { continuation in
+            continuation.yield("data: \(mockChatResponse.answer)")
+            continuation.finish()
+        }
+    }
+
+    func streamGuestMessage(_ request: ChatRequest) async throws -> AsyncThrowingStream<String, Error> {
+        try await streamMessage(request)
+    }
+
+    func signup(_ request: SignupRequest) async throws -> AuthResponse {
+        if shouldFail { throw NetworkError.unknown(NSError(domain: "PreviewMockAPIClient", code: 0, userInfo: [NSLocalizedDescriptionKey: "mock network error"])) }
+        return mockAuthResponse
+    }
+
+    func login(_ request: LoginRequest) async throws -> AuthResponse {
+        if shouldFail { throw NetworkError.unknown(NSError(domain: "PreviewMockAPIClient", code: 0, userInfo: [NSLocalizedDescriptionKey: "mock network error"])) }
+        return mockAuthResponse
+    }
+
+    func getCurrentUser() async throws -> UserResponse {
+        UserResponse(
+            id: "user-id",
+            firebaseUid: "firebase-uid",
+            email: "user@example.com",
+            displayName: "Mock User",
+            createdAt: "",
+            updatedAt: "",
+            lastLogin: ""
+        )
+    }
+
+    func updateCurrentUser(_ request: UpdateUserRequest) async throws -> UserResponse {
+        try await getCurrentUser()
+    }
+
+    func deleteCurrentUser() async throws {
+        return
+    }
+
+    func verifyToken() async throws {
+        return
+    }
+
+    func getPreferences() async throws -> UserPreferencesRequest {
+        UserPreferencesRequest(
+            languagePreference: "English",
+            customSystemPrompt: "mock",
+            responsePreferences: ResponsePreferencesRequest(length: "short", style: "concise", focus: "summary")
+        )
+    }
+
+    func setPreferences(_ request: UserPreferencesRequest) async throws {
+        return
+    }
+
+    func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data {
+        return Data("{\"title\":\"Mock Title\"}".utf8)
+    }
+
+    func listConversations() async throws -> [ConversationResponse] {
+        return []
+    }
+
+    func createConversation(_ request: ConversationRequest) async throws -> ConversationResponse {
+        return ConversationResponse(id: "c1", threadId: "t1", title: request.title, createdAt: nil, updatedAt: nil)
+    }
+
+    func deleteAllConversations() async throws {
+        return
+    }
+
+    func deleteConversation(id: String) async throws {
+        return
+    }
+
+    func getMessages(conversationId: String) async throws -> ConversationMessagesResponse {
+        return ConversationMessagesResponse(conversationId: conversationId, messages: [])
     }
 }
 #endif

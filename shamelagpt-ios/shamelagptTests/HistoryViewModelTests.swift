@@ -369,6 +369,24 @@ final class HistoryViewModelTests: XCTestCase {
         XCTAssertFalse(returnedId.isEmpty)
     }
 
+    func testCreateNewConversationReusesExistingEmptyConversation() async throws {
+        // Given
+        let existingEmpty = Conversation(
+            id: "existing-empty",
+            title: "New Conversation",
+            messages: []
+        )
+        mockChatRepository.mockConversations = [existingEmpty]
+
+        // When
+        let returnedId = try await viewModel.createNewConversation()
+
+        // Then
+        XCTAssertEqual(returnedId, existingEmpty.id)
+        XCTAssertEqual(mockChatRepository.createConversationCallCount, 0, "Should reuse existing empty conversation instead of creating")
+        XCTAssertNil(viewModel.error)
+    }
+
     // MARK: - Display Logic Tests
 
     func testDisplayTitleForConversationWithTitle() throws {

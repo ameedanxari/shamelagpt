@@ -21,6 +21,17 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
     private let conversationsSubject = CurrentValueSubject<[Conversation], Never>([])
 
+    private func parseRemoteDate(_ value: String?) -> Date? {
+        guard let value else { return nil }
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = formatter.date(from: value) {
+            return date
+        }
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter.date(from: value)
+    }
+
     // MARK: - Initialization
     init(
         coreDataStack: CoreDataStackProtocol = CoreDataStack.shared,
@@ -38,17 +49,37 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
     // MARK: - Conversation Operations
 
-    func createConversation(title: String) async throws -> Conversation {
+    func createConversation(title: String, isLocalOnly: Bool = false) async throws -> Conversation {
         let context = coreDataStack.viewContext
+        var remoteConversation: ConversationResponse?
 
+        // Do not call remote API when conversation is marked local-only
+        if !isLocalOnly,
+           let apiClient = apiClient,
+           let networkMonitor = networkMonitor,
+           networkMonitor.isConnected {
+            remoteConversation = try? await apiClient.createConversation(
+                ConversationRequest(title: title)
+            )
+        }
         return try await context.perform {
-            let id = UUID().uuidString
+            let id = remoteConversation?.id ?? UUID().uuidString
             let entity = self.conversationDAO.create(
                 id: id,
-                threadId: nil,
-                title: title,
+                threadId: remoteConversation?.threadId,
+                title: remoteConversation?.title ?? title,
+                isLocalOnly: isLocalOnly,
                 in: context
             )
+
+            if let remote = remoteConversation {
+                if let createdAt = self.parseRemoteDate(remote.createdAt) {
+                    entity.createdAt = createdAt
+                }
+                if let updatedAt = self.parseRemoteDate(remote.updatedAt) {
+                    entity.updatedAt = updatedAt
+                }
+            }
 
             try self.coreDataStack.save(context: context)
 
@@ -77,7 +108,9 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
                 return nil
             }
             AppLogger.database.logInfo("Conversation found: \(id), threadId: \(entity.threadId ?? "nil")")
-            return ConversationMapper.toDomainModel(entity, includeMessages: true)
+            let domain = ConversationMapper.toDomainModel(entity, includeMessages: true)
+            AppLogger.database.logDebug("Conversation details - id:\(domain.id) threadId:\(domain.threadId ?? "nil") isLocalOnly:\(domain.isLocalOnly) messages:\(domain.messageCount) createdAt:\(domain.createdAt) updatedAt:\(domain.updatedAt)")
+            return domain
         }
     }
 
@@ -92,12 +125,12 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         }
     }
 
-    func fetchMostRecentEmptyConversation() async throws -> Conversation? {
-        AppLogger.database.logDebug("Fetching most recent empty conversation")
+    func fetchMostRecentEmptyConversation(includeLocalOnly: Bool = false) async throws -> Conversation? {
+        AppLogger.database.logDebug("Fetching most recent empty conversation (includeLocalOnly=\(includeLocalOnly))")
         let context = coreDataStack.viewContext
 
         return try await context.perform { [conversationDAO] in
-            guard let entity = try conversationDAO.fetchMostRecentEmpty(from: context) else {
+            guard let entity = try conversationDAO.fetchMostRecentEmpty(from: context, includeLocalOnly: includeLocalOnly) else {
                 AppLogger.database.logInfo("No empty conversations found")
                 return nil
             }
@@ -141,6 +174,13 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
             try coreDataStack.save(context: context)
             self.notifyConversationsChanged()
         }
+
+        // Propagate delete to server when authenticated
+        if let apiClient = apiClient,
+           let networkMonitor = networkMonitor,
+           networkMonitor.isConnected {
+            _ = try? await apiClient.deleteConversation(id: id)
+        }
     }
 
     func deleteAllConversations() async throws {
@@ -150,6 +190,51 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
             try conversationDAO.deleteAll(from: context)
             try coreDataStack.save(context: context)
             self.notifyConversationsChanged()
+        }
+
+        if let apiClient = apiClient,
+           let networkMonitor = networkMonitor,
+           networkMonitor.isConnected {
+            _ = try? await apiClient.deleteAllConversations()
+        }
+    }
+
+    func syncRemoteConversations() async throws {
+        guard let apiClient = apiClient,
+              let networkMonitor = networkMonitor,
+              networkMonitor.isConnected else { return }
+
+        let remoteConversations = try await apiClient.listConversations()
+        let context = coreDataStack.viewContext
+
+        try await context.perform { [conversationDAO, coreDataStack] in
+            for remote in remoteConversations {
+                // Upsert conversation using server id
+                let entity = conversationDAO.upsert(
+                    id: remote.id,
+                    threadId: remote.threadId,
+                    title: remote.title ?? "New Chat",
+                    createdAt: self.parseRemoteDate(remote.createdAt) ?? Date(),
+                    updatedAt: self.parseRemoteDate(remote.updatedAt) ?? Date(),
+                    in: context
+                )
+                conversationDAO.markAsUpdated(entity)
+            }
+            try coreDataStack.save(context: context)
+        }
+
+        notifyConversationsChanged()
+
+        // Hydrate messages for server conversations that are empty locally
+        for remote in remoteConversations {
+            do {
+                if let local = try await fetchConversation(byId: remote.id), !local.messages.isEmpty {
+                    continue
+                }
+                _ = try await fetchMessages(forConversation: remote.id)
+            } catch {
+                AppLogger.network.logWarning("Failed to hydrate messages for conversation \(remote.id): \(error)")
+            }
         }
     }
 
@@ -246,12 +331,64 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
     func fetchMessages(forConversation conversationId: String) async throws -> [Message] {
         let context = coreDataStack.viewContext
 
-        return try await context.perform { [messageDAO] in
+        // First fetch locally
+        let localMessages: [Message] = try await context.perform { [messageDAO] in
             let entities = try messageDAO.fetchAll(
                 forConversationId: conversationId,
                 from: context
             )
-            return MessageMapper.toDomainModels(entities)
+            let messages = MessageMapper.toDomainModels(entities)
+            AppLogger.database.logDebug("Fetched messages from DB for conversation \(conversationId) - count: \(messages.count) ids: \(messages.map { $0.id })")
+            return messages
+        }
+
+        // If we already have messages or no network/API, return local
+        if !localMessages.isEmpty {
+            return localMessages
+        }
+
+        // Try to hydrate from remote for authenticated users
+        guard let apiClient = apiClient,
+              let networkMonitor = networkMonitor,
+              networkMonitor.isConnected else {
+            return localMessages
+        }
+
+        AppLogger.network.logInfo("Fetching remote messages for conversation \(conversationId)")
+        do {
+            let remoteResponse = try await apiClient.getMessages(conversationId: conversationId)
+            AppLogger.network.logDebug("Remote messages received: \(remoteResponse.messages.count) for conversation \(conversationId) (response conversationId=\(remoteResponse.conversationId ?? "nil"))")
+
+            // Persist remote messages locally for resume
+            for msg in remoteResponse.messages {
+                guard let content = msg.content, let role = msg.role else {
+                    AppLogger.network.logWarning("Skipping remote message with missing content/role: \(msg)")
+                    continue
+                }
+                let roleLower = role.lowercased()
+                let isUser = roleLower == "user" || roleLower == "human"
+                // Persist as non-fact-check without sources (API currently returns text only)
+                _ = try? await addMessage(
+                    toConversation: conversationId,
+                    content: content,
+                    isUserMessage: isUser,
+                    sources: []
+                )
+            }
+
+            // Re-fetch now that we've hydrated
+            return try await context.perform { [messageDAO] in
+                let entities = try messageDAO.fetchAll(
+                    forConversationId: conversationId,
+                    from: context
+                )
+                let messages = MessageMapper.toDomainModels(entities)
+                AppLogger.database.logDebug("Hydrated remote messages for conversation \(conversationId) - count: \(messages.count)")
+                return messages
+            }
+        } catch {
+            AppLogger.network.logError("Failed to fetch remote messages for conversation \(conversationId)", error: error)
+            return localMessages
         }
     }
 
@@ -319,13 +456,15 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
             // Send message to API
             let request = ChatRequest(
                 question: message,
-                threadId: conversation.threadId
+                threadId: conversation.threadId,
+                languagePreference: LanguageManager.shared.currentLanguage.rawValue
             )
 
             let response = try await apiClient.sendMessage(request)
 
             // Update thread ID if provided and this is the first message
-            if conversation.threadId == nil, let newThreadId = response.threadId {
+            // Do NOT update thread ID for local-only conversations (guest/local-only)
+            if conversation.threadId == nil, let newThreadId = response.threadId, conversation.isLocalOnly == false {
                 try await updateConversationThreadId(
                     id: conversationId,
                     threadId: newThreadId

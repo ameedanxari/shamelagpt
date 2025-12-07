@@ -1,0 +1,1270 @@
+[MainTabView.swift:88] body - MainTabView detected navigation to conversation: 5576aa66-0026-4596-b211-35eb3e9184aa
+load_eligibility_plist: Failed to open /Users/macintosh/Library/Developer/CoreSimulator/Devices/1FAEEFFA-D0FB-43F0-BA7E-EC7382959503/data/Containers/Data/Application/92CEBB1D-D59E-49FD-BE2E-FD35D27C4635/private/var/db/eligibilityd/eligibility.plist: No such file or directory(2)
+[MainTabView.swift:364] validateCurrentConversation() - validateCurrentConversation called - current ID: 5576aa66-0026-4596-b211-35eb3e9184aa
+[ChatViewModel.swift:485] loadMessages() - Loading messages for conversation: 5576aa66-0026-4596-b211-35eb3e9184aa
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 5576aa66-0026-4596-b211-35eb3e9184aa
+[ChatViewModel.swift:486] loadMessages() - Current message count before load: 0
+[ChatViewModel.swift:485] loadMessages() - Loading messages for conversation: 5576aa66-0026-4596-b211-35eb3e9184aa
+[ChatViewModel.swift:486] loadMessages() - Current message count before load: 0
+[MainTabView.swift:364] validateCurrentConversation() - validateCurrentConversation called - current ID: 5576aa66-0026-4596-b211-35eb3e9184aa
+[ChatViewModel.swift:485] loadMessages() - Loading messages for conversation: 5576aa66-0026-4596-b211-35eb3e9184aa
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 5576aa66-0026-4596-b211-35eb3e9184aa
+[ChatViewModel.swift:486] loadMessages() - Current message count before load: 0
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 5576aa66-0026-4596-b211-35eb3e9184aa, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:5576aa66-0026-4596-b211-35eb3e9184aa threadId:nil isLocalOnly:false messages:4 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:00 +0000
+[ChatRepositoryImpl.swift:329] fetchMessages(forConversation:) - Fetched messages from DB for conversation 5576aa66-0026-4596-b211-35eb3e9184aa - count: 4 ids: ["BDD3C74E-3ED0-4C83-9129-548B0989B6EC", "D092AE66-0C2D-4735-8173-59AA7B1E5A66", "5A6E14AE-BD71-46D6-B0C6-50AE1BEB5C42", "122DB48C-8188-48E6-8236-F162278100AD"]
+[ChatRepositoryImpl.swift:329] fetchMessages(forConversation:) - Fetched messages from DB for conversation 5576aa66-0026-4596-b211-35eb3e9184aa - count: 4 ids: ["BDD3C74E-3ED0-4C83-9129-548B0989B6EC", "D092AE66-0C2D-4735-8173-59AA7B1E5A66", "5A6E14AE-BD71-46D6-B0C6-50AE1BEB5C42", "122DB48C-8188-48E6-8236-F162278100AD"]
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 5576aa66-0026-4596-b211-35eb3e9184aa, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:5576aa66-0026-4596-b211-35eb3e9184aa threadId:nil isLocalOnly:false messages:4 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:00 +0000
+[ChatRepositoryImpl.swift:329] fetchMessages(forConversation:) - Fetched messages from DB for conversation 5576aa66-0026-4596-b211-35eb3e9184aa - count: 4 ids: ["BDD3C74E-3ED0-4C83-9129-548B0989B6EC", "D092AE66-0C2D-4735-8173-59AA7B1E5A66", "5A6E14AE-BD71-46D6-B0C6-50AE1BEB5C42", "122DB48C-8188-48E6-8236-F162278100AD"]
+[MainTabView.swift:380] validateCurrentConversation() - Current conversation is valid: 5576aa66-0026-4596-b211-35eb3e9184aa, has 4 messages
+[MainTabView.swift:381] validateCurrentConversation() - Conversation metadata - threadId:nil isLocalOnly:false createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:00 +0000 messageCount:4
+[ChatViewModel.swift:492] loadMessages() - Fetched 4 messages from repository
+[ChatViewModel.swift:495] loadMessages() - Has optimistic messages: false, isLoading: false
+[ChatViewModel.swift:522] loadMessages() - Loaded 4 messages
+[ChatViewModel.swift:523] loadMessages() - Final messages array: ["BDD3C74E-3ED0-4C83-9129-548B0989B6EC: Please fact-check th...", "D092AE66-0C2D-4735-8173-59AA7B1E5A66: Please fact-check th...", "5A6E14AE-BD71-46D6-B0C6-50AE1BEB5C42: ## Fact-Checking the...", "122DB48C-8188-48E6-8236-F162278100AD: ## Fact-Checking the..."]
+[ChatViewModel.swift:526] loadMessages() - Message count after load: 4
+[ChatViewModel.swift:492] loadMessages() - Fetched 4 messages from repository
+[ChatViewModel.swift:495] loadMessages() - Has optimistic messages: false, isLoading: false
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 5576aa66-0026-4596-b211-35eb3e9184aa
+[ChatViewModel.swift:522] loadMessages() - Loaded 4 messages
+[ChatViewModel.swift:523] loadMessages() - Final messages array: ["BDD3C74E-3ED0-4C83-9129-548B0989B6EC: Please fact-check th...", "D092AE66-0C2D-4735-8173-59AA7B1E5A66: Please fact-check th...", "5A6E14AE-BD71-46D6-B0C6-50AE1BEB5C42: ## Fact-Checking the...", "122DB48C-8188-48E6-8236-F162278100AD: ## Fact-Checking the..."]
+[ChatViewModel.swift:526] loadMessages() - Message count after load: 4
+[MainTabView.swift:380] validateCurrentConversation() - Current conversation is valid: 5576aa66-0026-4596-b211-35eb3e9184aa, has 4 messages
+[MainTabView.swift:381] validateCurrentConversation() - Conversation metadata - threadId:nil isLocalOnly:false createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:00 +0000 messageCount:4
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 5576aa66-0026-4596-b211-35eb3e9184aa
+[ChatViewModel.swift:492] loadMessages() - Fetched 4 messages from repository
+[ChatViewModel.swift:495] loadMessages() - Has optimistic messages: false, isLoading: false
+[ChatViewModel.swift:522] loadMessages() - Loaded 4 messages
+[ChatViewModel.swift:523] loadMessages() - Final messages array: ["BDD3C74E-3ED0-4C83-9129-548B0989B6EC: Please fact-check th...", "D092AE66-0C2D-4735-8173-59AA7B1E5A66: Please fact-check th...", "5A6E14AE-BD71-46D6-B0C6-50AE1BEB5C42: ## Fact-Checking the...", "122DB48C-8188-48E6-8236-F162278100AD: ## Fact-Checking the..."]
+[ChatViewModel.swift:526] loadMessages() - Message count after load: 4
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 5576aa66-0026-4596-b211-35eb3e9184aa
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=0-169 detected=en substringPreview=Please fact-check this s -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=0-169 detected=en substringPreview=Please fact-check this s -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=0-95 detected=en substringPreview=Fact-Checking the Hadith -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ur, appLanguage=en, candidates=["ur", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:80] attemptFont(for:) - UIFont(name:) failed, attempting bundled file lookup for lang=ur, candidates=[(name: "NotoNastaliqUrdu-wght.ttf", subdirectory: Optional("/")), (name: "NotoNastaliqUrdu-wght.ttf", subdirectory: nil)]
+[FontRegistry.swift:136] registerFontFromBundle(url:baseSize:textStyle:) - Found bundled font file at: /Users/macintosh/Library/Developer/CoreSimulator/Devices/1FAEEFFA-D0FB-43F0-BA7E-EC7382959503/data/Containers/Bundle/Application/A619D4F3-5E40-4A48-B2C5-7B72FF65A9FE/ShamelaGPT.app//NotoNastaliqUrdu-wght.ttf
+[FontRegistry.swift:144] registerFontFromBundle(url:baseSize:textStyle:) - Bundled CGFont postScript name: NotoNastaliqUrdu-Regular
+[FontRegistry.swift:151] registerFontFromBundle(url:baseSize:textStyle:) - Successfully registered graphics font: NotoNastaliqUrdu-Regular
+[FontRegistry.swift:155] registerFontFromBundle(url:baseSize:textStyle:) - UIFont(name:) succeeded after registration, name=NotoNastaliqUrdu-Regular, fontName=NotoNastaliqUrdu-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=95-1 detected=ur substringPreview=ﷺ -> uiFont=NotoNastaliqUrdu-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=96-1381 detected=en substringPreview=) said: 'May Allah cause -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:80] attemptFont(for:) - UIFont(name:) failed, attempting bundled file lookup for lang=ar, candidates=[(name: "NotoNaskhArabic-wght.ttf", subdirectory: Optional("/")), (name: "NotoNaskhArabic-wght.ttf", subdirectory: nil)]
+[FontRegistry.swift:136] registerFontFromBundle(url:baseSize:textStyle:) - Found bundled font file at: /Users/macintosh/Library/Developer/CoreSimulator/Devices/1FAEEFFA-D0FB-43F0-BA7E-EC7382959503/data/Containers/Bundle/Application/A619D4F3-5E40-4A48-B2C5-7B72FF65A9FE/ShamelaGPT.app//NotoNaskhArabic-wght.ttf
+[FontRegistry.swift:144] registerFontFromBundle(url:baseSize:textStyle:) - Bundled CGFont postScript name: NotoNaskhArabic-Regular
+[FontRegistry.swift:151] registerFontFromBundle(url:baseSize:textStyle:) - Successfully registered graphics font: NotoNaskhArabic-Regular
+[FontRegistry.swift:155] registerFontFromBundle(url:baseSize:textStyle:) - UIFont(name:) succeeded after registration, name=NotoNaskhArabic-Regular, fontName=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1477-7 detected=ar substringPreview=المصادر -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=fr, appLanguage=en, candidates=["fr", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=fr
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1484-10 detected=fr substringPreview= / Sources -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1494-6 detected=ar substringPreview=المدخل -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1500-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1501-2 detected=ar substringPreview=في -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1503-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1504-5 detected=ar substringPreview=تاريخ -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1509-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1510-5 detected=ar substringPreview=السنة -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1515-36 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1551-6 detected=ar substringPreview=الجامع -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1557-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1558-6 detected=ar substringPreview=الصحيح -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1564-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1565-3 detected=und substringPreview=مما -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1568-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1569-3 detected=ar substringPreview=ليس -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1572-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1573-2 detected=ar substringPreview=في -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1575-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1576-8 detected=ar substringPreview=الصحيحين -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1584-39 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1623-9 detected=ar substringPreview=الاتجاهات -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1632-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1633-7 detected=ar substringPreview=الفقهية -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1640-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1641-3 detected=ar substringPreview=عند -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1644-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1645-5 detected=ar substringPreview=أصحاب -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1650-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1651-6 detected=ar substringPreview=الحديث -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1657-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1658-2 detected=ar substringPreview=في -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1660-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1661-5 detected=ar substringPreview=القرن -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1666-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1667-6 detected=ar substringPreview=الثالث -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1673-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1674-6 detected=ar substringPreview=الهجري -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1680-38 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1718-5 detected=und substringPreview=معارج -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1723-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1724-6 detected=ar substringPreview=القبول -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1730-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1731-4 detected=ar substringPreview=بشرح -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1735-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1736-3 detected=ar substringPreview=سلم -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1739-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1740-6 detected=ar substringPreview=الوصول -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1746-37 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1783-3 detected=und substringPreview=شرح -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1786-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1787-6 detected=ar substringPreview=الكوكب -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1793-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1794-6 detected=ar substringPreview=المنير -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1800-3 detected=nil substringPreview= =  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1803-3 detected=und substringPreview=شرح -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1806-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1807-5 detected=und substringPreview=مختصر -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1812-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1813-7 detected=ar substringPreview=التحرير -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1820-38 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1858-5 detected=und substringPreview=مشارق -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1863-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1864-7 detected=ar substringPreview=الأنوار -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1871-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1872-7 detected=ar substringPreview=الوهاجة -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1879-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1880-6 detected=ar substringPreview=ومطالع -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1886-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1887-7 detected=ar substringPreview=الأسرار -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1894-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1895-7 detected=ar substringPreview=البهاجة -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1902-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1903-2 detected=ar substringPreview=في -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1905-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1906-3 detected=und substringPreview=شرح -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1909-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=fa, appLanguage=en, candidates=["fa", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=fa, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1910-3 detected=fa substringPreview=سنن -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1913-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1914-6 detected=ar substringPreview=الإمام -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1920-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1921-3 detected=und substringPreview=ابن -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1924-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1925-4 detected=ar substringPreview=ماجه -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1929-35 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1964-3 detected=ar substringPreview=ذيل -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1967-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1968-5 detected=ar substringPreview=تاريخ -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1973-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1974-5 detected=ar substringPreview=بغداد -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1979-3 detected=nil substringPreview= -  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1982-3 detected=und substringPreview=ابن -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1985-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1986-6 detected=ar substringPreview=النجار -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1992-3 detected=nil substringPreview= -  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1995-1 detected=und substringPreview=ط -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1996-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1997-7 detected=ar substringPreview=العلمية -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2004-35 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2039-4 detected=und substringPreview=مقام -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2043-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2044-6 detected=ar substringPreview=الرشاد -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2050-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2051-3 detected=ar substringPreview=بين -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2054-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2055-7 detected=ar substringPreview=التقليد -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2062-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2063-9 detected=ar substringPreview=والاجتهاد -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2072-36 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2108-6 detected=ar substringPreview=المدخل -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2114-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2115-2 detected=ar substringPreview=في -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2117-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2118-5 detected=ar substringPreview=تاريخ -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2123-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2124-5 detected=ar substringPreview=السنة -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2129-36 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=0-95 detected=en substringPreview=Fact-Checking the Hadith -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ur, appLanguage=en, candidates=["ur", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNastaliqUrdu-Regular, lang=ur, returnedFont=NotoNastaliqUrdu-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=95-1 detected=ur substringPreview=ﷺ -> uiFont=NotoNastaliqUrdu-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=96-1381 detected=en substringPreview=) said: 'May Allah cause -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1477-7 detected=ar substringPreview=المصادر -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=fr, appLanguage=en, candidates=["fr", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=fr
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1484-10 detected=fr substringPreview= / Sources -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1494-6 detected=ar substringPreview=المدخل -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1500-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1501-2 detected=ar substringPreview=في -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1503-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1504-5 detected=ar substringPreview=تاريخ -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1509-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1510-5 detected=ar substringPreview=السنة -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1515-36 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1551-6 detected=ar substringPreview=الجامع -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1557-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1558-6 detected=ar substringPreview=الصحيح -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1564-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1565-3 detected=und substringPreview=مما -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1568-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1569-3 detected=ar substringPreview=ليس -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1572-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1573-2 detected=ar substringPreview=في -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1575-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1576-8 detected=ar substringPreview=الصحيحين -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1584-39 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1623-9 detected=ar substringPreview=الاتجاهات -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1632-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1633-7 detected=ar substringPreview=الفقهية -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1640-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1641-3 detected=ar substringPreview=عند -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1644-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1645-5 detected=ar substringPreview=أصحاب -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1650-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1651-6 detected=ar substringPreview=الحديث -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1657-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1658-2 detected=ar substringPreview=في -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1660-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1661-5 detected=ar substringPreview=القرن -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1666-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1667-6 detected=ar substringPreview=الثالث -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1673-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1674-6 detected=ar substringPreview=الهجري -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1680-38 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1718-5 detected=und substringPreview=معارج -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1723-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1724-6 detected=ar substringPreview=القبول -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1730-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1731-4 detected=ar substringPreview=بشرح -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1735-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1736-3 detected=ar substringPreview=سلم -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1739-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1740-6 detected=ar substringPreview=الوصول -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1746-37 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1783-3 detected=und substringPreview=شرح -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1786-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1787-6 detected=ar substringPreview=الكوكب -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1793-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1794-6 detected=ar substringPreview=المنير -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1800-3 detected=nil substringPreview= =  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1803-3 detected=und substringPreview=شرح -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1806-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1807-5 detected=und substringPreview=مختصر -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1812-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1813-7 detected=ar substringPreview=التحرير -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1820-38 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1858-5 detected=und substringPreview=مشارق -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1863-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1864-7 detected=ar substringPreview=الأنوار -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1871-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1872-7 detected=ar substringPreview=الوهاجة -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1879-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1880-6 detected=ar substringPreview=ومطالع -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1886-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1887-7 detected=ar substringPreview=الأسرار -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1894-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1895-7 detected=ar substringPreview=البهاجة -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1902-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1903-2 detected=ar substringPreview=في -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1905-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1906-3 detected=und substringPreview=شرح -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1909-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=fa, appLanguage=en, candidates=["fa", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=fa, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1910-3 detected=fa substringPreview=سنن -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1913-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1914-6 detected=ar substringPreview=الإمام -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1920-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1921-3 detected=und substringPreview=ابن -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1924-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1925-4 detected=ar substringPreview=ماجه -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1929-35 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1964-3 detected=ar substringPreview=ذيل -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1967-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1968-5 detected=ar substringPreview=تاريخ -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1973-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1974-5 detected=ar substringPreview=بغداد -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1979-3 detected=nil substringPreview= -  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1982-3 detected=und substringPreview=ابن -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1985-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1986-6 detected=ar substringPreview=النجار -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1992-3 detected=nil substringPreview= -  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1995-1 detected=und substringPreview=ط -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1996-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=1997-7 detected=ar substringPreview=العلمية -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2004-35 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=und, appLanguage=en, candidates=["und", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=und
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2039-4 detected=und substringPreview=مقام -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2043-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2044-6 detected=ar substringPreview=الرشاد -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2050-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2051-3 detected=ar substringPreview=بين -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2054-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2055-7 detected=ar substringPreview=التقليد -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2062-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2063-9 detected=ar substringPreview=والاجتهاد -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2072-36 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2108-6 detected=ar substringPreview=المدخل -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2114-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2115-2 detected=ar substringPreview=في -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2117-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2118-5 detected=ar substringPreview=تاريخ -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=nil, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2123-1 detected=nil substringPreview=  -> uiFont=.SFUI-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=ar, appLanguage=en, candidates=["ar", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:62] attemptFont(for:) - UIFont(name:) succeeded for name=NotoNaskhArabic-Regular, lang=ar, returnedFont=NotoNaskhArabic-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2124-5 detected=ar substringPreview=السنة -> uiFont=NotoNaskhArabic-Regular
+[FontRegistry.swift:113] uiFont(forLanguage:textStyle:weight:) - uiFont called with languageCode=en, appLanguage=en, candidates=["en", "default"], textStyle=UIFontTextStyle(_rawValue: UICTFontTextStyleBody), baseSize=17.0
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=en
+[FontRegistry.swift:107] attemptFont(for:) - No bundled font file configured for languageCode=nil
+[FontRegistry.swift:124] uiFont(forLanguage:textStyle:weight:) - Falling back to system font: .SFUI-Regular
+[MessageBubbleView.swift:296] parseMarkdown(_:) - MessageBubbleView: runRange=2129-36 detected=en substringPreview= - https://shamela. ws/b -> uiFont=.SFUI-Regular
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 5576aa66-0026-4596-b211-35eb3e9184aa, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:5576aa66-0026-4596-b211-35eb3e9184aa threadId:nil isLocalOnly:false messages:4 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:00 +0000
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 5576aa66-0026-4596-b211-35eb3e9184aa, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:5576aa66-0026-4596-b211-35eb3e9184aa threadId:nil isLocalOnly:false messages:4 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:00 +0000
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 5576aa66-0026-4596-b211-35eb3e9184aa, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:5576aa66-0026-4596-b211-35eb3e9184aa threadId:nil isLocalOnly:false messages:4 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:00 +0000
+[APIClient.swift:248] performRequest(url:method:body:) - Making GET request to: https://shamelagpt.com/api/conversations
+[APIClient.swift:301] performDataTask(request:) - URLSession configuration protocol classes: [_NSURLHTTPProtocol, _NSURLDataProtocol, _NSURLFTPProtocol, _NSURLFileProtocol, NSAboutURLProtocol]
+[APIClient.swift:302] performDataTask(request:) - URLSession configuration type: __NSURLSessionLocal
+[APIClient.swift:272] performRequest(url:method:body:) - Response status code: 200
+[APIClient.swift:274] performRequest(url:method:body:) - Response data size: 1845 bytes
+[APIClient.swift:277] performRequest(url:method:body:) - Response body: [{"id":"f8182351-b797-4881-9830-a3e9eacc647c","title":"New Conversation","updated_at":"2025-12-07T22:09:26.865346+00:00"},{"id":"58e76260-7720-4ff0-a737-1750309e6f55","title":"New Conversation","updated_at":"2025-12-07T22:00:47.852985+00:00"},{"id":"852b15c1-66ad-4b31-9543-14c4205a9869","title":"أركان الإسلام: الحد الأدنى","updated_at":"2025-12-07T14:28:34.865434+00:00"},{"id":"7dba0fc8-aae9-4519-8293-7e3a7fd977c9","title":"دعاء الطائف: النص و المعنى","updated_at":"2025-12-07T13:16:34.209952+00:00"},{"id":"1891ce90-3846-4b59-9df6-91662d26e8c8","title":"ما هو الإسلام؟","updated_at":"2025-12-07T13:06:46.262890+00:00"},{"id":"c0137f8a-0b17-49d4-9fc0-5b145747ca07","title":"ما هو الإسلام؟","updated_at":"2025-12-07T12:58:12.977113+00:00"},{"id":"917b0681-8da1-40dc-9304-827d69313a4b","title":"New Conversation","updated_at":"2025-12-07T00:22:48.574096+00:00"},{"id":"0539d635-6951-4a49-9516-bdfbe9fd8a28","title":"New Conversation","updated_at":"2025-12-07T00:21:55.122165+00:00"},{"id":"d6a160af...
+[APIClient.swift:280] performRequest(url:method:body:) - Full response length: 1724 characters
+[APIClient.swift:289] performRequest(url:method:body:) - Successfully decoded response
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: f8182351-b797-4881-9830-a3e9eacc647c
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: f8182351-b797-4881-9830-a3e9eacc647c, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:f8182351-b797-4881-9830-a3e9eacc647c threadId:nil isLocalOnly:false messages:0 createdAt:2025-12-07 22:11:00 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:329] fetchMessages(forConversation:) - Fetched messages from DB for conversation f8182351-b797-4881-9830-a3e9eacc647c - count: 0 ids: []
+[ChatRepositoryImpl.swift:345] fetchMessages(forConversation:) - Fetching remote messages for conversation f8182351-b797-4881-9830-a3e9eacc647c
+[HistoryViewModel.swift:53] setupConversationObserver() - HistoryViewModel received 25 conversations from observer
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:61da1159-a0ff-4e09-b218-3496dc50e560 messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 12:57:28 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:3ca58969-eb27-4bdc-8670-09f0e0a5de00 messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 12:57:28 +0000
+[APIClient.swift:233] getMessages(conversationId:) - Fetching messages for conversation f8182351-b797-4881-9830-a3e9eacc647c from API
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:3f1d5b05-bba9-413a-944f-f5f413e7051e messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 12:57:28 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:5576aa66-0026-4596-b211-35eb3e9184aa messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 12:57:28 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:5dda536a-64b3-4336-a931-a80b25896b32 messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 12:57:28 +0000
+[APIClient.swift:248] performRequest(url:method:body:) - Making GET request to: https://shamelagpt.com/api/conversations/f8182351-b797-4881-9830-a3e9eacc647c/messages
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:d6a160af-cf55-428a-ba53-d713ca9ecf13 messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 12:57:28 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:0539d635-6951-4a49-9516-bdfbe9fd8a28 messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 12:57:28 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:917b0681-8da1-40dc-9304-827d69313a4b messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 12:57:28 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:c0137f8a-0b17-49d4-9fc0-5b145747ca07 messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 13:14:53 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:1891ce90-3846-4b59-9df6-91662d26e8c8 messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 13:14:53 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:7dba0fc8-aae9-4519-8293-7e3a7fd977c9 messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 13:20:46 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:852b15c1-66ad-4b31-9543-14c4205a9869 messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 14:29:42 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:58e76260-7720-4ff0-a737-1750309e6f55 messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 22:07:50 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:f8182351-b797-4881-9830-a3e9eacc647c messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 22:11:00 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:DB83A33C-FFC1-409F-AC0C-2FD5FACCAE6C messages:0 threadId:nil isLocalOnly:false createdAt:2025-12-07 13:21:33 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:8C4CE825-0470-4D34-B72E-90943BFD22FB messages:0 threadId:c0137f8a-0b17-49d4-9fc0-5b145747ca07 isLocalOnly:false createdAt:2025-12-07 12:57:26 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:B3A971CC-B1D5-4E34-977A-6404F921B234 messages:0 threadId:nil isLocalOnly:true createdAt:2025-12-07 12:48:37 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:B4EDCCC4-6BDD-47C5-8E61-D60DE613988D messages:0 threadId:nil isLocalOnly:true createdAt:2025-12-07 12:43:34 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:86A2E85B-7D32-450A-80B9-B0E3079CB728 messages:0 threadId:nil isLocalOnly:true createdAt:2025-12-07 12:37:30 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:331E62DA-2160-481E-8DFD-C6889722C628 messages:0 threadId:nil isLocalOnly:true createdAt:2025-12-07 12:27:20 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:C5CD942D-C616-4124-A56C-292386FA6018 messages:0 threadId:nil isLocalOnly:true createdAt:2025-12-07 12:24:38 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:524B308D-26EE-4CD3-98EB-FEE52A3482B9 messages:0 threadId:nil isLocalOnly:true createdAt:2025-12-07 11:57:54 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:7727E084-CD8F-4296-BF17-E2C5B784ED1A messages:0 threadId:nil isLocalOnly:true createdAt:2025-12-07 11:54:12 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:4A979E2D-6658-4AF5-A76E-07A062D0C2E0 messages:0 threadId:nil isLocalOnly:true createdAt:2025-12-07 11:47:30 +0000
+[HistoryViewModel.swift:56] setupConversationObserver() - -- conv id:D0A3E102-7FC7-4A99-9885-5A62C551292B messages:0 threadId:nil isLocalOnly:true createdAt:2025-12-07 01:55:14 +0000
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 61da1159-a0ff-4e09-b218-3496dc50e560 has no local messages yet - INCLUDED (will hydrate on open)
+[APIClient.swift:301] performDataTask(request:) - URLSession configuration protocol classes: [_NSURLHTTPProtocol, _NSURLDataProtocol, _NSURLFTPProtocol, _NSURLFileProtocol, NSAboutURLProtocol]
+[APIClient.swift:302] performDataTask(request:) - URLSession configuration type: __NSURLSessionLocal
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 3ca58969-eb27-4bdc-8670-09f0e0a5de00 has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 3f1d5b05-bba9-413a-944f-f5f413e7051e has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 5576aa66-0026-4596-b211-35eb3e9184aa has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 5dda536a-64b3-4336-a931-a80b25896b32 has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation d6a160af-cf55-428a-ba53-d713ca9ecf13 has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 0539d635-6951-4a49-9516-bdfbe9fd8a28 has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 917b0681-8da1-40dc-9304-827d69313a4b has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation c0137f8a-0b17-49d4-9fc0-5b145747ca07 has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 1891ce90-3846-4b59-9df6-91662d26e8c8 has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 7dba0fc8-aae9-4519-8293-7e3a7fd977c9 has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 852b15c1-66ad-4b31-9543-14c4205a9869 has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 58e76260-7720-4ff0-a737-1750309e6f55 has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation f8182351-b797-4881-9830-a3e9eacc647c has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation DB83A33C-FFC1-409F-AC0C-2FD5FACCAE6C has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:74] setupConversationObserver() - Conversation 8C4CE825-0470-4D34-B72E-90943BFD22FB has no local messages yet - INCLUDED (will hydrate on open)
+[HistoryViewModel.swift:62] setupConversationObserver() - Conversation B3A971CC-B1D5-4E34-977A-6404F921B234 is local-only & empty - FILTERED from history
+[HistoryViewModel.swift:62] setupConversationObserver() - Conversation B4EDCCC4-6BDD-47C5-8E61-D60DE613988D is local-only & empty - FILTERED from history
+[HistoryViewModel.swift:62] setupConversationObserver() - Conversation 86A2E85B-7D32-450A-80B9-B0E3079CB728 is local-only & empty - FILTERED from history
+[HistoryViewModel.swift:62] setupConversationObserver() - Conversation 331E62DA-2160-481E-8DFD-C6889722C628 is local-only & empty - FILTERED from history
+[HistoryViewModel.swift:62] setupConversationObserver() - Conversation C5CD942D-C616-4124-A56C-292386FA6018 is local-only & empty - FILTERED from history
+[HistoryViewModel.swift:62] setupConversationObserver() - Conversation 524B308D-26EE-4CD3-98EB-FEE52A3482B9 is local-only & empty - FILTERED from history
+[HistoryViewModel.swift:62] setupConversationObserver() - Conversation 7727E084-CD8F-4296-BF17-E2C5B784ED1A is local-only & empty - FILTERED from history
+[HistoryViewModel.swift:62] setupConversationObserver() - Conversation 4A979E2D-6658-4AF5-A76E-07A062D0C2E0 is local-only & empty - FILTERED from history
+[HistoryViewModel.swift:62] setupConversationObserver() - Conversation D0A3E102-7FC7-4A99-9885-5A62C551292B is local-only & empty - FILTERED from history
+[HistoryViewModel.swift:81] setupConversationObserver() - HistoryViewModel filtered to 16 conversations
+[APIClient.swift:272] performRequest(url:method:body:) - Response status code: 200
+[APIClient.swift:274] performRequest(url:method:body:) - Response data size: 72 bytes
+[APIClient.swift:277] performRequest(url:method:body:) - Response body: {"conversation_id":"f8182351-b797-4881-9830-a3e9eacc647c","messages":[]}...
+[APIClient.swift:280] performRequest(url:method:body:) - Full response length: 72 characters
+[APIClient.swift:289] performRequest(url:method:body:) - Successfully decoded response
+[ChatRepositoryImpl.swift:348] fetchMessages(forConversation:) - Remote messages received: 0 for conversation f8182351-b797-4881-9830-a3e9eacc647c (response conversationId=f8182351-b797-4881-9830-a3e9eacc647c)
+[ChatRepositoryImpl.swift:376] fetchMessages(forConversation:) - Hydrated remote messages for conversation f8182351-b797-4881-9830-a3e9eacc647c - count: 0
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 58e76260-7720-4ff0-a737-1750309e6f55
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 58e76260-7720-4ff0-a737-1750309e6f55, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:58e76260-7720-4ff0-a737-1750309e6f55 threadId:nil isLocalOnly:false messages:0 createdAt:2025-12-07 22:07:50 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:329] fetchMessages(forConversation:) - Fetched messages from DB for conversation 58e76260-7720-4ff0-a737-1750309e6f55 - count: 0 ids: []
+[ChatRepositoryImpl.swift:345] fetchMessages(forConversation:) - Fetching remote messages for conversation 58e76260-7720-4ff0-a737-1750309e6f55
+[APIClient.swift:233] getMessages(conversationId:) - Fetching messages for conversation 58e76260-7720-4ff0-a737-1750309e6f55 from API
+[APIClient.swift:248] performRequest(url:method:body:) - Making GET request to: https://shamelagpt.com/api/conversations/58e76260-7720-4ff0-a737-1750309e6f55/messages
+[APIClient.swift:301] performDataTask(request:) - URLSession configuration protocol classes: [_NSURLHTTPProtocol, _NSURLDataProtocol, _NSURLFTPProtocol, _NSURLFileProtocol, NSAboutURLProtocol]
+[APIClient.swift:302] performDataTask(request:) - URLSession configuration type: __NSURLSessionLocal
+[APIClient.swift:272] performRequest(url:method:body:) - Response status code: 200
+[APIClient.swift:274] performRequest(url:method:body:) - Response data size: 72 bytes
+[APIClient.swift:277] performRequest(url:method:body:) - Response body: {"conversation_id":"58e76260-7720-4ff0-a737-1750309e6f55","messages":[]}...
+[APIClient.swift:280] performRequest(url:method:body:) - Full response length: 72 characters
+nw_connection_add_timestamp_locked_on_nw_queue [C1] Hit maximum timestamp count, will start dropping events
+[APIClient.swift:289] performRequest(url:method:body:) - Successfully decoded response
+[ChatRepositoryImpl.swift:348] fetchMessages(forConversation:) - Remote messages received: 0 for conversation 58e76260-7720-4ff0-a737-1750309e6f55 (response conversationId=58e76260-7720-4ff0-a737-1750309e6f55)
+[ChatRepositoryImpl.swift:376] fetchMessages(forConversation:) - Hydrated remote messages for conversation 58e76260-7720-4ff0-a737-1750309e6f55 - count: 0
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 852b15c1-66ad-4b31-9543-14c4205a9869
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 852b15c1-66ad-4b31-9543-14c4205a9869, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:852b15c1-66ad-4b31-9543-14c4205a9869 threadId:nil isLocalOnly:false messages:2 createdAt:2025-12-07 14:29:42 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 7dba0fc8-aae9-4519-8293-7e3a7fd977c9
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 7dba0fc8-aae9-4519-8293-7e3a7fd977c9, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:7dba0fc8-aae9-4519-8293-7e3a7fd977c9 threadId:nil isLocalOnly:false messages:2 createdAt:2025-12-07 13:20:46 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 1891ce90-3846-4b59-9df6-91662d26e8c8
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 1891ce90-3846-4b59-9df6-91662d26e8c8, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:1891ce90-3846-4b59-9df6-91662d26e8c8 threadId:nil isLocalOnly:false messages:4 createdAt:2025-12-07 13:14:53 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: c0137f8a-0b17-49d4-9fc0-5b145747ca07
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: c0137f8a-0b17-49d4-9fc0-5b145747ca07, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:c0137f8a-0b17-49d4-9fc0-5b145747ca07 threadId:nil isLocalOnly:false messages:4 createdAt:2025-12-07 13:14:53 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 917b0681-8da1-40dc-9304-827d69313a4b
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 917b0681-8da1-40dc-9304-827d69313a4b, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:917b0681-8da1-40dc-9304-827d69313a4b threadId:nil isLocalOnly:false messages:0 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:329] fetchMessages(forConversation:) - Fetched messages from DB for conversation 917b0681-8da1-40dc-9304-827d69313a4b - count: 0 ids: []
+[ChatRepositoryImpl.swift:345] fetchMessages(forConversation:) - Fetching remote messages for conversation 917b0681-8da1-40dc-9304-827d69313a4b
+[APIClient.swift:233] getMessages(conversationId:) - Fetching messages for conversation 917b0681-8da1-40dc-9304-827d69313a4b from API
+[APIClient.swift:248] performRequest(url:method:body:) - Making GET request to: https://shamelagpt.com/api/conversations/917b0681-8da1-40dc-9304-827d69313a4b/messages
+[APIClient.swift:301] performDataTask(request:) - URLSession configuration protocol classes: [_NSURLHTTPProtocol, _NSURLDataProtocol, _NSURLFTPProtocol, _NSURLFileProtocol, NSAboutURLProtocol]
+[APIClient.swift:302] performDataTask(request:) - URLSession configuration type: __NSURLSessionLocal
+[APIClient.swift:272] performRequest(url:method:body:) - Response status code: 200
+[APIClient.swift:274] performRequest(url:method:body:) - Response data size: 72 bytes
+[APIClient.swift:277] performRequest(url:method:body:) - Response body: {"conversation_id":"917b0681-8da1-40dc-9304-827d69313a4b","messages":[]}...
+[APIClient.swift:280] performRequest(url:method:body:) - Full response length: 72 characters
+[APIClient.swift:289] performRequest(url:method:body:) - Successfully decoded response
+[ChatRepositoryImpl.swift:348] fetchMessages(forConversation:) - Remote messages received: 0 for conversation 917b0681-8da1-40dc-9304-827d69313a4b (response conversationId=917b0681-8da1-40dc-9304-827d69313a4b)
+[ChatRepositoryImpl.swift:376] fetchMessages(forConversation:) - Hydrated remote messages for conversation 917b0681-8da1-40dc-9304-827d69313a4b - count: 0
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 0539d635-6951-4a49-9516-bdfbe9fd8a28
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 0539d635-6951-4a49-9516-bdfbe9fd8a28, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:0539d635-6951-4a49-9516-bdfbe9fd8a28 threadId:nil isLocalOnly:false messages:0 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:329] fetchMessages(forConversation:) - Fetched messages from DB for conversation 0539d635-6951-4a49-9516-bdfbe9fd8a28 - count: 0 ids: []
+[ChatRepositoryImpl.swift:345] fetchMessages(forConversation:) - Fetching remote messages for conversation 0539d635-6951-4a49-9516-bdfbe9fd8a28
+[APIClient.swift:233] getMessages(conversationId:) - Fetching messages for conversation 0539d635-6951-4a49-9516-bdfbe9fd8a28 from API
+[APIClient.swift:248] performRequest(url:method:body:) - Making GET request to: https://shamelagpt.com/api/conversations/0539d635-6951-4a49-9516-bdfbe9fd8a28/messages
+[APIClient.swift:301] performDataTask(request:) - URLSession configuration protocol classes: [_NSURLHTTPProtocol, _NSURLDataProtocol, _NSURLFTPProtocol, _NSURLFileProtocol, NSAboutURLProtocol]
+[APIClient.swift:302] performDataTask(request:) - URLSession configuration type: __NSURLSessionLocal
+[APIClient.swift:272] performRequest(url:method:body:) - Response status code: 200
+[APIClient.swift:274] performRequest(url:method:body:) - Response data size: 72 bytes
+[APIClient.swift:277] performRequest(url:method:body:) - Response body: {"conversation_id":"0539d635-6951-4a49-9516-bdfbe9fd8a28","messages":[]}...
+[APIClient.swift:280] performRequest(url:method:body:) - Full response length: 72 characters
+[APIClient.swift:289] performRequest(url:method:body:) - Successfully decoded response
+[ChatRepositoryImpl.swift:348] fetchMessages(forConversation:) - Remote messages received: 0 for conversation 0539d635-6951-4a49-9516-bdfbe9fd8a28 (response conversationId=0539d635-6951-4a49-9516-bdfbe9fd8a28)
+[ChatRepositoryImpl.swift:376] fetchMessages(forConversation:) - Hydrated remote messages for conversation 0539d635-6951-4a49-9516-bdfbe9fd8a28 - count: 0
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: d6a160af-cf55-428a-ba53-d713ca9ecf13
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: d6a160af-cf55-428a-ba53-d713ca9ecf13, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:d6a160af-cf55-428a-ba53-d713ca9ecf13 threadId:nil isLocalOnly:false messages:0 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:329] fetchMessages(forConversation:) - Fetched messages from DB for conversation d6a160af-cf55-428a-ba53-d713ca9ecf13 - count: 0 ids: []
+[ChatRepositoryImpl.swift:345] fetchMessages(forConversation:) - Fetching remote messages for conversation d6a160af-cf55-428a-ba53-d713ca9ecf13
+[APIClient.swift:233] getMessages(conversationId:) - Fetching messages for conversation d6a160af-cf55-428a-ba53-d713ca9ecf13 from API
+[APIClient.swift:248] performRequest(url:method:body:) - Making GET request to: https://shamelagpt.com/api/conversations/d6a160af-cf55-428a-ba53-d713ca9ecf13/messages
+[APIClient.swift:301] performDataTask(request:) - URLSession configuration protocol classes: [_NSURLHTTPProtocol, _NSURLDataProtocol, _NSURLFTPProtocol, _NSURLFileProtocol, NSAboutURLProtocol]
+[APIClient.swift:302] performDataTask(request:) - URLSession configuration type: __NSURLSessionLocal
+[APIClient.swift:248] performRequest(url:method:body:) - Making POST request to: https://shamelagpt.com/api/conversations
+[APIClient.swift:259] performRequest(url:method:body:) - Request body: {"title":"New Conversation"}
+[APIClient.swift:301] performDataTask(request:) - URLSession configuration protocol classes: [_NSURLHTTPProtocol, _NSURLDataProtocol, _NSURLFTPProtocol, _NSURLFileProtocol, NSAboutURLProtocol]
+[APIClient.swift:302] performDataTask(request:) - URLSession configuration type: __NSURLSessionLocal
+[APIClient.swift:272] performRequest(url:method:body:) - Response status code: 200
+[APIClient.swift:274] performRequest(url:method:body:) - Response data size: 72 bytes
+[APIClient.swift:277] performRequest(url:method:body:) - Response body: {"conversation_id":"d6a160af-cf55-428a-ba53-d713ca9ecf13","messages":[]}...
+[APIClient.swift:280] performRequest(url:method:body:) - Full response length: 72 characters
+[APIClient.swift:289] performRequest(url:method:body:) - Successfully decoded response
+[ChatRepositoryImpl.swift:348] fetchMessages(forConversation:) - Remote messages received: 0 for conversation d6a160af-cf55-428a-ba53-d713ca9ecf13 (response conversationId=d6a160af-cf55-428a-ba53-d713ca9ecf13)
+[ChatRepositoryImpl.swift:376] fetchMessages(forConversation:) - Hydrated remote messages for conversation d6a160af-cf55-428a-ba53-d713ca9ecf13 - count: 0
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 5dda536a-64b3-4336-a931-a80b25896b32
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 5dda536a-64b3-4336-a931-a80b25896b32, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:5dda536a-64b3-4336-a931-a80b25896b32 threadId:nil isLocalOnly:false messages:0 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:329] fetchMessages(forConversation:) - Fetched messages from DB for conversation 5dda536a-64b3-4336-a931-a80b25896b32 - count: 0 ids: []
+[ChatRepositoryImpl.swift:345] fetchMessages(forConversation:) - Fetching remote messages for conversation 5dda536a-64b3-4336-a931-a80b25896b32
+[APIClient.swift:233] getMessages(conversationId:) - Fetching messages for conversation 5dda536a-64b3-4336-a931-a80b25896b32 from API
+[APIClient.swift:248] performRequest(url:method:body:) - Making GET request to: https://shamelagpt.com/api/conversations/5dda536a-64b3-4336-a931-a80b25896b32/messages
+[APIClient.swift:301] performDataTask(request:) - URLSession configuration protocol classes: [_NSURLHTTPProtocol, _NSURLDataProtocol, _NSURLFTPProtocol, _NSURLFileProtocol, NSAboutURLProtocol]
+[APIClient.swift:302] performDataTask(request:) - URLSession configuration type: __NSURLSessionLocal
+[APIClient.swift:272] performRequest(url:method:body:) - Response status code: 200
+[APIClient.swift:274] performRequest(url:method:body:) - Response data size: 72 bytes
+[APIClient.swift:277] performRequest(url:method:body:) - Response body: {"conversation_id":"5dda536a-64b3-4336-a931-a80b25896b32","messages":[]}...
+[APIClient.swift:280] performRequest(url:method:body:) - Full response length: 72 characters
+[APIClient.swift:289] performRequest(url:method:body:) - Successfully decoded response
+[ChatRepositoryImpl.swift:348] fetchMessages(forConversation:) - Remote messages received: 0 for conversation 5dda536a-64b3-4336-a931-a80b25896b32 (response conversationId=5dda536a-64b3-4336-a931-a80b25896b32)
+[ChatRepositoryImpl.swift:376] fetchMessages(forConversation:) - Hydrated remote messages for conversation 5dda536a-64b3-4336-a931-a80b25896b32 - count: 0
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 5576aa66-0026-4596-b211-35eb3e9184aa
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 5576aa66-0026-4596-b211-35eb3e9184aa, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:5576aa66-0026-4596-b211-35eb3e9184aa threadId:nil isLocalOnly:false messages:4 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 3f1d5b05-bba9-413a-944f-f5f413e7051e
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 3f1d5b05-bba9-413a-944f-f5f413e7051e, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:3f1d5b05-bba9-413a-944f-f5f413e7051e threadId:nil isLocalOnly:false messages:2 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 3ca58969-eb27-4bdc-8670-09f0e0a5de00
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 3ca58969-eb27-4bdc-8670-09f0e0a5de00, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:3ca58969-eb27-4bdc-8670-09f0e0a5de00 threadId:nil isLocalOnly:false messages:2 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[ChatRepositoryImpl.swift:89] fetchConversation(byId:) - Fetching conversation by ID: 61da1159-a0ff-4e09-b218-3496dc50e560
+[ChatRepositoryImpl.swift:97] fetchConversation(byId:) - Conversation found: 61da1159-a0ff-4e09-b218-3496dc50e560, threadId: nil
+[ChatRepositoryImpl.swift:99] fetchConversation(byId:) - Conversation details - id:61da1159-a0ff-4e09-b218-3496dc50e560 threadId:nil isLocalOnly:false messages:2 createdAt:2025-12-07 12:57:28 +0000 updatedAt:2025-12-07 22:11:31 +0000
+[APIClient.swift:272] performRequest(url:method:body:) - Response status code: 200
+[APIClient.swift:274] performRequest(url:method:body:) - Response data size: 272 bytes
+[APIClient.swift:277] performRequest(url:method:body:) - Response body: {"id":"38cd9480-8772-4268-92d6-cfd4f87595a4","user_id":"2f4eace7-f500-4bd7-a120-cd628406c602","title":"New Conversation","language_preference":null,"custom_system_prompt":null,"created_at":"2025-12-07T22:11:33.525593+00:00","updated_at":"2025-12-07T22:11:33.525593+00:00"}...
+[APIClient.swift:280] performRequest(url:method:body:) - Full response length: 272 characters
+[APIClient.swift:289] performRequest(url:method:body:) - Successfully decoded response
+[HistoryView.swift:255] createNewConversation() - Failed to create new conversation from History: Failed to save data: Multiple validation errors occurred.

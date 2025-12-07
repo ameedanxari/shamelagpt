@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlinx.coroutines.tasks.await
 import java.io.IOException
@@ -24,10 +25,13 @@ data class OCRResult(
  *
  * @property context Application context
  */
-class OCRManager(private val context: Context) {
-
-    // Text recognizer instance with default options (supports Latin and Arabic scripts)
-    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+class OCRManager(
+    private val context: Context,
+    // Text recognizer is injected for testability (default ML Kit client in production)
+    private val recognizer: TextRecognizer = TextRecognition.getClient(
+        TextRecognizerOptions.DEFAULT_OPTIONS
+    )
+) {
 
     /**
      * Recognizes text from an image URI.

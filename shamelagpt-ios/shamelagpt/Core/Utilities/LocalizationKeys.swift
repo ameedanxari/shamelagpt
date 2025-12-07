@@ -28,9 +28,13 @@ enum LocalizationKeys {
     static let imageTextRecognition = "chat.imageTextRecognition"
     static let recording = "chat.recording"
     static let extractingText = "chat.extractingText"
+    static let thinking = "chat.thinking"
+    static let loadingMessages = "chat.loadingMessages"
     static let startConversation = "chat.startConversation"
     static let noMessagesYet = "chat.noMessagesYet"
     static let newConversation = "chat.newConversation"
+    static let newConversationWarningTitle = "chat.newConversationWarningTitle"
+    static let newConversationWarningMessage = "chat.newConversationWarningMessage"
     static let viewHistory = "chat.viewHistory"
 
     // MARK: - History Screen
@@ -46,6 +50,7 @@ enum LocalizationKeys {
     static let loadingConversations = "history.loadingConversations"
     static let share = "history.share"
     static let delete = "common.delete"
+    static let localOnlyBadge = "history.localOnly"
 
     // MARK: - Settings Screen
 
@@ -56,8 +61,52 @@ enum LocalizationKeys {
     static let supportShamelaGPT = "settings.supportShamelaGPT"
     static let aboutShamelaGPT = "settings.aboutShamelaGPT"
     static let privacyPolicy = "settings.privacyPolicy"
+    static let privacyPolicySectionIntro = "privacy.intro"
+    static let privacyPolicySectionInfo = "privacy.info"
+    static let privacyPolicySectionUsage = "privacy.usage"
+    static let privacyPolicySectionSecurity = "privacy.security"
+    static let privacyPolicySectionRights = "privacy.rights"
+    static let privacyPolicySectionContact = "privacy.contact"
     static let termsOfService = "settings.termsOfService"
-    static let version = "settings.version"
+    static let termsSectionAcceptance = "terms.acceptance"
+    static let termsSectionDescription = "terms.description"
+    static let termsSectionResponsibilities = "terms.responsibilities"
+    static let termsSectionDisclaimer = "terms.disclaimer"
+    static let termsSectionIP = "terms.ip"
+    static let termsSectionLiability = "terms.liability"
+    static let termsSectionChanges = "terms.changes"
+    static let termsSectionContact = "terms.contact"
+    static let languageFontRestartNote = "language.fontRestartNote"
+    static let settingsVersion = "settings.version"
+    static let aiPreferences = "settings.aiPreferences"
+    static let aiPreferencesLockedTitle = "settings.aiPreferencesLockedTitle"
+    static let aiPreferencesLockedMessage = "settings.aiPreferencesLockedMessage"
+    static let signInButton = "settings.signInButton"
+    static let signOut = "settings.signOut"
+    static let refreshPreferences = "settings.refreshPreferences"
+    static let customPromptTitle = "settings.customPrompt.title"
+    static let customPromptPlaceholder = "settings.customPrompt.placeholder"
+    static let customPromptEditTitle = "settings.customPrompt.editTitle"
+    // Preference option titles and values
+    static let prefLengthTitle = "settings.pref.length.title"
+    static let prefLengthShort = "settings.pref.length.short"
+    static let prefLengthMedium = "settings.pref.length.medium"
+    static let prefLengthDetailed = "settings.pref.length.detailed"
+
+    static let prefStyleTitle = "settings.pref.style.title"
+    static let prefStyleConversational = "settings.pref.style.conversational"
+    static let prefStyleAcademic = "settings.pref.style.academic"
+    static let prefStyleTechnical = "settings.pref.style.technical"
+
+    static let prefFocusTitle = "settings.pref.focus.title"
+    static let prefFocusPractical = "settings.pref.focus.practical"
+    static let prefFocusTheoretical = "settings.pref.focus.theoretical"
+    static let prefFocusHistorical = "settings.pref.focus.historical"
+    static let prefCurrent = "settings.pref.current"
+
+    // History
+    static let historyLockedTitle = "history.lockedTitle"
+    static let historyLockedMessage = "history.lockedMessage"
 
     // MARK: - Welcome Screen
 
@@ -88,6 +137,7 @@ enum LocalizationKeys {
     static let openSettings = "error.openSettings"
     static let retry = "error.retry"
     static let ok = "common.ok"
+    static let save = "common.save"
 
     // MARK: - Network Errors
 
@@ -140,6 +190,19 @@ enum LocalizationKeys {
     static let imagePickerAddImage = "imagePicker.addImage"
     static let imagePickerTakePhoto = "imagePicker.takePhoto"
     static let imagePickerChooseFromLibrary = "imagePicker.chooseFromLibrary"
+
+    // MARK: - Auth Screen
+
+    static let authSignIn = "auth.signIn"
+    static let authSignUp = "auth.signUp"
+    static let authCreateAccount = "auth.createAccount"
+    static let authEmail = "auth.email"
+    static let authPassword = "auth.password"
+    static let authDisplayName = "auth.displayName"
+    static let authContinueAsGuest = "auth.continueAsGuest"
+    static let authNeedAccount = "auth.needAccount"
+    static let authHaveAccount = "auth.haveAccount"
+    static let authSignInButton = "auth.signInButton"
 
     // MARK: - Permission Messages
 

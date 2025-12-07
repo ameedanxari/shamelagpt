@@ -10,6 +10,8 @@ import SwiftUI
 /// A view that displays an empty state when there are no messages
 struct EmptyStateView: View {
 
+    @Environment(\.colorScheme) private var colorScheme
+
     // MARK: - Body
 
     var body: some View {
@@ -23,13 +25,13 @@ struct EmptyStateView: View {
                 .symbolRenderingMode(.hierarchical)
 
             // Title
-            Text(LocalizationKeys.startConversation.localized)
+            Text(LocalizationKeys.startConversation.localizedKey)
                 .font(AppTheme.Typography.heading)
                 .foregroundColor(AppTheme.Colors.primaryText)
                 .fontWeight(.semibold)
 
             // Description
-            Text(LocalizationKeys.emptyStateDescription.localized)
+            Text(LocalizationKeys.emptyStateDescription.localizedKey)
                 .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.secondaryText)
                 .multilineTextAlignment(.center)
@@ -37,14 +39,14 @@ struct EmptyStateView: View {
 
             // Suggested questions
             VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-                Text(LocalizationKeys.emptyStateTryAsking.localized)
+                Text(LocalizationKeys.emptyStateTryAsking.localizedKey)
                     .font(AppTheme.Typography.caption)
                     .foregroundColor(AppTheme.Colors.secondaryText)
                     .fontWeight(.medium)
 
-                suggestionButton(text: LocalizationKeys.emptyStateSuggestion1.localized)
-                suggestionButton(text: LocalizationKeys.emptyStateSuggestion2.localized)
-                suggestionButton(text: LocalizationKeys.emptyStateSuggestion3.localized)
+                suggestionButton(text: LocalizationKeys.emptyStateSuggestion1.localizedKey)
+                suggestionButton(text: LocalizationKeys.emptyStateSuggestion2.localizedKey)
+                suggestionButton(text: LocalizationKeys.emptyStateSuggestion3.localizedKey)
             }
             .padding(.top, AppTheme.Spacing.md)
 
@@ -56,7 +58,7 @@ struct EmptyStateView: View {
 
     // MARK: - Subviews
 
-    private func suggestionButton(text: String) -> some View {
+    private func suggestionButton(text: LocalizedStringKey) -> some View {
         HStack {
             Image(systemName: "lightbulb.fill")
                 .font(.system(size: 12))
@@ -69,22 +71,23 @@ struct EmptyStateView: View {
             Spacer()
         }
         .padding(AppTheme.Spacing.sm)
-        .background(AppTheme.Colors.secondaryBackground)
+        .background(DesignSystem.Colors.surface(colorScheme))
         .cornerRadius(AppTheme.Layout.cornerRadius)
     }
 }
 
-// MARK: - Preview Provider
+struct EmptyStateView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            EmptyStateView()
 
-#Preview {
-    EmptyStateView()
-}
+            ZStack {
+                AppTheme.Colors.background
+                    .ignoresSafeArea()
 
-#Preview("With Background") {
-    ZStack {
-        AppTheme.Colors.background
-            .ignoresSafeArea()
-
-        EmptyStateView()
+                EmptyStateView()
+            }
+            .previewDisplayName("With Background")
+        }
     }
 }

@@ -11,7 +11,7 @@ struct PrivacyPolicyView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
-                Text("Privacy Policy")
+                Text(LocalizationKeys.privacyPolicy.localizedKey)
                     .font(AppTheme.Typography.title)
                     .fontWeight(.bold)
                     .foregroundColor(AppTheme.Colors.primaryText)
@@ -23,14 +23,14 @@ struct PrivacyPolicyView: View {
                 Divider()
 
                 sectionContent(
-                    title: "Introduction",
+                    title: LocalizationKeys.privacyPolicySectionIntro.localizedKey,
                     content: """
 ShamelaGPT ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application.
 """
                 )
 
                 sectionContent(
-                    title: "Information We Collect",
+                    title: LocalizationKeys.privacyPolicySectionInfo.localizedKey,
                     content: """
 We may collect the following types of information:
 
@@ -42,7 +42,7 @@ We may collect the following types of information:
                 )
 
                 sectionContent(
-                    title: "How We Use Your Information",
+                    title: LocalizationKeys.privacyPolicySectionUsage.localizedKey,
                     content: """
 We use collected information to:
 
@@ -56,14 +56,14 @@ We use collected information to:
                 )
 
                 sectionContent(
-                    title: "Data Security",
+                    title: LocalizationKeys.privacyPolicySectionSecurity.localizedKey,
                     content: """
 We implement appropriate technical and organizational security measures to protect your personal information. However, no method of transmission over the internet is 100% secure.
 """
                 )
 
                 sectionContent(
-                    title: "Your Rights",
+                    title: LocalizationKeys.privacyPolicySectionRights.localizedKey,
                     content: """
 You have the right to:
 
@@ -76,7 +76,7 @@ You have the right to:
                 )
 
                 sectionContent(
-                    title: "Contact Us",
+                    title: LocalizationKeys.privacyPolicySectionContact.localizedKey,
                     content: """
 If you have questions about this Privacy Policy, please contact us at:
 support@shamelagpt.com
@@ -85,12 +85,12 @@ support@shamelagpt.com
             }
             .padding(AppTheme.Spacing.lg)
         }
-        .navigationTitle("Privacy Policy")
+        .navigationTitle(LocalizationKeys.privacyPolicy.localizedKey)
         .navigationBarTitleDisplayMode(.inline)
         .background(AppTheme.Colors.background)
     }
 
-    private func sectionContent(title: String, content: String) -> some View {
+    private func sectionContent(title: LocalizedStringKey, content: String) -> some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
             Text(title)
                 .font(AppTheme.Typography.heading)
@@ -105,8 +105,10 @@ support@shamelagpt.com
     }
 }
 
-#Preview {
-    NavigationView {
-        PrivacyPolicyView()
+struct PrivacyPolicyView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            PrivacyPolicyView()
+        }
     }
 }

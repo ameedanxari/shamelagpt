@@ -41,41 +41,46 @@ final class OCRUITests: XCTestCase {
         XCTAssertTrue(cameraButton.isHittable, "Camera button should be tappable")
     }
 
-    func testTapCameraButtonShowsActionSheet() throws {
+    func testImageSourceSheetShowsOptions() throws {
         // Tap camera button
         let cameraButton = app.buttons["CameraButton"]
         XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
-        cameraButton.tap()
+        if cameraButton.isHittable {
+            cameraButton.tap()
+        } else {
+            // Fall back to coordinate tap if something overlaps the button
+            let coordinate = cameraButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            coordinate.tap()
+        }
 
-        // Verify action sheet appears
-        let actionSheet = app.sheets.firstMatch
-        XCTAssertTrue(actionSheet.waitForExistence(timeout: 3), "Action sheet should appear after tapping camera button")
-    }
+        // Wait for the image source sheet or its options to appear
+        XCTAssertTrue(waitForImageSourceSheet(timeout: 4), "Image source sheet should appear after tapping camera button")
 
-    func testActionSheetShowsCameraOption() throws {
-        // Tap camera button
-        let cameraButton = app.buttons["CameraButton"]
-        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
-        cameraButton.tap()
-
-        // Verify camera option exists in action sheet
+        // Validate options
         let cameraOption = app.buttons["Take Photo"]
         XCTAssertTrue(cameraOption.waitForExistence(timeout: 3), "Camera option should be available")
-    }
 
-    func testActionSheetShowsPhotoLibraryOption() throws {
-        // Tap camera button
-        let cameraButton = app.buttons["CameraButton"]
-        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
-        cameraButton.tap()
-
-        // Verify photo library option exists in sheet (it's a sheet, not action sheet)
         let photoLibraryOption = app.buttons.containing(NSPredicate(format: "label CONTAINS[c] 'library' OR label CONTAINS[c] 'photo'")).firstMatch
         XCTAssertTrue(photoLibraryOption.waitForExistence(timeout: 3), "Photo library option should be available")
+    }
 
-        // Sheet uses navigation, no separate cancel - can dismiss by navigating back
-        // Just verify the sheet opened successfully
-        XCTAssertTrue(true, "Photo selection sheet opened")
+    func testCameraPermissionDeniedShowsGuidance() throws {
+        // Relaunch simulating denied camera permission
+        UITestLauncher.relaunch(
+            app: app,
+            overrides: ["SIMULATE_CAMERA_PERMISSION_DENIED": "true"]
+        )
+
+        let cameraButton = app.buttons["CameraButton"]
+        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
+        tapCameraButton(cameraButton)
+
+        // Permission sheet should appear with guidance to open settings
+        let permissionTitle = app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] 'permission'")).firstMatch
+        let settingsButton = app.buttons.containing(NSPredicate(format: "label CONTAINS[c] 'settings'")).firstMatch
+
+        XCTAssertTrue(permissionTitle.waitForExistence(timeout: 6), "Permission guidance should be displayed")
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 6), "Permission guidance should include Settings action")
     }
 
     // MARK: - Camera Flow Tests
@@ -137,14 +142,16 @@ final class OCRUITests: XCTestCase {
         cameraButton.tap()
 
         // Wait for sheet to appear
-        let sheet = app.sheets.firstMatch
-        XCTAssertTrue(sheet.waitForExistence(timeout: 3))
+        XCTAssertTrue(waitForImageSourceSheet(timeout: 3))
 
-        // Dismiss sheet by tapping back button or outside
-        // In iOS, sheets can be dismissed by swiping down or tapping outside
-        // For testing, we'll tap outside the sheet
-        let coordinate = sheet.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: -0.2))
-        coordinate.tap()
+        // Dismiss using Cancel button in navigation bar (SwiftUI sheet)
+        let cancelButton = app.buttons["Cancel"]
+        if cancelButton.waitForExistence(timeout: 2) {
+            cancelButton.tap()
+        } else {
+            // Fallback: tap outside
+            app.tap()
+        }
 
         sleep(1)
 
@@ -163,15 +170,22 @@ final class OCRUITests: XCTestCase {
 
         let cameraButton = app.buttons["CameraButton"]
         XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
-        cameraButton.tap()
+        tapCameraButton(cameraButton)
 
-        // In real implementation, OCR would process an image and show confirmation
-        // For UI tests without actual image capture, this may not trigger
-        // Test passes if either confirmation appears OR image source sheet appears
-        let confirmationDialog = app.sheets.matching(NSPredicate(format: "label CONTAINS[c] 'confirmation' OR label CONTAINS[c] 'ocr'")).firstMatch
+        // Wait for source sheet then pick an option to drive mocked OCR flow
+        if waitForImageSourceSheet(timeout: 3) {
+            if app.buttons["Take Photo"].waitForExistence(timeout: 2) {
+                app.buttons["Take Photo"].tap()
+            } else if app.buttons["Choose from Library"].waitForExistence(timeout: 2) {
+                app.buttons["Choose from Library"].tap()
+            }
+        }
+
+        // For mocked OCR success we should see confirmation directly
+        let confirmationDialog = app.navigationBars.containing(NSPredicate(format: "label CONTAINS[c] 'Confirm'")).firstMatch
         let imageSheet = app.sheets.firstMatch
 
-        XCTAssertTrue(confirmationDialog.waitForExistence(timeout: 2) || imageSheet.exists,
+        XCTAssertTrue(confirmationDialog.waitForExistence(timeout: 5) || imageSheet.exists,
                      "Should show either OCR confirmation or image selection sheet")
     }
 
@@ -190,12 +204,6 @@ final class OCRUITests: XCTestCase {
 
         // OCR simulation may not work in UI tests without actual image processing
         // Accept test if image selection sheet appears
-        let imageSheet = app.sheets.firstMatch
-        if imageSheet.waitForExistence(timeout: 2) {
-            XCTAssert(true, "Image selection works, OCR requires actual image")
-            return
-        }
-
         // Look for the extracted text in the confirmation dialog
         let extractedText = app.staticTexts["Sample extracted text"]
         let textView = app.textViews.containing(NSPredicate(format: "value CONTAINS 'Sample'")).firstMatch
@@ -218,12 +226,6 @@ final class OCRUITests: XCTestCase {
         cameraButton.tap()
 
         // OCR simulation may not work in UI tests
-        let imageSheet = app.sheets.firstMatch
-        if imageSheet.waitForExistence(timeout: 2) {
-            XCTAssert(true, "Image selection works, OCR requires actual image")
-            return
-        }
-
         // Look for detected language indicator
         let languageLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'arabic' OR label CONTAINS[c] 'language'")).firstMatch
         XCTAssertTrue(languageLabel.waitForExistence(timeout: 3), "Detected language should be displayed in confirmation")
@@ -271,12 +273,6 @@ final class OCRUITests: XCTestCase {
         cameraButton.tap()
 
         // OCR simulation may not work in UI tests
-        let imageSheet = app.sheets.firstMatch
-        if imageSheet.waitForExistence(timeout: 2) {
-            XCTAssert(true, "Image selection works, OCR requires actual image")
-            return
-        }
-
         // Look for confirm/send button in confirmation dialog
         let confirmButton = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'confirm' OR label CONTAINS[c] 'send' OR label CONTAINS[c] 'fact-check'")).firstMatch
 
@@ -285,7 +281,7 @@ final class OCRUITests: XCTestCase {
 
         // Verify message was sent (appears in chat)
         let sentMessage = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Text to send")).firstMatch
-        XCTAssertTrue(sentMessage.waitForExistence(timeout: 3), "OCR text should be sent as message after confirmation")
+        XCTAssertTrue(sentMessage.waitForExistence(timeout: 5), "OCR text should be sent as message after confirmation")
     }
 
     func testOCRConfirmationCancelWorks() throws {
@@ -402,6 +398,58 @@ final class OCRUITests: XCTestCase {
                 // Verify we're back to chat screen
                 let textField = app.textViews.firstMatch
                 XCTAssertTrue(textField.exists, "Should return to chat screen after dismissing error")
+            }
+        }
+    }
+
+    // MARK: - Helpers
+
+    /// Waits for the image source picker sheet to appear. SwiftUI sheets sometimes
+    /// surface as navigation views instead of XCUI "sheets", so we check for both
+    /// the sheet element and its expected buttons.
+    @discardableResult
+    private func waitForImageSourceSheet(timeout: TimeInterval = 3) -> Bool {
+        let actionSheet = app.sheets.firstMatch
+        if actionSheet.waitForExistence(timeout: timeout) {
+            return true
+        }
+
+        // Fallback: detect by the nav title or the primary buttons rendered inside the sheet
+        if app.navigationBars["Add Image"].waitForExistence(timeout: timeout) {
+            return true
+        }
+
+        let takePhoto = app.buttons["Take Photo"]
+        if takePhoto.waitForExistence(timeout: timeout) {
+            return true
+        }
+
+        let choosePhoto = app.buttons.containing(NSPredicate(format: "label CONTAINS[c] 'photo' OR label CONTAINS[c] 'library'")).firstMatch
+        if choosePhoto.waitForExistence(timeout: timeout) {
+            return true
+        }
+
+        return false
+    }
+
+    /// Reliably taps the camera button, retrying with a coordinate tap if needed.
+    private func tapCameraButton(_ button: XCUIElement) {
+        // First attempt: normal tap if hittable
+        if button.isHittable {
+            button.tap()
+        } else {
+            let coordinate = button.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            coordinate.tap()
+        }
+
+        // If no sheet/guidance begins to appear, retry once after a short delay
+        let permissionHint = app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] 'permission'")).firstMatch
+        if !permissionHint.waitForExistence(timeout: 2) {
+            if button.isHittable {
+                button.tap()
+            } else {
+                let coordinate = button.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+                coordinate.tap()
             }
         }
     }

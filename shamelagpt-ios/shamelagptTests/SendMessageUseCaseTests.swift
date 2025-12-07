@@ -256,6 +256,35 @@ final class SendMessageUseCaseTests: XCTestCase {
         XCTAssertEqual(mockAPIClient.lastSendMessageRequest?.threadId, existingThreadId)
     }
 
+    func testExecutePassesLanguagePreferenceFromLanguageManager() async throws {
+        // Given
+        let previousLanguage = LanguageManager.shared.currentLanguage
+        LanguageManager.shared.setLanguage(.arabic)
+
+        let conversationId = "lang-test-conv"
+        let testConversation = Conversation(
+            id: conversationId,
+            threadId: "thread-lang",
+            title: "Test",
+            messages: []
+        )
+
+        mockNetworkMonitor.mockIsConnected = true
+        mockChatRepository.mockConversation = testConversation
+
+        // When
+        _ = try await sut.execute(
+            conversationId: conversationId,
+            message: "Question"
+        )
+
+        // Then
+        XCTAssertEqual(mockAPIClient.lastSendMessageRequest?.languagePreference, "ar")
+
+        // Reset language to avoid cross-test side effects
+        LanguageManager.shared.setLanguage(previousLanguage)
+    }
+
     func testExecuteWithFactCheckMessageSkipsSaveUserMessage() async throws {
         // Given
         let conversationId = "test-conv-1"

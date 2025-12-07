@@ -23,9 +23,13 @@
 "chat.imageTextRecognition" = "Image text recognition";
 "chat.recording" = "Recording...";
 "chat.extractingText" = "Extracting text...";
+"chat.thinking" = "Thinking...";
+"chat.loadingMessages" = "Loading messages...";
 "chat.startConversation" = "Start a conversation";
 "chat.noMessagesYet" = "No messages yet";
 "chat.newConversation" = "New Conversation";
+"chat.newConversationWarningTitle" = "Start a new chat?";
+"chat.newConversationWarningMessage" = "Starting a new chat will hide your current conversation. You won't be able to return to it.";
 "chat.viewHistory" = "View History";
 
 // MARK: - History Screen
@@ -41,6 +45,7 @@
 "history.loadingConversations" = "Loading conversations...";
 "history.share" = "Share";
 "common.delete" = "Delete";
+"history.localOnly" = "Local-only";
 
 // MARK: - Settings Screen
 
@@ -51,8 +56,37 @@
 "settings.supportShamelaGPT" = "Support ShamelaGPT";
 "settings.aboutShamelaGPT" = "About ShamelaGPT";
 "settings.privacyPolicy" = "Privacy Policy";
+"privacy.intro" = "Introduction";
+"privacy.info" = "Information We Collect";
+"privacy.usage" = "How We Use Your Information";
+"privacy.security" = "Data Security";
+"privacy.rights" = "Your Rights";
+"privacy.contact" = "Contact Us";
 "settings.termsOfService" = "Terms of Service";
+"terms.acceptance" = "Acceptance of Terms";
+"terms.description" = "Description of Service";
+"terms.responsibilities" = "User Responsibilities";
+"terms.disclaimer" = "Disclaimer";
+"terms.ip" = "Intellectual Property";
+"terms.liability" = "Limitation of Liability";
+"terms.changes" = "Changes to Terms";
+"terms.contact" = "Contact Information";
+"language.fontRestartNote" = "Note: After changing language, close the app from the task switcher and relaunch to apply font changes.";
 "settings.version" = "Version";
+"settings.aiPreferences" = "AI Preferences";
+"settings.aiPreferencesLockedTitle" = "Personalize Your Experience";
+"settings.aiPreferencesLockedMessage" = "Sign in to customize AI responses with your preferred length, style, and focus.";
+"settings.signInButton" = "Sign In";
+"settings.signOut" = "Sign out";
+"settings.refreshPreferences" = "Refresh Preferences";
+"settings.customPrompt.title" = "Custom System Prompt";
+"settings.customPrompt.placeholder" = "Tap to add a custom system prompt.";
+"settings.customPrompt.editTitle" = "Edit Prompt";
+"settings.pref.current" = "Current";
+
+// History
+"history.lockedTitle" = "Save Your Conversations";
+"history.lockedMessage" = "Sign in to keep track of your chat history, export conversations, and access them across devices.";
 
 // MARK: - Welcome Screen
 
@@ -83,6 +117,7 @@
 "error.openSettings" = "Open Settings";
 "error.retry" = "Retry";
 "common.ok" = "OK";
+"common.save" = "Save";
 
 // MARK: - Network Errors
 
@@ -143,3 +178,33 @@
 "imagePicker.addImage" = "Add Image";
 "imagePicker.takePhoto" = "Take Photo";
 "imagePicker.chooseFromLibrary" = "Choose from Library";
+
+// MARK: - Auth Screen
+
+"auth.signIn" = "Sign In";
+"auth.signUp" = "Sign Up";
+"auth.createAccount" = "Create Account";
+"auth.email" = "Email";
+"auth.password" = "Password";
+"auth.displayName" = "Display name (optional)";
+"auth.continueAsGuest" = "Continue as guest";
+"auth.needAccount" = "Need an account? Sign up";
+"auth.haveAccount" = "Have an account? Sign in";
+"auth.signInButton" = "Sign In";
+
+// MARK: - AI Preference Options
+
+"settings.pref.length.title" = "Response length";
+"settings.pref.length.short" = "Short";
+"settings.pref.length.medium" = "Medium";
+"settings.pref.length.detailed" = "Detailed";
+
+"settings.pref.style.title" = "Response style";
+"settings.pref.style.conversational" = "Conversational";
+"settings.pref.style.academic" = "Academic";
+"settings.pref.style.technical" = "Technical";
+
+"settings.pref.focus.title" = "Response focus";
+"settings.pref.focus.practical" = "Practical";
+"settings.pref.focus.theoretical" = "Theoretical";
+"settings.pref.focus.historical" = "Historical";

@@ -97,14 +97,12 @@ object TestData {
 
     val sampleChatRequest = ChatRequest(
         question = "What is the ruling on prayer?",
-        threadId = null,
-        userId = null
+        threadId = null
     )
 
     val sampleChatRequestWithThread = ChatRequest(
         question = "Can you elaborate on that?",
-        threadId = "thread_abc123",
-        userId = null
+        threadId = "thread_abc123"
     )
 
     val sampleChatResponse = ChatResponse(

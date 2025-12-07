@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.LayoutDirection
+import com.shamelagpt.android.core.utils.FontUtils
 
 /**
  * Utility for detecting and rendering bidirectional text with appropriate layout direction.
@@ -56,8 +57,14 @@ fun BiDirectionalText(
         detectLayoutDirection(text)
     }
 
+    // Detect language and get appropriate font family
+    val fontFamily = remember(text) {
+        FontUtils.getFontFamilyForLanguage(FontUtils.detectLanguage(text))
+    }
+
     CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
         Text(
+            fontFamily = fontFamily,
             text = text,
             modifier = modifier,
             style = style,

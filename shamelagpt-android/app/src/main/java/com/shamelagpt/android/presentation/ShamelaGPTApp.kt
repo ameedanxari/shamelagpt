@@ -9,6 +9,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.shamelagpt.android.presentation.navigation.*
+import org.koin.androidx.compose.get
 
 /**
  * Main app composable with bottom navigation and navigation host.
@@ -23,10 +24,14 @@ import com.shamelagpt.android.presentation.navigation.*
  * and hidden on other screens like Welcome and Language Selection.
  */
 @Composable
-fun ShamelaGPTApp() {
+@Composable
+fun ShamelaGPTApp(
+    startDestination: Any? = null
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val sessionManager: com.shamelagpt.android.core.preferences.SessionManager = get()
 
     // Determine if bottom bar should be shown
     // Show only on main tabs: Chat, History, Settings
@@ -35,6 +40,8 @@ fun ShamelaGPTApp() {
         destination.hasRoute<HistoryRoute>() ||
         destination.hasRoute<SettingsRoute>()
     } ?: false
+
+    val finalStartDest = startDestination ?: if (sessionManager.isLoggedIn()) ChatRoute() else AuthRoute
 
     Scaffold(
         bottomBar = {
@@ -45,7 +52,8 @@ fun ShamelaGPTApp() {
     ) { paddingValues ->
         ShamelaGPTNavGraph(
             navController = navController,
-            startDestination = ChatRoute(),
+            startDestination = finalStartDest,
+            isAuthenticated = { sessionManager.isLoggedIn() },
             modifier = Modifier.padding(paddingValues)
         )
     }

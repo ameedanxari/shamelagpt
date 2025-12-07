@@ -14,7 +14,10 @@ struct HistoryView: View {
 
     @StateObject var viewModel: HistoryViewModel
     @ObservedObject var coordinator: AppCoordinator
+    let isAuthenticated: Bool
+    let onSignIn: () -> Void
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
 
     // MARK: - State
 
@@ -24,17 +27,17 @@ struct HistoryView: View {
 
     var body: some View {
         ZStack {
-            AppTheme.Colors.background
+            DesignSystem.Colors.background(colorScheme)
                 .ignoresSafeArea()
 
             contentView
         }
-        .navigationTitle(LocalizationKeys.history.localized)
+        .navigationTitle(LocalizationKeys.history.localizedKey)
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                if !viewModel.conversations.isEmpty {
-                    Button(LocalizationKeys.clearAll.localized) {
+                if isAuthenticated && !viewModel.conversations.isEmpty {
+                    Button(LocalizationKeys.clearAll.localizedKey) {
                         showingDeleteAllAlert = true
                     }
                     .foregroundColor(.red)
@@ -47,32 +50,37 @@ struct HistoryView: View {
                         .font(.system(size: AppTheme.Layout.iconSize))
                         .foregroundColor(AppTheme.Colors.primary)
                 }
-                .accessibilityLabel(LocalizationKeys.newChat.localized)
+                .accessibilityLabel(Text(LocalizationKeys.newChat.localizedKey))
             }
         }
         .refreshable {
-            viewModel.loadConversations()
+            if isAuthenticated {
+                await viewModel.refreshConversations()
+            }
         }
-        .alert(LocalizationKeys.deleteConversation.localized, isPresented: $viewModel.showDeleteConfirmation) {
-            Button(LocalizationKeys.cancel.localized, role: .cancel) {
+        .onAppear {
+            viewModel.includeLocalOnly = isAuthenticated
+        }
+        .alert(LocalizationKeys.deleteConversation.localizedKey, isPresented: $viewModel.showDeleteConfirmation) {
+            Button(LocalizationKeys.cancel.localizedKey, role: .cancel) {
                 viewModel.cancelDelete()
             }
-            Button(LocalizationKeys.delete.localized, role: .destructive) {
+            Button(LocalizationKeys.delete.localizedKey, role: .destructive) {
                 viewModel.confirmDelete()
             }
         } message: {
-            Text(LocalizationKeys.deleteConversationMessage.localized)
+            Text(LocalizationKeys.deleteConversationMessage.localizedKey)
         }
-        .alert(LocalizationKeys.deleteAllConversations.localized, isPresented: $showingDeleteAllAlert) {
-            Button(LocalizationKeys.cancel.localized, role: .cancel) {}
-            Button(LocalizationKeys.clearAll.localized, role: .destructive) {
+        .alert(LocalizationKeys.deleteAllConversations.localizedKey, isPresented: $showingDeleteAllAlert) {
+            Button(LocalizationKeys.cancel.localizedKey, role: .cancel) {}
+            Button(LocalizationKeys.clearAll.localizedKey, role: .destructive) {
                 viewModel.deleteAllConversations()
             }
         } message: {
-            Text(LocalizationKeys.deleteAllConversationsMessage.localized)
+            Text(LocalizationKeys.deleteAllConversationsMessage.localizedKey)
         }
-        .alert(LocalizationKeys.error.localized, isPresented: .constant(viewModel.error != nil)) {
-            Button(LocalizationKeys.ok.localized) {
+        .alert(LocalizationKeys.error.localizedKey, isPresented: .constant(viewModel.error != nil)) {
+            Button(LocalizationKeys.ok.localizedKey) {
                 viewModel.error = nil
             }
         } message: {
@@ -81,7 +89,9 @@ struct HistoryView: View {
             }
         }
         .task {
-            viewModel.loadConversations()
+            if isAuthenticated {
+                viewModel.loadConversations()
+            }
         }
     }
 
@@ -89,7 +99,9 @@ struct HistoryView: View {
 
     @ViewBuilder
     private var contentView: some View {
-        if viewModel.isLoading && viewModel.conversations.isEmpty {
+        if !isAuthenticated {
+            guestLockedView
+        } else if viewModel.isLoading && viewModel.conversations.isEmpty {
             loadingView
         } else if viewModel.conversations.isEmpty {
             emptyStateView
@@ -100,11 +112,54 @@ struct HistoryView: View {
 
     // MARK: - Subviews
 
+    private var guestLockedView: some View {
+        VStack(spacing: AppTheme.Spacing.lg) {
+            Spacer()
+            
+            VStack(spacing: AppTheme.Spacing.md) {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 48))
+                    .foregroundColor(AppTheme.Colors.primary)
+                    .padding(AppTheme.Spacing.lg)
+                    .background(DesignSystem.Colors.surface(colorScheme))
+                    .clipShape(Circle())
+                
+                Text(LocalizationKeys.historyLockedTitle.localizedKey)
+                    .font(AppTheme.Typography.heading)
+                    .foregroundColor(AppTheme.Colors.primaryText)
+                    .multilineTextAlignment(.center)
+                
+                Text(LocalizationKeys.historyLockedMessage.localizedKey)
+                    .font(AppTheme.Typography.body)
+                    .foregroundColor(AppTheme.Colors.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
+            
+            Button(action: onSignIn) {
+                HStack {
+                    Image(systemName: "person.circle")
+                    Text(LocalizationKeys.signInButton.localizedKey)
+                }
+                .font(AppTheme.Typography.body.weight(.semibold))
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(DesignSystem.Colors.primary)
+                .cornerRadius(AppTheme.Layout.cornerRadius)
+            }
+            .padding(.horizontal, AppTheme.Spacing.xl)
+            
+            Spacer()
+        }
+        .padding()
+    }
+
     private var loadingView: some View {
         VStack(spacing: AppTheme.Spacing.md) {
             ProgressView()
                 .scaleEffect(1.5)
-            Text(LocalizationKeys.loadingConversations.localized)
+            Text(LocalizationKeys.loadingConversations.localizedKey)
                 .font(AppTheme.Typography.caption)
                 .foregroundColor(AppTheme.Colors.secondaryText)
         }
@@ -117,11 +172,11 @@ struct HistoryView: View {
                 .foregroundColor(AppTheme.Colors.tertiaryText)
 
             VStack(spacing: AppTheme.Spacing.xs) {
-                Text(LocalizationKeys.noConversations.localized)
+                Text(LocalizationKeys.noConversations.localizedKey)
                     .font(AppTheme.Typography.heading)
                     .foregroundColor(AppTheme.Colors.primaryText)
 
-                Text(LocalizationKeys.startNewChatToBegin.localized)
+                Text(LocalizationKeys.startNewChatToBegin.localizedKey)
                     .font(AppTheme.Typography.body)
                     .foregroundColor(AppTheme.Colors.secondaryText)
             }
@@ -129,7 +184,7 @@ struct HistoryView: View {
             Button(action: createNewConversation) {
                 HStack(spacing: AppTheme.Spacing.xs) {
                     Image(systemName: "plus.circle.fill")
-                    Text(LocalizationKeys.newConversation.localized)
+                    Text(LocalizationKeys.newConversation.localizedKey)
                 }
                 .font(AppTheme.Typography.body.weight(.semibold))
                 .foregroundColor(.white)
@@ -146,30 +201,30 @@ struct HistoryView: View {
     private var conversationsList: some View {
         List {
             ForEach(viewModel.conversations) { conversation in
-                NavigationLink(destination: ChatView(
-                    viewModel: DependencyContainer.shared.makeChatViewModel(
-                        conversationId: conversation.id
-                    )
-                )) {
+                Button(action: {
+                    coordinator.openConversation(conversation.id)
+                }) {
                     ConversationCardView(
                         title: viewModel.displayTitle(for: conversation),
                         preview: viewModel.messagePreview(for: conversation),
                         timestamp: viewModel.relativeTime(for: conversation),
-                        conversationType: conversation.conversationType
+                        conversationType: conversation.conversationType,
+                        isLocalOnly: conversation.isLocalOnly
                     )
                 }
-                .listRowBackground(AppTheme.Colors.background)
+                .buttonStyle(PlainButtonStyle())
+                .listRowBackground(DesignSystem.Colors.background(colorScheme))
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
                         viewModel.requestDelete(conversation)
                     } label: {
-                        Label(LocalizationKeys.delete.localized, systemImage: "trash")
+                        Label(LocalizationKeys.delete.localizedKey, systemImage: "trash")
                     }
 
                     Button {
                         shareConversation(conversation)
                     } label: {
-                        Label(LocalizationKeys.share.localized, systemImage: "square.and.arrow.up")
+                        Label(LocalizationKeys.share.localizedKey, systemImage: "square.and.arrow.up")
                     }
                     .tint(.blue)
                 }
@@ -183,6 +238,13 @@ struct HistoryView: View {
     private func createNewConversation() {
         Task {
             do {
+                guard isAuthenticated else {
+                    // Guests: request new chat in Chat tab (local-only) instead of forcing sign-in
+                    NotificationCenter.default.post(name: .requestNewChatFromHistory, object: nil)
+                    coordinator.resetTabSelectionToChat()
+                    return
+                }
+
                 let conversationId = try await viewModel.createNewConversation()
                 AppLogger.app.logInfo("Created new conversation from History: \(conversationId), navigating to Chat tab")
                 // Use coordinator to navigate to Chat tab with the new conversation
@@ -215,32 +277,40 @@ struct HistoryView: View {
 
 // MARK: - Preview Provider
 
-#Preview("Empty State") {
-    HistoryView(
-        viewModel: HistoryViewModel(
-            getConversationsUseCase: GetConversationsUseCase(
-                chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
-            ),
-            deleteConversationUseCase: DeleteConversationUseCase(
-                chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
-            ),
-            chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
-        ),
-        coordinator: AppCoordinator()
-    )
-}
+struct HistoryView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            HistoryView(
+                viewModel: HistoryViewModel(
+                    getConversationsUseCase: GetConversationsUseCase(
+                        chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
+                    ),
+                    deleteConversationUseCase: DeleteConversationUseCase(
+                        chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
+                    ),
+                    chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
+                ),
+                coordinator: AppCoordinator(),
+                isAuthenticated: false,
+                onSignIn: {}
+            )
+            .previewDisplayName("Empty State (Guest)")
 
-#Preview("With Conversations") {
-    HistoryView(
-        viewModel: HistoryViewModel(
-            getConversationsUseCase: GetConversationsUseCase(
-                chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
-            ),
-            deleteConversationUseCase: DeleteConversationUseCase(
-                chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
-            ),
-            chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
-        ),
-        coordinator: AppCoordinator()
-    )
+            HistoryView(
+                viewModel: HistoryViewModel(
+                    getConversationsUseCase: GetConversationsUseCase(
+                        chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
+                    ),
+                    deleteConversationUseCase: DeleteConversationUseCase(
+                        chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
+                    ),
+                    chatRepository: DependencyContainer.shared.resolve(ChatRepository.self)!
+                ),
+                coordinator: AppCoordinator(),
+                isAuthenticated: true,
+                onSignIn: {}
+            )
+            .previewDisplayName("With Conversations (Auth)")
+        }
+    }
 }

@@ -115,9 +115,24 @@ struct RoundedCorner: Shape {
 
 // MARK: - Color Extensions
 extension Color {
+    // MARK: - Primary Brand Colors
     static let primaryGreen = Color(hex: "#10B981") // Emerald-500
-    static let primaryLight = Color(hex: "#4C8C4A")
+    static let primaryLight = Color(hex: "#5CDBB3") // Emerald-400
+    static let primaryDark = Color(hex: "#059669") // Emerald-600
     static let accentGold = Color(hex: "#F59E0B") // Amber-500
+    
+    // MARK: - Gradient Colors
+    static let teal = Color(hex: "#2DD4BF") // Teal-400
+    static let cyan = Color(hex: "#22D3EE") // Cyan-400
+    
+    // MARK: - Dark Mode Backgrounds (matching website)
+    static let darkBackground = Color(hex: "#0f0f0f") // Deep black
+    static let darkSurface = Color(hex: "#171717") // Charcoal
+    static let darkCard = Color(hex: "#1F2937") // Gray-800
+    
+    // MARK: - Light Mode Backgrounds
+    static let lightBackground = Color(hex: "#FAFAFA")
+    static let lightSurface = Color(hex: "#F5F5F5")
 
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -143,3 +158,4 @@ extension Color {
         )
     }
 }
+

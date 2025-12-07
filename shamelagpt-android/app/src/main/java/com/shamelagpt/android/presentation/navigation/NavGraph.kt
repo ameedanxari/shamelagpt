@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.shamelagpt.android.presentation.auth.AuthScreen
 import com.shamelagpt.android.presentation.chat.ChatScreen
 import com.shamelagpt.android.presentation.history.HistoryScreen
 import com.shamelagpt.android.presentation.settings.LanguageSelectionScreen
@@ -24,6 +25,7 @@ import com.shamelagpt.android.presentation.welcome.WelcomeScreen
 fun ShamelaGPTNavGraph(
     navController: NavHostController,
     startDestination: Any,
+    isAuthenticated: () -> Boolean,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -31,6 +33,22 @@ fun ShamelaGPTNavGraph(
         startDestination = startDestination,
         modifier = modifier
     ) {
+        // Auth Screen
+        composable<AuthRoute> {
+            AuthScreen(
+                onAuthenticated = {
+                    navController.navigate(ChatRoute()) {
+                        popUpTo<AuthRoute> { inclusive = true }
+                    }
+                },
+                onContinueAsGuest = {
+                    navController.navigate(ChatRoute()) {
+                        popUpTo<AuthRoute> { inclusive = true }
+                    }
+                }
+            )
+        }
+
         // Welcome Screen - First launch only
         composable<WelcomeRoute> {
             WelcomeScreen(
@@ -56,6 +74,11 @@ fun ShamelaGPTNavGraph(
                 conversationId = route.conversationId,
                 onMenuClick = {
                     // Optional: Implement menu/drawer functionality
+                },
+                onRequireAuth = {
+                    navController.navigate(AuthRoute) {
+                        popUpTo<ChatRoute> { inclusive = true }
+                    }
                 }
             )
         }
@@ -63,8 +86,14 @@ fun ShamelaGPTNavGraph(
         // History Screen - Past conversations
         composable<HistoryRoute> {
             HistoryScreen(
+                isAuthenticated = isAuthenticated(),
                 onNavigateToChat = { conversationId ->
                     navController.navigate(ChatRoute(conversationId = conversationId))
+                },
+                onNavigateToAuth = {
+                    navController.navigate(AuthRoute) {
+                        popUpTo<ChatRoute> { inclusive = true }
+                    }
                 }
             )
         }
@@ -72,8 +101,19 @@ fun ShamelaGPTNavGraph(
         // Settings Screen - App configuration
         composable<SettingsRoute> {
             SettingsScreen(
+                isAuthenticated = isAuthenticated(),
                 onNavigateToLanguage = {
                     navController.navigate(LanguageSelectionRoute)
+                },
+                onNavigateToAuth = {
+                    navController.navigate(AuthRoute) {
+                        popUpTo<ChatRoute> { inclusive = true }
+                    }
+                },
+                onLogout = {
+                    navController.navigate(AuthRoute) {
+                        popUpTo<ChatRoute> { inclusive = true }
+                    }
                 }
             )
         }

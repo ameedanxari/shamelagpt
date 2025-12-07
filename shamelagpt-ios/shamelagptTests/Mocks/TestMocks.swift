@@ -23,10 +23,27 @@ class MockAPIClient: APIClientProtocol {
         answer: "This is a mock response.\n\nSources:\n\n* **book_name:** صحيح البخاري, **source_url:** https://shamela.ws/book/1234/52",
         threadId: "mock-thread-id"
     )
+    var mockCreateConversationResponse: ConversationResponse?
 
     // Track calls
     var healthCheckCallCount = 0
     var sendMessageCallCount = 0
+    var streamMessageCallCount = 0
+    var streamGuestMessageCallCount = 0
+    var signupCallCount = 0
+    var loginCallCount = 0
+    var currentUserCallCount = 0
+    var updateUserCallCount = 0
+    var deleteUserCallCount = 0
+    var verifyTokenCallCount = 0
+    var preferencesCallCount = 0
+    var setPreferencesCallCount = 0
+    var generateTitleCallCount = 0
+    var listConversationsCallCount = 0
+    var createConversationCallCount = 0
+    var deleteAllConversationsCallCount = 0
+    var deleteConversationCallCount = 0
+    var getMessagesCallCount = 0
     var lastSendMessageRequest: ChatRequest?
 
     func healthCheck() async throws -> HealthResponse {
@@ -56,12 +73,221 @@ class MockAPIClient: APIClientProtocol {
         return mockChatResponse
     }
 
+    func streamMessage(_ request: ChatRequest) async throws -> AsyncThrowingStream<String, Error> {
+        streamMessageCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return AsyncThrowingStream { continuation in
+            continuation.yield("chunk-1")
+            continuation.finish()
+        }
+    }
+
+    func streamGuestMessage(_ request: ChatRequest) async throws -> AsyncThrowingStream<String, Error> {
+        streamGuestMessageCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return AsyncThrowingStream { continuation in
+            continuation.yield("guest-chunk-1")
+            continuation.finish()
+        }
+    }
+
+    func signup(_ request: SignupRequest) async throws -> AuthResponse {
+        signupCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return AuthResponse(
+            token: "mock-token",
+            refreshToken: "mock-refresh",
+            expiresIn: "3600",
+            user: ["email": AnyCodable(request.email)]
+        )
+    }
+
+    func login(_ request: LoginRequest) async throws -> AuthResponse {
+        loginCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return AuthResponse(
+            token: "mock-token",
+            refreshToken: "mock-refresh",
+            expiresIn: "3600",
+            user: ["email": AnyCodable(request.email)]
+        )
+    }
+
+    func getCurrentUser() async throws -> UserResponse {
+        currentUserCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return UserResponse(
+            id: "mock-user-id",
+            firebaseUid: "mock-firebase-uid",
+            email: "mock@example.com",
+            displayName: "Mock User",
+            createdAt: "2025-01-01T00:00:00Z",
+            updatedAt: "2025-01-01T00:00:00Z",
+            lastLogin: "2025-01-02T00:00:00Z"
+        )
+    }
+
+    func updateCurrentUser(_ request: UpdateUserRequest) async throws -> UserResponse {
+        updateUserCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return UserResponse(
+            id: "mock-user-id",
+            firebaseUid: "mock-firebase-uid",
+            email: request.email ?? "mock@example.com",
+            displayName: request.displayName ?? "Mock User",
+            createdAt: "2025-01-01T00:00:00Z",
+            updatedAt: "2025-01-02T00:00:00Z",
+            lastLogin: "2025-01-02T00:00:00Z"
+        )
+    }
+
+    func deleteCurrentUser() async throws {
+        deleteUserCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+    }
+
+    func verifyToken() async throws {
+        verifyTokenCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+    }
+
+    func getPreferences() async throws -> UserPreferencesRequest {
+        preferencesCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return UserPreferencesRequest(
+            languagePreference: "en",
+            customSystemPrompt: nil,
+            responsePreferences: nil
+        )
+    }
+
+    func setPreferences(_ request: UserPreferencesRequest) async throws {
+        setPreferencesCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+    }
+
+    func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data {
+        generateTitleCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return Data("Mock Title".utf8)
+    }
+
+    func listConversations() async throws -> [ConversationResponse] {
+        listConversationsCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return [
+            ConversationResponse(
+                id: "conv-1",
+                threadId: "thread-1",
+                title: "Sample Conversation",
+                createdAt: "2025-01-01T00:00:00Z",
+                updatedAt: "2025-01-02T00:00:00Z"
+            )
+        ]
+    }
+
+    func createConversation(_ request: ConversationRequest) async throws -> ConversationResponse {
+        createConversationCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        if let mockCreateConversationResponse {
+            return mockCreateConversationResponse
+        }
+        return ConversationResponse(
+            id: "conv-created",
+            threadId: nil,
+            title: request.title,
+            createdAt: "2025-01-01T00:00:00Z",
+            updatedAt: "2025-01-01T00:00:00Z"
+        )
+    }
+
+    func deleteAllConversations() async throws {
+        deleteAllConversationsCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+    }
+
+    func deleteConversation(id: String) async throws {
+        deleteConversationCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+    }
+
+    func getMessages(conversationId: String) async throws -> Data {
+        getMessagesCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return Data("[]".utf8)
+    }
+
     func reset() {
         healthCheckCallCount = 0
         sendMessageCallCount = 0
         lastSendMessageRequest = nil
         shouldFail = false
         requestDelay = 0
+        streamMessageCallCount = 0
+        streamGuestMessageCallCount = 0
+        signupCallCount = 0
+        loginCallCount = 0
+        currentUserCallCount = 0
+        updateUserCallCount = 0
+        deleteUserCallCount = 0
+        verifyTokenCallCount = 0
+        preferencesCallCount = 0
+        setPreferencesCallCount = 0
+        generateTitleCallCount = 0
+        listConversationsCallCount = 0
+        createConversationCallCount = 0
+        deleteAllConversationsCallCount = 0
+        deleteConversationCallCount = 0
+        getMessagesCallCount = 0
+        mockCreateConversationResponse = nil
     }
 }
 
@@ -79,16 +305,19 @@ class MockChatRepository: ChatRepository {
     var addMessageCallCount = 0
     var fetchMessagesCallCount = 0
 
-    func fetchMostRecentEmptyConversation() async throws -> Conversation? {
+    func fetchMostRecentEmptyConversation(includeLocalOnly: Bool = false) async throws -> Conversation? {
         if shouldThrowError { throw errorToThrow }
-        return mockConversations.first { $0.messages.isEmpty }
+        if includeLocalOnly {
+            return mockConversations.first { $0.messages.isEmpty }
+        }
+        return mockConversations.first { $0.messages.isEmpty && !$0.isLocalOnly }
     }
 
     var conversationsPublisher: AnyPublisher<[Conversation], Never> {
         Just(mockConversations).eraseToAnyPublisher()
     }
 
-    func createConversation(title: String) async throws -> Conversation {
+    func createConversation(title: String, isLocalOnly: Bool = false) async throws -> Conversation {
         createConversationCallCount += 1
         if shouldThrowError { throw errorToThrow }
 
@@ -100,7 +329,8 @@ class MockChatRepository: ChatRepository {
             id: UUID().uuidString,
             threadId: nil,
             title: title,
-            messages: []
+            messages: [],
+            isLocalOnly: isLocalOnly
         )
         mockConversations.append(conversation)
         return conversation
@@ -109,6 +339,10 @@ class MockChatRepository: ChatRepository {
     func fetchAllConversations() async throws -> [Conversation] {
         if shouldThrowError { throw errorToThrow }
         return mockConversations
+    }
+
+    func syncRemoteConversations() async throws {
+        // no-op for mock
     }
 
     func fetchConversation(byId id: String) async throws -> Conversation? {

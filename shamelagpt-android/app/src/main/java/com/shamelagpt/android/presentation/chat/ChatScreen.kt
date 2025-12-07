@@ -42,7 +42,8 @@ import org.koin.androidx.compose.koinViewModel
 fun ChatScreen(
     conversationId: String? = null,
     viewModel: ChatViewModel = koinViewModel(),
-    onMenuClick: () -> Unit = {}
+    onMenuClick: () -> Unit = {},
+    onRequireAuth: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
@@ -76,6 +77,9 @@ fun ChatScreen(
                 }
                 is ChatEvent.MessageSent -> {
                     // Could add haptic feedback or other UI feedback here
+                }
+                ChatEvent.RequireAuth -> {
+                    onRequireAuth()
                 }
             }
         }

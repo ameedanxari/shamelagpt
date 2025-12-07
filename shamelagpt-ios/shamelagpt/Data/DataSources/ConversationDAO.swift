@@ -35,6 +35,7 @@ final class ConversationDAO: @unchecked Sendable {
         threadId: String?,
         title: String,
         conversationType: String = "regular",
+        isLocalOnly: Bool = false,
         in context: NSManagedObjectContext
     ) -> ConversationEntity {
         let entity = ConversationEntity(context: context)
@@ -44,6 +45,48 @@ final class ConversationDAO: @unchecked Sendable {
         entity.conversationType = conversationType
         entity.createdAt = Date()
         entity.updatedAt = Date()
+        // Set isLocalOnly if attribute exists in the model
+        if let attrs = ConversationEntity.entity().attributesByName as? [String: Any], attrs.keys.contains("isLocalOnly") {
+            entity.setValue(isLocalOnly, forKey: "isLocalOnly")
+        }
+        return entity
+    }
+
+    /// Upserts a conversation by id
+    @discardableResult
+    func upsert(
+        id: String,
+        threadId: String?,
+        title: String,
+        createdAt: Date,
+        updatedAt: Date,
+        conversationType: String = "regular",
+        isLocalOnly: Bool = false,
+        in context: NSManagedObjectContext
+    ) -> ConversationEntity {
+        if let existing = try? fetch(byId: id, from: context) {
+            existing.threadId = threadId
+            existing.title = title
+            existing.conversationType = conversationType
+            if existing.createdAt == nil {
+                existing.createdAt = createdAt
+            }
+            existing.updatedAt = updatedAt
+            if let attrs = ConversationEntity.entity().attributesByName as? [String: Any], attrs.keys.contains("isLocalOnly") {
+                existing.setValue(isLocalOnly, forKey: "isLocalOnly")
+            }
+            return existing
+        }
+        let entity = ConversationEntity(context: context)
+        entity.id = id
+        entity.threadId = threadId
+        entity.title = title
+        entity.conversationType = conversationType
+        entity.createdAt = createdAt
+        entity.updatedAt = updatedAt
+        if let attrs = ConversationEntity.entity().attributesByName as? [String: Any], attrs.keys.contains("isLocalOnly") {
+            entity.setValue(isLocalOnly, forKey: "isLocalOnly")
+        }
         return entity
     }
 
@@ -55,7 +98,8 @@ final class ConversationDAO: @unchecked Sendable {
     /// - Throws: CoreDataError if fetch fails
     func fetchAll(from context: NSManagedObjectContext) throws -> [ConversationEntity] {
         let request: NSFetchRequest<ConversationEntity> = ConversationEntity.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false)]
+        // Sort by creation date (newest first) to show history in reverse chronological order
+        request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
 
         do {
             return try context.fetch(request)
@@ -104,11 +148,20 @@ final class ConversationDAO: @unchecked Sendable {
     /// - Parameter context: The managed object context to use
     /// - Returns: The most recent empty ConversationEntity if found, nil otherwise
     /// - Throws: CoreDataError if fetch fails
-    func fetchMostRecentEmpty(from context: NSManagedObjectContext) throws -> ConversationEntity? {
+    func fetchMostRecentEmpty(from context: NSManagedObjectContext, includeLocalOnly: Bool = false) throws -> ConversationEntity? {
         let request: NSFetchRequest<ConversationEntity> = ConversationEntity.fetchRequest()
 
         // Filter for conversations with no messages
-        request.predicate = NSPredicate(format: "messages.@count == 0")
+        let entityDesc = ConversationEntity.entity()
+        if entityDesc.attributesByName.keys.contains("isLocalOnly") {
+            if includeLocalOnly {
+                request.predicate = NSPredicate(format: "messages.@count == 0")
+            } else {
+                request.predicate = NSPredicate(format: "messages.@count == 0 AND (isLocalOnly == NO OR isLocalOnly == nil)")
+            }
+        } else {
+            request.predicate = NSPredicate(format: "messages.@count == 0")
+        }
 
         // Sort by most recent updatedAt
         request.sortDescriptors = [NSSortDescriptor(key: "updatedAt", ascending: false)]

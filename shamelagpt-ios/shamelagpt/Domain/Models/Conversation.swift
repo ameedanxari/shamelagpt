@@ -22,6 +22,7 @@ struct Conversation: Identifiable, Equatable {
     let updatedAt: Date
     let messages: [Message]
     let conversationType: ConversationType
+    let isLocalOnly: Bool
 
     init(
         id: String = UUID().uuidString,
@@ -31,6 +32,8 @@ struct Conversation: Identifiable, Equatable {
         updatedAt: Date = Date(),
         messages: [Message] = [],
         conversationType: ConversationType = .regular
+        ,
+        isLocalOnly: Bool = false
     ) {
         self.id = id
         self.threadId = threadId
@@ -39,6 +42,7 @@ struct Conversation: Identifiable, Equatable {
         self.updatedAt = updatedAt
         self.messages = messages
         self.conversationType = conversationType
+        self.isLocalOnly = isLocalOnly
     }
 
     /// Returns the last message in the conversation
@@ -80,6 +84,8 @@ struct Conversation: Identifiable, Equatable {
             updatedAt: Date(),
             messages: messages,
             conversationType: conversationType
+            ,
+            isLocalOnly: isLocalOnly
         )
     }
 
@@ -93,6 +99,8 @@ struct Conversation: Identifiable, Equatable {
             updatedAt: Date(),
             messages: messages,
             conversationType: conversationType
+            ,
+            isLocalOnly: isLocalOnly
         )
     }
 
@@ -106,6 +114,8 @@ struct Conversation: Identifiable, Equatable {
             updatedAt: Date(),
             messages: messages,
             conversationType: type
+            ,
+            isLocalOnly: isLocalOnly
         )
     }
 }

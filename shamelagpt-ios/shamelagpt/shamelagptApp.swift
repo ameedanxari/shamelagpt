@@ -16,6 +16,19 @@ struct ShamelaGPTApp: App {
 
     /// Dependency container
     private let container: DependencyContainer
+    private let sessionManager: SessionManager
+    private let authRepository: AuthRepository
+
+    @State private var isAuthenticated: Bool
+    @State private var isGuest: Bool = false
+    
+    private func presentAuth() {
+        isAuthenticated = false
+        isGuest = false
+        self.sessionManager.setGuest(false)
+        coordinator.shouldShowWelcome = false
+        coordinator.resetTabSelectionToChat()
+    }
 
     // MARK: - Initialization
 
@@ -46,6 +59,27 @@ struct ShamelaGPTApp: App {
 
         // Initialize dependency container
         self.container = DependencyContainer.shared
+        self.sessionManager = container.resolve(SessionManager.self)!
+        self.authRepository = container.resolve(AuthRepository.self)!
+
+        let initialAuthState = sessionManager.isLoggedIn()
+        if isUITesting {
+            self._isAuthenticated = State(initialValue: true)
+            self._isGuest = State(initialValue: true)
+            self.sessionManager.setGuest(true)
+        } else {
+            self._isAuthenticated = State(initialValue: initialAuthState)
+            self._isGuest = State(initialValue: false)
+            self.sessionManager.setGuest(false)
+        }
+        
+        // Drive welcome visibility from auth state
+        if initialAuthState {
+            _coordinator.wrappedValue.shouldShowWelcome = false
+            _coordinator.wrappedValue.resetTabSelectionToChat()
+        } else if !isUITesting {
+            _coordinator.wrappedValue.shouldShowWelcome = true
+        }
     }
 
     /// Detects whether the app is running under UI tests (arguments, env, or runner bundle path)
@@ -142,17 +176,61 @@ struct ShamelaGPTApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                // Main tab view
-                MainTabView(
-                    coordinator: coordinator,
-                    container: container
-                )
-
-                // Welcome overlay for first launch
-                if coordinator.shouldShowWelcome {
-                    WelcomeView(coordinator: coordinator)
-                        .transition(.opacity)
-                        .zIndex(1)
+                // Determine which view to show
+                if coordinator.shouldShowWelcome && !isAuthenticated && !isGuest {
+                    WelcomeView(
+                        onGetStarted: {
+                            coordinator.dismissWelcome()
+                            // coordinator.dismissWelcome() already sets flag, view will recompose
+                            // If user was not authenticated, they will see AuthView next
+                        },
+                        onSkipToChat: {
+                            // Enable guest mode and dismiss welcome
+                            isGuest = true
+                            self.sessionManager.setGuest(true)
+                            coordinator.dismissWelcome()
+                        }
+                    )
+                    .transition(.opacity)
+                    .zIndex(1)
+                } else if isAuthenticated || isGuest {
+                    // Main tab view
+                    MainTabView(
+                        coordinator: coordinator,
+                        container: container,
+                        isAuthenticated: isAuthenticated,
+                        isGuest: isGuest,
+                        onLogout: {
+                            authRepository.logout()
+                            isAuthenticated = false
+                            isGuest = false
+                            self.sessionManager.setGuest(false)
+                            coordinator.shouldShowWelcome = true
+                            coordinator.resetTabSelectionToChat()
+                        },
+                        onRequireAuth: {
+                            presentAuth()
+                        }
+                    )
+                } else {
+                    // Auth overlay
+                    AuthView(
+                        viewModel: AuthViewModel(authRepository: authRepository),
+                        onAuthenticated: {
+                            isAuthenticated = true
+                            self.sessionManager.setGuest(false)
+                            coordinator.shouldShowWelcome = false
+                            coordinator.resetTabSelectionToChat()
+                            coordinator.start()
+                        },
+                        onContinueAsGuest: {
+                            isGuest = true
+                            self.sessionManager.setGuest(true)
+                            coordinator.shouldShowWelcome = false
+                            coordinator.resetTabSelectionToChat()
+                            coordinator.start()
+                        }
+                    )
                 }
             }
             .preferredColorScheme(.none) // Support both light and dark mode

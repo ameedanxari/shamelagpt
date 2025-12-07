@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.colorScheme) private var colorScheme
     var body: some View {
         VStack(spacing: AppTheme.Spacing.lg) {
             Image(systemName: "book.circle.fill")
@@ -33,10 +34,12 @@ struct ContentView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppTheme.Colors.background)
+        .background(DesignSystem.Colors.background(colorScheme))
     }
 }
 
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }

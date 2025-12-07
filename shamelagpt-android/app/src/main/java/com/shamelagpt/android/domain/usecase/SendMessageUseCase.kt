@@ -3,6 +3,7 @@ package com.shamelagpt.android.domain.usecase
 import com.shamelagpt.android.data.remote.dto.ChatResponse
 import com.shamelagpt.android.domain.repository.ChatRepository
 import com.shamelagpt.android.domain.repository.ConversationRepository
+import java.util.Locale
 
 /**
  * Use case for sending messages in a conversation.
@@ -34,7 +35,11 @@ class SendMessageUseCase(
         question: String,
         conversationId: String?,
         threadId: String?,
-        saveUserMessage: Boolean = true
+        saveUserMessage: Boolean = true,
+        promptConfig: com.google.gson.JsonElement? = null,
+        languagePreference: String? = null,
+        customSystemPrompt: String? = null,
+        enableThinking: Boolean? = null
     ): Result<Pair<ChatResponse, String>> {
         // Validate input
         if (question.isBlank()) {
@@ -50,7 +55,19 @@ class SendMessageUseCase(
         }
 
         // Send message to API
-        val result = chatRepository.sendMessage(question, actualConversationId, threadId, saveUserMessage)
+        val resolvedLanguagePreference = (languagePreference?.takeIf { it.isNotBlank() })
+            ?: Locale.getDefault().language
+
+        val result = chatRepository.sendMessage(
+            question = question,
+            conversationId = actualConversationId,
+            threadId = threadId,
+            saveUserMessage = saveUserMessage,
+            promptConfig = promptConfig,
+            languagePreference = resolvedLanguagePreference,
+            customSystemPrompt = customSystemPrompt,
+            enableThinking = enableThinking
+        )
 
         // Return the response with the conversation ID
         return result.map { response ->

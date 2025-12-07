@@ -77,7 +77,8 @@ struct OCRConfirmationView: View {
                         TextEditor(text: $editedText)
                             .frame(minHeight: 150)
                             .padding(8)
-                            .background(Color(.systemGray6))
+                            // Remove the light gray background so the screen background spans end-to-end
+                            .background(Color.clear)
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)

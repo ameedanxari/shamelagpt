@@ -15,6 +15,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+/**
+ * Dark color scheme matching shamelagpt.com website design.
+ * Uses deep black (#0f0f0f) and charcoal (#171717) backgrounds.
+ */
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryDark,
     onPrimary = OnPrimaryDark,
@@ -42,6 +46,9 @@ private val DarkColorScheme = darkColorScheme(
     outlineVariant = OutlineVariantDark,
 )
 
+/**
+ * Light color scheme with emerald primary and amber accents.
+ */
 private val LightColorScheme = lightColorScheme(
     primary = Primary,
     onPrimary = OnPrimary,
@@ -69,11 +76,18 @@ private val LightColorScheme = lightColorScheme(
     outlineVariant = OutlineVariant,
 )
 
+/**
+ * ShamelaGPT Material 3 theme.
+ * 
+ * @param darkTheme Whether to use dark theme. Defaults to system setting.
+ * @param dynamicColor Whether to use Android 12+ dynamic colors. Disabled by default
+ *                     to maintain brand consistency.
+ * @param content The composable content to apply the theme to.
+ */
 @Composable
 fun ShamelaGPTTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false,
+    dynamicColor: Boolean = false, // Disabled to maintain brand colors
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -81,7 +95,6 @@ fun ShamelaGPTTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
@@ -90,8 +103,10 @@ fun ShamelaGPTTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            // Use background color for status bar (immersive experience)
+            window.statusBarColor = colorScheme.background.toArgb()
+            // Light status bar icons in dark mode, dark icons in light mode
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
@@ -101,3 +116,4 @@ fun ShamelaGPTTheme(
         content = content
     )
 }
+

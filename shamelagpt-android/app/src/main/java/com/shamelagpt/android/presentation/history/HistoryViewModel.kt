@@ -39,6 +39,14 @@ class HistoryViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
+            // Attempt remote sync (no-op if guest)
+            val syncResult = getConversationsUseCase.sync()
+            syncResult.onFailure { exception ->
+                _uiState.update {
+                    it.copy(error = exception.message)
+                }
+            }
+
             getConversationsUseCase()
                 .catch { exception ->
                     _uiState.update {

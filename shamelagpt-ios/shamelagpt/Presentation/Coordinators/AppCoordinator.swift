@@ -34,6 +34,8 @@ class AppCoordinator: ObservableObject {
 
     /// UserDefaults key for last conversation
     private let lastConversationIdKey = "lastConversationId"
+    /// UserDefaults key for guest conversation id
+    private let guestConversationIdKey = "guest_conversation_id"
 
     /// UserDefaults instance
     private let userDefaults: UserDefaults
@@ -42,17 +44,28 @@ class AppCoordinator: ObservableObject {
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
+        
+        // Welcome screen state is now controlled by the App struct based on auth state
+        // defaulting to false here, but will be overridden or ignored by ShamelaGPTApp
+        self.shouldShowWelcome = true
 
-        // Check if user has seen welcome screen
-        let hasSeenWelcome = userDefaults.bool(forKey: hasSeenWelcomeKey)
-        self.shouldShowWelcome = !hasSeenWelcome
+        // Restore last selected tab if present, but ensure initial first tab is always Chat (index 0).
+        // This prevents RTL/layout mirroring from causing a different tab to appear selected on first load.
+        if userDefaults.object(forKey: lastSelectedTabKey) != nil {
+            let savedTab = userDefaults.integer(forKey: lastSelectedTabKey)
+            self.selectedTab = savedTab
+            AppLogger.app.logInfo("Restored previously saved selectedTab=\(savedTab)")
+        } else {
+            self.selectedTab = 0
+            AppLogger.app.logInfo("No saved tab found; defaulting selectedTab to Chat (0)")
+        }
 
-        // Restore last selected tab
-        let savedTab = userDefaults.integer(forKey: lastSelectedTabKey)
-        self.selectedTab = savedTab
-
-        // Restore last conversation ID
-        self.lastConversationId = userDefaults.string(forKey: lastConversationIdKey)
+        // Restore last conversation ID (support guest persisted conversation)
+        if userDefaults.bool(forKey: "is_guest") {
+            self.lastConversationId = userDefaults.string(forKey: guestConversationIdKey)
+        } else {
+            self.lastConversationId = userDefaults.string(forKey: lastConversationIdKey)
+        }
     }
 
     // MARK: - Navigation Methods
@@ -109,10 +122,11 @@ class AppCoordinator: ObservableObject {
         navigationRoutes.removeAll()
     }
 
-    /// Dismiss the welcome screen and mark it as seen
+    /// Dismiss the welcome screen
     func dismissWelcome() {
         shouldShowWelcome = false
-        userDefaults.set(true, forKey: hasSeenWelcomeKey)
+        resetTabSelectionToChat()
+        // No longer saving to UserDefaults as we want to show it every time if not logged in
     }
 
     /// Navigate to a new conversation
@@ -147,16 +161,28 @@ class AppCoordinator: ObservableObject {
         userDefaults.set(tab, forKey: lastSelectedTabKey)
     }
 
+    /// Force the selected tab back to Chat and persist that choice.
+    func resetTabSelectionToChat() {
+        selectedTab = 0
+        userDefaults.set(0, forKey: lastSelectedTabKey)
+    }
+
     /// Save the last accessed conversation ID
-    private func saveLastConversationId(_ conversationId: String) {
+    func saveLastConversationId(_ conversationId: String) {
         lastConversationId = conversationId
-        userDefaults.set(conversationId, forKey: lastConversationIdKey)
+        // Persist to guest key if guest, otherwise persist as normal
+        if userDefaults.bool(forKey: "is_guest") {
+            userDefaults.set(conversationId, forKey: guestConversationIdKey)
+        } else {
+            userDefaults.set(conversationId, forKey: lastConversationIdKey)
+        }
     }
 
     /// Clear saved state (useful for testing or logout)
     func clearSavedState() {
         userDefaults.removeObject(forKey: lastSelectedTabKey)
         userDefaults.removeObject(forKey: lastConversationIdKey)
+        userDefaults.removeObject(forKey: guestConversationIdKey)
         selectedTab = 0
         lastConversationId = nil
     }

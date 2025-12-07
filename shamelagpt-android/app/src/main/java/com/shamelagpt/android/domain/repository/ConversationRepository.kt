@@ -67,4 +67,9 @@ interface ConversationRepository {
      * @return Flow of message list sorted by timestamp
      */
     fun getMessagesByConversationId(conversationId: String): Flow<List<Message>>
+
+    /**
+     * Sync conversations from backend when authenticated.
+     */
+    suspend fun syncConversations(): Result<Unit>
 }

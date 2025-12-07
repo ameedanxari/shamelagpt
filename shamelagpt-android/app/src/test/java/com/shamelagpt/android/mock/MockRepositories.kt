@@ -28,19 +28,25 @@ class MockChatRepository(
     var lastThreadId: String? = null
     var lastConversationId: String? = null
     var lastSaveUserMessage: Boolean? = null
+    var lastLanguagePreference: String? = null
     var delayMs: Long = 0
 
     override suspend fun sendMessage(
         question: String,
         conversationId: String,
         threadId: String?,
-        saveUserMessage: Boolean
+        saveUserMessage: Boolean,
+        promptConfig: com.google.gson.JsonElement?,
+        languagePreference: String?,
+        customSystemPrompt: String?,
+        enableThinking: Boolean?
     ): Result<ChatResponse> {
         sendMessageCallCount++
         lastQuestion = question
         lastThreadId = threadId
         lastConversationId = conversationId
         lastSaveUserMessage = saveUserMessage
+        lastLanguagePreference = languagePreference
 
         if (delayMs > 0) {
             kotlinx.coroutines.delay(delayMs)
@@ -93,6 +99,7 @@ class MockChatRepository(
         lastThreadId = null
         lastConversationId = null
         lastSaveUserMessage = null
+        lastLanguagePreference = null
         delayMs = 0
     }
 }
@@ -165,6 +172,8 @@ class MockConversationRepository : ConversationRepository {
             MutableStateFlow(conversations[conversationId]?.messages ?: emptyList())
         }
     }
+
+    override suspend fun syncConversations(): Result<Unit> = Result.success(Unit)
 
     // Test helper methods
 

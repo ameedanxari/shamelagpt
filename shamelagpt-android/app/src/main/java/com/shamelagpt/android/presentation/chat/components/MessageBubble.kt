@@ -223,7 +223,8 @@ private fun SourcesList(sources: List<Source>) {
                 Text(
                     text = source.bookName,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
+                    // Use tertiary (amber) color for source links per website design
+                    color = MaterialTheme.colorScheme.tertiary,
                     textAlign = TextAlign.Start,
                     modifier = Modifier.fillMaxWidth()
                 )

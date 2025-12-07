@@ -9,6 +9,7 @@ import com.shamelagpt.android.core.util.OCRManager
 import com.shamelagpt.android.core.util.VoiceInputManager
 import com.shamelagpt.android.domain.repository.ConversationRepository
 import com.shamelagpt.android.domain.usecase.SendMessageUseCase
+import com.shamelagpt.android.core.network.NetworkError
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -163,11 +164,17 @@ class ChatViewModel(
                                 error = exception.message ?: "Failed to send message"
                             )
                         }
-                        _events.send(
-                            ChatEvent.ShowError(
-                                exception.message ?: "Failed to send message"
+                        when (exception) {
+                            is NetworkError.Unauthorized -> _events.send(ChatEvent.RequireAuth)
+                            is NetworkError.TooManyRequests -> _events.send(
+                                ChatEvent.ShowError("Rate limit exceeded. Please wait.")
                             )
-                        )
+                            else -> _events.send(
+                                ChatEvent.ShowError(
+                                    exception.message ?: "Failed to send message"
+                                )
+                            )
+                        }
                     }
                 )
             } catch (e: Exception) {
@@ -478,7 +485,14 @@ class ChatViewModel(
                 Logger.i("ChatVM", "User message saved successfully")
 
                 // Wrap text for fact-checking API prompt
-                val factCheckPrompt = "Please fact-check this statement: $trimmedText"
+                val factCheckPrompt = """
+                    Fact check this. If it is a Hadith, Quran, or other book reference, provide a definitive Yes/No answer regarding whether it was found in verified sources.
+                    Especially if the text contains citations (e.g., file names or numbers), specifically verify those references against the actual text.
+                    Your goal is to clarify the context and veracity of the shared text to remove any confusion.
+
+                    Text to check:
+                    $trimmedText
+                """.trimIndent()
                 Logger.d("ChatVM", "Fact-check prompt created: ${factCheckPrompt.take(100)}")
 
                 Logger.i("ChatVM", "Sending fact-check request to API")
@@ -584,6 +598,17 @@ class ChatViewModel(
         Logger.d("ChatVM", "Sending ShowError event to UI")
         viewModelScope.launch {
             _events.send(ChatEvent.ShowError("OCR error: $error"))
+        }
+    }
+
+    /**
+     * Clears OCR error state after it has been shown.
+     */
+    fun clearOcrError() {
+        _uiState.update { state ->
+            state.copy(
+                imageInputState = state.imageInputState.copy(error = null)
+            )
         }
     }
 

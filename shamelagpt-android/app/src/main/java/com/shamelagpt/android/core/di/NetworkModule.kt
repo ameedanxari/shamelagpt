@@ -3,11 +3,22 @@ package com.shamelagpt.android.core.di
 import com.google.gson.Gson
 import com.shamelagpt.android.core.network.NetworkMonitor
 import com.shamelagpt.android.core.network.RetrofitClient
+import com.shamelagpt.android.core.network.AuthInterceptor
+import com.shamelagpt.android.core.preferences.SessionManager
+import com.shamelagpt.android.core.preferences.PreferencesCache
 import com.shamelagpt.android.data.remote.ApiService
+import com.shamelagpt.android.data.remote.datasource.AuthRemoteDataSource
+import com.shamelagpt.android.data.remote.datasource.AuthRemoteDataSourceImpl
 import com.shamelagpt.android.data.remote.datasource.ChatRemoteDataSource
 import com.shamelagpt.android.data.remote.datasource.ChatRemoteDataSourceImpl
+import com.shamelagpt.android.data.remote.datasource.ConversationRemoteDataSource
+import com.shamelagpt.android.data.remote.datasource.ConversationRemoteDataSourceImpl
+import com.shamelagpt.android.data.repository.AuthRepositoryImpl
 import com.shamelagpt.android.data.repository.ChatRepositoryImpl
+import com.shamelagpt.android.data.repository.PreferencesRepositoryImpl
+import com.shamelagpt.android.domain.repository.AuthRepository
 import com.shamelagpt.android.domain.repository.ChatRepository
+import com.shamelagpt.android.domain.repository.PreferencesRepository
 import com.shamelagpt.android.domain.usecase.SendMessageUseCase
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
@@ -34,6 +45,11 @@ val networkModule = module {
         NetworkMonitor(androidContext())
     }
 
+    // Provide SessionManager
+    single {
+        SessionManager(androidContext())
+    }
+
     // Provide Gson
     single<Gson> {
         RetrofitClient.createGson()
@@ -43,7 +59,11 @@ val networkModule = module {
     single<OkHttpClient> {
         // Enable logging in debug builds
         val isDebug = androidContext().applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0
-        RetrofitClient.createOkHttpClient(isDebug = isDebug)
+        val authInterceptor = AuthInterceptor { get<SessionManager>().getToken() }
+        RetrofitClient.createOkHttpClient(
+            isDebug = isDebug,
+            extraInterceptors = listOf(authInterceptor)
+        )
     }
 
     // Provide Retrofit
@@ -64,11 +84,38 @@ val networkModule = module {
         ChatRemoteDataSourceImpl(apiService = get())
     }
 
+    // Provide AuthRemoteDataSource
+    single<AuthRemoteDataSource> {
+        AuthRemoteDataSourceImpl(apiService = get())
+    }
+
+    // Provide ConversationRemoteDataSource
+    single<ConversationRemoteDataSource> {
+        ConversationRemoteDataSourceImpl(apiService = get())
+    }
+
     // Provide ChatRepository
     single<ChatRepository> {
         ChatRepositoryImpl(
             chatRemoteDataSource = get(),
             conversationRepository = get()
+        )
+    }
+
+    // Provide AuthRepository
+    single<AuthRepository> {
+        AuthRepositoryImpl(
+            authRemoteDataSource = get(),
+            sessionManager = get()
+        )
+    }
+
+    // Provide PreferencesRepository
+    single<PreferencesRepository> {
+        PreferencesRepositoryImpl(
+            authRemoteDataSource = get(),
+            gson = get(),
+            preferencesCache = PreferencesCache(androidContext())
         )
     }
 

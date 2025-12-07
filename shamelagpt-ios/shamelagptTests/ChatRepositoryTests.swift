@@ -136,6 +136,37 @@ final class ChatRepositoryTests: XCTestCase {
         XCTAssertEqual(fetched?.title, "Updated Title")
     }
 
+    func testCreateConversationPersistsRemoteTimestampsWithFractionalSeconds() async throws {
+        // Given
+        let apiClient = MockAPIClient()
+        apiClient.mockCreateConversationResponse = ConversationResponse(
+            id: "remote-id",
+            threadId: "remote-thread",
+            title: "Remote Title",
+            createdAt: "2025-12-07T22:11:33.525593+00:00",
+            updatedAt: "2025-12-07T22:15:33.125593+00:00"
+        )
+        let networkMonitor = MockNetworkMonitor()
+        let repository = ChatRepositoryImpl(
+            coreDataStack: testCoreDataStack,
+            conversationDAO: conversationDAO,
+            messageDAO: messageDAO,
+            apiClient: apiClient,
+            networkMonitor: networkMonitor
+        )
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        // When
+        let conversation = try await repository.createConversation(title: "Ignored Local Title")
+        let fetched = try await repository.fetchConversation(byId: conversation.id)
+
+        // Then
+        XCTAssertEqual(conversation.id, "remote-id")
+        XCTAssertEqual(fetched?.createdAt, formatter.date(from: "2025-12-07T22:11:33.525593+00:00"))
+        XCTAssertEqual(fetched?.updatedAt, formatter.date(from: "2025-12-07T22:15:33.125593+00:00"))
+    }
+
     func testUpdateConversationThreadId() async throws {
         // Given
         let conversation = try await sut.createConversation(title: "Test")

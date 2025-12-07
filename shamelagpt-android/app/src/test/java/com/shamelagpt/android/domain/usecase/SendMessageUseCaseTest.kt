@@ -12,6 +12,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.Locale
 import java.util.UUID
 
 /**
@@ -58,6 +59,25 @@ class SendMessageUseCaseTest {
         assertThat(chatRepository.sendMessageCallCount).isEqualTo(1)
         assertThat(chatRepository.lastQuestion).isEqualTo(question)
         assertThat(chatRepository.lastThreadId).isEqualTo(threadId)
+    }
+
+    @Test
+    fun testInvokePassesLanguagePreferenceFromLocaleWhenNotProvided() = runTest {
+        // Given
+        val originalLocale = Locale.getDefault()
+        Locale.setDefault(Locale("ar"))
+
+        val question = "Language check"
+        val conversationId = UUID.randomUUID().toString()
+
+        // When
+        useCase.invoke(question, conversationId, threadId = null)
+
+        // Then
+        assertThat(chatRepository.lastLanguagePreference).isEqualTo("ar")
+
+        // Reset locale to avoid affecting other tests
+        Locale.setDefault(originalLocale)
     }
 
     @Test

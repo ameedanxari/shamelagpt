@@ -122,7 +122,8 @@ final class SendMessageUseCase {
 
             let request = ChatRequest(
                 question: message,
-                threadId: conversation.threadId
+                threadId: conversation.threadId,
+                languagePreference: LanguageManager.shared.currentLanguage.rawValue
             )
 
             let response = try await apiClient.sendMessage(request)
@@ -132,7 +133,8 @@ final class SendMessageUseCase {
             AppLogger.network.logDebug("Raw API answer preview (first 500 chars): \(response.answer.prefix(500))")
 
             // Update thread ID if provided and this is the first message
-            if conversation.threadId == nil, let newThreadId = response.threadId {
+            // Do NOT update thread ID for local-only conversations (guest/local-only); keep them local-only
+            if conversation.threadId == nil, let newThreadId = response.threadId, conversation.isLocalOnly == false {
                 AppLogger.chat.logDebug("First message in conversation, updating threadId: \(newThreadId)")
                 try await chatRepository.updateConversationThreadId(
                     id: conversationId,

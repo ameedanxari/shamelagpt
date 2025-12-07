@@ -132,29 +132,30 @@ struct BidirectionalText: View {
     }
 }
 
-// MARK: - Preview Helpers
+struct RTLModifier_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text("English Text - Left to Right")
+                .font(.title)
 
-#Preview("RTL Text") {
-    VStack(alignment: .leading, spacing: 20) {
-        Text("English Text - Left to Right")
-            .font(.title)
+            Text("النص العربي - من اليمين إلى اليسار")
+                .font(.title)
+                .environment(\.layoutDirection, .rightToLeft)
 
-        Text("النص العربي - من اليمين إلى اليسار")
-            .font(.title)
+            BidirectionalText(
+                text: "مرحبا بك في ShamelaGPT",
+                font: .title,
+                foregroundColor: .primary
+            )
+
+            HStack {
+                Image(systemName: "arrow.right")
+                    .mirrorInRTL()
+                Text("Arrow mirrors in RTL")
+            }
             .environment(\.layoutDirection, .rightToLeft)
-
-        BidirectionalText(
-            text: "مرحبا بك في ShamelaGPT",
-            font: .title,
-            foregroundColor: .primary
-        )
-
-        HStack {
-            Image(systemName: "arrow.right")
-                .mirrorInRTL()
-            Text("Arrow mirrors in RTL")
         }
-        .environment(\.layoutDirection, .rightToLeft)
+        .padding()
+        .previewDisplayName("RTL Text")
     }
-    .padding()
 }

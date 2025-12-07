@@ -15,6 +15,17 @@
     <string name="history">السجل</string>
     <string name="settings">الإعدادات</string>
 
+    <!-- Auth Screen -->
+    <string name="sign_in">تسجيل الدخول</string>
+    <string name="sign_up">إنشاء حساب</string>
+    <string name="create_account">إنشاء حساب</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="display_name_optional">الاسم المعروض (اختياري)</string>
+    <string name="continue_as_guest">المتابعة كضيف</string>
+    <string name="need_account">ليس لديك حساب؟ إنشاء حساب</string>
+    <string name="have_account">لديك حساب؟ تسجيل الدخول</string>
+
     <!-- Chat Screen -->
     <string name="chat_title">شاملة GPT</string>
     <string name="chat_placeholder">اطرح سؤالاً عن الإسلام...</string>
@@ -36,17 +47,26 @@
     <string name="cancel">إلغاء</string>
     <string name="new_chat">محادثة جديدة</string>
     <string name="just_now">الآن</string>
+    <string name="history_locked_title">احفظ محادثاتك</string>
+    <string name="history_locked_message">سجل الدخول للاحتفاظ بسجل محادثاتك، وتصديرها، والوصول إليها عبر الأجهزة.</string>
 
     <!-- Settings Screen -->
-    <string name="general">عام</string>
-    <string name="language">اللغة</string>
+    <string name="settings_general">عام</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_ai_preferences">تفضيلات الذكاء الاصطناعي</string>
+    <string name="settings_support">الدعم</string>
+    <string name="settings_support_shamelagpt">ادعم شاملة GPT</string>
+    <string name="settings_about">حول</string>
     <string name="support">الدعم</string>
     <string name="support_shamelagpt">ادعم شاملة GPT</string>
     <string name="about">حول</string>
-    <string name="about_shamelagpt">حول شاملة GPT</string>
-    <string name="privacy_policy">سياسة الخصوصية</string>
-    <string name="terms_of_service">شروط الخدمة</string>
-    <string name="version">الإصدار %s</string>
+    <string name="settings_about_shamelagpt">حول شاملة جي بي تي</string>
+    <string name="settings_privacy_policy">سياسة الخصوصية</string>
+    <string name="settings_terms_of_service">شروط الخدمة</string>
+    <string name="settings_version">الإصدار</string>
+    <string name="settings_ai_preferences_locked_title">تخصيص تجربتك</string>
+    <string name="settings_ai_preferences_locked_message">سجل الدخول لتخصيص ردود الذكاء الاصطناعي بالطول والأسلوب والتركيز المفضل لديك.</string>
+    <string name="settings_sign_in_button">تسجيل الدخول</string>
 
     <!-- Language Selection -->
     <string name="select_language">اختر اللغة</string>
@@ -77,6 +97,20 @@
     <string name="no_text_found">لم يتم العثور على نص في الصورة</string>
     <string name="voice_recognition_failed">فشل التعرف على الصوت</string>
     <string name="offline_mode">أنت غير متصل. سيتم إرسال الرسائل عند استعادة الاتصال.</string>
+    
+    <!-- Network Error Messages (user-friendly) -->
+    <string name="network_no_connection">لا يوجد اتصال بالإنترنت. يرجى التحقق من إعدادات الشبكة.</string>
+    <string name="network_timeout">انتهت مهلة الطلب. يرجى التحقق من اتصالك والمحاولة مرة أخرى.</string>
+    <string name="network_server_error">تواجه خوادمنا مشكلات. يرجى المحاولة بعد قليل.</string>
+    <string name="network_auth_required">يرجى تسجيل الدخول للمتابعة.</string>
+    <string name="network_access_forbidden">ليس لديك إذن للوصول إلى هذا المورد.</string>
+    <string name="network_not_found">تعذر العثور على المحتوى المطلوب.</string>
+    <string name="network_too_many_requests">طلبات كثيرة جدًا. يرجى الانتظار لحظة والمحاولة مرة أخرى.</string>
+    <string name="network_invalid_request">طلب غير صالح. يرجى التحقق من إدخالك والمحاولة مرة أخرى.</string>
+    <string name="network_generic_error">حدث خطأ ما. يرجى المحاولة مرة أخرى.</string>
+    <string name="network_connection_error">تعذر الاتصال. يرجى التحقق من اتصالك بالإنترنت.</string>
+    <string name="network_decoding_error">تعذرت معالجة استجابة الخادم. يرجى المحاولة مرة أخرى.</string>
+    <string name="network_unexpected_error">حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.</string>
 
     <!-- Content Descriptions -->
     <string name="send_message">إرسال رسالة</string>

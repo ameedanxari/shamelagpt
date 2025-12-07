@@ -15,6 +15,17 @@
     <string name="history">History</string>
     <string name="settings">Settings</string>
 
+    <!-- Auth Screen -->
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="create_account">Create Account</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="display_name_optional">Display name (optional)</string>
+    <string name="continue_as_guest">Continue as guest</string>
+    <string name="need_account">Need an account? Sign up</string>
+    <string name="have_account">Have an account? Sign in</string>
+
     <!-- Chat Screen -->
     <string name="chat_title">ShamelaGPT</string>
     <string name="chat_placeholder">Ask a question about Islam...</string>
@@ -36,17 +47,41 @@
     <string name="cancel">Cancel</string>
     <string name="new_chat">New Chat</string>
     <string name="just_now">Just now</string>
+    <string name="history_locked_title">Save Your Conversations</string>
+    <string name="history_locked_message">Sign in to keep track of your chat history, export conversations, and access them across devices.</string>
 
     <!-- Settings Screen -->
-    <string name="general">General</string>
-    <string name="language">Language</string>
+    <string name="settings_general">General</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_ai_preferences">AI Preferences</string>
+    <string name="settings_support">Support</string>
+    <string name="settings_support_shamelagpt">Support ShamelaGPT</string>
+    <string name="settings_about">About</string>
+    <!-- AI Preference options -->
+    <string name="settings_pref_length_title">Response length</string>
+    <string name="settings_pref_length_short">Short</string>
+    <string name="settings_pref_length_medium">Medium</string>
+    <string name="settings_pref_length_detailed">Detailed</string>
+
+    <string name="settings_pref_style_title">Response style</string>
+    <string name="settings_pref_style_conversational">Conversational</string>
+    <string name="settings_pref_style_academic">Academic</string>
+    <string name="settings_pref_style_technical">Technical</string>
+
+    <string name="settings_pref_focus_title">Response focus</string>
+    <string name="settings_pref_focus_practical">Practical</string>
+    <string name="settings_pref_focus_theoretical">Theoretical</string>
+    <string name="settings_pref_focus_historical">Historical</string>
     <string name="support">Support</string>
     <string name="support_shamelagpt">Support ShamelaGPT</string>
     <string name="about">About</string>
-    <string name="about_shamelagpt">About ShamelaGPT</string>
-    <string name="privacy_policy">Privacy Policy</string>
-    <string name="terms_of_service">Terms of Service</string>
-    <string name="version">Version %s</string>
+    <string name="settings_about_shamelagpt">About ShamelaGPT</string>
+    <string name="settings_privacy_policy">Privacy Policy</string>
+    <string name="settings_terms_of_service">Terms of Service</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_ai_preferences_locked_title">Personalize Your Experience</string>
+    <string name="settings_ai_preferences_locked_message">Sign in to customize AI responses with your preferred length, style, and focus.</string>
+    <string name="settings_sign_in_button">Sign In</string>
 
     <!-- Language Selection -->
     <string name="select_language">Select Language</string>
@@ -77,6 +112,20 @@
     <string name="no_text_found">No text found in image</string>
     <string name="voice_recognition_failed">Voice recognition failed</string>
     <string name="offline_mode">You are offline. Messages will be sent when connection is restored.</string>
+    
+    <!-- Network Error Messages (user-friendly) -->
+    <string name="network_no_connection">No internet connection. Please check your network settings.</string>
+    <string name="network_timeout">Request timed out. Please check your connection and try again.</string>
+    <string name="network_server_error">Our servers are experiencing issues. Please try again shortly.</string>
+    <string name="network_auth_required">Please sign in to continue.</string>
+    <string name="network_access_forbidden">You don\'t have permission to access this resource.</string>
+    <string name="network_not_found">The requested content could not be found.</string>
+    <string name="network_too_many_requests">Too many requests. Please wait a moment and try again.</string>
+    <string name="network_invalid_request">Invalid request. Please check your input and try again.</string>
+    <string name="network_generic_error">Something went wrong. Please try again.</string>
+    <string name="network_connection_error">Unable to connect. Please check your internet connection.</string>
+    <string name="network_decoding_error">Unable to process server response. Please try again.</string>
+    <string name="network_unexpected_error">An unexpected error occurred. Please try again.</string>
 
     <!-- Content Descriptions -->
     <string name="send_message">Send message</string>

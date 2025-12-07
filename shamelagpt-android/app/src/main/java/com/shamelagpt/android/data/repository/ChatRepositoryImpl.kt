@@ -24,7 +24,11 @@ class ChatRepositoryImpl(
         question: String,
         conversationId: String,
         threadId: String?,
-        saveUserMessage: Boolean
+        saveUserMessage: Boolean,
+        promptConfig: com.google.gson.JsonElement?,
+        languagePreference: String?,
+        customSystemPrompt: String?,
+        enableThinking: Boolean?
     ): Result<ChatResponse> {
         // Save user message immediately (unless it's a fact-check message already saved)
         if (saveUserMessage) {
@@ -39,7 +43,14 @@ class ChatRepositoryImpl(
         }
 
         // Send to API
-        val result = chatRemoteDataSource.sendMessage(question, threadId)
+        val result = chatRemoteDataSource.sendMessage(
+            question = question,
+            threadId = threadId,
+            promptConfig = promptConfig,
+            languagePreference = languagePreference,
+            customSystemPrompt = customSystemPrompt,
+            enableThinking = enableThinking
+        )
 
         // If successful, parse and save AI response
         result.onSuccess { response ->

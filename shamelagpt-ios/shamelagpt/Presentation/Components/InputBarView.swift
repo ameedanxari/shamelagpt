@@ -30,9 +30,11 @@ struct InputBarView: View {
 
     private let minHeight: CGFloat = 40
     private let maxHeight: CGFloat = 120
-    private var placeholder: String {
-        LocalizationKeys.askQuestionPlaceholder.localized
+    private var placeholder: LocalizedStringKey {
+        LocalizationKeys.askQuestionPlaceholder.localizedKey
     }
+
+    @Environment(\.colorScheme) private var colorScheme
 
     // MARK: - Body
 
@@ -64,7 +66,7 @@ struct InputBarView: View {
                 sendButton
             }
             .padding(AppTheme.Spacing.sm)
-            .background(AppTheme.Colors.background)
+            .background(DesignSystem.Colors.surface(colorScheme))
         }
     }
 
@@ -74,7 +76,7 @@ struct InputBarView: View {
         ZStack(alignment: .topLeading) {
             // Placeholder text
             if text.isEmpty {
-                Text(placeholder)
+                            Text(placeholder)
                     .font(AppTheme.Typography.body)
                     .foregroundColor(AppTheme.Colors.tertiaryText)
                     .padding(.horizontal, AppTheme.Spacing.xxs)
@@ -89,13 +91,15 @@ struct InputBarView: View {
                 .frame(minHeight: minHeight, maxHeight: min(textEditorHeight, maxHeight))
                 .background(Color.clear)
                 .focused($isFocused)
+                .accessibilityIdentifier("ChatInputTextView")
+                .accessibilityLabel(Text(LocalizationKeys.askQuestionPlaceholder.localizedKey))
                 .onChange(of: text) { _ in
                     updateHeight()
                 }
         }
         .padding(.horizontal, AppTheme.Spacing.xs)
         .padding(.vertical, AppTheme.Spacing.xxs)
-        .background(AppTheme.Colors.secondaryBackground)
+        .background(DesignSystem.Colors.inputBackground(colorScheme))
         .cornerRadius(AppTheme.Layout.cornerRadius)
     }
 
@@ -111,9 +115,9 @@ struct InputBarView: View {
         .disabled(!isCameraEnabled)
         .scaleEffect(isCameraEnabled ? 1.0 : 0.9)
         .animation(AppTheme.Animation.quick, value: isCameraEnabled)
-        .accessibilityLabel(LocalizationKeys.cameraAccessibilityLabel.localized)
+        .accessibilityLabel(Text(LocalizationKeys.cameraAccessibilityLabel.localizedKey))
         .accessibilityIdentifier("CameraButton")
-        .accessibilityHint(LocalizationKeys.cameraAccessibilityHint.localized)
+        .accessibilityHint(Text(LocalizationKeys.cameraAccessibilityHint.localizedKey))
         .accessibilityAddTraits(.isButton)
     }
 
@@ -143,10 +147,10 @@ struct InputBarView: View {
         .disabled(isProcessingOCR)  // Only disable during OCR, allow when empty or recording
         .scaleEffect(!isProcessingOCR ? 1.0 : 0.9)
         .animation(AppTheme.Animation.quick, value: isProcessingOCR)
-        .accessibilityLabel(isRecording ? LocalizationKeys.microphoneStopAccessibilityLabel.localized : LocalizationKeys.microphoneStartAccessibilityLabel.localized)
+        .accessibilityLabel(Text(isRecording ? LocalizationKeys.microphoneStopAccessibilityLabel.localizedKey : LocalizationKeys.microphoneStartAccessibilityLabel.localizedKey))
         .accessibilityIdentifier("MicrophoneButton")
-        .accessibilityHint(isRecording ? LocalizationKeys.microphoneStopAccessibilityHint.localized : LocalizationKeys.microphoneStartAccessibilityHint.localized)
-        .accessibilityValue(isRecording ? LocalizationKeys.microphoneRecordingValue.localized : LocalizationKeys.microphoneNotRecordingValue.localized)
+        .accessibilityHint(Text(isRecording ? LocalizationKeys.microphoneStopAccessibilityHint.localizedKey : LocalizationKeys.microphoneStartAccessibilityHint.localizedKey))
+        .accessibilityValue(Text(isRecording ? LocalizationKeys.microphoneRecordingValue.localizedKey : LocalizationKeys.microphoneNotRecordingValue.localizedKey))
         .onAppear {
             if isRecording {
                 startPulseAnimation()
@@ -170,9 +174,9 @@ struct InputBarView: View {
         }
         .disabled(!isEnabled)
         .animation(AppTheme.Animation.quick, value: isEnabled)
-        .accessibilityLabel(LocalizationKeys.sendMessage.localized)
+        .accessibilityLabel(Text(LocalizationKeys.sendMessage.localizedKey))
         .accessibilityIdentifier("SendMessageButton")
-        .accessibilityHint(LocalizationKeys.sendMessageAccessibilityHint.localized)
+        .accessibilityHint(Text(LocalizationKeys.sendMessageAccessibilityHint.localizedKey))
         .accessibilityAddTraits(.isButton)
     }
 
@@ -183,7 +187,7 @@ struct InputBarView: View {
                 .frame(width: 8, height: 8)
                 .scaleEffect(pulseScale)
 
-            Text(LocalizationKeys.recording.localized)
+            Text(LocalizationKeys.recording.localizedKey)
                 .font(AppTheme.Typography.caption)
                 .foregroundColor(AppTheme.Colors.secondaryText)
 
@@ -191,7 +195,7 @@ struct InputBarView: View {
         }
         .padding(.horizontal, AppTheme.Spacing.sm)
         .padding(.vertical, AppTheme.Spacing.xs)
-        .background(AppTheme.Colors.secondaryBackground)
+        .background(DesignSystem.Colors.surface(colorScheme))
     }
 
     private var ocrProcessingIndicator: some View {
@@ -199,7 +203,7 @@ struct InputBarView: View {
             ProgressView()
                 .scaleEffect(0.8)
 
-            Text(LocalizationKeys.extractingText.localized)
+            Text(LocalizationKeys.extractingText.localizedKey)
                 .font(AppTheme.Typography.caption)
                 .foregroundColor(AppTheme.Colors.secondaryText)
 
@@ -207,7 +211,7 @@ struct InputBarView: View {
         }
         .padding(.horizontal, AppTheme.Spacing.sm)
         .padding(.vertical, AppTheme.Spacing.xs)
-        .background(AppTheme.Colors.secondaryBackground)
+        .background(DesignSystem.Colors.surface(colorScheme))
     }
 
     // MARK: - Actions
@@ -247,94 +251,51 @@ struct InputBarView: View {
     }
 }
 
-// MARK: - Preview Provider
+struct InputBarView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            preview(text: "", isEnabled: true, isRecording: false, isProcessingOCR: false)
+                .previewDisplayName("Empty State")
 
-#Preview("Empty State") {
-    VStack {
-        Spacer()
-        InputBarView(
-            text: .constant(""),
-            isEnabled: true,
-            isRecording: false,
-            isProcessingOCR: false,
-            onSend: {},
-            onMicrophoneTap: {},
-            onCameraTap: {}
-        )
+            preview(text: "What are the pillars of Islam?", isEnabled: true, isRecording: false, isProcessingOCR: false)
+                .previewDisplayName("With Text")
+
+            preview(text: "", isEnabled: true, isRecording: true, isProcessingOCR: false)
+                .previewDisplayName("Recording")
+
+            preview(text: "", isEnabled: true, isRecording: false, isProcessingOCR: true)
+                .previewDisplayName("Processing OCR")
+
+            preview(text: "Loading...", isEnabled: false, isRecording: false, isProcessingOCR: false)
+                .previewDisplayName("Disabled")
+
+            preview(
+                text: "This is a longer message that spans multiple lines. It demonstrates how the text editor expands to accommodate more content while respecting the maximum height constraint.",
+                isEnabled: true,
+                isRecording: false,
+                isProcessingOCR: false
+            )
+            .previewDisplayName("Multi-line")
+        }
     }
-}
 
-#Preview("With Text") {
-    VStack {
-        Spacer()
-        InputBarView(
-            text: .constant("What are the pillars of Islam?"),
-            isEnabled: true,
-            isRecording: false,
-            isProcessingOCR: false,
-            onSend: {},
-            onMicrophoneTap: {},
-            onCameraTap: {}
-        )
-    }
-}
-
-#Preview("Recording") {
-    VStack {
-        Spacer()
-        InputBarView(
-            text: .constant(""),
-            isEnabled: true,
-            isRecording: true,
-            isProcessingOCR: false,
-            onSend: {},
-            onMicrophoneTap: {},
-            onCameraTap: {}
-        )
-    }
-}
-
-#Preview("Processing OCR") {
-    VStack {
-        Spacer()
-        InputBarView(
-            text: .constant(""),
-            isEnabled: true,
-            isRecording: false,
-            isProcessingOCR: true,
-            onSend: {},
-            onMicrophoneTap: {},
-            onCameraTap: {}
-        )
-    }
-}
-
-#Preview("Disabled") {
-    VStack {
-        Spacer()
-        InputBarView(
-            text: .constant("Loading..."),
-            isEnabled: false,
-            isRecording: false,
-            isProcessingOCR: false,
-            onSend: {},
-            onMicrophoneTap: {},
-            onCameraTap: {}
-        )
-    }
-}
-
-#Preview("Multi-line") {
-    VStack {
-        Spacer()
-        InputBarView(
-            text: .constant("This is a longer message that spans multiple lines. It demonstrates how the text editor expands to accommodate more content while respecting the maximum height constraint."),
-            isEnabled: true,
-            isRecording: false,
-            isProcessingOCR: false,
-            onSend: {},
-            onMicrophoneTap: {},
-            onCameraTap: {}
-        )
+    private static func preview(
+        text: String,
+        isEnabled: Bool,
+        isRecording: Bool,
+        isProcessingOCR: Bool
+    ) -> some View {
+        VStack {
+            Spacer()
+            InputBarView(
+                text: .constant(text),
+                isEnabled: isEnabled,
+                isRecording: isRecording,
+                isProcessingOCR: isProcessingOCR,
+                onSend: {},
+                onMicrophoneTap: {},
+                onCameraTap: {}
+            )
+        }
     }
 }

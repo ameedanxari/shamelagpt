@@ -20,7 +20,8 @@ struct ErrorStateView: View {
         systemImage: String = "exclamationmark.triangle.fill",
         retryAction: (() -> Void)? = nil
     ) {
-        self.title = title ?? LocalizationKeys.somethingWentWrong.localized
+        // Store raw keys or plain strings; rendering will wrap in LocalizedStringKey
+        self.title = title ?? LocalizationKeys.somethingWentWrong
         self.message = message
         self.systemImage = systemImage
         self.retryAction = retryAction
@@ -34,12 +35,12 @@ struct ErrorStateView: View {
                 .accessibilityHidden(true)
 
             VStack(spacing: AppTheme.Spacing.xs) {
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(AppTheme.Typography.heading)
                     .foregroundColor(AppTheme.Colors.primaryText)
                     .multilineTextAlignment(.center)
 
-                Text(message)
+                Text(LocalizedStringKey(message))
                     .font(AppTheme.Typography.body)
                     .foregroundColor(AppTheme.Colors.secondaryText)
                     .multilineTextAlignment(.center)
@@ -49,7 +50,7 @@ struct ErrorStateView: View {
                 Button(action: retryAction) {
                     HStack(spacing: AppTheme.Spacing.xs) {
                         Image(systemName: "arrow.clockwise")
-                        Text(LocalizationKeys.tryAgain.localized)
+                        Text(LocalizationKeys.tryAgain.localizedKey)
                     }
                     .font(AppTheme.Typography.body.weight(.semibold))
                     .foregroundColor(.white)
@@ -58,8 +59,8 @@ struct ErrorStateView: View {
                     .background(AppTheme.Colors.primary)
                     .cornerRadius(AppTheme.Layout.cornerRadius)
                 }
-                .accessibilityLabel(LocalizationKeys.tryAgain.localized)
-                .accessibilityHint(LocalizationKeys.tryAgainAccessibilityHint.localized)
+                .accessibilityLabel(Text(LocalizationKeys.tryAgain.localizedKey))
+                .accessibilityHint(Text(LocalizationKeys.tryAgainAccessibilityHint.localizedKey))
             }
         }
         .padding(AppTheme.Spacing.xl)
@@ -73,8 +74,8 @@ struct NetworkErrorView: View {
 
     var body: some View {
         ErrorStateView(
-            title: LocalizationKeys.noInternetConnection.localized,
-            message: LocalizationKeys.networkCheckConnection.localized,
+            title: LocalizationKeys.noInternetConnection,
+            message: LocalizationKeys.networkCheckConnection,
             systemImage: "wifi.slash",
             retryAction: retryAction
         )
@@ -88,7 +89,7 @@ struct APIErrorView: View {
 
     var body: some View {
         ErrorStateView(
-            title: LocalizationKeys.unableToConnect.localized,
+            title: LocalizationKeys.unableToConnect,
             message: error.localizedDescription,
             systemImage: "exclamationmark.triangle.fill",
             retryAction: retryAction
@@ -108,12 +109,11 @@ struct PermissionDeniedView: View {
                 .foregroundColor(.orange.opacity(0.8))
 
             VStack(spacing: AppTheme.Spacing.xs) {
-                Text(LocalizationKeys.permissionRequired.localized)
+                Text(LocalizationKeys.permissionRequired.localizedKey)
                     .font(AppTheme.Typography.heading)
                     .foregroundColor(AppTheme.Colors.primaryText)
                     .multilineTextAlignment(.center)
-
-                Text(LocalizationKeys.permissionMessage(permissionType))
+                Text(LocalizedStringKey(LocalizationKeys.permissionMessage(permissionType)))
                     .font(AppTheme.Typography.body)
                     .foregroundColor(AppTheme.Colors.secondaryText)
                     .multilineTextAlignment(.center)
@@ -122,7 +122,7 @@ struct PermissionDeniedView: View {
             Button(action: settingsAction) {
                 HStack(spacing: AppTheme.Spacing.xs) {
                     Image(systemName: "gearshape")
-                    Text(LocalizationKeys.openSettings.localized)
+                    Text(LocalizationKeys.openSettings.localizedKey)
                 }
                 .font(AppTheme.Typography.body.weight(.semibold))
                 .foregroundColor(.white)
@@ -131,8 +131,8 @@ struct PermissionDeniedView: View {
                 .background(AppTheme.Colors.primary)
                 .cornerRadius(AppTheme.Layout.cornerRadius)
             }
-            .accessibilityLabel(LocalizationKeys.openSettings.localized)
-            .accessibilityHint(LocalizationKeys.openSettingsAccessibilityHint.localized.localized(with: permissionType))
+            .accessibilityLabel(Text(LocalizationKeys.openSettings.localizedKey))
+            .accessibilityHint(Text(L10n.formattedKeyWithLocalizedArgs(LocalizationKeys.openSettingsAccessibilityHint, argKeys: permissionType)))
         }
         .padding(AppTheme.Spacing.xl)
     }
@@ -148,7 +148,7 @@ struct NetworkStatusBanner: View {
                 Image(systemName: "wifi.slash")
                     .font(.system(size: 14))
 
-                Text(LocalizationKeys.noInternetConnection.localized)
+                Text(LocalizationKeys.noInternetConnection.localizedKey)
                     .font(AppTheme.Typography.caption)
 
                 Spacer()
@@ -156,38 +156,38 @@ struct NetworkStatusBanner: View {
             .foregroundColor(.white)
             .padding(.horizontal, AppTheme.Spacing.sm)
             .padding(.vertical, AppTheme.Spacing.xs)
-            .background(Color.red)
+            .background(DesignSystem.Colors.error)
             .transition(.move(edge: .top).combined(with: .opacity))
             .accessibilityElement(children: .combine)
-            .accessibilityLabel(LocalizationKeys.noInternetConnection.localized)
+            .accessibilityLabel(Text(LocalizationKeys.noInternetConnection.localizedKey))
             .accessibilityAddTraits(.isStaticText)
         }
     }
 }
 
-// MARK: - Preview Provider
+struct ErrorStateView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            ErrorStateView(
+                message: LocalizationKeys.failedToLoadData,
+                retryAction: {}
+            )
+            .previewDisplayName("Error State")
 
-#Preview("Error State") {
-    ErrorStateView(
-        message: LocalizationKeys.failedToLoadData.localized,
-        retryAction: {}
-    )
-}
+            NetworkErrorView(retryAction: {})
+                .previewDisplayName("Network Error")
 
-#Preview("Network Error") {
-    NetworkErrorView(retryAction: {})
-}
+            PermissionDeniedView(
+                permissionType: "Microphone",
+                settingsAction: {}
+            )
+            .previewDisplayName("Permission Denied")
 
-#Preview("Permission Denied") {
-    PermissionDeniedView(
-        permissionType: "Microphone",
-        settingsAction: {}
-    )
-}
-
-#Preview("Network Banner") {
-    VStack {
-        NetworkStatusBanner(networkMonitor: NetworkMonitor.shared)
-        Spacer()
+            VStack {
+                NetworkStatusBanner(networkMonitor: NetworkMonitor.shared)
+                Spacer()
+            }
+            .previewDisplayName("Network Banner")
+        }
     }
 }
