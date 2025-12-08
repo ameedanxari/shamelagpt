@@ -378,6 +378,9 @@ final class ChatViewModel: ObservableObject {
                         }
 
                         if encounteredDone {
+                            Task {
+                                await persistThreadIdIfNeeded()
+                            }
                             shouldTerminateStream = true
                         }
                     }
@@ -478,6 +481,18 @@ final class ChatViewModel: ObservableObject {
 
         } catch {
             AppLogger.chat.logError("Error checking conversation existence", error: error)
+        }
+    }
+
+    private func persistThreadIdIfNeeded() async {
+        guard !isGuest, let newThreadId = threadId else { return }
+        do {
+            if let conversation = try await chatRepository.fetchConversation(byId: conversationId), conversation.isLocalOnly == false {
+                try await chatRepository.updateConversationThreadId(id: conversationId, threadId: newThreadId)
+                AppLogger.chat.logInfo("Persisted threadId \(newThreadId) for conversation \(conversationId)")
+            }
+        } catch {
+            AppLogger.chat.logError("Failed to persist threadId \(threadId ?? "nil") for conversation \(conversationId)", error: error)
         }
     }
 

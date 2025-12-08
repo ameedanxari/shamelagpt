@@ -60,7 +60,7 @@ class ChatRepositoryImpl(
             // Create AI message with parsed data
             val aiMessage = Message(
                 id = UUID.randomUUID().toString(),
-                content = cleanContent,
+                content = response.answer,
                 isUserMessage = false,
                 timestamp = System.currentTimeMillis(),
                 sources = sources.ifEmpty { null }

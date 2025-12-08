@@ -262,24 +262,17 @@ final class HistoryViewModel: ObservableObject {
     /// - Parameter conversation: The conversation to export
     /// - Returns: Formatted text of the conversation
     func exportConversation(_ conversation: Conversation) -> String {
-        var text = "Conversation: \(displayTitle(for: conversation))\n"
-        text += "Created: \(conversation.createdAt.formatted())\n"
-        text += "Updated: \(conversation.updatedAt.formatted())\n"
-        text += "\n---\n\n"
+        let title = displayTitle(for: conversation)
+        let link = "https://shamelagpt.com/chat?id=\(conversation.id)"
+        let preview = messagePreview(for: conversation)
+        let updated = conversation.updatedAt.formatted()
 
-        for message in conversation.messages {
-            let sender = message.isUserMessage ? "You" : "ShamelaGPT"
-            text += "[\(sender)] \(message.timestamp.formatted())\n"
-            text += "\(message.content)\n"
+        var text = "ShamelaGPT Chat: \(title)\n"
+        text += "Link: \(link)\n"
+        text += "Last updated: \(updated)\n"
 
-            if message.hasSources {
-                text += "\nSources:\n"
-                for (index, source) in message.sources.enumerated() {
-                    text += "\(index + 1). \(source.citation)\n"
-                }
-            }
-
-            text += "\n---\n\n"
+        if !preview.isEmpty {
+            text += "\nPreview:\n\(preview)"
         }
 
         return text

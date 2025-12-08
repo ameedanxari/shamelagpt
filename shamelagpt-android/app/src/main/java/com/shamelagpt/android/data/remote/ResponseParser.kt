@@ -10,31 +10,31 @@ object ResponseParser {
     /**
      * Parses the answer markdown to extract clean content and sources.
      *
-     * The answer format is:
-     * ```
-     * Content...
-     *
-     * Sources:
-     *
-     * * **book_name:** Book Title, **source_url:** https://shamela.ws/book/123/45
-     * * **book_name:** Another Book, **source_url:** https://shamela.ws/book/456/78
-     * ```
+     * Supports headers like "Sources:", "المصادر", or "المصادر / Sources".
      *
      * @param answer The markdown formatted answer from API
      * @return Pair of (clean content, list of sources)
      */
     fun parseAnswer(answer: String): Pair<String, List<Source>> {
-        // Split by "Sources:" section
-        val parts = answer.split(Regex("\\n\\s*Sources:\\s*\\n"), limit = 2)
+        val normalized = answer.replace("\r\n", "\n")
+        val headerPattern = Regex("(?mi)^(?:المصادر|Sources)(?:\\s*/\\s*(?:Sources|المصادر))?\\s*:?.*$")
 
-        val content = parts[0].trim()
-        val sources = if (parts.size > 1) {
-            extractSources(parts[1])
-        } else {
-            emptyList()
+        val headerMatch = headerPattern.find(normalized)
+        if (headerMatch == null) {
+            return normalized.trim() to emptyList()
         }
 
-        return Pair(content, sources)
+        val contentPart = normalized.substring(0, headerMatch.range.first)
+        val sourcesPart = normalized.substring(headerMatch.range.last + 1)
+        val nextHeader = headerPattern.find(sourcesPart)
+        val sourcesSlice = if (nextHeader != null) {
+            sourcesPart.substring(0, nextHeader.range.first)
+        } else {
+            sourcesPart
+        }
+
+        val sources = extractSources(sourcesSlice)
+        return contentPart.trim() to sources
     }
 
     /**
@@ -46,21 +46,46 @@ object ResponseParser {
     private fun extractSources(sourcesSection: String): List<Source> {
         val sources = mutableListOf<Source>()
 
-        // Pattern to match: * **book_name:** Book Title, **source_url:** https://...
-        val pattern = Regex(
-            """\*\s*\*\*book_name:\*\*\s*([^,]+),\s*\*\*source_url:\*\*\s*(\S+)""",
-            RegexOption.MULTILINE
-        )
+        // Accept lines beginning with "-" or "*"
+        sourcesSection
+            .split("\n")
+            .map { it.trim() }
+            .filter { it.startsWith("-") || it.startsWith("*") }
+            .forEach { line ->
+                val cleanLine = line.replace(Regex("^[*-]\\s*"), "")
 
-        pattern.findAll(sourcesSection).forEach { match ->
-            val bookName = match.groupValues[1].trim()
-            val sourceUrl = match.groupValues[2].trim()
+                // Try **book_name:** format
+                val bookNamePattern = Regex("""\*\*book_name:\*\*\s*([^,]+)""")
+                val sourceUrlPattern = Regex("""\*\*source_url:\*\*\s*(https?://\S+)""")
+                val bookName = bookNamePattern.find(cleanLine)?.groupValues?.get(1)?.trim()
+                val urlStructured = sourceUrlPattern.find(cleanLine)?.groupValues?.get(1)?.trim()
 
-            if (bookName.isNotEmpty() && sourceUrl.isNotEmpty()) {
-                sources.add(Source(bookName = bookName, sourceURL = sourceUrl))
+                if (!bookName.isNullOrEmpty() && !urlStructured.isNullOrEmpty()) {
+                    sources.add(Source(bookName = bookName, sourceURL = urlStructured))
+                    return@forEach
+                }
+
+                // Fallback: split on first URL in the line (e.g., "Title - https://...")
+                val urlFallback = findFirstUrl(cleanLine)
+                if (urlFallback != null) {
+                    val title = cleanLine
+                        .replace(urlFallback, "")
+                        .replace(" - ", " ")
+                        .trim()
+                    sources.add(
+                        Source(
+                            bookName = if (title.isEmpty()) urlFallback else title,
+                            sourceURL = urlFallback
+                        )
+                    )
+                }
             }
-        }
 
         return sources
+    }
+
+    private fun findFirstUrl(text: String): String? {
+        val pattern = Regex("https?://[^\\s]+")
+        return pattern.find(text)?.value
     }
 }

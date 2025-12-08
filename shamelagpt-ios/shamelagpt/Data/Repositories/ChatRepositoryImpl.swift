@@ -367,12 +367,14 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
                 }
                 let roleLower = role.lowercased()
                 let isUser = roleLower == "user" || roleLower == "human"
-                // Persist as non-fact-check without sources (API currently returns text only)
+                let parsed = ResponseParser.parseMarkdownResponse(content)
+
+                // Persist raw content; extract sources for UI but avoid mutating payload
                 _ = try? await addMessage(
                     toConversation: conversationId,
                     content: content,
                     isUserMessage: isUser,
-                    sources: []
+                    sources: isUser ? [] : parsed.sources
                 )
             }
 
@@ -477,7 +479,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
             // Save assistant message with sources
             let assistantMessage = try await addMessage(
                 toConversation: conversationId,
-                content: parsedResponse.cleanContent,
+                content: response.answer,
                 isUserMessage: false,
                 sources: parsedResponse.sources
             )

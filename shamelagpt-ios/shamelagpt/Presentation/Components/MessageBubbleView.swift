@@ -39,7 +39,7 @@ struct MessageBubbleView: View {
                     .padding(.horizontal, AppTheme.Spacing.xs)
 
                 // Sources section (if available)
-                if message.hasSources {
+                if !displayedSources.isEmpty {
                     sourcesSection
                 }
             }
@@ -65,8 +65,8 @@ struct MessageBubbleView: View {
         .accessibilityLabel(message.content)
         .accessibilityHint(message.isUserMessage
                            ? "Your message. Double tap to view context menu with copy and share options."
-                           : (message.hasSources
-                              ? "Assistant message. Contains \(message.sources.count) sources. Double tap for options."
+                           : (!displayedSources.isEmpty
+                              ? "Assistant message. Contains \(displayedSources.count) sources. Double tap for options."
                               : "Assistant message. Double tap for options."))
         .accessibilityValue(formattedTimestamp)
     }
@@ -99,9 +99,11 @@ struct MessageBubbleView: View {
             }
 
             // Message text
-            Text(formattedContent)
-                .font(AppTheme.Typography.body)
-                .foregroundColor(DesignSystem.Colors.textPrimary(colorScheme))
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(messageLines.enumerated()), id: \.offset) { _, line in
+                    messageLineView(line)
+                }
+            }
         }
         .padding(AppTheme.Spacing.sm)
         .background(bubbleBackground)
@@ -145,7 +147,7 @@ struct MessageBubbleView: View {
                 .fontWeight(.semibold)
                 .accessibilityIdentifier("SourcesHeader")
 
-            ForEach(message.sources) { source in
+            ForEach(displayedSources) { source in
                 sourceLink(for: source)
             }
         }
@@ -192,18 +194,22 @@ struct MessageBubbleView: View {
         return formatter.string(from: message.timestamp)
     }
 
-    private var formattedContent: AttributedString {
-        // Basic markdown support using AttributedString
-        if message.isAssistantMessage {
-            return parseMarkdown(message.content)
+    private var messageLines: [AttributedString] {
+        let normalizedLines = normalizedLines(from: messageDisplayContent)
+        return normalizedLines.map { line in
+            let displayLine = line.isEmpty ? " " : line
+            if message.isAssistantMessage {
+                return AttributedString(parseMarkdown(displayLine))
+            } else {
+                return AttributedString(stringLiteral: displayLine)
+            }
         }
-        return AttributedString(message.content)
     }
 
     // MARK: - Actions
 
     private func copyMessage() {
-        UIPasteboard.general.string = message.content
+        UIPasteboard.general.string = shareContent
         showingCopyConfirmation = true
 
         // Hide confirmation after 2 seconds
@@ -214,7 +220,7 @@ struct MessageBubbleView: View {
 
     private func shareMessage() {
         let activityVC = UIActivityViewController(
-            activityItems: [message.content],
+            activityItems: [shareContent],
             applicationActivities: nil
         )
 
@@ -244,17 +250,12 @@ struct MessageBubbleView: View {
         }
     }
 
-    private func parseMarkdown(_ text: String) -> AttributedString {
+    private func parseMarkdown(_ text: String) -> NSAttributedString {
         // Use stock iOS markdown support without any preprocessing
         // iOS AttributedString handles CommonMark markdown automatically
 
         do {
-            // Normalize escaped newlines so server responses with "\n" render as real line breaks.
-            let normalized = text
-                .replacingOccurrences(of: "\\r\\n", with: "\n")
-                .replacingOccurrences(of: "\\n", with: "\n")
-                // Also insert a space before capital letters that immediately follow punctuation without spacing (common in streamed text)
-                .replacingOccurrences(of: "([\\.\\!\\?])(\\w)", with: "$1 $2", options: .regularExpression)
+            let normalized = normalizeMarkdownInput(text)
 
             // Parse markdown using Swift's AttributedString API (available on iOS 15+),
             // then bridge to an NSMutableAttributedString so we can mutate fonts per-range.
@@ -291,21 +292,116 @@ struct MessageBubbleView: View {
                 // Detect language for the run (prefer heuristic)
                 let detected = LanguageDetector.detectLanguage(for: substring)
 
-                // Map to font and apply
-                let uiFont = FontRegistry.shared.uiFont(forLanguage: detected, textStyle: .body)
-                AppLogger.font.logDebug("MessageBubbleView: runRange=\(runRange.location)-\(runRange.length) detected=\(detected ?? "nil") substringPreview=\(substring.prefix(24)) -> uiFont=\(uiFont.fontName)")
+                // Map to language-aware font while preserving original size/traits (so markdown headings keep scale)
+                let currentFont = ns.attribute(.font, at: runRange.location, effectiveRange: nil) as? UIFont
+                let uiFont = languageAwareFont(for: detected, originalFont: currentFont)
+                AppLogger.font.logDebug("MessageBubbleView: runRange=\(runRange.location)-\(runRange.length) detected=\(detected ?? "nil") substringPreview=\(substring.prefix(24)) -> uiFont=\(uiFont.fontName) pointSize=\(uiFont.pointSize)")
                 ns.addAttribute(NSAttributedString.Key.font, value: uiFont, range: runRange)
 
                 index = j
             }
 
-            // Convert back to AttributedString for SwiftUI (use NSAttributedString bridge)
-            return AttributedString(ns)
+            return ns
         } catch {
             // Fallback to plain text if markdown parsing fails
             AppLogger.ui.logError("Markdown parsing failed, using plain text", error: error)
-            return AttributedString(text)
+            return NSAttributedString(string: text)
         }
+    }
+
+    private func normalizeMarkdownInput(_ text: String) -> String {
+        normalizeNewlines(in: text)
+    }
+
+    private func normalizeNewlines(in text: String) -> String {
+        text
+            // Normalize escaped newlines so server responses with "\n" render as real line breaks.
+            .replacingOccurrences(of: "\\r\\n", with: "\n")
+            .replacingOccurrences(of: "\\n", with: "\n")
+            .replacingOccurrences(of: "\r\n", with: "\n")
+    }
+
+    @ViewBuilder
+    private func messageLineView(_ line: AttributedString) -> some View {
+        if message.isAssistantMessage {
+            Text(line)
+        } else {
+            Text(line)
+                .font(AppTheme.Typography.body)
+                .foregroundColor(DesignSystem.Colors.textPrimary(colorScheme))
+        }
+    }
+
+    private var messageDisplayContent: String {
+        let base = message.isAssistantMessage
+            ? ResponseParser.parseMarkdownResponse(message.content).cleanContent
+            : message.content
+        return sanitizedContent(base)
+    }
+
+    private var displayedSources: [Source] {
+        if !message.sources.isEmpty {
+            return message.sources
+        }
+        if message.isAssistantMessage {
+            return ResponseParser.parseMarkdownResponse(message.content).sources
+        }
+        return []
+    }
+
+    private var shareContent: String {
+        guard !displayedSources.isEmpty else { return messageDisplayContent }
+
+        let sourcesLines = displayedSources.map { source -> String in
+            if let url = source.sourceUrl, !url.isEmpty {
+                return "- \(source.citation) - \(url)"
+            }
+            return "- \(source.citation)"
+        }.joined(separator: "\n")
+
+        return """
+        \(messageDisplayContent)
+
+        Sources:
+        \(sourcesLines)
+        """
+    }
+
+    private func languageAwareFont(for detectedLanguage: String?, originalFont: UIFont?) -> UIFont {
+        let baseFont = originalFont ?? UIFont.preferredFont(forTextStyle: .body)
+        let weight = baseFont.fontWeight
+        let languageFont = FontRegistry.shared.uiFont(forLanguage: detectedLanguage, textStyle: .body, weight: weight)
+        let descriptorWithTraits = languageFont.fontDescriptor
+            .withSymbolicTraits(baseFont.fontDescriptor.symbolicTraits) ?? languageFont.fontDescriptor
+        return UIFont(descriptor: descriptorWithTraits, size: baseFont.pointSize)
+    }
+}
+
+private extension UIFont {
+    var fontWeight: UIFont.Weight {
+        let traits = fontDescriptor.object(forKey: .traits) as? [UIFontDescriptor.TraitKey: Any]
+        if let weightValue = traits?[.weight] as? CGFloat {
+            return UIFont.Weight(weightValue)
+        }
+        return .regular
+    }
+}
+
+// MARK: - Content Normalization Helpers
+
+private extension MessageBubbleView {
+    func sanitizedContent(_ text: String) -> String {
+        let normalized = normalizeNewlines(in: text)
+        // Fix domain breaks like "https://shamela. ws" that may appear in stored text
+        return normalized
+            .replacingOccurrences(of: "https?://shamela\\.\\s*ws", with: "https://shamela.ws", options: .regularExpression)
+    }
+
+    func normalizedLines(from text: String) -> [String] {
+        let normalized = normalizeNewlines(in: text)
+        return normalized
+            .split(separator: "\n", omittingEmptySubsequences: false)
+            .map(String.init)
     }
 }
 

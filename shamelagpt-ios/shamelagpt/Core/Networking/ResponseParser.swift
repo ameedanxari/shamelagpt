@@ -21,34 +21,30 @@ struct ResponseParser {
     /// ```
     /// Content here...
     ///
-    /// Sources:
-    ///
-    /// * **book_name:** Book Title, **source_url:** https://shamela.ws/book/123/45
+    /// المصادر / Sources:
+    /// - Title - https://shamela.ws/book/123/45
     /// ```
     static func parseMarkdownResponse(_ markdown: String) -> ParsedResponse {
-        // Locate the first "Sources:" marker (with or without markdown heading)
-        if let range = markdown.range(of: "Sources:", options: [.caseInsensitive]) {
-            let contentPart = markdown[..<range.lowerBound]
-            let sourcesPartFull = markdown[range.upperBound...]
+        let normalized = markdown.replacingOccurrences(of: "\r\n", with: "\n")
 
-            // Limit parsing to the first sources section (ignore subsequent "Sources:" blocks)
-            let nextSourcesRange = sourcesPartFull.range(
-                of: "\n\\s*Sources:",
-                options: [.regularExpression, .caseInsensitive]
-            )
-            let sourcesSlice = nextSourcesRange.map { sourcesPartFull[..<$0.lowerBound] } ?? sourcesPartFull
-            let sourcesPart = sourcesSlice
-
-            let cleanContent = contentPart
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            let sources = parseSources(from: String(sourcesPart))
-
-            return ParsedResponse(cleanContent: cleanContent, sources: sources)
+        // Find the first sources header in either English or Arabic, with optional slash and colon
+        let headerPattern = #"(?mi)^(?:المصادر|Sources)(?:\s*/\s*(?:Sources|المصادر))?\s*:?\s*$"#
+        guard let headerRange = normalized.range(of: headerPattern, options: .regularExpression) else {
+            let cleanContent = normalized.trimmingCharacters(in: .whitespacesAndNewlines)
+            return ParsedResponse(cleanContent: cleanContent, sources: [])
         }
 
-        // Fallback when no sources marker found
-        let cleanContent = markdown.trimmingCharacters(in: .whitespacesAndNewlines)
-        return ParsedResponse(cleanContent: cleanContent, sources: [])
+        let contentPart = normalized[..<headerRange.lowerBound]
+        let sourcesPartFull = normalized[headerRange.upperBound...]
+
+        // Take until the next header repeat if present
+        let nextHeaderRange = sourcesPartFull.range(of: headerPattern, options: .regularExpression)
+        let sourcesSlice = nextHeaderRange.map { sourcesPartFull[..<$0.lowerBound] } ?? sourcesPartFull
+
+        let cleanContent = contentPart.trimmingCharacters(in: .whitespacesAndNewlines)
+        let sources = parseSources(from: String(sourcesSlice))
+
+        return ParsedResponse(cleanContent: cleanContent, sources: sources)
     }
 
     /// Parses sources from the sources section
@@ -58,8 +54,8 @@ struct ResponseParser {
     private static func parseSources(from sourcesText: String) -> [Source] {
         var sources: [Source] = []
 
-        // Split by lines that start with "* " or "- "
-        let lines = sourcesText.components(separatedBy: "\n")
+        let lines = sourcesText
+            .components(separatedBy: "\n")
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { $0.hasPrefix("*") || $0.hasPrefix("-") }
 
@@ -126,7 +122,22 @@ struct ResponseParser {
         guard let title = bookTitle?.trimmingCharacters(in: .whitespacesAndNewlines),
               let url = sourceUrl?.trimmingCharacters(in: .whitespacesAndNewlines),
               !title.isEmpty else {
-            return nil
+            // Last-chance fallback: split on URL directly (e.g., "Title - https://...").
+            guard let rawURL = extractFirstURL(from: line) else { return nil }
+            let titleFallback = line
+                .replacingOccurrences(of: rawURL, with: "")
+                .replacingOccurrences(of: " - ", with: " ")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
+            let (volumeNumber, pageNumber) = extractVolumeAndPage(from: rawURL)
+            return Source(
+                bookTitle: titleFallback.isEmpty ? rawURL : titleFallback,
+                author: nil,
+                volumeNumber: volumeNumber,
+                pageNumber: pageNumber,
+                text: line,
+                sourceUrl: rawURL
+            )
         }
 
         // Extract volume and page numbers from URL if present
@@ -141,6 +152,12 @@ struct ResponseParser {
             text: line, // Store the full citation line as text
             sourceUrl: url
         )
+    }
+
+    private static func extractFirstURL(from text: String) -> String? {
+        let pattern = "https?://[^\\s]+"
+        guard let range = text.range(of: pattern, options: .regularExpression) else { return nil }
+        return String(text[range])
     }
 
     /// Extracts the matched value from a regex pattern
