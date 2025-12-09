@@ -30,12 +30,12 @@ struct AboutView: View {
 
                     HStack(spacing: 4) {
                         Text(LocalizationKeys.settingsVersion.localizedKey)
-                        Text("1.0.0")
+                            .font(AppTheme.Typography.caption)
+                            .foregroundColor(AppTheme.Colors.tertiaryText)
+                        Text(appVersion)
                             .font(AppTheme.Typography.caption)
                             .foregroundColor(AppTheme.Colors.tertiaryText)
                     }
-                        .font(AppTheme.Typography.caption)
-                        .foregroundColor(AppTheme.Colors.tertiaryText)
                 }
                 .frame(maxWidth: .infinity)
 
@@ -79,6 +79,15 @@ struct AboutView: View {
             .fontWeight(.semibold)
             .foregroundColor(AppTheme.Colors.primaryText)
     }
+}
+
+// MARK: - Helpers
+private var appVersion: String {
+    let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "–"
+    if let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String, !build.isEmpty {
+        return "\(version) (\(build))"
+    }
+    return version
 }
 
 struct AboutView_Previews: PreviewProvider {

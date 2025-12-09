@@ -84,18 +84,25 @@ struct InputBarView: View {
                     .allowsHitTesting(false)
             }
 
-            // Text editor
-            TextEditor(text: $text)
-                .font(AppTheme.Typography.body)
-                .foregroundColor(AppTheme.Colors.primaryText)
-                .frame(minHeight: minHeight, maxHeight: min(textEditorHeight, maxHeight))
-                .background(Color.clear)
-                .focused($isFocused)
-                .accessibilityIdentifier("ChatInputTextView")
-                .accessibilityLabel(Text(LocalizationKeys.askQuestionPlaceholder.localizedKey))
-                .onChange(of: text) { _ in
-                    updateHeight()
+            // Text editor without the default opaque background (prevents overlay from hiding placeholder)
+            Group {
+                if #available(iOS 16.0, *) {
+                    TextEditor(text: $text)
+                        .scrollContentBackground(.hidden)
+                } else {
+                    TextEditor(text: $text)
                 }
+            }
+            .font(AppTheme.Typography.body)
+            .foregroundColor(AppTheme.Colors.primaryText)
+            .frame(minHeight: minHeight, maxHeight: min(textEditorHeight, maxHeight))
+            .background(Color.clear)
+            .focused($isFocused)
+            .accessibilityIdentifier("ChatInputTextView")
+            .accessibilityLabel(Text(LocalizationKeys.askQuestionPlaceholder.localizedKey))
+            .onChange(of: text) { _ in
+                updateHeight()
+            }
         }
         .padding(.horizontal, AppTheme.Spacing.xs)
         .padding(.vertical, AppTheme.Spacing.xxs)

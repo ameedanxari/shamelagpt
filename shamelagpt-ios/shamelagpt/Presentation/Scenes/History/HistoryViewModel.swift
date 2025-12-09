@@ -57,24 +57,13 @@ final class HistoryViewModel: ObservableObject {
                 }
 
                 let filtered = conversations.filter { [weak self] conversation in
-                    // Drop empty local-only conversations; they will never hydrate remotely
-                    if conversation.isLocalOnly && conversation.messages.isEmpty {
-                        AppLogger.app.logDebug("Conversation \(conversation.id) is local-only & empty - FILTERED from history")
-                        return false
-                    }
-
                     // Hide local-only conversations only when not allowed (e.g., guests viewing history)
                     if conversation.isLocalOnly && (self?.includeLocalOnly == false) {
                         AppLogger.app.logDebug("Conversation \(conversation.id) is local-only - FILTERED from history")
                         return false
                     }
 
-                    // Keep conversations even if messages are not yet hydrated (remote messages fetched separately)
-                    if conversation.messages.isEmpty {
-                        AppLogger.app.logDebug("Conversation \(conversation.id) has no local messages yet - INCLUDED (will hydrate on open)")
-                    } else {
-                        AppLogger.app.logDebug("Conversation \(conversation.id) INCLUDED (messages=\(conversation.messages.count), localOnly=\(conversation.isLocalOnly))")
-                    }
+                    AppLogger.app.logDebug("Conversation \(conversation.id) INCLUDED (messages=\(conversation.messages.count), localOnly=\(conversation.isLocalOnly))")
                     return true
                 }
 
@@ -108,9 +97,6 @@ final class HistoryViewModel: ObservableObject {
             let conversations = try await getConversationsUseCase.execute()
             await MainActor.run {
                 self.conversations = conversations.filter { conversation in
-                    if conversation.isLocalOnly && conversation.messages.isEmpty {
-                        return false
-                    }
                     // Hide local-only conversations only when not allowed (e.g., guests viewing history)
                     if conversation.isLocalOnly && includeLocalOnly == false {
                         return false
@@ -186,27 +172,6 @@ final class HistoryViewModel: ObservableObject {
             }
 
             isLoading = false
-        }
-    }
-
-    /// Creates a new conversation
-    /// - Returns: The ID of the newly created conversation
-    func createNewConversation() async throws -> String {
-        error = nil
-
-        do {
-            if let emptyConversation = try await chatRepository.fetchMostRecentEmptyConversation(includeLocalOnly: includeLocalOnly) {
-                AppLogger.app.logInfo("Reusing existing empty conversation from History: \(emptyConversation.id)")
-                return emptyConversation.id
-            }
-
-            // Generate title from timestamp
-            let title = "New Conversation"
-            let conversation = try await chatRepository.createConversation(title: title)
-            return conversation.id
-        } catch {
-            self.error = "Failed to create conversation: \(error.localizedDescription)"
-            throw error
         }
     }
 

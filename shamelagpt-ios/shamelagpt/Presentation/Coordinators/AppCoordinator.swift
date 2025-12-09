@@ -135,12 +135,10 @@ class AppCoordinator: ObservableObject {
         selectedTab = 0
         popToRoot()
 
-        // Generate new conversation ID
-        let newConversationId = UUID().uuidString
-        saveLastConversationId(newConversationId)
+        clearLastConversationId()
 
-        // Navigate to new chat
-        navigate(to: .chat(conversationId: newConversationId))
+        // Navigate to chat without pre-creating a conversation
+        navigate(to: .chat(conversationId: nil))
     }
 
     /// Navigate to a specific conversation
@@ -148,6 +146,10 @@ class AppCoordinator: ObservableObject {
     func openConversation(_ conversationId: String) {
         // Switch to chat tab
         selectedTab = 0
+
+        // Persist and publish the selected conversation immediately so listeners (MainTabView) can react
+        saveLastConversationId(conversationId)
+        AppLogger.app.logInfo("Coordinator openConversation -> conversationId=\(conversationId)")
 
         // Navigate to specific conversation
         navigate(to: .chat(conversationId: conversationId))
@@ -175,6 +177,16 @@ class AppCoordinator: ObservableObject {
             userDefaults.set(conversationId, forKey: guestConversationIdKey)
         } else {
             userDefaults.set(conversationId, forKey: lastConversationIdKey)
+        }
+    }
+
+    /// Clear the persisted last conversation ID
+    func clearLastConversationId() {
+        lastConversationId = nil
+        if userDefaults.bool(forKey: "is_guest") {
+            userDefaults.removeObject(forKey: guestConversationIdKey)
+        } else {
+            userDefaults.removeObject(forKey: lastConversationIdKey)
         }
     }
 

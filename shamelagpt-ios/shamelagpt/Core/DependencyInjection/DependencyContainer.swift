@@ -158,7 +158,10 @@ class DependencyContainer {
 
     /// Factory method to create a ChatViewModel for a specific conversation
     @MainActor
-    func makeChatViewModel(conversationId: String) -> ChatViewModel {
+    func makeChatViewModel(
+        conversationId: String?,
+        onConversationChange: ((String?) -> Void)? = nil
+    ) -> ChatViewModel {
         let sessionManager = resolve(SessionManager.self)
         let guestSessionId = sessionManager?.getOrCreateGuestSessionId()
         return ChatViewModel(
@@ -169,7 +172,8 @@ class DependencyContainer {
             isGuest: sessionManager?.isGuest() ?? false,
             guestSessionId: guestSessionId,
             voiceInputManager: VoiceInputManager(),
-            ocrManager: OCRManager()
+            ocrManager: OCRManager(),
+            onConversationIdChange: onConversationChange
         )
     }
 

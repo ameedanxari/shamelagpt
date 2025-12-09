@@ -70,26 +70,25 @@ final class HistoryViewModelTests: XCTestCase {
         XCTAssertEqual(mockGetConversationsUseCase.executeCallCount, 1)
     }
 
-    func testLoadConversationsFiltersEmptyConversations() async throws {
+    func testLoadConversationsIncludesEmptyConversations() async throws {
         // Given
-        let oldDate = Date().addingTimeInterval(-600) // 10 minutes ago (older than 5 minute threshold)
         let conv1 = Conversation(
             id: "1",
             title: "Conversation with messages",
             messages: [Message.preview]
         )
-        let conv2 = Conversation(
+        let localEmpty = Conversation(
             id: "2",
-            title: "Empty Conversation",
-            createdAt: oldDate, // Old empty conversation should be filtered
-            messages: []
+            title: "Empty Local Conversation",
+            messages: [],
+            isLocalOnly: true
         )
         let conv3 = Conversation(
             id: "3",
             title: "Another with messages",
             messages: [Message.previewAssistant]
         )
-        mockGetConversationsUseCase.mockConversations = [conv1, conv2, conv3]
+        mockGetConversationsUseCase.mockConversations = [conv1, localEmpty, conv3]
 
         // When
         viewModel.loadConversations()
@@ -97,11 +96,9 @@ final class HistoryViewModelTests: XCTestCase {
         // Give time for async operation
         try await Task.sleep(nanoseconds: 100_000_000)
 
-        // Then - should only include conversations with messages or recent empty ones
-        // Conv2 is old and empty, so it should be filtered out
-        XCTAssertEqual(viewModel.conversations.count, 2, "Should filter out old empty conversations")
-        XCTAssertTrue(viewModel.conversations.allSatisfy { !$0.messages.isEmpty || Date().timeIntervalSince($0.createdAt) < 300 }, "All conversations should have messages or be recent")
-        XCTAssertFalse(viewModel.conversations.contains { $0.id == "2" }, "Old empty conversation should be filtered out")
+        // Then - empty conversations should remain (includeLocalOnly defaults to true)
+        XCTAssertEqual(viewModel.conversations.count, 3, "Empty conversations should not be filtered out")
+        XCTAssertTrue(viewModel.conversations.contains { $0.id == "2" }, "Empty conversation should be present")
     }
 
     func testLoadConversationsWithError() async throws {
@@ -310,81 +307,6 @@ final class HistoryViewModelTests: XCTestCase {
         XCTAssertNotNil(viewModel.error)
         XCTAssertTrue(viewModel.error?.contains("Failed to delete all conversations") ?? false)
         XCTAssertFalse(viewModel.isLoading)
-    }
-
-    // MARK: - Conversation Creation Tests
-
-    func testCreateNewConversationSuccess() async throws {
-        // Given
-        let expectedId = "new-conv-id"
-        let newConversation = Conversation(
-            id: expectedId,
-            title: "New Conversation",
-            messages: []
-        )
-        mockChatRepository.mockConversation = newConversation
-
-        // When
-        let conversationId = try await viewModel.createNewConversation()
-
-        // Then
-        XCTAssertEqual(conversationId, expectedId)
-        XCTAssertEqual(mockChatRepository.createConversationCallCount, 1)
-        XCTAssertNil(viewModel.error)
-    }
-
-    func testCreateNewConversationWithError() async throws {
-        // Given
-        mockChatRepository.shouldThrowError = true
-        mockChatRepository.errorToThrow = NSError(
-            domain: "test",
-            code: -1,
-            userInfo: [NSLocalizedDescriptionKey: "Creation failed"]
-        )
-
-        // When/Then
-        do {
-            _ = try await viewModel.createNewConversation()
-            XCTFail("Should have thrown an error")
-        } catch {
-            XCTAssertNotNil(viewModel.error)
-            XCTAssertTrue(viewModel.error?.contains("Failed to create conversation") ?? false)
-        }
-    }
-
-    func testCreateNewConversationReturnsId() async throws {
-        // Given
-        let newConversation = Conversation(
-            id: "unique-id-123",
-            title: "New Conversation",
-            messages: []
-        )
-        mockChatRepository.mockConversation = newConversation
-
-        // When
-        let returnedId = try await viewModel.createNewConversation()
-
-        // Then
-        XCTAssertEqual(returnedId, "unique-id-123")
-        XCTAssertFalse(returnedId.isEmpty)
-    }
-
-    func testCreateNewConversationReusesExistingEmptyConversation() async throws {
-        // Given
-        let existingEmpty = Conversation(
-            id: "existing-empty",
-            title: "New Conversation",
-            messages: []
-        )
-        mockChatRepository.mockConversations = [existingEmpty]
-
-        // When
-        let returnedId = try await viewModel.createNewConversation()
-
-        // Then
-        XCTAssertEqual(returnedId, existingEmpty.id)
-        XCTAssertEqual(mockChatRepository.createConversationCallCount, 0, "Should reuse existing empty conversation instead of creating")
-        XCTAssertNil(viewModel.error)
     }
 
     // MARK: - Display Logic Tests

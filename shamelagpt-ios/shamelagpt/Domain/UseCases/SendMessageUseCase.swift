@@ -59,14 +59,6 @@ final class SendMessageUseCase {
     ) async throws -> Result {
         AppLogger.chat.logInfo("SendMessageUseCase.execute called with conversationId: \(conversationId)")
 
-        // Check network connectivity
-        guard networkMonitor.isConnected else {
-            AppLogger.chat.logWarning("No network connection")
-            throw NetworkError.noConnection
-        }
-
-        AppLogger.chat.logDebug("Network is connected, fetching conversation")
-
         // Fetch the conversation to get thread ID
         guard let conversation = try await chatRepository.fetchConversation(byId: conversationId) else {
             AppLogger.chat.logError("Conversation not found in local database: \(conversationId)")
@@ -116,13 +108,29 @@ final class SendMessageUseCase {
             )
         }
 
+        // Check network connectivity after persisting the user message locally
+        guard networkMonitor.isConnected else {
+            AppLogger.chat.logWarning("No network connection")
+            throw NetworkError.noConnection
+        }
+
         do {
             // Send message to API
-            AppLogger.network.logInfo("Sending message to API with threadId: \(conversation.threadId ?? "nil")")
+            // Reuse existing thread when history exists but threadId is missing by falling back to conversation id
+            var threadIdForRequest = conversation.threadId
+            if threadIdForRequest == nil,
+               conversation.isLocalOnly == false,
+               conversation.hasMessages {
+                threadIdForRequest = conversation.id
+                try? await chatRepository.updateConversationThreadId(id: conversationId, threadId: conversation.id)
+                AppLogger.chat.logDebug("Thread ID missing; defaulting to conversationId for request: \(conversation.id)")
+            }
+
+            AppLogger.network.logInfo("Sending message to API with threadId: \(threadIdForRequest ?? "nil") for conversation \(conversationId)")
 
             let request = ChatRequest(
                 question: message,
-                threadId: conversation.threadId,
+                threadId: threadIdForRequest,
                 languagePreference: LanguageManager.shared.currentLanguage.rawValue
             )
 
@@ -133,9 +141,8 @@ final class SendMessageUseCase {
             AppLogger.network.logDebug("Raw API answer preview (first 500 chars): \(response.answer.prefix(500))")
 
             // Update thread ID if provided and this is the first message
-            // Do NOT update thread ID for local-only conversations (guest/local-only); keep them local-only
-            if conversation.threadId == nil, let newThreadId = response.threadId, conversation.isLocalOnly == false {
-                AppLogger.chat.logDebug("First message in conversation, updating threadId: \(newThreadId)")
+            if conversation.threadId == nil, let newThreadId = response.threadId {
+                AppLogger.chat.logInfo("Updating conversation \(conversationId) threadId to \(newThreadId)")
                 try await chatRepository.updateConversationThreadId(
                     id: conversationId,
                     threadId: newThreadId

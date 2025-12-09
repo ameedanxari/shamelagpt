@@ -202,6 +202,8 @@ struct HistoryView: View {
         List {
             ForEach(viewModel.conversations) { conversation in
                 Button(action: {
+                    AppLogger.app.logInfo("History tap -> conversation id:\(conversation.id) messages:\(conversation.messages.count) threadId:\(conversation.threadId ?? "nil") localOnly:\(conversation.isLocalOnly)")
+                    NotificationCenter.default.post(name: .openConversationFromHistory, object: conversation.id)
                     coordinator.openConversation(conversation.id)
                 }) {
                     ConversationCardView(
@@ -236,26 +238,10 @@ struct HistoryView: View {
     // MARK: - Actions
 
     private func createNewConversation() {
-        Task {
-            do {
-                guard isAuthenticated else {
-                    // Guests: request new chat in Chat tab (local-only) instead of forcing sign-in
-                    NotificationCenter.default.post(name: .requestNewChatFromHistory, object: nil)
-                    coordinator.resetTabSelectionToChat()
-                    return
-                }
-
-                let conversationId = try await viewModel.createNewConversation()
-                AppLogger.app.logInfo("Created new conversation from History: \(conversationId), navigating to Chat tab")
-                // Use coordinator to navigate to Chat tab with the new conversation
-                await MainActor.run {
-                    coordinator.openConversation(conversationId)
-                }
-            } catch {
-                AppLogger.app.logError("Failed to create new conversation from History", error: error)
-                // Error is already set in viewModel
-            }
-        }
+        // Always route to the chat tab with a fresh conversation state.
+        NotificationCenter.default.post(name: .requestNewChatFromHistory, object: nil)
+        coordinator.clearLastConversationId()
+        coordinator.resetTabSelectionToChat()
     }
 
     private func shareConversation(_ conversation: Conversation) {

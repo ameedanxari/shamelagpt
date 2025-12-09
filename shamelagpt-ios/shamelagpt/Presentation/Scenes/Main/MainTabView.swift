@@ -21,8 +21,7 @@ struct MainTabView: View {
     // MARK: - State
 
     @State private var currentConversationId: String?
-    @State private var isInitialized = false
-    @State private var needsValidation = false
+    @State private var chatViewKey: String = "new-chat"
     @State private var showNewChatWarning = false
 
     // MARK: - Body
@@ -60,6 +59,9 @@ struct MainTabView: View {
         .onChange(of: coordinator.selectedTab) { newTab in
             withAnimation(AppTheme.Animation.standard) {
                 coordinator.saveSelectedTab(newTab)
+                if newTab == 0 {
+                    syncConversationFromCoordinator(reason: "selectedTab changed to Chat")
+                }
             }
         }
         .alert(LocalizationKeys.newConversationWarningTitle.localizedKey, isPresented: $showNewChatWarning) {
@@ -68,25 +70,28 @@ struct MainTabView: View {
             }
             Button(LocalizationKeys.newConversation.localizedKey, role: .destructive) {
                 showNewChatWarning = false
-                Task {
-                    await createOrReuseConversation()
-                }
+                startNewChat()
             }
         } message: {
             Text(LocalizationKeys.newConversationWarningMessage.localizedKey)
-        }
-        .task {
-            // Ensure we have a valid conversation on first launch
-            await ensureConversationExists()
         }
         .onReceive(NotificationCenter.default.publisher(for: .requestNewChatFromHistory)) { _ in
             coordinator.resetTabSelectionToChat()
             handleNewConversationRequest()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .openConversationFromHistory)) { notification in
+            guard let conversationId = notification.object as? String else { return }
+            AppLogger.app.logDebug("Notification openConversationFromHistory received for id \(conversationId)")
+            coordinator.resetTabSelectionToChat()
+            // Set immediately so ChatView refreshes without waiting for published changes
+            currentConversationId = conversationId
+            chatViewKey = conversationId
+        }
         .onChange(of: coordinator.lastConversationId) { newId in
             guard let newId, newId != currentConversationId else { return }
             AppLogger.app.logInfo("MainTabView detected navigation to conversation: \(newId)")
             currentConversationId = newId
+            chatViewKey = newId
             Task {
                 await validateCurrentConversation()
             }
@@ -95,174 +100,36 @@ struct MainTabView: View {
 
     // MARK: - Helper Methods
 
-    /// Ensures a conversation exists for the chat tab
-    /// Reuses existing empty conversation or creates a new one
-    private func ensureConversationExists() async {
-        guard !isInitialized else { return }
-        isInitialized = true
 
-        AppLogger.app.logInfo("Ensuring conversation exists for chat tab")
+    /// Resets the chat tab to a fresh conversation (no pre-created conversation record)
+    @MainActor
+    private func startNewChat() {
+        AppLogger.app.logInfo("Starting new chat view without pre-creating conversation")
+        currentConversationId = nil
+        chatViewKey = "new-chat-\(UUID().uuidString)"
+        coordinator.clearLastConversationId()
+    }
 
-        do {
-            guard let chatRepo = container.resolve(ChatRepository.self) else {
-                AppLogger.app.logError("Failed to resolve ChatRepository from DependencyContainer")
-                currentConversationId = UUID().uuidString
-                return
-            }
-
-            // Guest mode: try to restore last guest conversation or reuse/create a local-only one
-            if isGuest {
-                AppLogger.app.logInfo("Guest mode: restoring or creating local-only conversation")
-
-                // Try restore last conversation id first
-                if let lastId = coordinator.lastConversationId,
-                   let restored = try await chatRepo.fetchConversation(byId: lastId) {
-                    AppLogger.app.logInfo("Restored guest conversation by id: \(lastId)")
-                    currentConversationId = lastId
-                    coordinator.saveLastConversationId(lastId)
-                    return
-                }
-
-                // Prefer reusing the newest empty local-only conversation to avoid creating duplicates
-                if let emptyLocal = try await chatRepo.fetchMostRecentEmptyConversation(includeLocalOnly: true) {
-                    AppLogger.app.logInfo("Reusing existing empty local-only conversation: \(emptyLocal.id)")
-                    currentConversationId = emptyLocal.id
-                    coordinator.saveLastConversationId(emptyLocal.id)
-                    return
-                }
-
-                // Reuse any existing local-only conversation (empty or not)
-                if let localOnly = try await chatRepo.fetchAllConversations().first(where: { $0.isLocalOnly }) {
-                    AppLogger.app.logInfo("Reusing existing local-only conversation: \(localOnly.id)")
-                    currentConversationId = localOnly.id
-                    coordinator.saveLastConversationId(localOnly.id)
-                    return
-                }
-
-                // No local conversation found - create one persisted as local-only
-                AppLogger.app.logInfo("No guest conversation found, creating new local-only conversation")
-                let newConversation = try await chatRepo.createConversation(title: "New Conversation", isLocalOnly: true)
-                currentConversationId = newConversation.id
-                coordinator.saveLastConversationId(newConversation.id)
-                return
-            }
-
-            // First, try to find an existing empty conversation
-            if let emptyConversation = try await chatRepo.fetchMostRecentEmptyConversation() {
-                AppLogger.app.logInfo("Reusing existing empty conversation: \(emptyConversation.id)")
-                currentConversationId = emptyConversation.id
-                coordinator.lastConversationId = emptyConversation.id
-                return
-            }
-
-            // No empty conversation found, create a new one
-            AppLogger.app.logInfo("No empty conversation found, creating new one")
-            await createNewConversation()
-
-        } catch {
-            AppLogger.app.logError("Error checking for empty conversation", error: error)
-            // Fallback to creating a new conversation
-            await createNewConversation()
+    /// Sync chat state from coordinator when switching tabs or resuming
+    @MainActor
+    private func syncConversationFromCoordinator(reason: String) {
+        if currentConversationId == nil, let lastId = coordinator.lastConversationId {
+            AppLogger.app.logDebug("Syncing chat state from coordinator (\(reason)) -> lastConversationId=\(lastId)")
+            currentConversationId = lastId
+            chatViewKey = lastId
         }
     }
 
-    /// Creates a new conversation in CoreData
-    private func createNewConversation() async {
-        AppLogger.app.logInfo("Creating new conversation in CoreData")
-
-        do {
-            guard let chatRepo = container.resolve(ChatRepository.self) else {
-                AppLogger.app.logError("Failed to resolve ChatRepository from DependencyContainer")
-                currentConversationId = UUID().uuidString
-                return
-            }
-
-            // If guest, create a local-only persisted conversation
-            if isGuest {
-                // Reuse any existing local-only conversation instead of creating another one
-                if let existingLocal = try await chatRepo.fetchAllConversations().first(where: { $0.isLocalOnly }) {
-                    AppLogger.app.logInfo("Guest mode - reusing existing local-only conversation instead of creating new: \(existingLocal.id)")
-                    currentConversationId = existingLocal.id
-                    coordinator.saveLastConversationId(existingLocal.id)
-                    return
-                }
-
-                let newConversation = try await chatRepo.createConversation(title: "New Conversation", isLocalOnly: true)
-                currentConversationId = newConversation.id
-                coordinator.saveLastConversationId(newConversation.id)
-                AppLogger.app.logInfo("Guest mode - created local-only conversation: \(newConversation.id)")
-                return
-            }
-
-            let newConversation = try await chatRepo.createConversation(title: "New Conversation")
-            currentConversationId = newConversation.id
-            coordinator.saveLastConversationId(newConversation.id)
-            AppLogger.app.logInfo("Created new conversation: \(newConversation.id)")
-        } catch {
-            AppLogger.app.logError("Failed to create conversation", error: error)
-            // Fallback to a random ID (will fail when trying to send messages, but at least app won't crash)
-            currentConversationId = UUID().uuidString
+    /// Callback for ChatViewModel to notify when a conversation is created/loaded
+    @MainActor
+    private func handleConversationChanged(_ newId: String?) {
+        if currentConversationId != newId {
+            currentConversationId = newId
         }
-    }
-
-    /// Creates or reuses an empty conversation when user taps "New Conversation"
-    private func createOrReuseConversation() async {
-        AppLogger.app.logInfo("User requested new conversation")
-
-        do {
-            guard let chatRepo = container.resolve(ChatRepository.self) else {
-                AppLogger.app.logError("Failed to resolve ChatRepository from DependencyContainer")
-                return
-            }
-
-            // Guest path: create or reuse a local-only conversation and return
-            if isGuest {
-                AppLogger.app.logInfo("Guest mode: creating or reusing local-only conversation on user request")
-
-                // Reuse current if empty
-                if let currentId = currentConversationId,
-                   let current = try await chatRepo.fetchConversation(byId: currentId),
-                   current.messages.isEmpty {
-                    AppLogger.app.logInfo("Current guest conversation is already empty, no action needed")
-                    return
-                }
-
-                if let emptyConversation = try await chatRepo.fetchMostRecentEmptyConversation(includeLocalOnly: true) {
-                    AppLogger.app.logInfo("Reusing existing local-only empty conversation: \(emptyConversation.id)")
-                    currentConversationId = emptyConversation.id
-                    coordinator.lastConversationId = emptyConversation.id
-                    return
-                }
-
-                let newConversation = try await chatRepo.createConversation(title: "New Conversation", isLocalOnly: true)
-                currentConversationId = newConversation.id
-                coordinator.lastConversationId = newConversation.id
-                return
-            }
-
-            // Check if current conversation is already empty
-            if let currentId = currentConversationId,
-               let current = try await chatRepo.fetchConversation(byId: currentId),
-               current.messages.isEmpty {
-                AppLogger.app.logInfo("Current conversation is already empty, no action needed")
-                return
-            }
-
-            // Try to find an existing empty conversation
-            if let emptyConversation = try await chatRepo.fetchMostRecentEmptyConversation() {
-                AppLogger.app.logInfo("Reusing existing empty conversation: \(emptyConversation.id)")
-                currentConversationId = emptyConversation.id
-                coordinator.lastConversationId = emptyConversation.id
-                return
-            }
-
-            // No empty conversation found, create a new one
-            AppLogger.app.logInfo("No empty conversation found, creating new one")
-            await createNewConversation()
-
-        } catch {
-            AppLogger.app.logError("Error in createOrReuseConversation", error: error)
-            await createNewConversation()
+        if let newId {
+            coordinator.saveLastConversationId(newId)
+        } else {
+            coordinator.clearLastConversationId()
         }
     }
 
@@ -274,9 +141,7 @@ struct MainTabView: View {
                 if needsWarning {
                     showNewChatWarning = true
                 } else {
-                    Task {
-                        await createOrReuseConversation()
-                    }
+                    startNewChat()
                 }
             }
         }
@@ -296,76 +161,12 @@ struct MainTabView: View {
         return !conversation.messages.isEmpty
     }
 
-    // MARK: - Tab Views
-
-    /// Chat tab with navigation view (iOS 15 compatible)
-    private var chatTab: some View {
-        NavigationView {
-            if let conversationId = currentConversationId {
-                ChatView(
-                    viewModel: container.makeChatViewModel(
-                        conversationId: conversationId
-                    )
-                ) {
-                    onRequireAuth()
-                }
-                .id(conversationId) // force view/model refresh when switching conversations
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Menu {
-                            Button(action: {
-                                handleNewConversationRequest()
-                            }) {
-                                Label(LocalizationKeys.newConversation.localizedKey, systemImage: "square.and.pencil")
-                            }
-
-                            Button(action: {
-                                coordinator.navigate(to: .history)
-                            }) {
-                                Label(LocalizationKeys.viewHistory.localizedKey, systemImage: "clock")
-                            }
-
-                            Button(action: {
-                                coordinator.navigate(to: .settings)
-                            }) {
-                                Label(LocalizationKeys.settings.localizedKey, systemImage: "gearshape")
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
-                                .font(.system(size: AppTheme.Layout.iconSize))
-                                .foregroundColor(AppTheme.Colors.primary)
-                        }
-                    }
-                }
-            } else {
-                // Loading state while conversation is being created
-                VStack {
-                    ProgressView()
-                    Text("Loading...")
-                        .foregroundColor(AppTheme.Colors.secondaryText)
-                        .padding(.top)
-                }
-            }
-        }
-        .navigationViewStyle(.stack)
-        .onAppear {
-            // Re-check conversation exists when tab appears
-            // This handles the case where user deleted all conversations
-            // NOTE: We always validate to ensure conversation exists
-            Task {
-                await validateCurrentConversation()
-            }
-        }
-    }
-
-    /// Validates that the current conversation still exists
-    /// If not, creates a new one
+    /// Validates that the current conversation still exists; resets to new chat if missing
     private func validateCurrentConversation() async {
         AppLogger.app.logDebug("validateCurrentConversation called - current ID: \(currentConversationId ?? "nil")")
 
         guard let conversationId = currentConversationId else {
-            AppLogger.app.logDebug("No current conversation ID, calling ensureConversationExists")
-            await ensureConversationExists()
+            AppLogger.app.logDebug("No current conversation ID, staying on new chat view")
             return
         }
 
@@ -375,21 +176,71 @@ struct MainTabView: View {
         }
 
         do {
-            // Check if conversation still exists
             if let conversation = try await chatRepo.fetchConversation(byId: conversationId) {
                 AppLogger.app.logDebug("Current conversation is valid: \(conversationId), has \(conversation.messages.count) messages")
                 AppLogger.app.logDebug("Conversation metadata - threadId:\(conversation.threadId ?? "nil") isLocalOnly:\(conversation.isLocalOnly) createdAt:\(conversation.createdAt) updatedAt:\(conversation.updatedAt) messageCount:\(conversation.messageCount)")
                 return
             }
 
-            // Conversation was deleted, create a new one
-            AppLogger.app.logWarning("Current conversation no longer exists, creating new one")
-            currentConversationId = nil
-            await ensureConversationExists()
+            AppLogger.app.logWarning("Current conversation no longer exists, resetting to new chat")
+            await MainActor.run {
+                startNewChat()
+            }
 
         } catch {
             AppLogger.app.logError("Error validating conversation", error: error)
-            await ensureConversationExists()
+            await MainActor.run {
+                startNewChat()
+            }
+        }
+    }
+
+    /// Chat tab with navigation view (iOS 15 compatible)
+    private var chatTab: some View {
+        NavigationView {
+            ChatView(
+                viewModel: container.makeChatViewModel(
+                    conversationId: currentConversationId,
+                    onConversationChange: handleConversationChanged
+                )
+            ) {
+                onRequireAuth()
+            }
+            .id(chatViewKey) // force view/model refresh when explicitly switching conversations
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(action: {
+                            handleNewConversationRequest()
+                        }) {
+                            Label(LocalizationKeys.newConversation.localizedKey, systemImage: "square.and.pencil")
+                        }
+
+                        Button(action: {
+                            coordinator.navigate(to: .history)
+                        }) {
+                            Label(LocalizationKeys.viewHistory.localizedKey, systemImage: "clock")
+                        }
+
+                        Button(action: {
+                            coordinator.navigate(to: .settings)
+                        }) {
+                            Label(LocalizationKeys.settings.localizedKey, systemImage: "gearshape")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.system(size: AppTheme.Layout.iconSize))
+                            .foregroundColor(AppTheme.Colors.primary)
+                    }
+                }
+            }
+        }
+        .navigationViewStyle(.stack)
+        .onAppear {
+            // Re-check conversation exists when tab appears to handle deletes
+            Task {
+                await validateCurrentConversation()
+            }
         }
     }
 

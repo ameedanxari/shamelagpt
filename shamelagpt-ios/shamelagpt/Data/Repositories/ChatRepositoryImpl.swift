@@ -84,6 +84,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
             try self.coreDataStack.save(context: context)
 
             let conversation = ConversationMapper.toDomainModel(entity)
+            AppLogger.database.logInfo("Created conversation \(conversation.id) threadId:\(conversation.threadId ?? "nil") localOnly:\(conversation.isLocalOnly)")
             self.notifyConversationsChanged()
             return conversation
         }
@@ -94,7 +95,8 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
         return try await context.perform { [conversationDAO] in
             let entities = try conversationDAO.fetchAll(from: context)
-            return ConversationMapper.toDomainModels(entities, includeMessages: false)
+            // Include messages so history and previews reflect accurate counts/content
+            return ConversationMapper.toDomainModels(entities, includeMessages: true)
         }
     }
 
@@ -107,9 +109,8 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
                 AppLogger.database.logWarning("Conversation not found in database: \(id)")
                 return nil
             }
-            AppLogger.database.logInfo("Conversation found: \(id), threadId: \(entity.threadId ?? "nil")")
             let domain = ConversationMapper.toDomainModel(entity, includeMessages: true)
-            AppLogger.database.logDebug("Conversation details - id:\(domain.id) threadId:\(domain.threadId ?? "nil") isLocalOnly:\(domain.isLocalOnly) messages:\(domain.messageCount) createdAt:\(domain.createdAt) updatedAt:\(domain.updatedAt)")
+            AppLogger.database.logDebug("Conversation found: \(domain.id) threadId:\(domain.threadId ?? "nil") localOnly:\(domain.isLocalOnly) messages:\(domain.messageCount)")
             return domain
         }
     }
@@ -163,6 +164,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
             conversationDAO.updateThreadId(entity, threadId: threadId)
             try coreDataStack.save(context: context)
+            AppLogger.database.logInfo("Updated conversation \(id) threadId to \(threadId)")
         }
     }
 
@@ -465,8 +467,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
             let response = try await apiClient.sendMessage(request)
 
             // Update thread ID if provided and this is the first message
-            // Do NOT update thread ID for local-only conversations (guest/local-only)
-            if conversation.threadId == nil, let newThreadId = response.threadId, conversation.isLocalOnly == false {
+            if conversation.threadId == nil, let newThreadId = response.threadId {
                 try await updateConversationThreadId(
                     id: conversationId,
                     threadId: newThreadId

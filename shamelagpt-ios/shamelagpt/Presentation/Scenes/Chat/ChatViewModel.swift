@@ -23,7 +23,7 @@ final class ChatViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var error: Error?
     @Published var errorMessage: String?
-    @Published private(set) var conversationId: String
+    @Published private(set) var conversationId: String?
     @Published private(set) var threadId: String?
     @Published var thinkingMessages: [String] = []
 
@@ -56,6 +56,7 @@ final class ChatViewModel: ObservableObject {
     private let chatRepository: ChatRepository
     private let apiClient: APIClientProtocol?
     private let isGuest: Bool
+    private let onConversationIdChange: ((String?) -> Void)?
     private let voiceInputManager: any VoiceInputManagerProtocol
     private let ocrManager: any OCRManagerProtocol
     private var cancellables = Set<AnyCancellable>()
@@ -71,14 +72,15 @@ final class ChatViewModel: ObservableObject {
     // MARK: - Initialization
 
     init(
-        conversationId: String,
+        conversationId: String?,
         sendMessageUseCase: SendMessageUseCaseProtocol,
         chatRepository: ChatRepository,
         apiClient: APIClientProtocol? = nil,
         isGuest: Bool = false,
         guestSessionId: String? = nil,
         voiceInputManager: any VoiceInputManagerProtocol,
-        ocrManager: any OCRManagerProtocol
+        ocrManager: any OCRManagerProtocol,
+        onConversationIdChange: ((String?) -> Void)? = nil
     ) {
         self.conversationId = conversationId
         self.guestSessionId = guestSessionId
@@ -86,6 +88,7 @@ final class ChatViewModel: ObservableObject {
         self.chatRepository = chatRepository
         self.apiClient = apiClient
         self.isGuest = isGuest
+        self.onConversationIdChange = onConversationIdChange
         self.voiceInputManager = voiceInputManager
         self.ocrManager = ocrManager
         let env = ProcessInfo.processInfo.environment
@@ -101,9 +104,11 @@ final class ChatViewModel: ObservableObject {
             photoLibraryPermission = .authorized
         }
 
-        // Load messages on initialization
-        Task {
-            await loadMessages()
+        // Load messages on initialization when a conversation already exists
+        if conversationId != nil {
+            Task {
+                await loadMessages()
+            }
         }
 
         // Observe voice input transcription
@@ -175,30 +180,30 @@ final class ChatViewModel: ObservableObject {
         let messageText = inputText
         inputText = "" // Clear input immediately for better UX
 
-        AppLogger.chat.logInfo("Sending message: '\(messageText.prefix(50))...' in conversation: \(conversationId)")
-
-        // Create optimistic user message and add to UI immediately
-        let optimisticUserMessage = Message(
-            id: "temp-\(UUID().uuidString)",
-            conversationId: conversationId,
-            content: messageText,
-            isUserMessage: true,
-            timestamp: Date(),
-            sources: []
-        )
-        messages.append(optimisticUserMessage)
-        AppLogger.chat.logDebug("Added optimistic user message to UI - Total messages now: \(messages.count)")
-        AppLogger.chat.logDebug("Current messages array: \(messages.map { "\($0.id): \($0.content.prefix(20))..." })")
-
-        isLoading = true
-        error = nil
-        errorMessage = nil
-        thinkingMessages = isGuest ? [] : [LocalizationKeys.thinking.localized]
-
         Task { @MainActor in
+            var optimisticMessageId: String?
             do {
-                // Ensure conversation exists in database before sending
-                await ensureConversationExistsBeforeSending()
+                let activeConversationId = try await ensureConversationForSend(firstMessage: messageText)
+                AppLogger.chat.logInfo("Sending message: '\(messageText.prefix(50))...' in conversation: \(activeConversationId)")
+
+                // Create optimistic user message and add to UI immediately
+                let optimisticUserMessage = Message(
+                    id: "temp-\(UUID().uuidString)",
+                    conversationId: activeConversationId,
+                    content: messageText,
+                    isUserMessage: true,
+                    timestamp: Date(),
+                    sources: []
+                )
+                optimisticMessageId = optimisticUserMessage.id
+                messages.append(optimisticUserMessage)
+                AppLogger.chat.logDebug("Added optimistic user message to UI - Total messages now: \(messages.count)")
+                AppLogger.chat.logDebug("Current messages array: \(messages.map { "\($0.id): \($0.content.prefix(20))..." })")
+
+                isLoading = true
+                error = nil
+                errorMessage = nil
+                thinkingMessages = isGuest ? [] : [LocalizationKeys.thinking.localized]
 
                 // Guest path: use streaming SSE endpoint to receive incremental chunks
                 if isGuest || apiClient != nil {
@@ -223,11 +228,11 @@ final class ChatViewModel: ObservableObject {
                     // Try to save user message locally if this conversation is local-only or authenticated (so history persists)
                     var shouldSaveAssistant = !isGuestFlow
                     if let chatRepo = Optional(self.chatRepository) {
-                        if let conv = try? await chatRepo.fetchConversation(byId: conversationId), conv.isLocalOnly {
+                        if let conv = try? await chatRepo.fetchConversation(byId: activeConversationId), conv.isLocalOnly {
                             shouldSaveAssistant = true
                             // Save user message locally so it's persisted for guest local-only conversations
                             _ = try? await chatRepo.addMessage(
-                                toConversation: conversationId,
+                                toConversation: activeConversationId,
                                 content: messageText,
                                 isUserMessage: true,
                                 sources: []
@@ -235,7 +240,7 @@ final class ChatViewModel: ObservableObject {
                         } else if !isGuestFlow {
                             // Authenticated flow: persist user message immediately
                             _ = try? await chatRepo.addMessage(
-                                toConversation: conversationId,
+                                toConversation: activeConversationId,
                                 content: messageText,
                                 isUserMessage: true,
                                 sources: []
@@ -258,7 +263,7 @@ final class ChatViewModel: ObservableObject {
                             if assistantMessageId == nil {
                                 let assistant = Message(
                                     id: UUID().uuidString,
-                                    conversationId: conversationId,
+                                    conversationId: activeConversationId,
                                     content: content,
                                     isUserMessage: false,
                                     timestamp: Date(),
@@ -285,7 +290,7 @@ final class ChatViewModel: ObservableObject {
                     }
 
                     func processEventLines(_ lines: [String]) {
-                        // Extract payloads: support "data:" prefixed SSE and plain JSON lines (e.g. "message\t{...}")
+                        // Extract payloads: support "data:" prefixed SSE and plain JSON lines (e.g. "message	{...}")
                         AppLogger.network.logDebug("processEventLines called - raw lines: \(lines)")
                         let dataLines = lines.compactMap { line -> String? in
                             let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -300,7 +305,7 @@ final class ChatViewModel: ObservableObject {
                         }
 
                         guard !dataLines.isEmpty else { return }
-                        let combined = dataLines.joined(separator: "\n")
+                        let combined = dataLines.joined(separator: "\\n")
                         AppLogger.network.logDebug("processEventLines - combined payload (first 1000 chars): \(String(combined.prefix(1000)))")
 
                         // Some servers may send [DONE]
@@ -316,6 +321,7 @@ final class ChatViewModel: ObservableObject {
                             let type: String
                             let content: String?
                             let sessionId: String?
+                            let threadId: String?
                             let fullAnswer: String?
                         }
 
@@ -337,12 +343,23 @@ final class ChatViewModel: ObservableObject {
                                     encounteredDone = true
                                 }
 
+                                // Persist thread identifier as soon as the server provides it
+                                if let tid = event.threadId ?? event.sessionId {
+                                    Task { @MainActor in
+                                        if threadId == nil || threadId != tid {
+                                            threadId = tid
+                                        }
+                                    }
+                                }
+
                                 Task { @MainActor in
                                     switch event.type {
                                     case "metadata":
-                                        if let sid = event.sessionId {
-                                            if threadId == nil {
-                                                threadId = sid
+                                        // Prefer explicit threadId from server, otherwise fall back to sessionId
+                                        if let tid = event.threadId ?? event.sessionId {
+                                            if threadId == nil || threadId != tid {
+                                                AppLogger.chat.logInfo("SSE metadata - updating threadId to \(tid)")
+                                                threadId = tid
                                             }
                                         }
                                     case "thinking":
@@ -417,7 +434,7 @@ final class ChatViewModel: ObservableObject {
                     if shouldSaveAssistant, let assistantId = assistantMessageId, let chatRepo = Optional(self.chatRepository) {
                         if let assistant = messages.first(where: { $0.id == assistantId }) {
                             _ = try? await chatRepo.addMessage(
-                                toConversation: conversationId,
+                                toConversation: activeConversationId,
                                 content: assistant.content,
                                 isUserMessage: false,
                                 sources: assistant.sources
@@ -431,7 +448,7 @@ final class ChatViewModel: ObservableObject {
 
                 // Non-guest (authenticated) flow: use the unified SendMessageUseCase
                 let result = try await sendMessageUseCase.execute(
-                    conversationId: conversationId,
+                    conversationId: activeConversationId,
                     message: messageText
                 )
 
@@ -456,7 +473,8 @@ final class ChatViewModel: ObservableObject {
                 thinkingMessages.removeAll()
 
                 // Remove optimistic message and put text back in input field
-                if let index = messages.firstIndex(where: { $0.id == optimisticUserMessage.id }) {
+                if let optimisticId = optimisticMessageId,
+                   let index = messages.firstIndex(where: { $0.id == optimisticId }) {
                     messages.remove(at: index)
                 }
                 inputText = messageText
@@ -464,30 +482,52 @@ final class ChatViewModel: ObservableObject {
         }
     }
 
-    /// Ensures conversation exists in database before sending message
-    /// Creates a new conversation on-the-fly if the current one doesn't exist
-    private func ensureConversationExistsBeforeSending() async {
-        do {
-            // Check if current conversation exists
-            if let _ = try await chatRepository.fetchConversation(byId: conversationId) {
-                AppLogger.chat.logDebug("Conversation exists: \(conversationId)")
-                return
+    /// Creates or fetches a conversation for a new outgoing message
+    private func ensureConversationForSend(firstMessage: String) async throws -> String {
+        if let existingId = conversationId,
+           let existingConversation = try? await chatRepository.fetchConversation(byId: existingId) {
+            // If this conversation already has history but no threadId, fall back to server conversation id for continuity
+            if threadId == nil,
+               existingConversation.hasMessages,
+               existingConversation.isLocalOnly == false {
+                threadId = existingConversation.threadId ?? existingConversation.id
+                if let tid = threadId {
+                    AppLogger.chat.logInfo("ensureConversationForSend - assigning fallback threadId \(tid) for existing conversation \(existingId)")
+                    try? await chatRepository.updateConversationThreadId(id: existingId, threadId: tid)
+                }
             }
-
-            // Conversation doesn't exist - this shouldn't happen with the new validation
-            // but we log it for debugging
-            AppLogger.chat.logWarning("Conversation \(conversationId) doesn't exist in database")
-            AppLogger.chat.logWarning("This should have been handled by MainTabView.validateCurrentConversation()")
-
-        } catch {
-            AppLogger.chat.logError("Error checking conversation existence", error: error)
+            AppLogger.chat.logDebug("ensureConversationForSend - reusing conversation \(existingId) threadId:\(threadId ?? "nil")")
+            return existingConversation.id
         }
+
+        let title = generateTitle(from: firstMessage)
+        let conversation = try await chatRepository.createConversation(
+            title: title,
+            isLocalOnly: isGuest
+        )
+        conversationId = conversation.id
+        threadId = conversation.threadId
+        AppLogger.chat.logInfo("ensureConversationForSend - created conversation \(conversation.id) threadId:\(conversation.threadId ?? "nil") isLocalOnly:\(conversation.isLocalOnly)")
+        onConversationIdChange?(conversation.id)
+        AppLogger.chat.logInfo("Created conversation \(conversation.id) for first message")
+        return conversation.id
+    }
+
+    /// Generates a safe conversation title from the first message
+    private func generateTitle(from message: String) -> String {
+        let trimmed = message.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "New Conversation" }
+        let maxLength = 50
+        return trimmed.count > maxLength
+        ? String(trimmed.prefix(maxLength)).trimmingCharacters(in: .whitespacesAndNewlines) + "..."
+        : trimmed
     }
 
     private func persistThreadIdIfNeeded() async {
-        guard !isGuest, let newThreadId = threadId else { return }
+        guard let newThreadId = threadId,
+              let conversationId = conversationId else { return }
         do {
-            if let conversation = try await chatRepository.fetchConversation(byId: conversationId), conversation.isLocalOnly == false {
+            if let conversation = try await chatRepository.fetchConversation(byId: conversationId) {
                 try await chatRepository.updateConversationThreadId(id: conversationId, threadId: newThreadId)
                 AppLogger.chat.logInfo("Persisted threadId \(newThreadId) for conversation \(conversationId)")
             }
@@ -498,8 +538,13 @@ final class ChatViewModel: ObservableObject {
 
     /// Loads messages for the current conversation
     func loadMessages() async {
+        guard let conversationId = conversationId else {
+            AppLogger.chat.logDebug("loadMessages called with no conversationId - showing empty chat")
+            messages = []
+            return
+        }
+
         AppLogger.chat.logDebug("Loading messages for conversation: \(conversationId)")
-        AppLogger.chat.logDebug("Current message count before load: \(messages.count)")
 
         do {
             let fetchedMessages = try await chatRepository.fetchMessages(
@@ -508,7 +553,6 @@ final class ChatViewModel: ObservableObject {
             AppLogger.chat.logDebug("Fetched \(fetchedMessages.count) messages from repository")
 
             let hasOptimisticMessages = messages.contains { $0.id.hasPrefix("temp-") }
-            AppLogger.chat.logDebug("Has optimistic messages: \(hasOptimisticMessages), isLoading: \(isLoading)")
 
             // ENHANCED: Only skip reload if we're loading AND have optimistic messages
             // AND the fetch returned fewer messages than we currently have
@@ -531,21 +575,24 @@ final class ChatViewModel: ObservableObject {
                     }
                 }
                 messages = mergedMessages.sorted { $0.timestamp < $1.timestamp }
-                AppLogger.chat.logInfo("Merged messages: \(mergedMessages.count) total (\(fetchedMessages.count) from DB, \(mergedMessages.count - fetchedMessages.count) optimistic)")
-                AppLogger.chat.logDebug("Final messages array: \(messages.map { "\($0.id): \($0.content.prefix(20))..." })")
+                let optimisticCount = mergedMessages.count - fetchedMessages.count
+                AppLogger.chat.logInfo("Loaded \(messages.count) messages (\(fetchedMessages.count) persisted, \(optimisticCount) optimistic)")
             } else {
                 messages = fetchedMessages
                 AppLogger.chat.logInfo("Loaded \(fetchedMessages.count) messages")
-                AppLogger.chat.logDebug("Final messages array: \(messages.map { "\($0.id): \($0.content.prefix(20))..." })")
             }
 
-            AppLogger.chat.logDebug("Message count after load: \(messages.count)")
-
             // Also update thread ID from conversation
-            if let conversation = try await chatRepository.fetchConversation(byId: conversationId),
-               let fetchedThreadId = conversation.threadId {
-                threadId = fetchedThreadId
-                AppLogger.chat.logDebug("Updated thread ID from conversation: \(fetchedThreadId)")
+            if let conversation = try await chatRepository.fetchConversation(byId: conversationId) {
+                if let fetchedThreadId = conversation.threadId {
+                    threadId = fetchedThreadId
+                    AppLogger.chat.logInfo("loadMessages - applied threadId from conversation: \(fetchedThreadId)")
+                } else if !conversation.isLocalOnly, !fetchedMessages.isEmpty {
+                    // Fallback: use server conversation id as thread id when history exists but threadId is missing
+                    threadId = conversationId
+                    AppLogger.chat.logInfo("loadMessages - threadId missing; defaulting to conversationId for continuity: \(conversationId)")
+                    try? await chatRepository.updateConversationThreadId(id: conversationId, threadId: conversationId)
+                }
             }
         } catch {
             AppLogger.chat.logError("Failed to load messages", error: error)
@@ -810,39 +857,43 @@ final class ChatViewModel: ObservableObject {
 
     /// Sends a fact-check message with image data and language metadata
     private func sendFactCheckMessage(text: String, imageData: Data?, detectedLanguage: String?) async {
-        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty else {
             AppLogger.chat.logDebug("Attempted to send empty fact-check message, ignoring")
             return
         }
 
-        AppLogger.chat.logInfo("Sending fact-check message: '\(text.prefix(50))...' in conversation: \(conversationId)")
+        AppLogger.chat.logInfo("Sending fact-check message: '\(trimmedText.prefix(50))...' in conversation: \(conversationId ?? "new-conversation")")
 
-        // Create optimistic user message with fact-check metadata
-        let optimisticUserMessage = Message(
-            id: "temp-\(UUID().uuidString)",
-            conversationId: conversationId,
-            content: text,
-            isUserMessage: true,
-            timestamp: Date(),
-            sources: [],
-            imageData: imageData,
-            detectedLanguage: detectedLanguage,
-            isFactCheckMessage: true
-        )
-        messages.append(optimisticUserMessage)
-        AppLogger.chat.logDebug("Added optimistic fact-check user message to UI")
-
-        isLoading = true
-        error = nil
+        var optimisticMessageId: String?
 
         do {
-            // Ensure conversation exists in database before sending
-            await ensureConversationExistsBeforeSending()
+            let activeConversationId = try await ensureConversationForSend(firstMessage: trimmedText)
+
+            // Create optimistic user message with fact-check metadata
+            let optimisticUserMessage = Message(
+                id: "temp-\(UUID().uuidString)",
+                conversationId: activeConversationId,
+                content: trimmedText,
+                isUserMessage: true,
+                timestamp: Date(),
+                sources: [],
+                imageData: imageData,
+                detectedLanguage: detectedLanguage,
+                isFactCheckMessage: true
+            )
+            messages.append(optimisticUserMessage)
+            optimisticMessageId = optimisticUserMessage.id
+            AppLogger.chat.logDebug("Added optimistic fact-check user message to UI")
+
+            isLoading = true
+            error = nil
+            errorMessage = nil
 
             // Save user message with fact-check metadata to database
             let savedUserMessage = try await chatRepository.addFactCheckMessage(
-                toConversation: conversationId,
-                content: text,
+                toConversation: activeConversationId,
+                content: trimmedText,
                 isUserMessage: true,
                 sources: [],
                 imageData: imageData,
@@ -859,12 +910,12 @@ final class ChatViewModel: ObservableObject {
             Your goal is to clarify the context and veracity of the shared text to remove any confusion.
             
             Text to check:
-            \(text)
+            \(trimmedText)
             """
 
             // Send to API (don't save user message again - we already saved it with metadata)
             let result = try await sendMessageUseCase.execute(
-                conversationId: conversationId,
+                conversationId: activeConversationId,
                 message: factCheckPrompt,
                 saveUserMessage: false
             )
@@ -884,11 +935,12 @@ final class ChatViewModel: ObservableObject {
 
         } catch {
             AppLogger.chat.logError("Failed to send fact-check message", error: error)
-            self.error = error
+            handleError(error)
             isLoading = false
 
             // Remove optimistic message on error
-            if let index = messages.firstIndex(where: { $0.id == optimisticUserMessage.id }) {
+            if let optimisticId = optimisticMessageId,
+               let index = messages.firstIndex(where: { $0.id == optimisticId }) {
                 messages.remove(at: index)
             }
         }

@@ -122,9 +122,13 @@ struct ChatView: View {
             scrollToBottom()
         }
         .task {
-            isHydrating = true
-            await viewModel.loadMessages()
-            isHydrating = false
+            if viewModel.conversationId != nil {
+                isHydrating = true
+                await viewModel.loadMessages()
+                isHydrating = false
+            } else {
+                isHydrating = false
+            }
         }
         .onChange(of: viewModel.requiresAuth) { requiresAuth in
             if requiresAuth {
