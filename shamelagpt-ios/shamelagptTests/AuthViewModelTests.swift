@@ -87,7 +87,7 @@ final class AuthViewModelTests: XCTestCase {
         sut.email = "test@example.com"
         sut.password = "password123"
         mockRepository.shouldFail = true
-        mockRepository.errorToThrow = NSError(domain: "test", code: 401, userInfo: [NSLocalizedDescriptionKey: "Invalid credentials"])
+        mockRepository.errorToThrow = NSError(domain: "test", code: 500, userInfo: [NSLocalizedDescriptionKey: "Server exploded"])
         
         let expectation = XCTestExpectation(description: "Should fail")
         expectation.isInverted = true // Should NOT be called
@@ -109,6 +109,27 @@ final class AuthViewModelTests: XCTestCase {
         )
         XCTAssertEqual(sut.errorMessage, expectedMessage)
         
+        await fulfillment(of: [expectation], timeout: 0.1)
+    }
+
+    func testLoginInvalidCredentialsShowsFriendlyMessage() async {
+        sut.email = "test@example.com"
+        sut.password = "wrong-password"
+        mockRepository.shouldFail = true
+        mockRepository.errorToThrow = NetworkError.httpError(statusCode: 401)
+
+        let expectation = XCTestExpectation(description: "Should fail")
+        expectation.isInverted = true
+
+        sut.authenticate {
+            expectation.fulfill()
+        }
+
+        try? await Task.sleep(nanoseconds: 100_000_000)
+
+        XCTAssertEqual(mockRepository.loginCallCount, 1)
+        XCTAssertEqual(sut.errorMessage, LocalizationKeys.authInvalidCredentials.localized)
+
         await fulfillment(of: [expectation], timeout: 0.1)
     }
     

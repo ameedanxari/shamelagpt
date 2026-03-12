@@ -25,6 +25,8 @@
     <string name="continue_as_guest">المتابعة كضيف</string>
     <string name="need_account">ليس لديك حساب؟ إنشاء حساب</string>
     <string name="have_account">لديك حساب؟ تسجيل الدخول</string>
+    <string name="auth_invalid_credentials">تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور ثم حاول مرة أخرى.</string>
+    <string name="auth_email_exists_use_login">هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول.</string>
 
     <!-- Chat Screen -->
     <string name="chat_title">شاملة GPT</string>

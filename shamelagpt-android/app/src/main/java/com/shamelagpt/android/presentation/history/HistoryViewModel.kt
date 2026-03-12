@@ -137,7 +137,8 @@ class HistoryViewModel(
 
     fun exportConversation(conversation: Conversation): String {
         val title = displayTitle(conversation)
-        val link = "https://shamelagpt.com/chat?id=${conversation.id}"
+        // updated share URL format per new spec
+        val link = "https://shamelagpt.com/shared?chatid=${conversation.id}"
         val preview = messagePreview(conversation)
         val updated = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
             .format(java.util.Date(conversation.updatedAt))

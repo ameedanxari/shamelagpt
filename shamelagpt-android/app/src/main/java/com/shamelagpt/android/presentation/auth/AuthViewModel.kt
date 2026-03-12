@@ -3,6 +3,7 @@ package com.shamelagpt.android.presentation.auth
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shamelagpt.android.R
 import com.shamelagpt.android.core.error.AppError
 import com.shamelagpt.android.core.error.UserErrorMessage
 import com.shamelagpt.android.core.network.NetworkError
@@ -42,7 +43,10 @@ class AuthViewModel(
 
     fun toggleMode() {
         _uiState.update {
-            it.copy(isLoginMode = !it.isLoginMode, error = null)
+            it.copy(
+                isLoginMode = !it.isLoginMode,
+                error = null
+            )
         }
     }
 
@@ -53,7 +57,11 @@ class AuthViewModel(
         
         if (state.email.isBlank() || state.password.isBlank()) {
             Logger.w(TAG, "authenticate validation failed: missing required fields")
-            _uiState.update { it.copy(error = "Email and password are required") }
+            _uiState.update {
+                it.copy(
+                    error = "Email and password are required"
+                )
+            }
             return
         }
 
@@ -84,11 +92,16 @@ class AuthViewModel(
                 },
                 onFailure = { ex ->
                     Logger.w(TAG, "authentication failed mode=$mode reason=${ex::class.simpleName}")
-                    Logger.e(TAG, "authentication error", ex)
+                    if (isExpectedAuthValidation(state.isLoginMode, ex)) {
+                        Logger.w(TAG, "authentication validation error mode=$mode detail=${ex.message}")
+                    } else {
+                        Logger.e(TAG, "authentication error", ex)
+                    }
+                    val mappedError = ex.toAuthFailureUi(state.isLoginMode)
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = ex.toUserFacingMessage()
+                            error = mappedError.message
                         )
                     }
                 }
@@ -146,6 +159,41 @@ class AuthViewModel(
         }
     }
 
+    private fun isExpectedAuthValidation(isLoginMode: Boolean, throwable: Throwable): Boolean {
+        if (isInvalidLoginCredentials(isLoginMode, throwable)) return true
+        if (isLoginMode) return false
+        val httpError = throwable as? NetworkError.HttpError ?: return false
+        val body = httpError.errorBody.orEmpty()
+        return httpError.code == 400 && body.contains("Email already exists", ignoreCase = true)
+    }
+
+    private fun Throwable.toAuthFailureUi(isLoginMode: Boolean): AuthFailureUi {
+        if (isInvalidLoginCredentials(isLoginMode, this)) {
+            return AuthFailureUi(message = appContext.getString(R.string.auth_invalid_credentials))
+        }
+        if (!isLoginMode) {
+            val httpError = this as? NetworkError.HttpError
+            val body = httpError?.errorBody.orEmpty()
+            if (httpError?.code == 400 && body.contains("Email already exists", ignoreCase = true)) {
+                return AuthFailureUi(message = appContext.getString(R.string.auth_email_exists_use_login))
+            }
+        }
+        return AuthFailureUi(message = toUserFacingMessage())
+    }
+
+    private fun isInvalidLoginCredentials(isLoginMode: Boolean, throwable: Throwable): Boolean {
+        if (!isLoginMode) return false
+        val httpError = throwable as? NetworkError.HttpError ?: return false
+        if (httpError.code == 401) return true
+        if (httpError.code != 400) return false
+
+        val body = httpError.errorBody.orEmpty()
+        return body.contains("invalid credential", ignoreCase = true) ||
+            body.contains("invalid login credential", ignoreCase = true) ||
+            body.contains("invalid email or password", ignoreCase = true) ||
+            body.contains("email or password", ignoreCase = true)
+    }
+
     private fun Throwable.toUserFacingMessage(): String {
         return when (this) {
             is NetworkError -> getUserMessageWithCode(appContext)
@@ -153,4 +201,6 @@ class AuthViewModel(
             else -> UserErrorMessage.from(appContext, this)
         }
     }
+
+    private data class AuthFailureUi(val message: String)
 }

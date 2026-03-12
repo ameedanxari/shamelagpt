@@ -1,5 +1,6 @@
 package com.shamelagpt.android.presentation.auth
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,13 +12,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
@@ -45,11 +48,15 @@ fun AuthScreen(
     viewModel: AuthViewModel = koinViewModel()
 ){
     val state by viewModel.uiState.collectAsState()
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = { focusManager.clearFocus(force = true) })
+            }
             .testTag(TestTags.Auth.Screen),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -126,7 +133,12 @@ fun AuthScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { if (!state.isLoading) viewModel.authenticate(onAuthenticated) },
+            onClick = {
+                if (!state.isLoading) {
+                    focusManager.clearFocus(force = true)
+                    viewModel.authenticate(onAuthenticated)
+                }
+            },
             enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth().testTag(if (state.isLoginMode) TestTags.Auth.SignInButton else TestTags.Auth.SignUpButton)
         ) {
@@ -136,7 +148,10 @@ fun AuthScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
-            onClick = onContinueAsGuest,
+            onClick = {
+                focusManager.clearFocus(force = true)
+                onContinueAsGuest()
+            },
             enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth().testTag(TestTags.Auth.ContinueAsGuestButton)
         ) {
@@ -146,7 +161,10 @@ fun AuthScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         TextButton(
-            onClick = { viewModel.toggleMode() },
+            onClick = {
+                focusManager.clearFocus(force = true)
+                viewModel.toggleMode()
+            },
             modifier = Modifier.testTag(TestTags.Auth.ToggleModeButton)
         ) {
             Text(

@@ -213,6 +213,8 @@ struct ShamelaGPTApp: App {
         let mockKeys = [
             "isUITesting",
             "mockScenarioId",
+            "mockAuthResponse",
+            "mockAuthError",
             "mockChatResponse",
             "mockChatError",
             "mockNetworkError",
@@ -248,6 +250,8 @@ struct ShamelaGPTApp: App {
         // Clear any existing mock configuration first to prevent state leakage
         let mockKeys = [
             "mockScenarioId",
+            "mockAuthResponse",
+            "mockAuthError",
             "mockChatResponse",
             "mockChatError",
             "mockNetworkError",
@@ -330,9 +334,19 @@ struct ShamelaGPTApp: App {
             AppLogger.app.logDebug("MOCK_CONFIG: Set custom mock response")
         }
 
+        if let mockAuthResponse = environment["MOCK_AUTH_RESPONSE"] {
+            UserDefaults.standard.set(mockAuthResponse, forKey: "mockAuthResponse")
+            AppLogger.app.logDebug("MOCK_CONFIG: Set custom auth response")
+        }
+
         if let mockError = environment["MOCK_CHAT_ERROR"] {
             UserDefaults.standard.set(mockError, forKey: "mockChatError")
             AppLogger.app.logDebug("MOCK_CONFIG: Set custom mock error")
+        }
+
+        if let mockAuthError = environment["MOCK_AUTH_ERROR"] {
+            UserDefaults.standard.set(mockAuthError, forKey: "mockAuthError")
+            AppLogger.app.logDebug("MOCK_CONFIG: Set custom auth error")
         }
 
         if let delay = environment["MOCK_DELAY"], let delayValue = Double(delay) {
@@ -380,6 +394,8 @@ struct ShamelaGPTApp: App {
         let finalConfig: [String: Any] = [
             "mockNetworkError": UserDefaults.standard.bool(forKey: "mockNetworkError"),
             "mockTimeoutError": UserDefaults.standard.bool(forKey: "mockTimeoutError"),
+            "mockAuthError": UserDefaults.standard.string(forKey: "mockAuthError") ?? "nil",
+            "mockAuthResponse": UserDefaults.standard.string(forKey: "mockAuthResponse")?.prefix(100) ?? "nil",
             "mockChatError": UserDefaults.standard.string(forKey: "mockChatError") ?? "nil",
             "mockChatResponse": UserDefaults.standard.string(forKey: "mockChatResponse")?.prefix(100) ?? "nil",
             "mockDelay": UserDefaults.standard.double(forKey: "mockDelay"),

@@ -61,10 +61,38 @@ final class AuthViewModel: ObservableObject {
             } catch {
                 isLoading = false
                 AppLogger.auth.logWarning("authentication failed mode=\(mode) reason=\(type(of: error))")
-                AppLogger.auth.logError("authentication error", error: error)
-                errorMessage = error.userFacingMessage
+                if shouldShowInvalidCredentialsError(error: error, isLoginMode: isLoginMode) {
+                    AppLogger.auth.logWarning("login rejected for invalid credentials; showing friendly copy")
+                    errorMessage = LocalizationKeys.authInvalidCredentials.localized
+                } else if shouldSuggestSignInAfterSignup(error: error, isLoginMode: isLoginMode) {
+                    AppLogger.auth.logWarning("signup rejected for existing account; suggesting login")
+                    errorMessage = LocalizationKeys.authEmailExistsUseLogin.localized
+                } else {
+                    AppLogger.auth.logError("authentication error", error: error)
+                    errorMessage = error.userFacingMessage
+                }
             }
         }
+    }
+
+    private func shouldShowInvalidCredentialsError(error: Error, isLoginMode: Bool) -> Bool {
+        guard isLoginMode else { return false }
+
+        if let networkError = error as? NetworkError {
+            switch networkError {
+            case .httpError(let statusCode):
+                return statusCode == 400 || statusCode == 401
+            case .badRequest:
+                return true
+            default:
+                break
+            }
+        }
+
+        let message = error.localizedDescription.lowercased()
+        return message.contains("invalid credential") ||
+            message.contains("invalid email or password") ||
+            message.contains("email or password")
     }
 
     func forgotPassword() {
@@ -109,6 +137,19 @@ final class AuthViewModel: ObservableObject {
                 AppLogger.auth.logError("google sign-in error", error: error)
                 errorMessage = error.userFacingMessage
             }
+        }
+    }
+
+    private func shouldSuggestSignInAfterSignup(error: Error, isLoginMode: Bool) -> Bool {
+        guard !isLoginMode else { return false }
+        guard let networkError = error as? NetworkError else { return false }
+        switch networkError {
+        case .httpError(let statusCode):
+            return statusCode == 400
+        case .badRequest:
+            return true
+        default:
+            return false
         }
     }
 }

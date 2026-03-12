@@ -246,6 +246,8 @@
 "auth.needAccount" = "Need an account? Sign up";
 "auth.haveAccount" = "Have an account? Sign in";
 "auth.signInButton" = "Sign In";
+"auth.invalidCredentials" = "Unable to sign in. Check your email and password and try again.";
+"auth.emailExistsUseLogin" = "This email is already registered. Please sign in.";
 
 // MARK: - AI Preference Options
 

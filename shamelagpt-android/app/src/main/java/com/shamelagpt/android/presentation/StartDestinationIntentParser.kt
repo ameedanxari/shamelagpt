@@ -55,6 +55,7 @@ object StartDestinationIntentParser {
     private fun routeFromPath(path: String, data: Uri): Any? {
         return when {
             path.startsWith("/chat") -> chatRouteFromUri(data)
+            path.startsWith("/shared") -> chatRouteFromUriWithChatId(data)
             path.startsWith("/history") -> HistoryRoute
             path.startsWith("/settings") -> SettingsRoute
             else -> null
@@ -63,6 +64,12 @@ object StartDestinationIntentParser {
 
     private fun chatRouteFromUri(data: Uri): ChatRoute {
         val conversationId = data.getQueryParameter("id")?.takeIf { it.isNotBlank() }
+        return ChatRoute(conversationId)
+    }
+
+    private fun chatRouteFromUriWithChatId(data: Uri): ChatRoute {
+        // handles /shared?chatid=...
+        val conversationId = data.getQueryParameter("chatid")?.takeIf { it.isNotBlank() }
         return ChatRoute(conversationId)
     }
 }
