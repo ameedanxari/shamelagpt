@@ -249,6 +249,8 @@
 "auth.signInButton" = "تسجيل الدخول";
 "auth.invalidCredentials" = "تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور ثم حاول مرة أخرى.";
 "auth.emailExistsUseLogin" = "هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول.";
+"auth.signInWithGoogle" = "تسجيل الدخول بحساب جوجل";
+"auth.orDivider" = "أو";
 
 "settings.pref.length.title" = "طول الإجابة";
 "settings.pref.length.short" = "قصيرة";

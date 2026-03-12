@@ -25,6 +25,7 @@ enum AccessibilityID {
         static let signUpButton = "signUpButton"
         static let continueAsGuestButton = "continueAsGuestButton"
         static let toggleModeButton = "toggleModeButton"
+        static let googleSignInButton = "googleSignInButton"
     }
 
     enum Chat {

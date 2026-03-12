@@ -248,6 +248,8 @@
 "auth.signInButton" = "Sign In";
 "auth.invalidCredentials" = "Unable to sign in. Check your email and password and try again.";
 "auth.emailExistsUseLogin" = "This email is already registered. Please sign in.";
+"auth.signInWithGoogle" = "Sign in with Google";
+"auth.orDivider" = "or";
 
 // MARK: - AI Preference Options
 

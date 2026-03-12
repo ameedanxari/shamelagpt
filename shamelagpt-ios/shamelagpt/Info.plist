@@ -30,6 +30,16 @@
 				<string>shamelagpt</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.googleusercontent.apps.1056619207445-sh6qcja4ffj8hhjo2ohc3jsfev1h2pfo</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1056619207445-sh6qcja4ffj8hhjo2ohc3jsfev1h2pfo</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>

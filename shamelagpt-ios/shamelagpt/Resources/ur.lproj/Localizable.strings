@@ -247,6 +247,8 @@
 "auth.signInButton" = "سائن اِن";
 "auth.invalidCredentials" = "سائن اِن نہیں ہو سکا۔ اپنا ای میل اور پاس ورڈ چیک کریں اور دوبارہ کوشش کریں۔";
 "auth.emailExistsUseLogin" = "یہ ای میل پہلے سے رجسٹرڈ ہے۔ براہ کرم سائن اِن کریں۔";
+"auth.signInWithGoogle" = "گوگل سے سائن اِن کریں";
+"auth.orDivider" = "یا";
 
 // MARK: - AI Preference Options
 

@@ -5,6 +5,7 @@
 //  Created by Ameed Khalid on 04/11/2025.
 //
 
+import GoogleSignIn
 import SwiftUI
 import UIKit
 
@@ -533,6 +534,8 @@ struct ShamelaGPTApp: App {
                 (languageManager.currentLanguage == .arabic || languageManager.currentLanguage == .urdu) ? .rightToLeft : .leftToRight
             )
             .onOpenURL { url in
+                // Handle Google Sign-In callback
+                GIDSignIn.sharedInstance.handle(url)
                 // Handle deep links (custom URL schemes / onOpenURL)
                 _ = coordinator.handleDeepLink(url)
             }

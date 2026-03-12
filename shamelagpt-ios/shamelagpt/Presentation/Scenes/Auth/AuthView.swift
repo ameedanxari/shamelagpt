@@ -5,6 +5,7 @@
 //  Created by Codex on 05/12/2025.
 //
 
+import GoogleSignIn
 import SwiftUI
 
 struct AuthView: View {
@@ -74,6 +75,50 @@ struct AuthView: View {
                 .buttonStyle(.primary)
                 .disabled(viewModel.isLoading)
                 .accessibilityIdentifier(viewModel.isLoginMode ? AccessibilityID.Auth.signInButton : AccessibilityID.Auth.signUpButton)
+
+                // "or" divider
+                HStack {
+                    Rectangle()
+                        .frame(height: 1)
+                        .foregroundColor(DesignSystem.Colors.border(colorScheme))
+                    Text(LocalizationKeys.authOrDivider.localizedKey)
+                        .font(DesignSystem.Typography.footnote)
+                        .foregroundColor(DesignSystem.Colors.textSecondary(colorScheme))
+                    Rectangle()
+                        .frame(height: 1)
+                        .foregroundColor(DesignSystem.Colors.border(colorScheme))
+                }
+                .padding(.vertical, DesignSystem.Spacing.xs)
+
+                // Google Sign-In button
+                Button {
+                    dismissKeyboard()
+                    guard !viewModel.isLoading else { return }
+                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                          let rootViewController = windowScene.windows.first?.rootViewController else {
+                        return
+                    }
+                    GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { result, error in
+                        if let error = error {
+                            viewModel.errorMessage = error.localizedDescription
+                            return
+                        }
+                        guard let idToken = result?.user.idToken?.tokenString else {
+                            viewModel.errorMessage = "Failed to get Google ID token"
+                            return
+                        }
+                        viewModel.googleSignIn(idToken: idToken, onSuccess: onAuthenticated)
+                    }
+                } label: {
+                    HStack(spacing: DesignSystem.Spacing.xs) {
+                        Image(systemName: "g.circle.fill")
+                            .font(.system(size: 20))
+                        Text(LocalizationKeys.authSignInWithGoogle.localizedKey)
+                    }
+                }
+                .buttonStyle(.secondary)
+                .disabled(viewModel.isLoading)
+                .accessibilityIdentifier(AccessibilityID.Auth.googleSignInButton)
 
                 Button {
                     dismissKeyboard()
