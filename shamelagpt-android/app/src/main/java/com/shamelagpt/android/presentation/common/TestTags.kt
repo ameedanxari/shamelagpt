@@ -23,6 +23,7 @@ object TestTags {
         const val SignUpButton = "signUpButton"
         const val ContinueAsGuestButton = "continueAsGuestButton"
         const val ToggleModeButton = "toggleModeButton"
+        const val GoogleSignInButton = "googleSignInButton"
     }
 
     object Chat {

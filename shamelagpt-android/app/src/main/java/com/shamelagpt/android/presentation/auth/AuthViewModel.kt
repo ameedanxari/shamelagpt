@@ -41,6 +41,10 @@ class AuthViewModel(
         _uiState.update { it.copy(displayName = name) }
     }
 
+    fun setError(message: String) {
+        _uiState.update { it.copy(error = message) }
+    }
+
     fun toggleMode() {
         _uiState.update {
             it.copy(

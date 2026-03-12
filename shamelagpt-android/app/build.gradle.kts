@@ -201,6 +201,11 @@ dependencies {
     // Material Components (for Theme.Material3.DayNight.NoActionBar in XML)
     implementation(libs.material)
 
+    // Google Credential Manager (Google Sign-In)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
+
     // Testing - Unit Tests
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
