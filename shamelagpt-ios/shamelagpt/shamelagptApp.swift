@@ -71,6 +71,7 @@ struct ShamelaGPTApp: App {
         self.forcedColorScheme = Self.uiTestForcedColorScheme(isUITesting: isUITesting)
         // Keep tab ordering semantic (Chat, History, Settings) independent of RTL mirroring.
         UITabBar.appearance().semanticContentAttribute = .forceLeftToRight
+        GoogleSignInConfiguration.configureSharedInstance()
 
         // Handle test mode
         if isUITesting {

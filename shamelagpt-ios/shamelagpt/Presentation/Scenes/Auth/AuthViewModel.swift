@@ -27,6 +27,10 @@ final class AuthViewModel: ObservableObject {
         errorMessage = nil
     }
 
+    func setError(_ message: String) {
+        errorMessage = message
+    }
+
     func authenticate(onSuccess: @escaping () -> Void) {
         let mode = isLoginMode ? "login" : "signup"
         AppLogger.auth.logInfo("authenticate requested mode=\(mode)")

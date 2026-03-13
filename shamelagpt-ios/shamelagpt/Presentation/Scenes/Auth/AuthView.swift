@@ -6,7 +6,9 @@
 //
 
 import GoogleSignIn
+import GoogleSignInSwift
 import SwiftUI
+import UIKit
 
 struct AuthView: View {
     private enum Field: Hashable {
@@ -90,34 +92,17 @@ struct AuthView: View {
                 }
                 .padding(.vertical, DesignSystem.Spacing.xs)
 
-                // Google Sign-In button
-                Button {
+                // Use Google-provided SwiftUI button to match brand/style guidance.
+                GoogleSignInButton(
+                    scheme: googleSignInButtonScheme,
+                    style: .wide,
+                    state: viewModel.isLoading ? .disabled : .normal
+                ) {
                     dismissKeyboard()
                     guard !viewModel.isLoading else { return }
-                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                          let rootViewController = windowScene.windows.first?.rootViewController else {
-                        return
-                    }
-                    GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { result, error in
-                        if let error = error {
-                            viewModel.errorMessage = error.localizedDescription
-                            return
-                        }
-                        guard let idToken = result?.user.idToken?.tokenString else {
-                            viewModel.errorMessage = "Failed to get Google ID token"
-                            return
-                        }
-                        viewModel.googleSignIn(idToken: idToken, onSuccess: onAuthenticated)
-                    }
-                } label: {
-                    HStack(spacing: DesignSystem.Spacing.xs) {
-                        Image(systemName: "g.circle.fill")
-                            .font(.system(size: 20))
-                        Text(LocalizationKeys.authSignInWithGoogle.localizedKey)
-                    }
+                    handleGoogleSignIn()
                 }
-                .buttonStyle(.secondary)
-                .disabled(viewModel.isLoading)
+                .frame(maxWidth: .infinity)
                 .accessibilityIdentifier(AccessibilityID.Auth.googleSignInButton)
 
                 Button {
@@ -152,5 +137,79 @@ struct AuthView: View {
     private func dismissKeyboard() {
         focusedField = nil
         hideKeyboard()
+    }
+
+    private var googleSignInButtonScheme: GoogleSignInButtonColorScheme {
+        colorScheme == .dark ? .dark : .light
+    }
+
+    private func handleGoogleSignIn() {
+        guard let presentingViewController = activePresentingViewController() else {
+            AppLogger.auth.logWarning("google sign-in aborted: no presenting view controller")
+            viewModel.setError(LocalizationKeys.authGoogleSignInFailed.localized)
+            return
+        }
+
+        GIDSignIn.sharedInstance.signIn(withPresenting: presentingViewController) { result, error in
+            if let error {
+                if isGoogleSignInCancellation(error) {
+                    AppLogger.auth.logInfo("google sign-in cancelled by user")
+                    return
+                }
+                AppLogger.auth.logWarning("google sdk sign-in failed reason=\(type(of: error))")
+                AppLogger.auth.logError("google sdk sign-in error", error: error)
+                Task { @MainActor in
+                    viewModel.setError(LocalizationKeys.authGoogleSignInFailed.localized)
+                }
+                return
+            }
+
+            guard let idToken = result?.user.idToken?.tokenString, !idToken.isEmpty else {
+                AppLogger.auth.logWarning("google sign-in failed: missing id token")
+                Task { @MainActor in
+                    viewModel.setError(LocalizationKeys.authGoogleSignInFailed.localized)
+                }
+                return
+            }
+
+            Task { @MainActor in
+                viewModel.googleSignIn(idToken: idToken, onSuccess: onAuthenticated)
+            }
+        }
+    }
+
+    private func activePresentingViewController() -> UIViewController? {
+        let scenes = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .filter { $0.activationState == .foregroundActive }
+        let windows = scenes.flatMap(\.windows)
+        let keyWindow = windows.first { $0.isKeyWindow } ?? windows.first
+        return topViewController(from: keyWindow?.rootViewController)
+    }
+
+    private func topViewController(from root: UIViewController?) -> UIViewController? {
+        guard let root else { return nil }
+        if let presented = root.presentedViewController {
+            return topViewController(from: presented)
+        }
+        if let nav = root as? UINavigationController {
+            return topViewController(from: nav.visibleViewController)
+        }
+        if let tab = root as? UITabBarController {
+            return topViewController(from: tab.selectedViewController)
+        }
+        return root
+    }
+
+    private func isGoogleSignInCancellation(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled {
+            return true
+        }
+        if nsError.code == -5 {
+            // Google Sign-In cancellation code
+            return true
+        }
+        return nsError.localizedDescription.lowercased().contains("cancel")
     }
 }

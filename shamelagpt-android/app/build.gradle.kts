@@ -186,6 +186,9 @@ dependencies {
     // Google Play Services Tasks (for ML Kit)
     implementation(libs.play.services.tasks)
 
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+
     // Kotlinx Coroutines Play Services (for await() extension)
     implementation(libs.kotlinx.coroutines.play.services)
 

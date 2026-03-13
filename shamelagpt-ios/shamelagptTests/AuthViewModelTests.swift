@@ -147,4 +147,45 @@ final class AuthViewModelTests: XCTestCase {
         XCTAssertFalse(sut.isLoading)
         XCTAssertNil(sut.errorMessage)
     }
+
+    func testGoogleSignInSuccess() async {
+        let expectation = XCTestExpectation(description: "Google Sign-In success callback")
+
+        sut.googleSignIn(idToken: "google-id-token") {
+            expectation.fulfill()
+        }
+
+        await fulfillment(of: [expectation], timeout: 1.0)
+
+        XCTAssertEqual(mockRepository.googleSignInCallCount, 1)
+        XCTAssertFalse(sut.isLoading)
+        XCTAssertNil(sut.errorMessage)
+    }
+
+    func testGoogleSignInFailureShowsUserFacingError() async {
+        mockRepository.shouldFail = true
+        mockRepository.errorToThrow = NSError(
+            domain: "test",
+            code: 500,
+            userInfo: [NSLocalizedDescriptionKey: "Google failed"]
+        )
+        let expectation = XCTestExpectation(description: "Google Sign-In should fail")
+        expectation.isInverted = true
+
+        sut.googleSignIn(idToken: "google-id-token") {
+            expectation.fulfill()
+        }
+
+        try? await Task.sleep(nanoseconds: 100_000_000)
+
+        XCTAssertEqual(mockRepository.googleSignInCallCount, 1)
+        XCTAssertFalse(sut.isLoading)
+        let expectedMessage = UserErrorFormatter.format(
+            messageKey: LocalizationKeys.somethingWentWrong,
+            code: "E-APP-000"
+        )
+        XCTAssertEqual(sut.errorMessage, expectedMessage)
+
+        await fulfillment(of: [expectation], timeout: 0.1)
+    }
 }
