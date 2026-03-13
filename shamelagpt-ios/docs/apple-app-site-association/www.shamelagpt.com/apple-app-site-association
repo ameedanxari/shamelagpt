@@ -4,7 +4,7 @@
     "details": [
       {
         "appID": "SSTKXHNR6U.com.shamelagpt.ios",
-        "paths": ["/chat", "/chat/*"]
+        "paths": ["/chat", "/chat/*", "/shared", "/shared/*"]
       }
     ]
   }

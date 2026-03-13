@@ -56,4 +56,16 @@ final class AppCoordinatorDeepLinkTests: XCTestCase {
         XCTAssertEqual(sessionState.conversationId, id)
         XCTAssertEqual(coordinator.navigationRoutes.last, .chat(conversationId: id))
     }
+
+    func testHandleUniversalLinkSharedPath_opensConversation() {
+        let (coordinator, sessionState) = makeCoordinator()
+        let id = "f1e2d3c4-5678-90ab-cdef-1234567890ab"
+        let url = URL(string: "https://shamelagpt.com/shared?chatid=\(id)")!
+
+        let handled = coordinator.handleDeepLink(url)
+
+        XCTAssertTrue(handled)
+        XCTAssertEqual(sessionState.conversationId, id)
+        XCTAssertEqual(coordinator.navigationRoutes.last, .chat(conversationId: id))
+    }
 }

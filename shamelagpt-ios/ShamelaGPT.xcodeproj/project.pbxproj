@@ -9,8 +9,12 @@
 /* Begin PBXBuildFile section */
 		E22B21562F162DA100FF9C77 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2D28BB12EF3E47500AB186F /* UniformTypeIdentifiers.framework */; };
 		E22B21612F162DA100FF9C77 /* FactCheckAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E22B21552F162DA000FF9C77 /* FactCheckAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AA11BB22CC33DD44EE55FF66 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = BB22CC33DD44EE55FF66AA11 /* GoogleSignInSwift */; };
+		E20A4466D14D48E5B208C001 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 4BA0A98F4DEAB2E089B1A001 /* GoogleSignIn */; };
+		E20A4467D14D48E5B208C002 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 7C59C4F7E2A34FDDA1E2E110 /* GoogleSignIn */; };
 		E2D28BB22EF3E47600AB186F /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2D28BB12EF3E47500AB186F /* UniformTypeIdentifiers.framework */; };
 		E2D28BBE2EF3E47600AB186F /* FactCheckShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E2D28BAF2EF3E47500AB186F /* FactCheckShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F1AB67148246C02958D2CCBE /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = F10682626469EB36E392DC16 /* GoogleSignIn */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -144,6 +148,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA11BB22CC33DD44EE55FF66 /* GoogleSignInSwift in Frameworks */,
+				F1AB67148246C02958D2CCBE /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,6 +157,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E20A4466D14D48E5B208C001 /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +165,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E20A4467D14D48E5B208C002 /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,6 +260,8 @@
 			);
 			name = ShamelaGPT;
 			packageProductDependencies = (
+				BB22CC33DD44EE55FF66AA11 /* GoogleSignInSwift */,
+				F10682626469EB36E392DC16 /* GoogleSignIn */,
 			);
 			productName = shamelagpt;
 			productReference = E24643D52EBAF683008F6234 /* ShamelaGPT.app */;
@@ -275,6 +285,7 @@
 			);
 			name = ShamelaGPTTests;
 			packageProductDependencies = (
+				4BA0A98F4DEAB2E089B1A001 /* GoogleSignIn */,
 			);
 			productName = shamelagptTests;
 			productReference = E24643E22EBAF687008F6234 /* ShamelaGPTTests.xctest */;
@@ -298,6 +309,7 @@
 			);
 			name = ShamelaGPTUITests;
 			packageProductDependencies = (
+				7C59C4F7E2A34FDDA1E2E110 /* GoogleSignIn */,
 			);
 			productName = shamelagptUITests;
 			productReference = E24643EC2EBAF687008F6234 /* ShamelaGPTUITests.xctest */;
@@ -365,6 +377,9 @@
 			);
 			mainGroup = E24643CC2EBAF683008F6234;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				48A23096B70234E46E5E39CE /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E24643D62EBAF683008F6234 /* Products */;
 			projectDirPath = "";
@@ -496,7 +511,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios.FactCheckAction;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -526,7 +541,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios.FactCheckAction;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -679,7 +694,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -705,7 +720,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -722,7 +737,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.creatrixe.shamelagptTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -740,7 +755,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.creatrixe.shamelagptTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -757,7 +772,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.creatrixe.shamelagptUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -775,7 +790,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.creatrixe.shamelagptUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -804,7 +819,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios.FactCheckShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -836,7 +851,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.shamelagpt.ios.FactCheckShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -908,6 +923,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		48A23096B70234E46E5E39CE /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4BA0A98F4DEAB2E089B1A001 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 48A23096B70234E46E5E39CE /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		7C59C4F7E2A34FDDA1E2E110 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 48A23096B70234E46E5E39CE /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		BB22CC33DD44EE55FF66AA11 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 48A23096B70234E46E5E39CE /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		F10682626469EB36E392DC16 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 48A23096B70234E46E5E39CE /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E24643CD2EBAF683008F6234 /* Project object */;
 }

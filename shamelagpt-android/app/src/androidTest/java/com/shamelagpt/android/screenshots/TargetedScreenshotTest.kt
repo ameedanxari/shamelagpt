@@ -47,7 +47,7 @@ import java.util.Locale
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class StoreScreenshotTest {
+class TargetedScreenshotTest {
 
     @get:Rule
     val composeRule = createAndroidComposeRule<ComponentActivity>()
@@ -64,22 +64,32 @@ class StoreScreenshotTest {
 
     private enum class Screen { Chat, Settings, History, Welcome, Auth }
 
-    private val baseScenarios = listOf(
+    // All available scenarios - can be filtered by screen
+    private val allScenarios = listOf(
+        // Chat scenarios
         Scenario(id = "chat_happy", locale = "en", screen = Screen.Chat, uiState = happyChatState("en")),
         Scenario(id = "chat_happy", locale = "ar", screen = Screen.Chat, uiState = happyChatState("ar")),
         Scenario(id = "chat_happy", locale = "ur", screen = Screen.Chat, uiState = happyChatState("ur")),
         Scenario(id = "chat_error", locale = "en", screen = Screen.Chat, uiState = errorChatState("en")),
         Scenario(id = "chat_error", locale = "ar", screen = Screen.Chat, uiState = errorChatState("ar")),
         Scenario(id = "chat_error", locale = "ur", screen = Screen.Chat, uiState = errorChatState("ur")),
+        
+        // Settings scenarios
         Scenario(id = "settings_main", locale = "en", screen = Screen.Settings),
         Scenario(id = "settings_main", locale = "ar", screen = Screen.Settings),
         Scenario(id = "settings_main", locale = "ur", screen = Screen.Settings),
+        
+        // History scenarios
         Scenario(id = "history_list", locale = "en", screen = Screen.History),
         Scenario(id = "history_list", locale = "ar", screen = Screen.History),
         Scenario(id = "history_list", locale = "ur", screen = Screen.History),
+        
+        // Welcome scenarios
         Scenario(id = "welcome_main", locale = "en", screen = Screen.Welcome),
         Scenario(id = "welcome_main", locale = "ar", screen = Screen.Welcome),
         Scenario(id = "welcome_main", locale = "ur", screen = Screen.Welcome),
+        
+        // Auth scenarios
         Scenario(id = "auth_login", locale = "en", screen = Screen.Auth, authUiState = loginAuthState("en")),
         Scenario(id = "auth_login", locale = "ar", screen = Screen.Auth, authUiState = loginAuthState("ar")),
         Scenario(id = "auth_login", locale = "ur", screen = Screen.Auth, authUiState = loginAuthState("ur")),
@@ -97,27 +107,81 @@ class StoreScreenshotTest {
         Scenario(id = "auth_error", locale = "ur", screen = Screen.Auth, authUiState = authErrorState("ur"))
     )
 
-    private val scenarios = baseScenarios.flatMap { scenario ->
-        listOf(
-            scenario,
-            scenario.copy(isDark = true)
-        )
-    }
-
     private val mockEvents = MutableSharedFlow<ChatEvent>(extraBufferCapacity = 1)
 
     @Test
-    fun captureStoreScreenshots() {
+    fun captureAuthScreenshots() {
+        captureScreenshotsForScreen(Screen.Auth)
+    }
+
+    @Test
+    fun captureChatScreenshots() {
+        captureScreenshotsForScreen(Screen.Chat)
+    }
+
+    @Test
+    fun captureSettingsScreenshots() {
+        captureScreenshotsForScreen(Screen.Settings)
+    }
+
+    @Test
+    fun captureHistoryScreenshots() {
+        captureScreenshotsForScreen(Screen.History)
+    }
+
+    @Test
+    fun captureWelcomeScreenshots() {
+        captureScreenshotsForScreen(Screen.Welcome)
+    }
+
+    @Test
+    fun captureTargetedScreenshots() {
         val device = (System.getenv("SCREENSHOT_DEVICE") ?: Build.MODEL ?: "android").replace(" ", "_")
         val instrumentationArgs = InstrumentationRegistry.getArguments()
+        
+        // Parse filters from instrumentation arguments
+        val screenFilter = instrumentationArgs.getString("screen")?.let { 
+            Screen.valueOf(it.uppercase()) 
+        }
         val localeFilter = instrumentationArgs.getString("locale") ?: System.getProperty("locale")
+        val scenarioFilter = instrumentationArgs.getString("scenario")
+        val darkModeOnly = instrumentationArgs.getString("darkMode")?.toBoolean() ?: false
+        
         val baseDir = instrumentationArgs.getString("additionalTestOutputDir")
             ?.let { File(it).resolve("screenshots").absolutePath }
             ?: System.getenv("SCREENSHOT_OUTPUT_DIR")
             ?: composeRule.activity.getExternalFilesDir("screenshots")?.absolutePath
             ?: composeRule.activity.filesDir.resolve("screenshots").absolutePath
-        val activeScenarios = scenarios.filter { localeFilter == null || it.locale == localeFilter }
-        val scenarioState = mutableStateOf(activeScenarios.first())
+
+        // Filter scenarios based on provided criteria
+        val filteredScenarios = allScenarios.filter { scenario ->
+            val screenMatch = screenFilter == null || scenario.screen == screenFilter
+            val localeMatch = localeFilter == null || scenario.locale == localeFilter
+            val scenarioMatch = scenarioFilter == null || scenario.id.contains(scenarioFilter, ignoreCase = true)
+            val darkMatch = !darkModeOnly || scenario.isDark
+            
+            screenMatch && localeMatch && scenarioMatch && darkMatch
+        }
+
+        if (filteredScenarios.isEmpty()) {
+            throw IllegalArgumentException("No scenarios match the provided filters. " +
+                "Screen: $screenFilter, Locale: $localeFilter, Scenario: $scenarioFilter, Dark Only: $darkModeOnly")
+        }
+
+        println("Generating ${filteredScenarios.size} screenshots:")
+        filteredScenarios.forEach { scenario ->
+            println("- ${scenario.screen.name}/${scenario.locale}/${scenario.id}${if (scenario.isDark) "_dark" else ""}")
+        }
+
+        val scenariosWithDark = if (darkModeOnly) {
+            filteredScenarios
+        } else {
+            filteredScenarios.flatMap { scenario ->
+                listOf(scenario, scenario.copy(isDark = true))
+            }
+        }
+
+        val scenarioState = mutableStateOf(scenariosWithDark.first())
         setLocale(scenarioState.value.locale, scenarioState.value.isDark)
 
         composeRule.setContent {
@@ -166,7 +230,88 @@ class StoreScreenshotTest {
             }
         }
 
-        activeScenarios.forEach { scenario ->
+        scenariosWithDark.forEach { scenario ->
+            setLocale(scenario.locale, scenario.isDark)
+            scenarioState.value = scenario
+
+            composeRule.waitForIdle()
+            val image = captureScenarioBitmap()
+            val dir = File(baseDir, "$device/${scenario.locale}/${scenario.screen.name.lowercase()}")
+            dir.mkdirs()
+            val suffix = if (scenario.isDark) "_dark" else ""
+            val file = File(dir, "${scenario.id}$suffix.png")
+            saveImage(image, file)
+            println("Saved: ${file.absolutePath}")
+        }
+    }
+
+    private fun captureScreenshotsForScreen(targetScreen: Screen) {
+        val device = (System.getenv("SCREENSHOT_DEVICE") ?: Build.MODEL ?: "android").replace(" ", "_")
+        val instrumentationArgs = InstrumentationRegistry.getArguments()
+        val localeFilter = instrumentationArgs.getString("locale") ?: System.getProperty("locale")
+        val baseDir = instrumentationArgs.getString("additionalTestOutputDir")
+            ?.let { File(it).resolve("screenshots").absolutePath }
+            ?: System.getenv("SCREENSHOT_OUTPUT_DIR")
+            ?: composeRule.activity.getExternalFilesDir("screenshots")?.absolutePath
+            ?: composeRule.activity.filesDir.resolve("screenshots").absolutePath
+
+        val screenScenarios = allScenarios.filter { it.screen == targetScreen }
+        val activeScenarios = screenScenarios.filter { localeFilter == null || it.locale == localeFilter }
+        
+        val scenariosWithDark = activeScenarios.flatMap { scenario ->
+            listOf(scenario, scenario.copy(isDark = true))
+        }
+
+        val scenarioState = mutableStateOf(scenariosWithDark.first())
+        setLocale(scenarioState.value.locale, scenarioState.value.isDark)
+
+        composeRule.setContent {
+            val scenario = scenarioState.value
+            val isRtl = scenario.locale.lowercase() in listOf("ar", "ur", "fa")
+            val scenarioContext = localeContext ?: composeRule.activity
+            ShamelaGPTTheme(darkTheme = scenario.isDark) {
+                val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
+                CompositionLocalProvider(
+                    LocalLayoutDirection provides direction,
+                    LocalContext provides scenarioContext
+                ) {
+                    Surface {
+                        when (scenario.screen) {
+                            Screen.Chat -> scenario.uiState?.let { ui ->
+                                ChatScreen(viewModel = mockChatViewModel(ui))
+                            }
+                            Screen.Settings -> SettingsScreen(
+                                isAuthenticated = true,
+                                onNavigateToLanguage = {},
+                                onNavigateToAbout = {},
+                                onNavigateToAuth = {},
+                                onLogout = {},
+                                viewModel = mockSettingsViewModel(scenario.locale)
+                            )
+                            Screen.History -> HistoryScreen(
+                                isAuthenticated = true,
+                                onNavigateToChat = {},
+                                onNavigateToAuth = {},
+                                viewModel = mockHistoryViewModel(scenario.locale)
+                            )
+                            Screen.Welcome -> WelcomeScreen(
+                                onGetStarted = {},
+                                onSkipToChat = {}
+                            )
+                            Screen.Auth -> scenario.authUiState?.let { authState ->
+                                AuthScreen(
+                                    onAuthenticated = {},
+                                    onContinueAsGuest = {},
+                                    viewModel = mockAuthViewModel(authState)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        scenariosWithDark.forEach { scenario ->
             setLocale(scenario.locale, scenario.isDark)
             scenarioState.value = scenario
 
@@ -180,6 +325,7 @@ class StoreScreenshotTest {
         }
     }
 
+    // Helper methods (same as original StoreScreenshotTest)
     private fun mockChatViewModel(state: ChatUiState): com.shamelagpt.android.presentation.chat.ChatViewModel {
         val vm = mockk<com.shamelagpt.android.presentation.chat.ChatViewModel>(relaxed = true)
         val stateFlow = MutableStateFlow(state)
@@ -263,30 +409,6 @@ class StoreScreenshotTest {
                 ),
                 conversationType = ConversationType.FACT_CHECK,
                 isLocalOnly = true
-            ),
-            com.shamelagpt.android.domain.model.Conversation(
-                id = "3",
-                title = when (locale) {
-                    "ar" -> "زكاة المال: النصاب، الحول، وطريقة الحساب"
-                    "ur" -> "زکوٰۃ المال: نصاب، سال کی شرط اور حساب"
-                    else -> "Zakat al-Mal: Nisab, Hawl, and Step-by-Step Calculation"
-                },
-                createdAt = System.currentTimeMillis() - 604800000,
-                updatedAt = System.currentTimeMillis() - 345600000,
-                messages = listOf(
-                    Message(
-                        id = "3-preview",
-                        content = when (locale) {
-                            "ar" -> "طريقة حساب زكاة المال خطوة بخطوة."
-                            "ur" -> "زکوٰۃ المال کے حساب کا مرحلہ وار طریقہ۔"
-                            else -> "Step-by-step zakat al-mal calculation workflow."
-                        },
-                        isUserMessage = true,
-                        timestamp = System.currentTimeMillis() - 345500000
-                    )
-                ),
-                conversationType = ConversationType.REGULAR,
-                isLocalOnly = false
             )
         )
         val uiState = com.shamelagpt.android.presentation.history.HistoryUiState(
@@ -307,11 +429,6 @@ class StoreScreenshotTest {
                     else -> "No messages"
                 }
         }
-        return vm
-    }
-
-    private fun mockWelcomeViewModel(): com.shamelagpt.android.presentation.welcome.WelcomeViewModel {
-        val vm = mockk<com.shamelagpt.android.presentation.welcome.WelcomeViewModel>(relaxed = true)
         return vm
     }
 
@@ -364,6 +481,33 @@ class StoreScreenshotTest {
             isLoading = false,
             conversationId = "store-shot",
             threadId = "thread-store"
+        )
+    }
+
+    private fun errorChatState(locale: String): ChatUiState {
+        val now = System.currentTimeMillis()
+        val prompt = when (locale) {
+            "ar" -> "أعد المحاولة من فضلك، هناك مشكلة في الاتصال"
+            "ur" -> "براہ کرم دوبارہ کوشش کریں، کنکشن میں مسئلہ ہے"
+            else -> "Please check connection"
+        }
+        val error = formattedError(
+            locale = locale,
+            message = localizedServerErrorMessage(locale),
+            code = "E-SRV-500"
+        )
+        return ChatUiState(
+            messages = listOf(
+                Message(
+                    id = "u1",
+                    content = prompt,
+                    isUserMessage = true,
+                    timestamp = now - 2_000
+                )
+            ),
+            inputText = "",
+            isLoading = false,
+            error = error
         )
     }
 
@@ -459,33 +603,6 @@ class StoreScreenshotTest {
             password = "••••••••",
             displayName = "",
             isLoginMode = true,
-            isLoading = false,
-            error = error
-        )
-    }
-
-    private fun errorChatState(locale: String): ChatUiState {
-        val now = System.currentTimeMillis()
-        val prompt = when (locale) {
-            "ar" -> "أعد المحاولة من فضلك، هناك مشكلة في الاتصال"
-            "ur" -> "براہ کرم دوبارہ کوشش کریں، کنکشن میں مسئلہ ہے"
-            else -> "Please check connection"
-        }
-        val error = formattedError(
-            locale = locale,
-            message = localizedServerErrorMessage(locale),
-            code = "E-SRV-500"
-        )
-        return ChatUiState(
-            messages = listOf(
-                Message(
-                    id = "u1",
-                    content = prompt,
-                    isUserMessage = true,
-                    timestamp = now - 2_000
-                )
-            ),
-            inputText = "",
             isLoading = false,
             error = error
         )

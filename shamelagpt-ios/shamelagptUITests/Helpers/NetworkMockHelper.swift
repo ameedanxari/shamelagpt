@@ -26,6 +26,8 @@ class NetworkMockHelper {
         static let mockScenarioId = "MOCK_SCENARIO_ID"
         static let mockChatResponse = "MOCK_CHAT_RESPONSE"
         static let mockChatError = "MOCK_CHAT_ERROR"
+        static let mockAuthError = "MOCK_AUTH_ERROR"
+        static let mockAuthResponse = "MOCK_AUTH_RESPONSE"
         static let mockNetworkError = "MOCK_NETWORK_ERROR"
         static let mockDelay = "MOCK_DELAY"
         static let mockChatStreamEvents = "MOCK_CHAT_STREAM"

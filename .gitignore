@@ -163,3 +163,9 @@ conversations_*.txt
 working_copy/
 artifacts
 shamelagpt-android/app/release
+
+# Secrets / credentials
+*.jks
+*.json.enc
+client_secret_*.json
+client_*.plist

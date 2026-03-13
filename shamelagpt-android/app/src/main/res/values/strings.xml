@@ -25,6 +25,12 @@
     <string name="continue_as_guest">Continue as guest</string>
     <string name="need_account">Need an account? Sign up</string>
     <string name="have_account">Have an account? Sign in</string>
+    <string name="auth_invalid_credentials">Unable to sign in. Check your email and password and try again.</string>
+    <string name="auth_email_exists_use_login">This email is already registered. Please sign in.</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="auth_or_divider">or</string>
+    <string name="google_sign_in_failed">Google sign-in failed. Please try again.</string>
+    <string name="google_web_client_id" translatable="false">1056619207445-fr9fddgs6ge4980dl19nd4ksogisft9u.apps.googleusercontent.com</string>
 
     <!-- Chat Screen -->
     <string name="chat_title">ShamelaGPT</string>

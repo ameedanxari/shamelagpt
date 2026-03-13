@@ -25,6 +25,11 @@
     <string name="continue_as_guest">بطور مہمان جاری رکھیں</string>
     <string name="need_account">اکاؤنٹ نہیں ہے؟ نیا بنائیں</string>
     <string name="have_account">اکاؤنٹ ہے؟ سائن اِن کریں</string>
+    <string name="auth_invalid_credentials">سائن اِن نہیں ہو سکا۔ اپنا ای میل اور پاس ورڈ چیک کریں اور دوبارہ کوشش کریں۔</string>
+    <string name="auth_email_exists_use_login">یہ ای میل پہلے سے رجسٹرڈ ہے۔ براہ کرم سائن اِن کریں۔</string>
+    <string name="sign_in_with_google">گوگل سے سائن اِن کریں</string>
+    <string name="auth_or_divider">یا</string>
+    <string name="google_sign_in_failed">گوگل سائن اِن ناکام ہوا۔ براہ کرم دوبارہ کوشش کریں۔</string>
 
     <!-- Chat Screen -->
     <string name="chat_title">شاملہ GPT</string>

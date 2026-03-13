@@ -351,6 +351,14 @@ class MockURLProtocol: URLProtocol {
             return mockPreferencesResponse(delay: delay)
         }
 
+        if urlString.contains("/api/auth/signup") ||
+            urlString.contains("/api/auth/login") ||
+            urlString.contains("/api/auth/google") ||
+            urlString.contains("/api/auth/forgot-password") ||
+            urlString.contains("/api/auth/refresh") {
+            return mockAuthResponse(delay: delay)
+        }
+
         // Conversation endpoints
         if urlString.contains("/api/conversations") {
             return mockConversationsResponse(delay: delay)
@@ -380,6 +388,42 @@ class MockURLProtocol: URLProtocol {
 
         AppLogger.network.logDebug("MockURLProtocol: No mock configuration found for request")
         return nil
+    }
+
+    private func mockAuthResponse(delay: TimeInterval) -> MockResponse? {
+        let method = request.httpMethod?.uppercased() ?? "GET"
+
+        if let authErrorJSON = UserDefaults.standard.string(forKey: "mockAuthError"),
+           let authErrorData = authErrorJSON.data(using: .utf8) {
+            let statusCode = parseStatusCode(from: authErrorJSON) ?? 400
+            AppLogger.network.logInfo("MockURLProtocol: Returning mocked auth error status=\(statusCode)")
+            let response = MockURLProtocol.httpResponse(statusCode: statusCode)
+            return MockResponse(data: authErrorData, response: response, delay: delay)
+        }
+
+        if let authResponseJSON = UserDefaults.standard.string(forKey: "mockAuthResponse"),
+           let authResponseData = authResponseJSON.data(using: .utf8) {
+            AppLogger.network.logInfo("MockURLProtocol: Returning mocked auth response")
+            let response = MockURLProtocol.httpResponse(statusCode: 200)
+            return MockResponse(data: authResponseData, response: response, delay: delay)
+        }
+
+        if method == "POST",
+           request.url?.absoluteString.contains("/api/auth/forgot-password") == true {
+            return MockURLProtocol.successResponse(json: [:], statusCode: 200, delay: delay)
+        }
+
+        let defaultAuthResponse: [String: Any] = [
+            "token": "mock-token",
+            "refresh_token": "mock-refresh-token",
+            "expires_in": "3600",
+            "user": [
+                "uid": "mock-user-id",
+                "email": "mock@shamela.app"
+            ]
+        ]
+        AppLogger.network.logInfo("MockURLProtocol: Returning default auth response")
+        return MockURLProtocol.successResponse(json: defaultAuthResponse, statusCode: 200, delay: delay)
     }
 
     private func mockPreferencesResponse(delay: TimeInterval) -> MockResponse? {

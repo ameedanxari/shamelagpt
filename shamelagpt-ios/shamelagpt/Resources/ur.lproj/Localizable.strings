@@ -245,6 +245,11 @@
 "auth.needAccount" = "اکاؤنٹ نہیں ہے؟ نیا بنائیں";
 "auth.haveAccount" = "اکاؤنٹ ہے؟ سائن اِن کریں";
 "auth.signInButton" = "سائن اِن";
+"auth.invalidCredentials" = "سائن اِن نہیں ہو سکا۔ اپنا ای میل اور پاس ورڈ چیک کریں اور دوبارہ کوشش کریں۔";
+"auth.emailExistsUseLogin" = "یہ ای میل پہلے سے رجسٹرڈ ہے۔ براہ کرم سائن اِن کریں۔";
+"auth.signInWithGoogle" = "گوگل سے سائن اِن کریں";
+"auth.googleSignInFailed" = "گوگل سائن اِن ناکام ہوا۔ براہ کرم دوبارہ کوشش کریں۔";
+"auth.orDivider" = "یا";
 
 // MARK: - AI Preference Options
 
