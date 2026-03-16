@@ -78,7 +78,8 @@ val presentationModule = module {
             voiceInputManager = get(),
             ocrManager = get(),
             context = androidContext(),
-            preferencesManager = get()
+            preferencesManager = get(),
+            authRepository = get()
         )
     }
 

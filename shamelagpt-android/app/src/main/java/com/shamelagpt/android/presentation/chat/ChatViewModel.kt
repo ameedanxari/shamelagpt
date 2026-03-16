@@ -25,6 +25,7 @@ import com.shamelagpt.android.core.error.AppError
 import com.shamelagpt.android.core.error.UserErrorMessage
 import com.shamelagpt.android.core.network.NetworkError
 import com.shamelagpt.android.core.preferences.PreferencesManager
+import com.shamelagpt.android.domain.repository.AuthRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
@@ -52,10 +53,17 @@ class ChatViewModel(
     private val voiceInputManager: VoiceInputManager,
     private val ocrManager: OCRManager,
     private val context: Context,
-    private val preferencesManager: PreferencesManager? = null
+    private val preferencesManager: PreferencesManager? = null,
+    private val authRepository: AuthRepository? = null
 ) : ViewModel() {
 
     private val TAG = "ChatViewModel"
+
+    // Mode preference: 0 = research, 2 = fact_check
+    private val _modePreference = MutableStateFlow(0)
+    val modePreference: StateFlow<Int> = _modePreference.asStateFlow()
+    private val _isModeLoading = MutableStateFlow(false)
+    val isModeLoading: StateFlow<Boolean> = _isModeLoading.asStateFlow()
 
     // UI State
     private val _uiState = MutableStateFlow(createFreshUiState())
@@ -68,7 +76,30 @@ class ChatViewModel(
     init {
         // Initial state is already fresh, but we can call it if needed.
         // For tests, calling it often causes race conditions with resets.
-        // loadConversation(null) 
+        // loadConversation(null)
+        loadModePreference()
+    }
+
+    private fun loadModePreference() {
+        viewModelScope.launch {
+            authRepository?.getModePreference()?.onSuccess { response ->
+                _modePreference.value = response.modePreference
+            }?.onFailure {
+                Logger.e(TAG, "Failed to load mode preference: ${it.message}")
+            }
+        }
+    }
+
+    fun updateModePreference(mode: Int) {
+        _isModeLoading.value = true
+        viewModelScope.launch {
+            authRepository?.setModePreference(mode)?.onSuccess { response ->
+                _modePreference.value = response.modePreference
+            }?.onFailure {
+                Logger.e(TAG, "Failed to update mode preference: ${it.message}")
+            }
+            _isModeLoading.value = false
+        }
     }
 
     // Job for collecting messages from Room Flow
