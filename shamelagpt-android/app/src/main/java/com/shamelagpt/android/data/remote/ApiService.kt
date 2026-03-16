@@ -19,6 +19,8 @@ import com.shamelagpt.android.data.remote.dto.RefreshTokenRequest
 import com.shamelagpt.android.data.remote.dto.OCRRequest
 import com.shamelagpt.android.data.remote.dto.OCRResponse
 import com.shamelagpt.android.data.remote.dto.ConfirmFactCheckRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
 import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -127,6 +129,18 @@ interface ApiService {
      */
     @PUT("api/auth/me/preferences")
     suspend fun setPreferences(@Body request: UserPreferencesRequest): EmptyResponse
+
+    /**
+     * Get user mode preference (research vs fact-check).
+     */
+    @GET("api/auth/me/mode")
+    suspend fun getModePreference(): ModePreferenceResponse
+
+    /**
+     * Update user mode preference.
+     */
+    @PUT("api/auth/me/mode")
+    suspend fun setModePreference(@Body request: ModePreferenceRequest): ModePreferenceResponse
 
     @POST("api/chat/generate-title")
     suspend fun generateTitle(@Body request: ConversationRequest): com.shamelagpt.android.data.remote.dto.GenerateTitleResponse

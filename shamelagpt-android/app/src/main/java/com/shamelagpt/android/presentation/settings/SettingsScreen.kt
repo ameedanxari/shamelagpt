@@ -95,6 +95,49 @@ fun SettingsScreen(
 
             if (isAuthenticatedState) {
 
+                // Mode preference toggle (Research / Fact Check)
+                item {
+                    val modePreference by viewModel.modePreference.collectAsState()
+                    val isModeLoading by viewModel.isModeLoading.collectAsState()
+                    val isFactCheck = modePreference == 2
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = if (isFactCheck) Icons.Default.FactCheck else Icons.Default.Search,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_mode_preference),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = if (isFactCheck) stringResource(R.string.settings_mode_fact_check) else stringResource(R.string.settings_mode_research),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        if (isModeLoading) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                        } else {
+                            Switch(
+                                checked = isFactCheck,
+                                onCheckedChange = { checked ->
+                                    viewModel.updateModePreference(if (checked) 2 else 0)
+                                }
+                            )
+                        }
+                    }
+                }
+
                 item {
                     SettingsItem(
                         title = stringResource(R.string.settings_custom_prompt),

@@ -36,6 +36,12 @@ class SettingsViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    // Mode preference: 0 = default/research, 1 = research, 2 = fact_check
+    private val _modePreference = MutableStateFlow(0)
+    val modePreference: StateFlow<Int> = _modePreference.asStateFlow()
+    private val _isModeLoading = MutableStateFlow(false)
+    val isModeLoading: StateFlow<Boolean> = _isModeLoading.asStateFlow()
+
     private val _isAuthenticated = MutableStateFlow(false)
     val isAuthenticated: StateFlow<Boolean> = _isAuthenticated.asStateFlow()
 
@@ -44,6 +50,7 @@ class SettingsViewModel(
             _isAuthenticated.value = authRepository.isLoggedIn()
             if (_isAuthenticated.value) {
                 loadPreferences()
+                loadModePreference()
             }
         }
     }
@@ -92,6 +99,28 @@ class SettingsViewModel(
             Log.d(TAG, "Saving preferences with language: ${prefs.languagePreference}")
             preferencesRepository.updatePreferences(prefs)
             Log.d(TAG, "savePreferences() completed")
+        }
+    }
+
+    private suspend fun loadModePreference() {
+        authRepository.getModePreference().onSuccess { response ->
+            _modePreference.value = response.modePreference
+        }.onFailure {
+            Log.e(TAG, "Failed to load mode preference: ${it.message}")
+        }
+    }
+
+    fun updateModePreference(mode: Int) {
+        _isModeLoading.value = true
+        viewModelScope.launch {
+            authRepository.setModePreference(mode).onSuccess { response ->
+                _modePreference.value = response.modePreference
+                Log.d(TAG, "Mode preference updated to: ${response.modeName}")
+            }.onFailure {
+                Log.e(TAG, "Failed to update mode preference: ${it.message}")
+                _error.value = it.message
+            }
+            _isModeLoading.value = false
         }
     }
 

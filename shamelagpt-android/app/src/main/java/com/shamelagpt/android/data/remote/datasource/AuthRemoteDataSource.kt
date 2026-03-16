@@ -9,6 +9,8 @@ import com.shamelagpt.android.data.remote.dto.UserResponse
 import com.shamelagpt.android.data.remote.dto.EmptyResponse
 import com.shamelagpt.android.data.remote.dto.ForgotPasswordRequest
 import com.shamelagpt.android.data.remote.dto.GoogleSignInRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
 import com.shamelagpt.android.data.remote.dto.RefreshTokenRequest
 
 interface AuthRemoteDataSource {
@@ -23,4 +25,6 @@ interface AuthRemoteDataSource {
     suspend fun verifyToken(): Result<EmptyResponse>
     suspend fun getPreferences(): Result<UserPreferencesRequest>
     suspend fun setPreferences(request: UserPreferencesRequest): Result<EmptyResponse>
+    suspend fun getModePreference(): Result<ModePreferenceResponse>
+    suspend fun setModePreference(request: ModePreferenceRequest): Result<ModePreferenceResponse>
 }
