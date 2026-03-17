@@ -129,6 +129,22 @@ final class AuthRepositoryImpl: AuthRepository {
         }
     }
 
+    func getModePreference() async throws -> ModePreferenceResponse {
+        do {
+            return try await apiClient.getModePreference()
+        } catch {
+            throw normalizeError(error)
+        }
+    }
+
+    func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse {
+        do {
+            return try await apiClient.setModePreference(request)
+        } catch {
+            throw normalizeError(error)
+        }
+    }
+
     func logout() {
         AppLogger.auth.logInfo("logout called")
         sessionManager.clearSession()

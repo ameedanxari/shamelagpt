@@ -201,6 +201,16 @@ struct ChatView: View {
                 }
 
             VStack(spacing: 0) {
+                if viewModel.canToggleModePreference {
+                    HStack {
+                        Spacer()
+                        modeToggleControl
+                    }
+                    .padding(.horizontal, AppTheme.Spacing.md)
+                    .padding(.top, AppTheme.Spacing.sm)
+                    .padding(.bottom, AppTheme.Spacing.xs)
+                }
+
                 // Messages area
                 messagesArea
 
@@ -264,6 +274,34 @@ struct ChatView: View {
     }
 
     // MARK: - Subviews
+
+    private var modeToggleControl: some View {
+        Group {
+            if viewModel.isModePreferenceLoading {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .controlSize(.small)
+                    .accessibilityIdentifier(AccessibilityID.Chat.modeToggleProgress)
+            } else {
+                Button(action: {
+                    viewModel.toggleModePreference()
+                }) {
+                    Label(
+                        viewModel.isFactCheckModeEnabled
+                            ? LocalizationKeys.chatModeFactCheck.localizedKey
+                            : LocalizationKeys.chatModeResearch.localizedKey,
+                        systemImage: viewModel.isFactCheckModeEnabled ? "checkmark.seal" : "magnifyingglass"
+                    )
+                    .font(.caption.weight(.semibold))
+                    .padding(.horizontal, AppTheme.Spacing.sm)
+                    .padding(.vertical, AppTheme.Spacing.xs)
+                }
+                .buttonStyle(.bordered)
+                .tint(viewModel.isFactCheckModeEnabled ? .orange : AppTheme.Colors.primary)
+                .accessibilityIdentifier(AccessibilityID.Chat.modeToggleButton)
+            }
+        }
+    }
 
     private var messagesArea: some View {
         Group {

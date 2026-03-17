@@ -15,11 +15,14 @@ class MockAuthRepository: AuthRepository {
     var isLoggedInCallCount = 0
     var refreshTokenCallCount = 0
     var deleteCurrentUserCallCount = 0
+    var getModePreferenceCallCount = 0
+    var setModePreferenceCallCount = 0
     
     // Stub Results
     var mockAuthResponse = AuthResponse(token: "mock-token", refreshToken: "mock-refresh", expiresIn: "3600", user: ["uid": AnyCodable("123")])
     var mockUserResponse = UserResponse(id: "123", firebaseUid: "fb123", email: "test@example.com", displayName: "Test User", createdAt: "", updatedAt: "", lastLogin: "")
     var mockIsLoggedIn = false
+    var mockModePreferenceResponse = ModePreferenceResponse(modePreference: 1, modeName: "research")
     
     func signup(request: SignupRequest) async throws -> AuthResponse {
         signupCallCount += 1
@@ -76,6 +79,22 @@ class MockAuthRepository: AuthRepository {
     
     func setPreferences(_ request: UserPreferencesRequest) async throws {
         if shouldFail { throw errorToThrow }
+    }
+
+    func getModePreference() async throws -> ModePreferenceResponse {
+        getModePreferenceCallCount += 1
+        if shouldFail { throw errorToThrow }
+        return mockModePreferenceResponse
+    }
+
+    func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse {
+        setModePreferenceCallCount += 1
+        if shouldFail { throw errorToThrow }
+        mockModePreferenceResponse = ModePreferenceResponse(
+            modePreference: request.modePreference,
+            modeName: request.modePreference == 2 ? "fact_check" : "research"
+        )
+        return mockModePreferenceResponse
     }
     
     func logout() {

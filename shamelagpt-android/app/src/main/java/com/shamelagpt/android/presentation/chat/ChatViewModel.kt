@@ -59,8 +59,8 @@ class ChatViewModel(
 
     private val TAG = "ChatViewModel"
 
-    // Mode preference: 0 = research, 2 = fact_check
-    private val _modePreference = MutableStateFlow(0)
+    // Mode preference follows backend canonical values (research=1, fact-check=2).
+    private val _modePreference = MutableStateFlow(MODE_RESEARCH)
     val modePreference: StateFlow<Int> = _modePreference.asStateFlow()
     private val _isModeLoading = MutableStateFlow(false)
     val isModeLoading: StateFlow<Boolean> = _isModeLoading.asStateFlow()
@@ -81,21 +81,26 @@ class ChatViewModel(
     }
 
     private fun loadModePreference() {
+        if (authRepository == null) return
+        _isModeLoading.value = true
         viewModelScope.launch {
-            authRepository?.getModePreference()?.onSuccess { response ->
+            authRepository.getModePreference().onSuccess { response ->
                 _modePreference.value = response.modePreference
-            }?.onFailure {
+            }.onFailure {
                 Logger.e(TAG, "Failed to load mode preference: ${it.message}")
             }
+            _isModeLoading.value = false
         }
     }
 
     fun updateModePreference(mode: Int) {
+        if (authRepository == null) return
+        val requestedMode = if (mode == MODE_FACT_CHECK) MODE_FACT_CHECK else MODE_RESEARCH
         _isModeLoading.value = true
         viewModelScope.launch {
-            authRepository?.setModePreference(mode)?.onSuccess { response ->
+            authRepository.setModePreference(requestedMode).onSuccess { response ->
                 _modePreference.value = response.modePreference
-            }?.onFailure {
+            }.onFailure {
                 Logger.e(TAG, "Failed to update mode preference: ${it.message}")
             }
             _isModeLoading.value = false
@@ -1154,6 +1159,8 @@ class ChatViewModel(
 
     private companion object {
         const val DEFAULT_THINKING_MESSAGE = "Thinking..."
+        const val MODE_RESEARCH = 1
+        const val MODE_FACT_CHECK = 2
         @Volatile
         var factCheckRequiresImageUrl: Boolean = false
     }

@@ -6,8 +6,11 @@ import com.shamelagpt.android.data.remote.dto.AuthResponse
 import com.shamelagpt.android.data.remote.dto.LoginRequest
 import com.shamelagpt.android.data.remote.dto.SignupRequest
 import com.shamelagpt.android.data.remote.dto.EmptyResponse
+import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
 import com.shamelagpt.android.util.MainCoroutineRule
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -89,5 +92,37 @@ class AuthRepositoryImplTest {
         assertTrue(result.isSuccess)
         verify { sessionManager.clearSession() }
         verify { sessionManager.clearCredentials() }
+    }
+
+    @Test
+    fun `getModePreference delegates to datasource`() = runTest {
+        // Given
+        val expected = ModePreferenceResponse(modePreference = 2, modeName = "fact_check")
+        coEvery { authRemoteDataSource.getModePreference() } returns Result.success(expected)
+
+        // When
+        val result = repository.getModePreference()
+
+        // Then
+        assertTrue(result.isSuccess)
+        assertEquals(expected, result.getOrNull())
+        coVerify(exactly = 1) { authRemoteDataSource.getModePreference() }
+    }
+
+    @Test
+    fun `setModePreference sends request and returns datasource response`() = runTest {
+        // Given
+        val expected = ModePreferenceResponse(modePreference = 1, modeName = "research")
+        coEvery { authRemoteDataSource.setModePreference(any()) } returns Result.success(expected)
+
+        // When
+        val result = repository.setModePreference(1)
+
+        // Then
+        assertTrue(result.isSuccess)
+        assertEquals(expected, result.getOrNull())
+        coVerify(exactly = 1) {
+            authRemoteDataSource.setModePreference(ModePreferenceRequest(modePreference = 1))
+        }
     }
 }

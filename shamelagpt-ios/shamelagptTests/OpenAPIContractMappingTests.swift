@@ -90,6 +90,7 @@ final class OpenAPIContractMappingTests: XCTestCase {
             "/api/auth/me",
             "/api/auth/verify",
             "/api/auth/me/preferences",
+            "/api/auth/me/mode",
             "/api/chat/generate-title",
             "/api/chat/ocr",
             "/api/chat/confirm-factcheck",
