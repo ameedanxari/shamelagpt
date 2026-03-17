@@ -20,6 +20,8 @@ protocol AuthRepository {
     func verifyToken() async throws
     func getPreferences() async throws -> UserPreferencesRequest
     func setPreferences(_ request: UserPreferencesRequest) async throws
+    func getModePreference() async throws -> ModePreferenceResponse
+    func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse
     func logout()
     func token() -> String?
     func isLoggedIn() -> Bool

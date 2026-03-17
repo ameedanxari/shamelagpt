@@ -88,6 +88,9 @@
     <string name="settings_custom_prompt">مخصوص سسٹم پرامپٹ</string>
     <string name="settings_custom_prompt_optional">اختیاری</string>
     <string name="settings_not_set">سیٹ نہیں ہے</string>
+    <string name="settings_mode_preference">چیٹ موڈ</string>
+    <string name="settings_mode_research">تحقیق</string>
+    <string name="settings_mode_fact_check">فیکٹ چیک</string>
     <string name="settings_save_preferences">ترجیحات محفوظ کریں</string>
     <string name="settings_sign_out">سائن آؤٹ</string>
     <string name="sign_out_confirmation_title">سائن آؤٹ؟</string>

@@ -50,12 +50,15 @@ final class ChatViewModel: ObservableObject {
     @Published var ocrExtractedText: String = ""
     @Published var ocrDetectedLanguage: String?
     @Published var ocrImageData: Data?
+    @Published private(set) var modePreference: Int = ModePreference.research
+    @Published private(set) var isModePreferenceLoading: Bool = false
 
     // MARK: - Private Properties
 
     private let sendMessageUseCase: SendMessageUseCaseProtocol
     private let chatRepository: ChatRepository
     private let apiClient: APIClientProtocol?
+    private let authRepository: AuthRepository?
     private let isGuest: Bool
     private let onConversationIdChange: ((String?) -> Void)?
     private let voiceInputManager: any VoiceInputManagerProtocol
@@ -76,6 +79,10 @@ final class ChatViewModel: ObservableObject {
     private let simulatedOCRLanguage: String?
     private var forceGuestForConversation: Bool
     private static var factCheckRequiresImageUrl: Bool = false
+    private enum ModePreference {
+        static let research = 1
+        static let factCheck = 2
+    }
 
     // MARK: - Initialization
 
@@ -84,6 +91,7 @@ final class ChatViewModel: ObservableObject {
         sendMessageUseCase: SendMessageUseCaseProtocol,
         chatRepository: ChatRepository,
         apiClient: APIClientProtocol? = nil,
+        authRepository: AuthRepository? = nil,
         isGuest: Bool = false,
         guestSessionId: String? = nil,
         voiceInputManager: any VoiceInputManagerProtocol,
@@ -96,6 +104,7 @@ final class ChatViewModel: ObservableObject {
         self.sendMessageUseCase = sendMessageUseCase
         self.chatRepository = chatRepository
         self.apiClient = apiClient
+        self.authRepository = authRepository
         self.isGuest = isGuest
         self.onConversationIdChange = onConversationIdChange
         self.voiceInputManager = voiceInputManager
@@ -186,9 +195,54 @@ final class ChatViewModel: ObservableObject {
             self.errorMessage = nil
             AppLogger.chat.logDebug("UI_TESTING: Error state cleared - error: \(self.error?.localizedDescription ?? "nil"), errorMessage: \(self.errorMessage ?? "nil")")
         }
+
+        if canToggleModePreference {
+            Task {
+                await loadModePreference()
+            }
+        }
     }
 
     // MARK: - Public Methods
+
+    var canToggleModePreference: Bool {
+        !isGuest && authRepository != nil
+    }
+
+    var isFactCheckModeEnabled: Bool {
+        modePreference == ModePreference.factCheck
+    }
+
+    func toggleModePreference() {
+        let nextMode = isFactCheckModeEnabled ? ModePreference.research : ModePreference.factCheck
+        Task {
+            await updateModePreference(nextMode)
+        }
+    }
+
+    func loadModePreference() async {
+        guard let authRepository = authRepository, !isGuest else { return }
+        isModePreferenceLoading = true
+        defer { isModePreferenceLoading = false }
+        do {
+            let response = try await authRepository.getModePreference()
+            modePreference = response.modePreference
+        } catch {
+            AppLogger.chat.logWarning("Failed to load mode preference reason=\(type(of: error))")
+        }
+    }
+
+    func updateModePreference(_ mode: Int) async {
+        guard let authRepository = authRepository, !isGuest else { return }
+        isModePreferenceLoading = true
+        defer { isModePreferenceLoading = false }
+        do {
+            let response = try await authRepository.setModePreference(ModePreferenceRequest(modePreference: mode))
+            modePreference = response.modePreference
+        } catch {
+            AppLogger.chat.logWarning("Failed to update mode preference reason=\(type(of: error))")
+        }
+    }
 
     /// Sends a message to the assistant
     func sendMessage(prefilledMessage: String? = nil) {

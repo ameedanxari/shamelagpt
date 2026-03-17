@@ -38,6 +38,8 @@ enum LocalizationKeys {
     static let newConversationWarningMessageLoggedIn = "chat.newConversationWarningMessageLoggedIn"
     static let newConversationWarningMessageLoggedOut = "chat.newConversationWarningMessageLoggedOut"
     static let viewHistory = "chat.viewHistory"
+    static let chatModeResearch = "chat.mode.research"
+    static let chatModeFactCheck = "chat.mode.factCheck"
 
     // MARK: - History Screen
 

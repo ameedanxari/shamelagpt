@@ -131,6 +131,9 @@
     <string name="settings_custom_prompt">Custom system prompt</string>
     <string name="settings_custom_prompt_optional">Optional</string>
     <string name="settings_not_set">Not set</string>
+    <string name="settings_mode_preference">Chat Mode</string>
+    <string name="settings_mode_research">Research</string>
+    <string name="settings_mode_fact_check">Fact Check</string>
     <string name="settings_save_preferences">Save preferences</string>
     <string name="settings_sign_out">Sign out</string>
     <string name="sign_out_confirmation_title">Sign Out?</string>

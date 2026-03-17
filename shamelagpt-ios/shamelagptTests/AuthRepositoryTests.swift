@@ -139,4 +139,52 @@ final class AuthRepositoryTests: XCTestCase {
         XCTAssertEqual(result.token, "aToken")
         XCTAssertTrue(sut.isLoggedIn())
     }
+
+    func testGetModePreferenceSuccess() async throws {
+        // Given
+        let expectedResponse = ModePreferenceResponse(modePreference: 2, modeName: "fact_check")
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        let responseData = try encoder.encode(expectedResponse)
+
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.url?.path, "/api/auth/me/mode")
+            XCTAssertEqual(request.httpMethod, "GET")
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, responseData)
+        }
+
+        // When
+        let result = try await sut.getModePreference()
+
+        // Then
+        XCTAssertEqual(result.modePreference, 2)
+        XCTAssertEqual(result.modeName, "fact_check")
+    }
+
+    func testSetModePreferenceSuccess() async throws {
+        // Given
+        let requestPayload = ModePreferenceRequest(modePreference: 1)
+        let expectedResponse = ModePreferenceResponse(modePreference: 1, modeName: "research")
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        let responseData = try encoder.encode(expectedResponse)
+        var capturedBody: Data?
+
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.url?.path, "/api/auth/me/mode")
+            XCTAssertEqual(request.httpMethod, "PUT")
+            capturedBody = request.httpBody
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, responseData)
+        }
+
+        // When
+        let result = try await sut.setModePreference(requestPayload)
+
+        // Then
+        XCTAssertEqual(result.modePreference, 1)
+        XCTAssertEqual(result.modeName, "research")
+        XCTAssertNotNil(capturedBody)
+        let json = try XCTUnwrap(try JSONSerialization.jsonObject(with: capturedBody!) as? [String: Any])
+        XCTAssertEqual(json["mode_preference"] as? Int, 1)
+    }
 }

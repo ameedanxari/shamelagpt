@@ -25,6 +25,7 @@ import com.shamelagpt.android.core.error.AppError
 import com.shamelagpt.android.core.error.UserErrorMessage
 import com.shamelagpt.android.core.network.NetworkError
 import com.shamelagpt.android.core.preferences.PreferencesManager
+import com.shamelagpt.android.domain.repository.AuthRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
@@ -52,10 +53,17 @@ class ChatViewModel(
     private val voiceInputManager: VoiceInputManager,
     private val ocrManager: OCRManager,
     private val context: Context,
-    private val preferencesManager: PreferencesManager? = null
+    private val preferencesManager: PreferencesManager? = null,
+    private val authRepository: AuthRepository? = null
 ) : ViewModel() {
 
     private val TAG = "ChatViewModel"
+
+    // Mode preference follows backend canonical values (research=1, fact-check=2).
+    private val _modePreference = MutableStateFlow(MODE_RESEARCH)
+    val modePreference: StateFlow<Int> = _modePreference.asStateFlow()
+    private val _isModeLoading = MutableStateFlow(false)
+    val isModeLoading: StateFlow<Boolean> = _isModeLoading.asStateFlow()
 
     // UI State
     private val _uiState = MutableStateFlow(createFreshUiState())
@@ -68,7 +76,35 @@ class ChatViewModel(
     init {
         // Initial state is already fresh, but we can call it if needed.
         // For tests, calling it often causes race conditions with resets.
-        // loadConversation(null) 
+        // loadConversation(null)
+        loadModePreference()
+    }
+
+    private fun loadModePreference() {
+        if (authRepository == null) return
+        _isModeLoading.value = true
+        viewModelScope.launch {
+            authRepository.getModePreference().onSuccess { response ->
+                _modePreference.value = response.modePreference
+            }.onFailure {
+                Logger.e(TAG, "Failed to load mode preference: ${it.message}")
+            }
+            _isModeLoading.value = false
+        }
+    }
+
+    fun updateModePreference(mode: Int) {
+        if (authRepository == null) return
+        val requestedMode = if (mode == MODE_FACT_CHECK) MODE_FACT_CHECK else MODE_RESEARCH
+        _isModeLoading.value = true
+        viewModelScope.launch {
+            authRepository.setModePreference(requestedMode).onSuccess { response ->
+                _modePreference.value = response.modePreference
+            }.onFailure {
+                Logger.e(TAG, "Failed to update mode preference: ${it.message}")
+            }
+            _isModeLoading.value = false
+        }
     }
 
     // Job for collecting messages from Room Flow
@@ -1123,6 +1159,8 @@ class ChatViewModel(
 
     private companion object {
         const val DEFAULT_THINKING_MESSAGE = "Thinking..."
+        const val MODE_RESEARCH = 1
+        const val MODE_FACT_CHECK = 2
         @Volatile
         var factCheckRequiresImageUrl: Boolean = false
     }

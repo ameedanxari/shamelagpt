@@ -201,6 +201,7 @@ class DependencyContainer {
             sendMessageUseCase: resolve(SendMessageUseCase.self)!,
             chatRepository: resolve(ChatRepository.self)!,
             apiClient: resolve(APIClientProtocol.self),
+            authRepository: resolve(AuthRepository.self),
             isGuest: sessionManager?.isGuest() ?? false,
             guestSessionId: guestSessionId,
             voiceInputManager: VoiceInputManager(),

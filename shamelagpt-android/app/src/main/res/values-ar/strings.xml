@@ -115,6 +115,9 @@
     <string name="settings_custom_prompt">موجه النظام المخصص</string>
     <string name="settings_custom_prompt_optional">اختياري</string>
     <string name="settings_not_set">غير محدد</string>
+    <string name="settings_mode_preference">وضع المحادثة</string>
+    <string name="settings_mode_research">بحث</string>
+    <string name="settings_mode_fact_check">تحقق من الحقائق</string>
     <string name="settings_save_preferences">حفظ التفضيلات</string>
     <string name="settings_sign_out">تسجيل الخروج</string>
     <string name="sign_out_confirmation_title">تسجيل الخروج؟</string>

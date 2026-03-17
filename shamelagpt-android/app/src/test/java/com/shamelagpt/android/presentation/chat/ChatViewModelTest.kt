@@ -9,6 +9,8 @@ import com.shamelagpt.android.core.util.OCRManager
 import com.shamelagpt.android.core.util.OCRResult
 import com.shamelagpt.android.core.util.VoiceInputManager
 import com.shamelagpt.android.core.preferences.PreferencesManager
+import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
+import com.shamelagpt.android.domain.repository.AuthRepository
 import com.shamelagpt.android.domain.usecase.SendMessageUseCase
 import com.shamelagpt.android.domain.usecase.StreamMessageUseCase
 import com.shamelagpt.android.domain.usecase.OCRUseCase
@@ -54,6 +56,7 @@ class ChatViewModelTest {
     private lateinit var mockVoiceInputManager: VoiceInputManager
     private lateinit var mockOCRManager: OCRManager
     private lateinit var mockPreferencesManager: PreferencesManager
+    private lateinit var mockAuthRepository: AuthRepository
     private lateinit var mockContext: Context
     private lateinit var mockContentResolver: ContentResolver
 
@@ -71,7 +74,11 @@ class ChatViewModelTest {
         mockVoiceInputManager = mockk(relaxed = true)
         mockOCRManager = mockk(relaxed = true)
         mockPreferencesManager = mockk(relaxed = true)
+        mockAuthRepository = mockk(relaxed = true)
         every { mockPreferencesManager.getSelectedLanguage() } returns "en"
+        coEvery { mockAuthRepository.getModePreference() } returns Result.success(
+            ModePreferenceResponse(modePreference = 1, modeName = "research")
+        )
         mockContext = mockk(relaxed = true)
         mockContentResolver = mockk(relaxed = true)
         every { mockContext.contentResolver } returns mockContentResolver
@@ -103,7 +110,8 @@ class ChatViewModelTest {
             voiceInputManager = mockVoiceInputManager,
             ocrManager = mockOCRManager,
             context = mockContext,
-            preferencesManager = mockPreferencesManager
+            preferencesManager = mockPreferencesManager,
+            authRepository = mockAuthRepository
         )
     }
 
@@ -836,6 +844,47 @@ class ChatViewModelTest {
     }
 
     // MARK: - State Management Tests
+
+    @Test
+    fun testInitLoadsModePreference() = runTest {
+        // When
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        assertThat(viewModel.modePreference.value).isEqualTo(1)
+        assertThat(viewModel.isModeLoading.value).isFalse()
+        coVerify(exactly = 1) { mockAuthRepository.getModePreference() }
+    }
+
+    @Test
+    fun testUpdateModePreferenceUpdatesState() = runTest {
+        // Given
+        coEvery { mockAuthRepository.setModePreference(2) } returns Result.success(
+            ModePreferenceResponse(modePreference = 2, modeName = "fact_check")
+        )
+
+        // When
+        viewModel.updateModePreference(2)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        assertThat(viewModel.modePreference.value).isEqualTo(2)
+        assertThat(viewModel.isModeLoading.value).isFalse()
+        coVerify(exactly = 1) { mockAuthRepository.setModePreference(2) }
+    }
+
+    @Test
+    fun testUpdateModePreferenceFailureClearsLoadingState() = runTest {
+        // Given
+        coEvery { mockAuthRepository.setModePreference(2) } returns Result.failure(Exception("network"))
+
+        // When
+        viewModel.updateModePreference(2)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        assertThat(viewModel.isModeLoading.value).isFalse()
+    }
 
     @Test
     fun testInitialUiStateIsCorrect() = runTest {

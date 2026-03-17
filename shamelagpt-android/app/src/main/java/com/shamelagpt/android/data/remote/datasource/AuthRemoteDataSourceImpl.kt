@@ -11,6 +11,8 @@ import com.shamelagpt.android.data.remote.dto.UserResponse
 import com.shamelagpt.android.data.remote.dto.EmptyResponse
 import com.shamelagpt.android.data.remote.dto.ForgotPasswordRequest
 import com.shamelagpt.android.data.remote.dto.GoogleSignInRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
 import com.shamelagpt.android.data.remote.dto.RefreshTokenRequest
 
 class AuthRemoteDataSourceImpl(
@@ -64,5 +66,13 @@ class AuthRemoteDataSourceImpl(
 
     override suspend fun setPreferences(request: UserPreferencesRequest): Result<EmptyResponse> = callWithAuth {
         apiService.setPreferences(request)
+    }
+
+    override suspend fun getModePreference(): Result<ModePreferenceResponse> = callWithAuth {
+        apiService.getModePreference()
+    }
+
+    override suspend fun setModePreference(request: ModePreferenceRequest): Result<ModePreferenceResponse> = callWithAuth {
+        apiService.setModePreference(request)
     }
 }

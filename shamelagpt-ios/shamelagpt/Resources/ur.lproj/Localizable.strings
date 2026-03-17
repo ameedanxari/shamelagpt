@@ -31,6 +31,8 @@
 "chat.newConversationWarningMessageLoggedIn" = "نئی گفتگو شروع کرنے سے آپ کی موجودہ گفتگو چھپ جائے گی، لیکن آپ اسے تاریخچہ سے دوبارہ کھول سکتے ہیں۔";
 "chat.newConversationWarningMessageLoggedOut" = "نئی گفتگو شروع کرنے سے آپ کی موجودہ گفتگو چھپ جائے گی، اور بطور مہمان آپ اس پر واپس نہیں جا سکیں گے۔";
 "chat.viewHistory" = "تاریخچہ دیکھیں";
+"chat.mode.research" = "تحقیق";
+"chat.mode.factCheck" = "فیکٹ چیک";
 
 // MARK: - History Screen
 

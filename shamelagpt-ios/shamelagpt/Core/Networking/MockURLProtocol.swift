@@ -351,6 +351,11 @@ class MockURLProtocol: URLProtocol {
             return mockPreferencesResponse(delay: delay)
         }
 
+        // Mode preference endpoint
+        if urlString.contains("/api/auth/me/mode") {
+            return mockModePreferenceResponse(delay: delay)
+        }
+
         if urlString.contains("/api/auth/signup") ||
             urlString.contains("/api/auth/login") ||
             urlString.contains("/api/auth/google") ||
@@ -456,6 +461,40 @@ class MockURLProtocol: URLProtocol {
         }
 
         return nil
+    }
+
+    private func mockModePreferenceResponse(delay: TimeInterval) -> MockResponse? {
+        let method = request.httpMethod?.uppercased() ?? "GET"
+
+        if let modeErrorJSON = UserDefaults.standard.string(forKey: "mockModePreferenceError"),
+           let modeErrorData = modeErrorJSON.data(using: .utf8) {
+            let statusCode = parseStatusCode(from: modeErrorJSON) ?? 400
+            let response = MockURLProtocol.httpResponse(statusCode: statusCode)
+            return MockResponse(data: modeErrorData, response: response, delay: delay)
+        }
+
+        if method == "PUT",
+           let body = request.httpBody,
+           let payload = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
+           let modePreference = payload["mode_preference"] as? Int {
+            let responseJSON: [String: Any] = [
+                "mode_preference": modePreference,
+                "mode_name": modePreference == 2 ? "fact_check" : "research"
+            ]
+            return MockURLProtocol.successResponse(json: responseJSON, statusCode: 200, delay: delay)
+        }
+
+        if let modeJSON = UserDefaults.standard.string(forKey: "mockModePreference"),
+           let modeData = modeJSON.data(using: .utf8) {
+            let response = MockURLProtocol.httpResponse(statusCode: 200)
+            return MockResponse(data: modeData, response: response, delay: delay)
+        }
+
+        let defaultMode: [String: Any] = [
+            "mode_preference": 1,
+            "mode_name": "research"
+        ]
+        return MockURLProtocol.successResponse(json: defaultMode, statusCode: 200, delay: delay)
     }
 
     private func mockConversationsResponse(delay: TimeInterval) -> MockResponse? {

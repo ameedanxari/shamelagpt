@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.automirrored.filled.FactCheck
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,6 +39,7 @@ import com.shamelagpt.android.presentation.chat.components.InputBar
 import com.shamelagpt.android.presentation.chat.components.MessageBubble
 import com.shamelagpt.android.presentation.chat.components.OCRConfirmationDialog
 import com.shamelagpt.android.presentation.chat.components.TypingIndicator
+import androidx.compose.material.icons.filled.Search
 import com.shamelagpt.android.core.util.FactCheckSharePayloadStore
 import com.shamelagpt.android.core.util.Logger
 import kotlinx.coroutines.flow.collectLatest
@@ -315,18 +317,59 @@ fun ChatScreen(
                 }
             }
 
-            if (canStartNewConversation) {
-                SmallFloatingActionButton(
-                    onClick = { showNewConversationWarning = true },
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 12.dp, end = 12.dp)
-                        .testTag(TestTags.Chat.NewChatButton)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.new_chat)
-                    )
+            // Top row: mode toggle + new chat button
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 12.dp, end = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Mode toggle (Research / Fact Check)
+                if (isAuthenticated) {
+                    val modePreference by viewModel.modePreference.collectAsState()
+                    val isModeLoading by viewModel.isModeLoading.collectAsState()
+                    val isFactCheck = modePreference == 2
+
+                    if (isModeLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        FilterChip(
+                            selected = isFactCheck,
+                            onClick = {
+                                viewModel.updateModePreference(if (isFactCheck) 1 else 2)
+                            },
+                            modifier = Modifier.testTag(TestTags.Chat.ModeToggleChip),
+                            label = {
+                                Text(
+                                    text = if (isFactCheck) stringResource(R.string.settings_mode_fact_check) else stringResource(R.string.settings_mode_research),
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = if (isFactCheck) Icons.AutoMirrored.Filled.FactCheck else Icons.Default.Search,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        )
+                    }
+                }
+
+                if (canStartNewConversation) {
+                    SmallFloatingActionButton(
+                        onClick = { showNewConversationWarning = true },
+                        modifier = Modifier.testTag(TestTags.Chat.NewChatButton)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.new_chat)
+                        )
+                    }
                 }
             }
 

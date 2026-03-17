@@ -38,6 +38,7 @@ object TestTags {
         const val SendButton = "sendButton"
         const val CameraButton = "cameraButton"
         const val MicButton = "micButton"
+        const val ModeToggleChip = "modeToggleChip"
         const val NewChatButton = "newChatButton"
         const val ErrorBanner = "chatErrorBanner"
         const val ErrorBannerDismissButton = "chatErrorBannerDismissButton"

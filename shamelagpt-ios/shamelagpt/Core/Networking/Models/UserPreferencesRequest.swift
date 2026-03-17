@@ -12,3 +12,12 @@ struct UserPreferencesRequest: Codable, Equatable {
     let customSystemPrompt: String?
     let responsePreferences: ResponsePreferencesRequest?
 }
+
+struct ModePreferenceRequest: Codable, Equatable {
+    let modePreference: Int
+}
+
+struct ModePreferenceResponse: Codable, Equatable {
+    let modePreference: Int
+    let modeName: String?
+}
