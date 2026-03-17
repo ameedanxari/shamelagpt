@@ -7,6 +7,17 @@
 
 import SwiftUI
 
+// MARK: - String Extension
+extension String {
+    func localizedCaseInsensitiveContains(_ substring: String) -> Bool {
+        return self.localizedLowercase().contains(substring.localizedLowercase())
+    }
+
+    private func localizedLowercase() -> String {
+        return self.folding(options: .caseInsensitive, locale: .current)
+    }
+}
+
 /// View displaying conversation history
 struct HistoryView: View {
 
@@ -22,6 +33,7 @@ struct HistoryView: View {
     // MARK: - State
 
     @State private var showingDeleteAllAlert = false
+    @State private var searchText = ""
 
     // MARK: - Body
 
@@ -47,7 +59,7 @@ struct HistoryView: View {
 
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: createNewConversation) {
-                    Image(systemName: "square.and.pencil")
+                    Label(LocalizationKeys.newChat.localizedKey, systemImage: "square.and.pencil")
                         .font(.system(size: AppTheme.Layout.iconSize))
                         .foregroundColor(AppTheme.Colors.primary)
                 }
@@ -55,6 +67,7 @@ struct HistoryView: View {
                 .accessibilityIdentifier(AccessibilityID.History.newChatButton)
             }
         }
+        .searchable(text: $searchText)
         .refreshable {
             if isAuthenticated {
                 await viewModel.refreshConversations(forceRefresh: true)
@@ -122,7 +135,7 @@ struct HistoryView: View {
     private var guestLockedView: some View {
         VStack(spacing: AppTheme.Spacing.lg) {
             Spacer()
-            
+
             VStack(spacing: AppTheme.Spacing.md) {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 48))
@@ -131,13 +144,13 @@ struct HistoryView: View {
                     .background(DesignSystem.Colors.surface(colorScheme))
                     .clipShape(Circle())
                     .accessibilityIdentifier(AccessibilityID.History.lockedIcon)
-                
+
                 Text(LocalizationKeys.historyLockedTitle.localizedKey)
                     .font(AppTheme.Typography.heading)
                     .foregroundColor(AppTheme.Colors.primaryText)
                     .multilineTextAlignment(.center)
                     .accessibilityIdentifier(AccessibilityID.History.lockedTitle)
-                
+
                 Text(LocalizationKeys.historyLockedMessage.localizedKey)
                     .font(AppTheme.Typography.body)
                     .foregroundColor(AppTheme.Colors.secondaryText)
@@ -145,7 +158,7 @@ struct HistoryView: View {
                     .padding(.horizontal)
                     .accessibilityIdentifier(AccessibilityID.History.lockedMessage)
             }
-            
+
             Button(action: onSignIn) {
                 HStack {
                     Image(systemName: "person.circle")
@@ -160,7 +173,7 @@ struct HistoryView: View {
             }
             .padding(.horizontal, AppTheme.Spacing.xl)
             .accessibilityIdentifier(AccessibilityID.Auth.signInButton)
-            
+
             Spacer()
         }
         .padding()
@@ -207,12 +220,19 @@ struct HistoryView: View {
             .padding(.top, AppTheme.Spacing.md)
             .accessibilityIdentifier(AccessibilityID.History.newConversationButton)
         }
-        .padding(AppTheme.Spacing.xl)
+        .padding(.horizontal, AppTheme.Spacing.xl)
     }
 
     private var conversationsList: some View {
-        List {
-            ForEach(viewModel.conversations) { conversation in
+        let filteredConversations = searchText.isEmpty
+            ? viewModel.conversations
+            : viewModel.conversations.filter { conversation in
+                conversation.title.localizedCaseInsensitiveContains(searchText) ||
+                conversation.messages.contains { $0.content.localizedCaseInsensitiveContains(searchText) }
+            }
+
+        return List {
+            ForEach(filteredConversations) { conversation in
                 Button(action: {
                     AppLogger.app.logInfo("History tap -> conversation id:\(conversation.id) messages:\(conversation.messages.count) threadId:\(conversation.threadId ?? "nil") localOnly:\(conversation.isLocalOnly)")
                     NotificationCenter.default.post(name: .openConversationFromHistory, object: conversation.id)
@@ -223,7 +243,10 @@ struct HistoryView: View {
                         preview: viewModel.messagePreview(for: conversation),
                         timestamp: viewModel.relativeTime(for: conversation),
                         conversationType: conversation.conversationType,
-                        isLocalOnly: conversation.isLocalOnly
+                        isLocalOnly: conversation.isLocalOnly,
+                        onShare: {
+                            shareConversation(conversation)
+                        }
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -273,6 +296,7 @@ struct HistoryView: View {
             rootViewController.present(activityController, animated: true)
         }
     }
+
 }
 
 // MARK: - Preview Provider
@@ -280,7 +304,7 @@ struct HistoryView: View {
 struct HistoryView_Previews: PreviewProvider {
     static var previews: some View {
         let sessionState = ChatSessionState(sessionManager: SessionManager())
-        
+
         Group {
             HistoryView(
                 viewModel: HistoryViewModel(

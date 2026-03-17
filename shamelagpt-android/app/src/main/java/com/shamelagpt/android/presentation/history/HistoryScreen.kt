@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -73,6 +75,7 @@ import com.shamelagpt.android.R
 import com.shamelagpt.android.presentation.common.TestTags
 import com.shamelagpt.android.presentation.components.DeleteConfirmationDialog
 import com.shamelagpt.android.presentation.components.EmptyState
+import com.shamelagpt.android.presentation.components.SearchBar
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -98,7 +101,9 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
+    val layoutDirection = LocalLayoutDirection.current
     val uiState by viewModel.uiState.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -110,8 +115,8 @@ fun HistoryScreen(
     val pullToRefreshState = rememberPullToRefreshState()
 
     // Handle pull-to-refresh
-    if (pullToRefreshState.isRefreshing) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect(pullToRefreshState.isRefreshing, isAuthenticated) {
+        if (pullToRefreshState.isRefreshing) {
             if (isAuthenticated) {
                 viewModel.loadConversations(forceRefresh = true)
             } else {
@@ -147,14 +152,8 @@ fun HistoryScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.history)) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                actions = {
-                    if (isAuthenticated && uiState.conversations.isNotEmpty()) {
-                        // Optional: Clear all button or other actions
-                    }
-                }
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
             )
         },
         floatingActionButton = {
@@ -174,128 +173,56 @@ fun HistoryScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(WindowInsets.navigationBars)
     ) { paddingValues ->
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .nestedScroll(pullToRefreshState.nestedScrollConnection)
         ) {
-            if (!isAuthenticated) {
-                // Guest View - Locked State
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.padding(32.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(80.dp)
-                                .background(
-                                    MaterialTheme.colorScheme.surfaceVariant,
-                                    shape = MaterialTheme.shapes.large
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Lock,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(40.dp)
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.height(24.dp))
-                        
-                        Text(
-                            text = stringResource(R.string.history_locked_title),
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Text(
-                            text = stringResource(R.string.history_locked_message),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
-                        
-                        Spacer(modifier = Modifier.height(32.dp))
-                        
-                        Button(
-                            onClick = onNavigateToAuth,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Login,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(R.string.settings_sign_in_button))
-                        }
-                    }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag(TestTags.History.List),
+                contentPadding = PaddingValues(
+                    top = paddingValues.calculateTopPadding() + 8.dp,
+                    bottom = paddingValues.calculateBottomPadding(),
+                    start = paddingValues.calculateStartPadding(layoutDirection),
+                    end = paddingValues.calculateEndPadding(layoutDirection)
+                ),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Search bar
+                item {
+                    SearchBar(
+                        query = searchQuery,
+                        onQueryChange = viewModel::updateSearchQuery,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
                 }
-            } else {
-                when {
-                    uiState.isLoading && uiState.conversations.isEmpty() -> {
-                        // Initial loading state
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
 
-                    uiState.conversations.isEmpty() -> {
-                        // Empty state
-                        EmptyState(
-                            icon = Icons.Default.History,
-                            title = stringResource(R.string.no_conversations),
-                            message = stringResource(R.string.start_new_chat)
-                        )
-                    }
-
-                    else -> {
-                        // Conversation list
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize().testTag(TestTags.History.List),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(
-                                items = uiState.conversations,
-                                key = { it.id }
-                            ) { conversation ->
-                                SwipeRevealConversationCard(
-                                    conversation = conversation,
-                                    title = viewModel.displayTitle(conversation),
-                                    preview = viewModel.messagePreview(conversation),
-                                    onOpen = { onNavigateToChat(conversation.id) },
-                                    onShare = { shareConversation(context, viewModel, conversation) },
-                                    onDelete = { conversationToDelete = conversation },
-                                    modifier = Modifier
-                                        .testTag(TestTags.History.conversationCard(conversation.id))
-                                )
-                            }
-                        }
-                    }
+                // Conversation list
+                items(
+                    items = viewModel.getFilteredConversations(),
+                    key = { it.id }
+                ) { conversation ->
+                    SwipeRevealConversationCard(
+                        conversation = conversation,
+                        title = viewModel.displayTitle(conversation),
+                        preview = viewModel.messagePreview(conversation),
+                        onOpen = { onNavigateToChat(conversation.id) },
+                        onShare = { shareConversation(context, viewModel, conversation) },
+                        onDelete = { conversationToDelete = conversation },
+                        modifier = Modifier
+                            .testTag(TestTags.History.conversationCard(conversation.id))
+                    )
                 }
-                
-                // Pull-to-refresh indicator
-                PullToRefreshContainer(
-                    state = pullToRefreshState,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
             }
+
+            PullToRefreshContainer(
+                state = pullToRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
 
         // Delete confirmation dialog

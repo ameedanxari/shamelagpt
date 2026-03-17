@@ -11,6 +11,7 @@ import UIKit
 final class TargetedScreenshotUITests: LocalizedUITestCase {
 
     private var currentAppearance: UIUserInterfaceStyle = .light
+    private var currentLocale: String = "en"
 
     // MARK: - Targeted Screenshot Tests
 
@@ -223,7 +224,7 @@ final class TargetedScreenshotUITests: LocalizedUITestCase {
                 app: app,
                 includeReset: true,
                 overrides: [
-                    NetworkMockHelper.LaunchEnvironmentKeys.mockHistoryResponse: historyListResponseJSON(),
+                    NetworkMockHelper.LaunchEnvironmentKeys.mockHistory: historyListResponseJSON(),
                     NetworkMockHelper.LaunchEnvironmentKeys.mockPreferences: preferencesJSON(),
                     "SKIP_WELCOME": "1"
                 ],
@@ -278,26 +279,16 @@ final class TargetedScreenshotUITests: LocalizedUITestCase {
 
     private func setAppearance(_ appearance: UIUserInterfaceStyle) {
         currentAppearance = appearance
-        app.launchArguments.append(appearanceArgument)
+        // UITestLauncher applies the simulator appearance via launch arguments.
     }
 
     private var appearanceArgument: String {
-        switch currentAppearance {
-        case .light:
-            return "-AppleAppearanceOverride"
-        case .dark:
-            return "-AppleInterfaceStyle"
-        case .unspecified:
-            return "-AppleAppearanceOverride"
-        @unknown default:
-            return "-AppleAppearanceOverride"
-        }
+        currentAppearance == .dark ? "dark" : "light"
     }
 
     private func setLocale(_ locale: String) {
-        app.launchArguments.removeAll { $0.hasPrefix("-AppleLanguages") }
-        app.launchArguments.append("-AppleLanguages")
-        app.launchArguments.append("(\(locale))")
+        currentLocale = locale
+        UITestLanguageContext.set(locale)
     }
 
     private func assertNoErrorBanners(context: String) {
@@ -307,16 +298,29 @@ final class TargetedScreenshotUITests: LocalizedUITestCase {
         }
     }
 
-    private func chatTabButton() -> XCUIElement {
-        return app.tabBars.buttons["chat"]
-    }
+    private func captureScreenshot(name: String) throws {
+        let screenshot = XCUIScreen.main.screenshot()
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
 
-    private func settingsTabButton() -> XCUIElement {
-        return app.tabBars.buttons["settings"]
-    }
+        let outputPath = UITestEnvironment.value("SCREENSHOT_OUTPUT_DIR") ?? "/tmp/screenshots"
+        let deviceName = UITestEnvironment.value("SCREENSHOT_DEVICE") ??
+            UITestEnvironment.value("SIMULATOR_DEVICE_NAME") ??
+            "iPhone"
+        let safeDevice = deviceName.replacingOccurrences(of: " ", with: "_")
+        let fileName = "\(safeDevice)_\(name).png"
+        let fullPath = (outputPath as NSString).appendingPathComponent(fileName)
 
-    private func historyTabButton() -> XCUIElement {
-        return app.tabBars.buttons["history"]
+        do {
+            let fileURL = URL(fileURLWithPath: fullPath)
+            try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try screenshot.pngRepresentation.write(to: fileURL, options: .atomic)
+            print("SCREENSHOT_PATH: \(fullPath)")
+        } catch {
+            XCTFail("Failed to save screenshot: \(error)")
+        }
     }
 
     private func localizedChatQuestion() -> String {
@@ -333,48 +337,57 @@ final class TargetedScreenshotUITests: LocalizedUITestCase {
     // MARK: - Mock Response Helpers (reuse from StoreScreenshotUITests)
 
     private func chatHappyResponseJSON() -> String {
-        return """
-        {
-            "choices": [{
-                "message": {
-                    "content": "Start by summing all zakatable assets (cash, gold/silver, trading inventory, and trade-intent stocks). Subtract short-term payable debts. If the net value is at or above nisab for one lunar year, pay 2.5%.",
-                    "sources": [
-                        {
-                            "book_name": "Ibn Qudamah - Al-Mughni (Book of Zakat)",
-                            "source_url": "https://shamela.ws/book/8463"
-                        }
-                    ]
-                }
-            }]
-        }
-        """
+        let payload: [String: Any] = [
+            "answer": "Start by summing all zakatable assets (cash, gold/silver, trading inventory, and trade-intent stocks). Subtract short-term payable debts. If the net value is at or above nisab for one lunar year, pay 2.5%.",
+            "conversation_id": "targeted-screenshot-conversation",
+            "thread_id": "targeted-screenshot-thread"
+        ]
+        return jsonString(payload)
     }
 
     private func preferencesJSON() -> String {
-        return """
-        {
-            "language": "\(currentLocale ?? "en")",
-            "response_preferences": {
+        let payload: [String: Any] = [
+            "language_preference": currentLocale,
+            "response_preferences": [
                 "length": "detailed",
                 "style": "academic",
                 "focus": "evidence_first"
-            }
-        }
-        """
+            ]
+        ]
+        return jsonString(payload)
     }
 
     private func historyListResponseJSON() -> String {
-        return """
-        {
-            "conversations": [
-                {
-                    "id": "1",
-                    "title": "\(currentLocale == "ar" ? "أشراط الساعة: الفرق بين العلامات الصغرى والكبرى" : currentLocale == "ur" ? "قیامت کی نشانیاں: صغریٰ اور کبریٰ میں فرق" : "Signs of the Hour: Difference Between Minor and Major")",
-                    "created_at": "2024-01-15T10:30:00Z",
-                    "updated_at": "2024-01-15T11:30:00Z"
-                }
-            ]
+        let title: String
+        switch currentLocale {
+        case "ar":
+            title = "أشراط الساعة: الفرق بين العلامات الصغرى والكبرى"
+        case "ur":
+            title = "قیامت کی نشانیاں: صغریٰ اور کبریٰ میں فرق"
+        default:
+            title = "Signs of the Hour: Difference Between Minor and Major"
         }
-        """
+
+        let nowMs = Date().timeIntervalSince1970 * 1000
+        let payload: [[String: Any]] = [
+            [
+                "id": "targeted-conv-1",
+                "title": title,
+                "updated_at": nowMs,
+                "messages": [
+                    ["id": "m1", "content": localizedChatQuestion(), "is_user_message": true]
+                ]
+            ]
+        ]
+        return jsonString(payload)
+    }
+
+    private func jsonString(_ object: Any) -> String {
+        guard let data = try? JSONSerialization.data(withJSONObject: object, options: []),
+              let json = String(data: data, encoding: .utf8) else {
+            XCTFail("Failed to serialize JSON fixture")
+            return "{}"
+        }
+        return json
     }
 }

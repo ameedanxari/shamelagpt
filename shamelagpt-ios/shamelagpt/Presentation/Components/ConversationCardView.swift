@@ -17,25 +17,24 @@ struct ConversationCardView: View {
     let timestamp: String
     let conversationType: ConversationType?
     let isLocalOnly: Bool
+    let onShare: () -> Void
 
     // MARK: - Initialization
 
-    init(title: String, preview: String, timestamp: String, conversationType: ConversationType? = nil, isLocalOnly: Bool = false) {
+    init(title: String, preview: String, timestamp: String, conversationType: ConversationType? = nil, isLocalOnly: Bool = false, onShare: @escaping () -> Void = {}) {
         self.title = title
         self.preview = preview
         self.timestamp = timestamp
         self.conversationType = conversationType
         self.isLocalOnly = isLocalOnly
+        self.onShare = onShare
     }
 
     // MARK: - Body
 
     var body: some View {
         HStack(spacing: AppTheme.Spacing.sm) {
-            // Conversation icon
-            conversationIcon
-
-            // Content
+            // Content (no icon to match Android)
             VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
                 // Title with fact-check badge
                 HStack(spacing: AppTheme.Spacing.xs) {
@@ -93,20 +92,21 @@ struct ConversationCardView: View {
         }
         .padding(.vertical, AppTheme.Spacing.xs)
         .contentShape(Rectangle())
+        .onLongPressGesture {
+            // Provide haptic feedback
+            let impact = UIImpactFeedbackGenerator(style: .light)
+            impact.impactOccurred()
+            
+            // Trigger share callback
+            onShare()
+        }
     }
 
     // MARK: - Subviews
 
     private var conversationIcon: some View {
-            ZStack {
-            Circle()
-                .fill(DesignSystem.Colors.primary.opacity(0.1))
-                .frame(width: 48, height: 48)
-
-            Image(systemName: "message.fill")
-                .font(.system(size: 20))
-                .foregroundColor(AppTheme.Colors.primary)
-        }
+        // No icon to match Android implementation
+        EmptyView()
     }
 }
 

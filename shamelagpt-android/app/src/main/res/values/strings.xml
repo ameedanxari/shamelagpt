@@ -39,6 +39,12 @@
     <string name="typing">AI is typing...</string>
     <string name="copy">Copy</string>
     <string name="common_share">Share</string>
+    <string name="share_conversation_title">ShamelaGPT Conversation</string>
+    <string name="share_messages_count">%1$d messages in this conversation</string>
+    <string name="share_last_updated">Last updated: %1$s</string>
+    <string name="share_preview">Preview:</string>
+    <string name="share_read_full">Read the full conversation:</string>
+    <string name="share_powered_by">Powered by ShamelaGPT - Your Islamic Knowledge Assistant</string>
     <string name="copied">Copied to clipboard</string>
     <string name="start_conversation">Start a conversation</string>
     <string name="ask_anything">Ask me anything about Islam or use the camera to fact-check text</string>

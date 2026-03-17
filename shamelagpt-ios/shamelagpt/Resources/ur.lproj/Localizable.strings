@@ -48,6 +48,12 @@
 "history.deleteAllFailed" = "تمام مکالمات حذف نہیں ہو سکے۔";
 "history.loadingConversations" = "گفتگوئیں لوڈ ہو رہی ہیں...";
 "common.share" = "شیئر کریں";
+"share.conversationTitle" = "شاملہ جی پی ٹی گفتگو";
+"share.messagesCount" = "اس گفتگو میں %1$d پیغامات ہیں";
+"share.lastUpdated" = "آپڈیٹ ہوا: %1$s";
+"share.preview" = "پیش نظارہ:";
+"share.readFull" = "مکمل گفتگو پڑھیں:";
+"share.poweredBy" = "شاملہ جی پی ٹی کی طاقت سے - آپ کا اسلامی علمی معاون";
 "common.delete" = "حذف کریں";
 "history.localOnly" = "صرف مقامی";
 
@@ -249,6 +255,8 @@
 "auth.emailExistsUseLogin" = "یہ ای میل پہلے سے رجسٹرڈ ہے۔ براہ کرم سائن اِن کریں۔";
 "auth.signInWithGoogle" = "گوگل سے سائن اِن کریں";
 "auth.googleSignInFailed" = "گوگل سائن اِن ناکام ہوا۔ براہ کرم دوبارہ کوشش کریں۔";
+"auth.signInWithApple" = "ایپل سے سائن اِن کریں";
+"auth.appleSignInFailed" = "ایپل سائن اِن ناکام ہوا۔ براہ کرم دوبارہ کوشش کریں۔";
 "auth.orDivider" = "یا";
 
 // MARK: - AI Preference Options

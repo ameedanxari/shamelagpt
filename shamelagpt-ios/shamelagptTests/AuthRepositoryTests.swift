@@ -118,4 +118,25 @@ final class AuthRepositoryTests: XCTestCase {
         XCTAssertEqual(result.token, "gToken")
         XCTAssertTrue(sut.isLoggedIn())
     }
+
+    func testAppleSignIn() async throws {
+        // Given
+        let expectedResponse = AuthResponse(token: "aToken", refreshToken: "aRefresh", expiresIn: "3600", user: ["email": AnyCodable("a@example.com")])
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        let responseData = try encoder.encode(expectedResponse)
+
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.url?.path, "/api/auth/apple")
+            XCTAssertEqual(request.httpMethod, "POST")
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, responseData)
+        }
+
+        // When
+        let result = try await sut.appleSignIn(request: AppleSignInRequest(idToken: "id_token_apple"))
+
+        // Then
+        XCTAssertEqual(result.token, "aToken")
+        XCTAssertTrue(sut.isLoggedIn())
+    }
 }

@@ -86,7 +86,8 @@ val presentationModule = module {
     viewModel {
         HistoryViewModel(
             getConversationsUseCase = get(),
-            deleteConversationUseCase = get()
+            deleteConversationUseCase = get(),
+            appContext = androidContext()
         )
     }
 

@@ -24,6 +24,7 @@ enum UITestID {
         static let signInButton = "signInButton"
         static let signUpButton = "signUpButton"
         static let googleSignInButton = "googleSignInButton"
+        static let appleSignInButton = "appleSignInButton"
         static let continueAsGuestButton = "continueAsGuestButton"
         static let toggleModeButton = "toggleModeButton"
     }

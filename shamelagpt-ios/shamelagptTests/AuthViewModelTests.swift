@@ -188,4 +188,45 @@ final class AuthViewModelTests: XCTestCase {
 
         await fulfillment(of: [expectation], timeout: 0.1)
     }
+
+    func testAppleSignInSuccess() async {
+        let expectation = XCTestExpectation(description: "Apple Sign-In success callback")
+
+        sut.appleSignIn(idToken: "apple-id-token") {
+            expectation.fulfill()
+        }
+
+        await fulfillment(of: [expectation], timeout: 1.0)
+
+        XCTAssertEqual(mockRepository.appleSignInCallCount, 1)
+        XCTAssertFalse(sut.isLoading)
+        XCTAssertNil(sut.errorMessage)
+    }
+
+    func testAppleSignInFailureShowsUserFacingError() async {
+        mockRepository.shouldFail = true
+        mockRepository.errorToThrow = NSError(
+            domain: "test",
+            code: 500,
+            userInfo: [NSLocalizedDescriptionKey: "Apple failed"]
+        )
+        let expectation = XCTestExpectation(description: "Apple Sign-In should fail")
+        expectation.isInverted = true
+
+        sut.appleSignIn(idToken: "apple-id-token") {
+            expectation.fulfill()
+        }
+
+        try? await Task.sleep(nanoseconds: 100_000_000)
+
+        XCTAssertEqual(mockRepository.appleSignInCallCount, 1)
+        XCTAssertFalse(sut.isLoading)
+        let expectedMessage = UserErrorFormatter.format(
+            messageKey: LocalizationKeys.somethingWentWrong,
+            code: "E-APP-000"
+        )
+        XCTAssertEqual(sut.errorMessage, expectedMessage)
+
+        await fulfillment(of: [expectation], timeout: 0.1)
+    }
 }

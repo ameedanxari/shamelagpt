@@ -275,6 +275,8 @@ enum LocalizationKeys {
     static let authEmailExistsUseLogin = "auth.emailExistsUseLogin"
     static let authSignInWithGoogle = "auth.signInWithGoogle"
     static let authGoogleSignInFailed = "auth.googleSignInFailed"
+    static let authSignInWithApple = "auth.signInWithApple"
+    static let authAppleSignInFailed = "auth.appleSignInFailed"
     static let authOrDivider = "auth.orDivider"
 
     // MARK: - Permission Messages

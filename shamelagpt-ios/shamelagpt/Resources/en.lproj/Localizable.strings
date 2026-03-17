@@ -50,6 +50,12 @@
 "history.deleteAllFailed" = "Failed to delete all conversations.";
 "history.loadingConversations" = "Loading conversations...";
 "common.share" = "Share";
+"share.conversationTitle" = "ShamelaGPT Conversation";
+"share.messagesCount" = "%1$d messages in this conversation";
+"share.lastUpdated" = "Last updated: %1$s";
+"share.preview" = "Preview:";
+"share.readFull" = "Read the full conversation:";
+"share.poweredBy" = "Powered by ShamelaGPT - Your Islamic Knowledge Assistant";
 "common.delete" = "Delete";
 "history.localOnly" = "Local-only";
 
@@ -250,6 +256,8 @@
 "auth.emailExistsUseLogin" = "This email is already registered. Please sign in.";
 "auth.signInWithGoogle" = "Sign in with Google";
 "auth.googleSignInFailed" = "Google sign-in failed. Please try again.";
+"auth.signInWithApple" = "Sign in with Apple";
+"auth.appleSignInFailed" = "Apple sign-in failed. Please try again.";
 "auth.orDivider" = "or";
 
 // MARK: - AI Preference Options

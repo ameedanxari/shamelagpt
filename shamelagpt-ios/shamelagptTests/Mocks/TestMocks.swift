@@ -44,6 +44,7 @@ class MockAPIClient: APIClientProtocol {
     var verifyTokenCallCount = 0
     var forgotPasswordCallCount = 0
     var googleSignInCallCount = 0
+    var appleSignInCallCount = 0
     var refreshTokenCallCount = 0
     var getPreferencesCallCount = 0
     var setPreferencesCallCount = 0
@@ -160,6 +161,17 @@ class MockAPIClient: APIClientProtocol {
             refreshToken: "mock-refresh",
             expiresIn: "3600",
             user: ["uid": AnyCodable("google-123")]
+        )
+    }
+
+    func appleSignIn(_ request: AppleSignInRequest) async throws -> AuthResponse {
+        appleSignInCallCount += 1
+        if shouldFail { throw errorToThrow }
+        return AuthResponse(
+            token: "mock-token",
+            refreshToken: "mock-refresh",
+            expiresIn: "3600",
+            user: ["uid": AnyCodable("apple-123")]
         )
     }
 

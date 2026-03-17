@@ -5,6 +5,7 @@
 //  Created by Codex on 05/12/2025.
 //
 
+import AuthenticationServices
 import GoogleSignIn
 import GoogleSignInSwift
 import SwiftUI
@@ -102,8 +103,18 @@ struct AuthView: View {
                     guard !viewModel.isLoading else { return }
                     handleGoogleSignIn()
                 }
-                .frame(maxWidth: .infinity)
+                .frame(width: 220)
                 .accessibilityIdentifier(AccessibilityID.Auth.googleSignInButton)
+
+                SignInWithAppleButton(.signIn) { request in
+                    request.requestedScopes = [.fullName, .email]
+                } onCompletion: { result in
+                    handleAppleSignIn(result)
+                }
+                .signInWithAppleButtonStyle(appleSignInButtonStyle)
+                .frame(width: 220, height: 44)
+                .disabled(viewModel.isLoading)
+                .accessibilityIdentifier(AccessibilityID.Auth.appleSignInButton)
 
                 Button {
                     dismissKeyboard()
@@ -143,6 +154,10 @@ struct AuthView: View {
         colorScheme == .dark ? .dark : .light
     }
 
+    private var appleSignInButtonStyle: SignInWithAppleButton.Style {
+        colorScheme == .dark ? .white : .black
+    }
+
     private func handleGoogleSignIn() {
         guard let presentingViewController = activePresentingViewController() else {
             AppLogger.auth.logWarning("google sign-in aborted: no presenting view controller")
@@ -175,6 +190,36 @@ struct AuthView: View {
             Task { @MainActor in
                 viewModel.googleSignIn(idToken: idToken, onSuccess: onAuthenticated)
             }
+        }
+    }
+
+    private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
+        switch result {
+        case .success(let authorization):
+            guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+                AppLogger.auth.logWarning("apple sign-in failed: unexpected credential type")
+                viewModel.setError(LocalizationKeys.authAppleSignInFailed.localized)
+                return
+            }
+
+            guard let identityTokenData = appleIDCredential.identityToken,
+                  let idToken = String(data: identityTokenData, encoding: .utf8),
+                  !idToken.isEmpty else {
+                AppLogger.auth.logWarning("apple sign-in failed: missing identity token")
+                viewModel.setError(LocalizationKeys.authAppleSignInFailed.localized)
+                return
+            }
+
+            viewModel.appleSignIn(idToken: idToken, onSuccess: onAuthenticated)
+
+        case .failure(let error):
+            if isAppleSignInCancellation(error) {
+                AppLogger.auth.logInfo("apple sign-in cancelled by user")
+                return
+            }
+            AppLogger.auth.logWarning("apple sign-in failed reason=\(type(of: error))")
+            AppLogger.auth.logError("apple sign-in error", error: error)
+            viewModel.setError(LocalizationKeys.authAppleSignInFailed.localized)
         }
     }
 
@@ -211,5 +256,12 @@ struct AuthView: View {
             return true
         }
         return nsError.localizedDescription.lowercased().contains("cancel")
+    }
+
+    private func isAppleSignInCancellation(_ error: Error) -> Bool {
+        guard let authError = error as? ASAuthorizationError else {
+            return false
+        }
+        return authError.code == .canceled
     }
 }

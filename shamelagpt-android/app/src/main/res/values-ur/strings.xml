@@ -38,6 +38,12 @@
     <string name="typing">AI جواب تیار کر رہا ہے...</string>
     <string name="copy">کاپی کریں</string>
     <string name="common_share">شیئر کریں</string>
+    <string name="share_conversation_title">شاملہ جی پی ٹی گفتگو</string>
+    <string name="share_messages_count">اس گفتگو میں %1$d پیغامات ہیں</string>
+    <string name="share_last_updated">آپڈیٹ ہوا: %1$s</string>
+    <string name="share_preview">پیش نظارہ:</string>
+    <string name="share_read_full">مکمل گفتگو پڑھیں:</string>
+    <string name="share_powered_by">شاملہ جی پی ٹی کی طاقت سے - آپا کا اسلامی علمی معاون</string>
     <string name="copied">کاپی کلپ بورڈ پر ہو گئی</string>
     <string name="start_conversation">گفتگو شروع کریں</string>
     <string name="ask_anything">اسلام کے بارے میں کچھ بھی پوچھیں یا متن کی تصدیق کے لیے کیمرہ استعمال کریں</string>

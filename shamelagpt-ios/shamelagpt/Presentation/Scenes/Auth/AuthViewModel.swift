@@ -144,6 +144,25 @@ final class AuthViewModel: ObservableObject {
         }
     }
 
+    func appleSignIn(idToken: String, onSuccess: @escaping () -> Void) {
+        Task {
+            isLoading = true
+            errorMessage = nil
+            do {
+                AppLogger.auth.logInfo("apple sign-in request started")
+                _ = try await authRepository.appleSignIn(request: AppleSignInRequest(idToken: idToken))
+                isLoading = false
+                AppLogger.auth.logInfo("apple sign-in success")
+                onSuccess()
+            } catch {
+                isLoading = false
+                AppLogger.auth.logWarning("apple sign-in failed reason=\(type(of: error))")
+                AppLogger.auth.logError("apple sign-in error", error: error)
+                errorMessage = error.userFacingMessage
+            }
+        }
+    }
+
     private func shouldSuggestSignInAfterSignup(error: Error, isLoginMode: Bool) -> Bool {
         guard !isLoginMode else { return false }
         guard let networkError = error as? NetworkError else { return false }

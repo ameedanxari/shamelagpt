@@ -354,6 +354,7 @@ class MockURLProtocol: URLProtocol {
         if urlString.contains("/api/auth/signup") ||
             urlString.contains("/api/auth/login") ||
             urlString.contains("/api/auth/google") ||
+            urlString.contains("/api/auth/apple") ||
             urlString.contains("/api/auth/forgot-password") ||
             urlString.contains("/api/auth/refresh") {
             return mockAuthResponse(delay: delay)

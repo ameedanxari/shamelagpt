@@ -38,6 +38,12 @@
     <string name="typing">الذكاء الاصطناعي يكتب...</string>
     <string name="copy">نسخ</string>
     <string name="common_share">مشاركة</string>
+    <string name="share_conversation_title">محادثة شاملة GPT</string>
+    <string name="share_messages_count">%1$d رسائل في هذه المحادثة</string>
+    <string name="share_last_updated">آخر تحديث: %1$s</string>
+    <string name="share_preview">معاينة:</string>
+    <string name="share_read_full">اقرأ المحادثة الكاملة:</string>
+    <string name="share_powered_by">مدعوم بواسطة شاملة GPT - مساعد المعرفة الإسلامية الخاص بك</string>
     <string name="copied">تم النسخ إلى الحافظة</string>
     <string name="start_conversation">ابدأ محادثة</string>
     <string name="ask_anything">اسألني أي شيء عن الإسلام أو استخدم الكاميرا للتحقق من صحة النص</string>

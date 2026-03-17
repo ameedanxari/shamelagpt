@@ -294,7 +294,13 @@ class StoreScreenshotTest {
             isLoading = false
         )
         val stateFlow = MutableStateFlow(uiState)
+        val searchFlow = MutableStateFlow("")
         every { vm.uiState } returns stateFlow
+        every { vm.searchQuery } returns searchFlow
+        every { vm.getFilteredConversations() } returns mockConversations
+        every { vm.updateSearchQuery(any()) } answers {
+            searchFlow.value = firstArg()
+        }
         every { vm.displayTitle(any()) } answers { firstArg<com.shamelagpt.android.domain.model.Conversation>().title }
         every { vm.messagePreview(any()) } answers {
             firstArg<com.shamelagpt.android.domain.model.Conversation>()

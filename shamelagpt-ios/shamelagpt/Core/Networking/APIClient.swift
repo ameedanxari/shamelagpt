@@ -18,6 +18,7 @@ protocol APIClientProtocol {
     func login(_ request: LoginRequest) async throws -> AuthResponse
     func forgotPassword(_ email: String) async throws
     func googleSignIn(_ request: GoogleSignInRequest) async throws -> AuthResponse
+    func appleSignIn(_ request: AppleSignInRequest) async throws -> AuthResponse
     func refreshToken(_ request: RefreshTokenRequest) async throws -> AuthResponse
     func getCurrentUser() async throws -> UserResponse
     func updateCurrentUser(_ request: UpdateUserRequest) async throws -> UserResponse
@@ -176,6 +177,12 @@ final class APIClient: APIClientProtocol {
     /// Google Sign-In
     func googleSignIn(_ request: GoogleSignInRequest) async throws -> AuthResponse {
         let endpoint = baseURL.appendingPathComponent("api/auth/google")
+        return try await performRequest(url: endpoint, method: "POST", body: request)
+    }
+
+    /// Apple Sign-In
+    func appleSignIn(_ request: AppleSignInRequest) async throws -> AuthResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/apple")
         return try await performRequest(url: endpoint, method: "POST", body: request)
     }
 
@@ -585,6 +592,10 @@ final class PreviewMockAPIClient: APIClientProtocol {
     }
 
     func googleSignIn(_ request: GoogleSignInRequest) async throws -> AuthResponse {
+        return mockAuthResponse
+    }
+
+    func appleSignIn(_ request: AppleSignInRequest) async throws -> AuthResponse {
         return mockAuthResponse
     }
 

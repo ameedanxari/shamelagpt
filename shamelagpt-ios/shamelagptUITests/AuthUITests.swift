@@ -34,6 +34,7 @@ final class AuthUITests: LocalizedUITestCase {
         let passwordField = app.secureTextFields[UITestID.Auth.passwordTextField]
         let signInButton = app.buttons[UITestID.Auth.signInButton]
         let googleSignInButton = app.buttons[UITestID.Auth.googleSignInButton]
+        let appleSignInButton = app.buttons[UITestID.Auth.appleSignInButton]
         let toggleButton = app.buttons[UITestID.Auth.toggleModeButton]
         let continueAsGuestButton = app.buttons[UITestID.Auth.continueAsGuestButton]
 
@@ -57,6 +58,7 @@ final class AuthUITests: LocalizedUITestCase {
         )
         XCTAssertTrue(signInButton.exists, "Sign In button should exist")
         XCTAssertTrue(googleSignInButton.exists, "Google Sign-In button should exist")
+        XCTAssertTrue(appleSignInButton.exists, "Apple Sign-In button should exist")
         XCTAssertTrue(toggleButton.exists, "Toggle mode button should exist")
         XCTAssertTrue(continueAsGuestButton.exists, "Continue as Guest button should exist")
     }
