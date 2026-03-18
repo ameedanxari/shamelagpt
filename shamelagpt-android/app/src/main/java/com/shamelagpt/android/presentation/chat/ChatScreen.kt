@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.IntOffset
 import com.shamelagpt.android.R
 import com.shamelagpt.android.presentation.common.TestTags
 import com.shamelagpt.android.presentation.chat.components.InputBar
@@ -205,7 +204,73 @@ fun ChatScreen(
         }
     }
 
+    // Determine if new chat button should be shown (needed in top bar)
+    val uiHasActiveConversation = uiState.conversationId != null ||
+        uiState.messages.isNotEmpty() ||
+        uiState.streamingMessage != null ||
+        uiState.thinkingMessages.isNotEmpty() ||
+        uiState.inputText.isNotBlank()
+    val uiCanStartNew = uiHasActiveConversation &&
+        !uiState.isLoading &&
+        !uiState.isHydratingConversation
+
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {},
+                actions = {
+                    // Mode toggle (Research / Fact Check)
+                    if (isAuthenticated) {
+                        val modePreference by viewModel.modePreference.collectAsState()
+                        val isModeLoading by viewModel.isModeLoading.collectAsState()
+                        val isFactCheck = modePreference == 2
+
+                        if (isModeLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            FilterChip(
+                                selected = isFactCheck,
+                                onClick = {
+                                    viewModel.updateModePreference(if (isFactCheck) 1 else 2)
+                                },
+                                modifier = Modifier.testTag(TestTags.Chat.ModeToggleChip),
+                                label = {
+                                    Text(
+                                        text = if (isFactCheck) stringResource(R.string.settings_mode_fact_check) else stringResource(R.string.settings_mode_research),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = if (isFactCheck) Icons.AutoMirrored.Filled.FactCheck else Icons.Default.Search,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            )
+                        }
+                    }
+
+                    if (uiCanStartNew) {
+                        IconButton(
+                            onClick = { showNewConversationWarning = true },
+                            modifier = Modifier.testTag(TestTags.Chat.NewChatButton)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = stringResource(R.string.new_chat)
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
+            )
+        },
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
@@ -248,19 +313,11 @@ fun ChatScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
+                    top = paddingValues.calculateTopPadding(),
                     bottom = if (isBottomBarVisible) paddingValues.calculateBottomPadding() else 0.dp
                 )
                 .testTag(TestTags.Chat.Screen)
         ) {
-            val hasActiveConversationContext = uiState.conversationId != null ||
-                uiState.messages.isNotEmpty() ||
-                uiState.streamingMessage != null ||
-                uiState.thinkingMessages.isNotEmpty() ||
-                uiState.inputText.isNotBlank()
-            val canStartNewConversation = hasActiveConversationContext &&
-                !uiState.isLoading &&
-                !uiState.isHydratingConversation
-
             if (uiState.messages.isEmpty() && !uiState.isLoading && !uiState.isHydratingConversation) {
                 // Empty state
                 EmptyState(
@@ -313,62 +370,6 @@ fun ChatScreen(
                         item(key = "typing") {
                             TypingIndicator()
                         }
-                    }
-                }
-            }
-
-            // Top row: mode toggle + new chat button
-            Row(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 12.dp, end = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Mode toggle (Research / Fact Check)
-                if (isAuthenticated) {
-                    val modePreference by viewModel.modePreference.collectAsState()
-                    val isModeLoading by viewModel.isModeLoading.collectAsState()
-                    val isFactCheck = modePreference == 2
-
-                    if (isModeLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        FilterChip(
-                            selected = isFactCheck,
-                            onClick = {
-                                viewModel.updateModePreference(if (isFactCheck) 1 else 2)
-                            },
-                            modifier = Modifier.testTag(TestTags.Chat.ModeToggleChip),
-                            label = {
-                                Text(
-                                    text = if (isFactCheck) stringResource(R.string.settings_mode_fact_check) else stringResource(R.string.settings_mode_research),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = if (isFactCheck) Icons.AutoMirrored.Filled.FactCheck else Icons.Default.Search,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-                        )
-                    }
-                }
-
-                if (canStartNewConversation) {
-                    SmallFloatingActionButton(
-                        onClick = { showNewConversationWarning = true },
-                        modifier = Modifier.testTag(TestTags.Chat.NewChatButton)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.new_chat)
-                        )
                     }
                 }
             }
