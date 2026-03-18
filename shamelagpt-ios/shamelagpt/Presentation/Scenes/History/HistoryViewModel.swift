@@ -235,17 +235,30 @@ final class HistoryViewModel: ObservableObject {
     /// - Returns: Formatted text of the conversation
     func exportConversation(_ conversation: Conversation) -> String {
         let title = displayTitle(for: conversation)
-        let link = "https://shamelagpt.com/chat?id=\(conversation.id)"
+        let link = "https://shamelagpt.com/shared?chatid=\(conversation.id)"
         let preview = messagePreview(for: conversation)
         let updated = conversation.updatedAt.formatted()
+        let messageCount = conversation.messages.count
 
-        var text = "ShamelaGPT Chat: \(title)\n"
-        text += "Link: \(link)\n"
-        text += "Last updated: \(updated)\n"
+        var text = "📚 \(LanguageManager.shared.localizedString(forKey: "share.conversationTitle"))\n"
+        text += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        text += "📝 \(title)\n"
+        text += "📊 \(String(format: LanguageManager.shared.localizedString(forKey: "share.messagesCount"), messageCount))\n"
+        text += "🕒 \(String(format: LanguageManager.shared.localizedString(forKey: "share.lastUpdated"), updated))\n"
+        text += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
 
         if !preview.isEmpty {
-            text += "\nPreview:\n\(preview)"
+            text += "💬 \(LanguageManager.shared.localizedString(forKey: "share.preview"))\n"
+            text += "\(preview)\n"
+            if preview.count > 200 {
+                text += "...\n"
+            }
+            text += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
         }
+
+        text += "🔗 \(LanguageManager.shared.localizedString(forKey: "share.readFull"))\n"
+        text += "\(link)\n"
+        text += "\n🌟 \(LanguageManager.shared.localizedString(forKey: "share.poweredBy"))"
 
         return text
     }

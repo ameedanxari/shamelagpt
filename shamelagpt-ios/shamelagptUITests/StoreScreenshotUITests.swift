@@ -204,37 +204,136 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
         
         let emailField = app.textFields["emailTextField"]
         XCTAssertTrue(emailField.waitForExistence(timeout: 5))
-        emailField.tap()
-        emailField.typeText(localizedLoginEmail())
+        replaceText(in: emailField, with: localizedLoginEmail())
         
         let passwordField = app.secureTextFields["passwordTextField"]
         if passwordField.waitForExistence(timeout: 2) {
             passwordField.tap()
-            passwordField.typeText("12345678")
+            passwordField.typeText("12345678\n")
         }
-        
+        waitForKeyboardToDismiss()
+
         takeScreenshot(name: "auth_login")
 
-        let toggleButton = app.buttons["toggleModeButton"]
-        XCTAssertTrue(toggleButton.waitForExistence(timeout: 3))
-        toggleButton.tap()
-        
+        UITestLauncher.launch(
+            app: app,
+            includeReset: true,
+            overrides: [
+                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0"
+            ],
+            appearance: appearanceArgument
+        )
+
+        let signupGetStartedButton = app.buttons["GetStartedButton"]
+        if !signupGetStartedButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(signupGetStartedButton.waitForExistence(timeout: 5))
+        signupGetStartedButton.tap()
+
+        let signupToggleButton = app.buttons["toggleModeButton"]
+        XCTAssertTrue(signupToggleButton.waitForExistence(timeout: 3))
+        signupToggleButton.tap()
+
+        let signupEmailField = app.textFields["emailTextField"]
+        XCTAssertTrue(signupEmailField.waitForExistence(timeout: 3))
+        signupEmailField.tap()
+        signupEmailField.typeText("abdullah.khan@shamela.app")
+
+        let signupPasswordField = app.secureTextFields["passwordTextField"]
+        XCTAssertTrue(signupPasswordField.waitForExistence(timeout: 3))
+        signupPasswordField.tap()
+        signupPasswordField.typeText("12345678")
+
         let displayNameField = app.textFields["displayNameTextField"]
         XCTAssertTrue(displayNameField.waitForExistence(timeout: 3))
-
-        if emailField.exists {
-            emailField.tap()
-            emailField.press(forDuration: 1.0)
-            let selectAll = app.menuItems["Select All"]
-            if selectAll.waitForExistence(timeout: 1) {
-                selectAll.tap()
-            }
-            emailField.typeText("abdullah.khan@shamela.app")
-        }
-        
         displayNameField.tap()
-        displayNameField.typeText(localizedSignupDisplayName())
+        displayNameField.typeText(localizedSignupDisplayName() + "\n")
+        waitForKeyboardToDismiss()
         takeScreenshot(name: "auth_signup")
+
+        UITestLauncher.launch(
+            app: app,
+            includeReset: true,
+            overrides: [
+                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0",
+                NetworkMockHelper.LaunchEnvironmentKeys.mockAuthError: invalidLoginCredentialsErrorJSON()
+            ],
+            appearance: appearanceArgument
+        )
+
+        let invalidLoginGetStartedButton = app.buttons["GetStartedButton"]
+        if !invalidLoginGetStartedButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(invalidLoginGetStartedButton.waitForExistence(timeout: 5))
+        invalidLoginGetStartedButton.tap()
+
+        let invalidLoginEmailField = app.textFields["emailTextField"]
+        XCTAssertTrue(invalidLoginEmailField.waitForExistence(timeout: 5))
+        replaceText(in: invalidLoginEmailField, with: localizedLoginEmail())
+
+        let invalidLoginPasswordField = app.secureTextFields["passwordTextField"]
+        XCTAssertTrue(invalidLoginPasswordField.waitForExistence(timeout: 3))
+        invalidLoginPasswordField.tap()
+        invalidLoginPasswordField.typeText("wrong-pass")
+
+        let invalidLoginButton = app.buttons["signInButton"]
+        XCTAssertTrue(invalidLoginButton.waitForExistence(timeout: 3))
+        invalidLoginButton.tap()
+
+        let invalidLoginErrorLabel = app.staticTexts["errorLabel"]
+        XCTAssertTrue(invalidLoginErrorLabel.waitForExistence(timeout: 5))
+        XCTAssertEqual(invalidLoginErrorLabel.label, localizedInvalidCredentialsMessage())
+        takeScreenshot(name: "auth_invalid_credentials")
+
+        UITestLauncher.launch(
+            app: app,
+            includeReset: true,
+            overrides: [
+                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0",
+                NetworkMockHelper.LaunchEnvironmentKeys.mockAuthError: existingEmailSignupErrorJSON()
+            ],
+            appearance: appearanceArgument
+        )
+
+        let existingEmailGetStartedButton = app.buttons["GetStartedButton"]
+        if !existingEmailGetStartedButton.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(existingEmailGetStartedButton.waitForExistence(timeout: 5))
+        existingEmailGetStartedButton.tap()
+
+        let existingEmailField = app.textFields["emailTextField"]
+        XCTAssertTrue(existingEmailField.waitForExistence(timeout: 5))
+
+        let existingToggleButton = app.buttons["toggleModeButton"]
+        XCTAssertTrue(existingToggleButton.waitForExistence(timeout: 3))
+        existingToggleButton.tap()
+
+        let existingSignupEmailField = app.textFields["emailTextField"]
+        XCTAssertTrue(existingSignupEmailField.waitForExistence(timeout: 3))
+        existingSignupEmailField.tap()
+        existingSignupEmailField.typeText("abdullah.khan@shamela.app")
+
+        let existingPasswordField = app.secureTextFields["passwordTextField"]
+        XCTAssertTrue(existingPasswordField.waitForExistence(timeout: 3))
+        existingPasswordField.tap()
+        existingPasswordField.typeText("12345678")
+
+        let existingDisplayNameField = app.textFields["displayNameTextField"]
+        XCTAssertTrue(existingDisplayNameField.waitForExistence(timeout: 3))
+        existingDisplayNameField.tap()
+        existingDisplayNameField.typeText(localizedSignupDisplayName())
+
+        let signUpButton = app.buttons["signUpButton"]
+        XCTAssertTrue(signUpButton.waitForExistence(timeout: 3))
+        signUpButton.tap()
+
+        let existingEmailErrorLabel = app.staticTexts["errorLabel"]
+        XCTAssertTrue(existingEmailErrorLabel.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["switchToSignInButton"].exists)
+        takeScreenshot(name: "auth_existing_email")
 
         UITestLauncher.launch(
             app: app,
@@ -255,8 +354,7 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
 
         let errorEmailField = app.textFields["emailTextField"]
         XCTAssertTrue(errorEmailField.waitForExistence(timeout: 5))
-        errorEmailField.tap()
-        errorEmailField.typeText(localizedLoginEmail())
+        replaceText(in: errorEmailField, with: localizedLoginEmail())
 
         let errorPasswordField = app.secureTextFields["passwordTextField"]
         XCTAssertTrue(errorPasswordField.waitForExistence(timeout: 3))
@@ -478,6 +576,29 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
             return "عبداللہ خان"
         default:
             return "Abdullah Khan"
+        }
+    }
+
+    private func existingEmailSignupErrorJSON() -> String {
+        """
+        {"detail":"Email already exists. Please use /api/auth/login instead.","status_code":400}
+        """
+    }
+
+    private func invalidLoginCredentialsErrorJSON() -> String {
+        """
+        {"detail":"Invalid email or password.","status_code":401}
+        """
+    }
+
+    private func localizedInvalidCredentialsMessage() -> String {
+        switch currentLanguage {
+        case "ar":
+            return "تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور ثم حاول مرة أخرى."
+        case "ur":
+            return "سائن اِن نہیں ہو سکا۔ اپنا ای میل اور پاس ورڈ چیک کریں اور دوبارہ کوشش کریں۔"
+        default:
+            return "Unable to sign in. Check your email and password and try again."
         }
     }
 

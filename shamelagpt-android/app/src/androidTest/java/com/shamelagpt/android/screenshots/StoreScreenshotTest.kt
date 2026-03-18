@@ -86,6 +86,12 @@ class StoreScreenshotTest {
         Scenario(id = "auth_signup", locale = "en", screen = Screen.Auth, authUiState = signupAuthState("en")),
         Scenario(id = "auth_signup", locale = "ar", screen = Screen.Auth, authUiState = signupAuthState("ar")),
         Scenario(id = "auth_signup", locale = "ur", screen = Screen.Auth, authUiState = signupAuthState("ur")),
+        Scenario(id = "auth_invalid_credentials", locale = "en", screen = Screen.Auth, authUiState = invalidCredentialsAuthState("en")),
+        Scenario(id = "auth_invalid_credentials", locale = "ar", screen = Screen.Auth, authUiState = invalidCredentialsAuthState("ar")),
+        Scenario(id = "auth_invalid_credentials", locale = "ur", screen = Screen.Auth, authUiState = invalidCredentialsAuthState("ur")),
+        Scenario(id = "auth_existing_email", locale = "en", screen = Screen.Auth, authUiState = signupExistingEmailState("en")),
+        Scenario(id = "auth_existing_email", locale = "ar", screen = Screen.Auth, authUiState = signupExistingEmailState("ar")),
+        Scenario(id = "auth_existing_email", locale = "ur", screen = Screen.Auth, authUiState = signupExistingEmailState("ur")),
         Scenario(id = "auth_error", locale = "en", screen = Screen.Auth, authUiState = authErrorState("en")),
         Scenario(id = "auth_error", locale = "ar", screen = Screen.Auth, authUiState = authErrorState("ar")),
         Scenario(id = "auth_error", locale = "ur", screen = Screen.Auth, authUiState = authErrorState("ur"))
@@ -288,7 +294,13 @@ class StoreScreenshotTest {
             isLoading = false
         )
         val stateFlow = MutableStateFlow(uiState)
+        val searchFlow = MutableStateFlow("")
         every { vm.uiState } returns stateFlow
+        every { vm.searchQuery } returns searchFlow
+        every { vm.getFilteredConversations() } returns mockConversations
+        every { vm.updateSearchQuery(any()) } answers {
+            searchFlow.value = firstArg()
+        }
         every { vm.displayTitle(any()) } answers { firstArg<com.shamelagpt.android.domain.model.Conversation>().title }
         every { vm.messagePreview(any()) } answers {
             firstArg<com.shamelagpt.android.domain.model.Conversation>()
@@ -421,6 +433,43 @@ class StoreScreenshotTest {
         )
     }
 
+    private fun signupExistingEmailState(locale: String): AuthUiState {
+        val displayName = when (locale) {
+            "ar" -> "عبدالله السلمي"
+            "ur" -> "عبداللہ خان"
+            else -> "Abdullah Khan"
+        }
+        val error = when (locale) {
+            "ar" -> "هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول."
+            "ur" -> "یہ ای میل پہلے سے رجسٹرڈ ہے۔ براہ کرم سائن اِن کریں۔"
+            else -> "This email is already registered. Please sign in."
+        }
+        return AuthUiState(
+            email = "abdullah.khan@shamela.app",
+            password = "••••••••",
+            displayName = displayName,
+            isLoginMode = false,
+            isLoading = false,
+            error = error
+        )
+    }
+
+    private fun invalidCredentialsAuthState(locale: String): AuthUiState {
+        val error = when (locale) {
+            "ar" -> "تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور ثم حاول مرة أخرى."
+            "ur" -> "سائن اِن نہیں ہو سکا۔ اپنا ای میل اور پاس ورڈ چیک کریں اور دوبارہ کوشش کریں۔"
+            else -> "Unable to sign in. Check your email and password and try again."
+        }
+        return AuthUiState(
+            email = "support@shamela.app",
+            password = "••••••••",
+            displayName = "",
+            isLoginMode = true,
+            isLoading = false,
+            error = error
+        )
+    }
+
     private fun errorChatState(locale: String): ChatUiState {
         val now = System.currentTimeMillis()
         val prompt = when (locale) {
@@ -487,18 +536,67 @@ class StoreScreenshotTest {
     private fun captureScenarioBitmap(): Bitmap {
         repeat(2) { attempt ->
             try {
-                return composeRule.onRoot().captureToImage().asAndroidBitmap()
-            } catch (_: Throwable) {
-                composeRule.waitForIdle()
-                if (attempt == 1) {
-                    // fall through to fallback
+                val bitmap = composeRule.onRoot().captureToImage().asAndroidBitmap()
+                if (!looksBlank(bitmap)) {
+                    return bitmap
                 }
+            } catch (_: Throwable) {
             }
+            composeRule.waitForIdle()
+        }
+        val deviceScreenshot = captureDeviceBitmap()
+        if (deviceScreenshot != null && !looksBlank(deviceScreenshot)) {
+            return deviceScreenshot
         }
         return composeRule.runOnIdle {
             val rootView = composeRule.activity.findViewById<android.view.View>(android.R.id.content)
             rootView.drawToBitmap()
         }
+    }
+
+    private fun captureDeviceBitmap(): Bitmap? {
+        val fullBitmap = InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot() ?: return null
+        return composeRule.runOnIdle {
+            val rootView = composeRule.activity.findViewById<android.view.View>(android.R.id.content)
+            val location = IntArray(2)
+            rootView.getLocationOnScreen(location)
+            val left = location[0].coerceIn(0, fullBitmap.width)
+            val top = location[1].coerceIn(0, fullBitmap.height)
+            val width = rootView.width.coerceAtMost(fullBitmap.width - left)
+            val height = rootView.height.coerceAtMost(fullBitmap.height - top)
+            if (width > 0 && height > 0) {
+                Bitmap.createBitmap(fullBitmap, left, top, width, height)
+            } else {
+                fullBitmap
+            }
+        }
+    }
+
+    private fun looksBlank(bitmap: Bitmap): Boolean {
+        if (bitmap.width == 0 || bitmap.height == 0) return true
+        val samplesPerAxis = 6
+        var brightSamples = 0
+        var variedSamples = 0
+        var firstColor: Int? = null
+        for (xIndex in 0 until samplesPerAxis) {
+            for (yIndex in 0 until samplesPerAxis) {
+                val x = (bitmap.width - 1) * xIndex / (samplesPerAxis - 1)
+                val y = (bitmap.height - 1) * yIndex / (samplesPerAxis - 1)
+                val color = bitmap.getPixel(x, y)
+                if (firstColor == null) {
+                    firstColor = color
+                } else if (color != firstColor) {
+                    variedSamples++
+                }
+                val red = color shr 16 and 0xFF
+                val green = color shr 8 and 0xFF
+                val blue = color and 0xFF
+                if ((red + green + blue) > 30) {
+                    brightSamples++
+                }
+            }
+        }
+        return brightSamples <= 1 && variedSamples <= 1
     }
 
     private fun setLocale(tag: String, isDark: Boolean = false) {

@@ -18,6 +18,7 @@ protocol APIClientProtocol {
     func login(_ request: LoginRequest) async throws -> AuthResponse
     func forgotPassword(_ email: String) async throws
     func googleSignIn(_ request: GoogleSignInRequest) async throws -> AuthResponse
+    func appleSignIn(_ request: AppleSignInRequest) async throws -> AuthResponse
     func refreshToken(_ request: RefreshTokenRequest) async throws -> AuthResponse
     func getCurrentUser() async throws -> UserResponse
     func updateCurrentUser(_ request: UpdateUserRequest) async throws -> UserResponse
@@ -25,6 +26,8 @@ protocol APIClientProtocol {
     func verifyToken() async throws
     func getPreferences() async throws -> UserPreferencesRequest
     func setPreferences(_ request: UserPreferencesRequest) async throws
+    func getModePreference() async throws -> ModePreferenceResponse
+    func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse
     func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data
     func listConversations() async throws -> [ConversationResponse]
     func createConversation(_ request: ConversationRequest) async throws -> ConversationResponse
@@ -179,6 +182,12 @@ final class APIClient: APIClientProtocol {
         return try await performRequest(url: endpoint, method: "POST", body: request)
     }
 
+    /// Apple Sign-In
+    func appleSignIn(_ request: AppleSignInRequest) async throws -> AuthResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/apple")
+        return try await performRequest(url: endpoint, method: "POST", body: request)
+    }
+
     /// Refresh token
     func refreshToken(_ request: RefreshTokenRequest) async throws -> AuthResponse {
         let endpoint = baseURL.appendingPathComponent("api/auth/refresh")
@@ -218,6 +227,16 @@ final class APIClient: APIClientProtocol {
     func setPreferences(_ request: UserPreferencesRequest) async throws {
         let endpoint = baseURL.appendingPathComponent("api/auth/me/preferences")
         _ = try await performRequest(url: endpoint, method: "PUT", body: request) as EmptyResponse
+    }
+
+    func getModePreference() async throws -> ModePreferenceResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me/mode")
+        return try await performRequest(url: endpoint, method: "GET")
+    }
+
+    func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me/mode")
+        return try await performRequest(url: endpoint, method: "PUT", body: request)
     }
 
     /// Title generation
@@ -560,6 +579,17 @@ final class PreviewMockAPIClient: APIClientProtocol {
         return
     }
 
+    func getModePreference() async throws -> ModePreferenceResponse {
+        ModePreferenceResponse(modePreference: 1, modeName: "research")
+    }
+
+    func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse {
+        ModePreferenceResponse(
+            modePreference: request.modePreference,
+            modeName: request.modePreference == 2 ? "fact_check" : "research"
+        )
+    }
+
     func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data {
         return Data("{\"title\":\"Mock Title\"}".utf8)
     }
@@ -585,6 +615,10 @@ final class PreviewMockAPIClient: APIClientProtocol {
     }
 
     func googleSignIn(_ request: GoogleSignInRequest) async throws -> AuthResponse {
+        return mockAuthResponse
+    }
+
+    func appleSignIn(_ request: AppleSignInRequest) async throws -> AuthResponse {
         return mockAuthResponse
     }
 

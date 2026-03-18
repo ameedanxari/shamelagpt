@@ -27,6 +27,10 @@ final class AuthViewModel: ObservableObject {
         errorMessage = nil
     }
 
+    func setError(_ message: String) {
+        errorMessage = message
+    }
+
     func authenticate(onSuccess: @escaping () -> Void) {
         let mode = isLoginMode ? "login" : "signup"
         AppLogger.auth.logInfo("authenticate requested mode=\(mode)")
@@ -61,10 +65,38 @@ final class AuthViewModel: ObservableObject {
             } catch {
                 isLoading = false
                 AppLogger.auth.logWarning("authentication failed mode=\(mode) reason=\(type(of: error))")
-                AppLogger.auth.logError("authentication error", error: error)
-                errorMessage = error.userFacingMessage
+                if shouldShowInvalidCredentialsError(error: error, isLoginMode: isLoginMode) {
+                    AppLogger.auth.logWarning("login rejected for invalid credentials; showing friendly copy")
+                    errorMessage = LocalizationKeys.authInvalidCredentials.localized
+                } else if shouldSuggestSignInAfterSignup(error: error, isLoginMode: isLoginMode) {
+                    AppLogger.auth.logWarning("signup rejected for existing account; suggesting login")
+                    errorMessage = LocalizationKeys.authEmailExistsUseLogin.localized
+                } else {
+                    AppLogger.auth.logError("authentication error", error: error)
+                    errorMessage = error.userFacingMessage
+                }
             }
         }
+    }
+
+    private func shouldShowInvalidCredentialsError(error: Error, isLoginMode: Bool) -> Bool {
+        guard isLoginMode else { return false }
+
+        if let networkError = error as? NetworkError {
+            switch networkError {
+            case .httpError(let statusCode):
+                return statusCode == 400 || statusCode == 401
+            case .badRequest:
+                return true
+            default:
+                break
+            }
+        }
+
+        let message = error.localizedDescription.lowercased()
+        return message.contains("invalid credential") ||
+            message.contains("invalid email or password") ||
+            message.contains("email or password")
     }
 
     func forgotPassword() {
@@ -109,6 +141,38 @@ final class AuthViewModel: ObservableObject {
                 AppLogger.auth.logError("google sign-in error", error: error)
                 errorMessage = error.userFacingMessage
             }
+        }
+    }
+
+    func appleSignIn(idToken: String, onSuccess: @escaping () -> Void) {
+        Task {
+            isLoading = true
+            errorMessage = nil
+            do {
+                AppLogger.auth.logInfo("apple sign-in request started")
+                _ = try await authRepository.appleSignIn(request: AppleSignInRequest(idToken: idToken))
+                isLoading = false
+                AppLogger.auth.logInfo("apple sign-in success")
+                onSuccess()
+            } catch {
+                isLoading = false
+                AppLogger.auth.logWarning("apple sign-in failed reason=\(type(of: error))")
+                AppLogger.auth.logError("apple sign-in error", error: error)
+                errorMessage = error.userFacingMessage
+            }
+        }
+    }
+
+    private func shouldSuggestSignInAfterSignup(error: Error, isLoginMode: Bool) -> Bool {
+        guard !isLoginMode else { return false }
+        guard let networkError = error as? NetworkError else { return false }
+        switch networkError {
+        case .httpError(let statusCode):
+            return statusCode == 400
+        case .badRequest:
+            return true
+        default:
+            return false
         }
     }
 }

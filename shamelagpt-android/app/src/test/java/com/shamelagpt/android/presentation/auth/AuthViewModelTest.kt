@@ -1,9 +1,12 @@
 package com.shamelagpt.android.presentation.auth
 
 import android.content.Context
+import com.shamelagpt.android.R
+import com.shamelagpt.android.core.network.NetworkError
 import com.shamelagpt.android.data.remote.dto.AuthResponse
 import com.shamelagpt.android.data.remote.dto.LoginRequest
 import com.shamelagpt.android.domain.repository.AuthRepository
+import io.mockk.every
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -29,6 +32,10 @@ class AuthViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
+        every { appContext.getString(R.string.auth_invalid_credentials) } returns
+            "Unable to sign in. Check your email and password and try again."
+        every { appContext.getString(R.string.auth_email_exists_use_login) } returns
+            "This email is already registered. Please sign in."
         viewModel = AuthViewModel(authRepository, appContext)
     }
 
@@ -80,5 +87,22 @@ class AuthViewModelTest {
         assertFalse(successCalled)
         assertFalse(viewModel.uiState.value.isLoading)
         assertNotNull(viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `when login fails with invalid credentials, shows human readable error`() = runTest {
+        coEvery {
+            authRepository.login(any())
+        } returns Result.failure(NetworkError.HttpError(401, """{"detail":"Invalid email or password"}"""))
+
+        viewModel.updateEmail("test@example.com")
+        viewModel.updatePassword("wrong-password")
+
+        viewModel.authenticate { fail("success callback should not be called") }
+
+        assertEquals(
+            "Unable to sign in. Check your email and password and try again.",
+            viewModel.uiState.value.error
+        )
     }
 }

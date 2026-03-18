@@ -25,6 +25,8 @@ enum AccessibilityID {
         static let signUpButton = "signUpButton"
         static let continueAsGuestButton = "continueAsGuestButton"
         static let toggleModeButton = "toggleModeButton"
+        static let googleSignInButton = "googleSignInButton"
+        static let appleSignInButton = "appleSignInButton"
     }
 
     enum Chat {
@@ -32,6 +34,8 @@ enum AccessibilityID {
         static let cameraButton = "cameraButton"
         static let micButton = "micButton"
         static let sendButton = "sendButton"
+        static let modeToggleButton = "chatModeToggleButton"
+        static let modeToggleProgress = "chatModeToggleProgress"
         static let typingIndicator = "TypingIndicator"
         static let thinkingBubble = "ThinkingBubble"
         static let messageBubble = "MessageBubble"

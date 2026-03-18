@@ -38,6 +38,8 @@ enum LocalizationKeys {
     static let newConversationWarningMessageLoggedIn = "chat.newConversationWarningMessageLoggedIn"
     static let newConversationWarningMessageLoggedOut = "chat.newConversationWarningMessageLoggedOut"
     static let viewHistory = "chat.viewHistory"
+    static let chatModeResearch = "chat.mode.research"
+    static let chatModeFactCheck = "chat.mode.factCheck"
 
     // MARK: - History Screen
 
@@ -271,6 +273,13 @@ enum LocalizationKeys {
     static let authNeedAccount = "auth.needAccount"
     static let authHaveAccount = "auth.haveAccount"
     static let authSignInButton = "auth.signInButton"
+    static let authInvalidCredentials = "auth.invalidCredentials"
+    static let authEmailExistsUseLogin = "auth.emailExistsUseLogin"
+    static let authSignInWithGoogle = "auth.signInWithGoogle"
+    static let authGoogleSignInFailed = "auth.googleSignInFailed"
+    static let authSignInWithApple = "auth.signInWithApple"
+    static let authAppleSignInFailed = "auth.appleSignInFailed"
+    static let authOrDivider = "auth.orDivider"
 
     // MARK: - Permission Messages
 

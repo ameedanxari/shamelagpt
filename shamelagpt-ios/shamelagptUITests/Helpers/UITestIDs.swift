@@ -23,6 +23,8 @@ enum UITestID {
         static let errorLabel = "errorLabel"
         static let signInButton = "signInButton"
         static let signUpButton = "signUpButton"
+        static let googleSignInButton = "googleSignInButton"
+        static let appleSignInButton = "appleSignInButton"
         static let continueAsGuestButton = "continueAsGuestButton"
         static let toggleModeButton = "toggleModeButton"
     }
@@ -32,6 +34,8 @@ enum UITestID {
         static let cameraButton = "cameraButton"
         static let micButton = "micButton"
         static let sendButton = "sendButton"
+        static let modeToggleButton = "chatModeToggleButton"
+        static let modeToggleProgress = "chatModeToggleProgress"
         static let typingIndicator = "TypingIndicator"
         static let thinkingBubble = "ThinkingBubble"
         static let messageBubble = "MessageBubble"

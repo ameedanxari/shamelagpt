@@ -15,6 +15,7 @@ final class ChatViewModelTests: XCTestCase {
     var viewModel: ChatViewModel!
     var mockSendMessageUseCase: MockSendMessageUseCase!
     var mockChatRepository: MockChatRepository!
+    var mockAuthRepository: MockAuthRepository!
     var mockVoiceInputManager: MockVoiceInputManager!
     var mockOCRManager: MockOCRManager!
     var cancellables: Set<AnyCancellable>!
@@ -22,6 +23,7 @@ final class ChatViewModelTests: XCTestCase {
     override func setUpWithError() throws {
         mockSendMessageUseCase = MockSendMessageUseCase()
         mockChatRepository = MockChatRepository()
+        mockAuthRepository = MockAuthRepository()
         mockVoiceInputManager = MockVoiceInputManager()
         mockOCRManager = MockOCRManager()
         cancellables = Set<AnyCancellable>()
@@ -31,6 +33,7 @@ final class ChatViewModelTests: XCTestCase {
             sendMessageUseCase: mockSendMessageUseCase,
             chatRepository: mockChatRepository,
             apiClient: nil,
+            authRepository: mockAuthRepository,
             isGuest: false,
             guestSessionId: nil,
             voiceInputManager: mockVoiceInputManager,
@@ -42,6 +45,7 @@ final class ChatViewModelTests: XCTestCase {
         viewModel = nil
         mockSendMessageUseCase = nil
         mockChatRepository = nil
+        mockAuthRepository = nil
         mockVoiceInputManager = nil
         mockOCRManager = nil
         cancellables = nil
@@ -87,6 +91,68 @@ final class ChatViewModelTests: XCTestCase {
 
         // Then
         XCTAssertFalse(viewModel.canSendMessage)
+    }
+
+    // MARK: - Mode Preference Tests
+
+    func testInitLoadsModePreferenceForAuthenticatedUser() async throws {
+        // Given
+        mockAuthRepository.mockModePreferenceResponse = ModePreferenceResponse(modePreference: 2, modeName: "fact_check")
+        viewModel = ChatViewModel(
+            conversationId: "test-conversation-id",
+            sendMessageUseCase: mockSendMessageUseCase,
+            chatRepository: mockChatRepository,
+            apiClient: nil,
+            authRepository: mockAuthRepository,
+            isGuest: false,
+            guestSessionId: nil,
+            voiceInputManager: mockVoiceInputManager,
+            ocrManager: mockOCRManager
+        )
+
+        // When
+        try await Task.sleep(nanoseconds: 150_000_000)
+
+        // Then
+        XCTAssertEqual(viewModel.modePreference, 2)
+        XCTAssertGreaterThanOrEqual(mockAuthRepository.getModePreferenceCallCount, 1)
+    }
+
+    func testToggleModePreferenceCallsRepositoryAndUpdatesState() async throws {
+        // Given
+        try await Task.sleep(nanoseconds: 120_000_000)
+        XCTAssertEqual(viewModel.modePreference, 1)
+
+        // When
+        viewModel.toggleModePreference()
+        try await Task.sleep(nanoseconds: 150_000_000)
+
+        // Then
+        XCTAssertEqual(mockAuthRepository.setModePreferenceCallCount, 1)
+        XCTAssertEqual(viewModel.modePreference, 2)
+    }
+
+    func testGuestModeDoesNotLoadModePreference() async throws {
+        // Given
+        let guestAuthRepository = MockAuthRepository()
+        let guestViewModel = ChatViewModel(
+            conversationId: "test-conversation-id",
+            sendMessageUseCase: mockSendMessageUseCase,
+            chatRepository: mockChatRepository,
+            apiClient: nil,
+            authRepository: guestAuthRepository,
+            isGuest: true,
+            guestSessionId: nil,
+            voiceInputManager: mockVoiceInputManager,
+            ocrManager: mockOCRManager
+        )
+
+        // When
+        try await Task.sleep(nanoseconds: 120_000_000)
+
+        // Then
+        XCTAssertFalse(guestViewModel.canToggleModePreference)
+        XCTAssertEqual(guestAuthRepository.getModePreferenceCallCount, 0)
     }
 
     func testSendMessageWithWhitespaceOnlyIsIgnored() async throws {

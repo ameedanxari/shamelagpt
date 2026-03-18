@@ -10,6 +10,8 @@ import com.shamelagpt.android.data.remote.dto.UserPreferencesRequest
 import com.shamelagpt.android.data.remote.dto.UserResponse
 import com.shamelagpt.android.data.remote.dto.ForgotPasswordRequest
 import com.shamelagpt.android.data.remote.dto.GoogleSignInRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
 import com.shamelagpt.android.data.remote.dto.RefreshTokenRequest
 import com.shamelagpt.android.domain.repository.AuthRepository
 
@@ -73,6 +75,14 @@ class AuthRepositoryImpl(
 
     override suspend fun setPreferences(request: UserPreferencesRequest): Result<Unit> {
         return authRemoteDataSource.setPreferences(request).map { }
+    }
+
+    override suspend fun getModePreference(): Result<ModePreferenceResponse> {
+        return authRemoteDataSource.getModePreference()
+    }
+
+    override suspend fun setModePreference(modePreference: Int): Result<ModePreferenceResponse> {
+        return authRemoteDataSource.setModePreference(ModePreferenceRequest(modePreference))
     }
 
     override fun logout() {

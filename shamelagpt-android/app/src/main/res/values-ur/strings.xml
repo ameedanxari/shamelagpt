@@ -25,6 +25,11 @@
     <string name="continue_as_guest">بطور مہمان جاری رکھیں</string>
     <string name="need_account">اکاؤنٹ نہیں ہے؟ نیا بنائیں</string>
     <string name="have_account">اکاؤنٹ ہے؟ سائن اِن کریں</string>
+    <string name="auth_invalid_credentials">سائن اِن نہیں ہو سکا۔ اپنا ای میل اور پاس ورڈ چیک کریں اور دوبارہ کوشش کریں۔</string>
+    <string name="auth_email_exists_use_login">یہ ای میل پہلے سے رجسٹرڈ ہے۔ براہ کرم سائن اِن کریں۔</string>
+    <string name="sign_in_with_google">گوگل سے سائن اِن کریں</string>
+    <string name="auth_or_divider">یا</string>
+    <string name="google_sign_in_failed">گوگل سائن اِن ناکام ہوا۔ براہ کرم دوبارہ کوشش کریں۔</string>
 
     <!-- Chat Screen -->
     <string name="chat_title">شاملہ GPT</string>
@@ -33,6 +38,12 @@
     <string name="typing">AI جواب تیار کر رہا ہے...</string>
     <string name="copy">کاپی کریں</string>
     <string name="common_share">شیئر کریں</string>
+    <string name="share_conversation_title">شاملہ جی پی ٹی گفتگو</string>
+    <string name="share_messages_count">اس گفتگو میں %1$d پیغامات ہیں</string>
+    <string name="share_last_updated">آپڈیٹ ہوا: %1$s</string>
+    <string name="share_preview">پیش نظارہ:</string>
+    <string name="share_read_full">مکمل گفتگو پڑھیں:</string>
+    <string name="share_powered_by">شاملہ جی پی ٹی کی طاقت سے - آپا کا اسلامی علمی معاون</string>
     <string name="copied">کاپی کلپ بورڈ پر ہو گئی</string>
     <string name="start_conversation">گفتگو شروع کریں</string>
     <string name="ask_anything">اسلام کے بارے میں کچھ بھی پوچھیں یا متن کی تصدیق کے لیے کیمرہ استعمال کریں</string>
@@ -77,6 +88,9 @@
     <string name="settings_custom_prompt">مخصوص سسٹم پرامپٹ</string>
     <string name="settings_custom_prompt_optional">اختیاری</string>
     <string name="settings_not_set">سیٹ نہیں ہے</string>
+    <string name="settings_mode_preference">چیٹ موڈ</string>
+    <string name="settings_mode_research">تحقیق</string>
+    <string name="settings_mode_fact_check">فیکٹ چیک</string>
     <string name="settings_save_preferences">ترجیحات محفوظ کریں</string>
     <string name="settings_sign_out">سائن آؤٹ</string>
     <string name="sign_out_confirmation_title">سائن آؤٹ؟</string>

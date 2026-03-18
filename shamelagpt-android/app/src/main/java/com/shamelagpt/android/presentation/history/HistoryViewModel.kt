@@ -1,18 +1,21 @@
 package com.shamelagpt.android.presentation.history
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shamelagpt.android.R
 import com.shamelagpt.android.domain.model.Conversation
 import com.shamelagpt.android.domain.usecase.DeleteConversationUseCase
 import com.shamelagpt.android.domain.usecase.GetConversationsUseCase
-import java.text.DateFormat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.DateFormat
+import java.util.Date
 
 private const val TAG = "HistoryViewModel"
 
@@ -26,11 +29,15 @@ private const val TAG = "HistoryViewModel"
  */
 class HistoryViewModel(
     private val getConversationsUseCase: GetConversationsUseCase,
-    private val deleteConversationUseCase: DeleteConversationUseCase
+    private val deleteConversationUseCase: DeleteConversationUseCase,
+    private val appContext: Context? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HistoryUiState())
     val uiState: StateFlow<HistoryUiState> = _uiState.asStateFlow()
+    
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     init {
         loadConversations()
@@ -104,6 +111,35 @@ class HistoryViewModel(
     }
 
     /**
+     * Updates search query and filters conversations.
+     *
+     * @param query New search query
+     */
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    /**
+     * Gets filtered conversations based on current search query.
+     */
+    fun getFilteredConversations(): List<Conversation> {
+        val query = _searchQuery.value.trim()
+        val allConversations = _uiState.value.conversations
+        
+        if (query.isEmpty()) {
+            return allConversations
+        }
+        
+        return allConversations.filter { conversation ->
+            val titleMatch = conversation.title.contains(query, ignoreCase = true)
+            val messageMatch = conversation.messages.any { message ->
+                message.content.contains(query, ignoreCase = true)
+            }
+            titleMatch || messageMatch
+        }
+    }
+
+    /**
      * Clears the current error message.
      */
     fun clearError() {
@@ -137,18 +173,57 @@ class HistoryViewModel(
 
     fun exportConversation(conversation: Conversation): String {
         val title = displayTitle(conversation)
-        val link = "https://shamelagpt.com/chat?id=${conversation.id}"
+        val link = "https://shamelagpt.com/shared?chatid=${conversation.id}"
         val preview = messagePreview(conversation)
         val updated = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
-            .format(java.util.Date(conversation.updatedAt))
+            .format(Date(conversation.updatedAt))
+        val messageCount = conversation.messages.size
 
         return buildString {
-            append("ShamelaGPT Chat: $title\n")
-            append("Link: $link\n")
-            append("Last updated: $updated\n")
+            append("📚 ${localizedString(R.string.share_conversation_title, "ShamelaGPT Chat")}\n")
+            append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+            append("📝 $title\n")
+            append(
+                "📊 ${
+                    localizedString(
+                        R.string.share_messages_count,
+                        "$messageCount messages",
+                        messageCount
+                    )
+                }\n"
+            )
+            append(
+                "🕒 ${
+                    localizedString(
+                        R.string.share_last_updated,
+                        "Last Updated: $updated",
+                        updated
+                    )
+                }\n"
+            )
+            append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+            
             if (preview.isNotBlank()) {
-                append("\nPreview:\n$preview")
+                append("💬 ${localizedString(R.string.share_preview, "Preview")}\n")
+                append("$preview\n")
+                if (preview.length > 200) {
+                    append("...\n")
+                }
+                append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
             }
+            
+            append("🔗 ${localizedString(R.string.share_read_full, "Read Full Conversation")}\n")
+            append("$link\n")
+            append("\n🌟 ${localizedString(R.string.share_powered_by, "Powered by ShamelaGPT")}")
+        }
+    }
+
+    private fun localizedString(resId: Int, fallback: String, vararg args: Any): String {
+        val context = appContext ?: return fallback
+        return if (args.isEmpty()) {
+            context.getString(resId)
+        } else {
+            context.getString(resId, *args)
         }
     }
 }

@@ -78,7 +78,8 @@ val presentationModule = module {
             voiceInputManager = get(),
             ocrManager = get(),
             context = androidContext(),
-            preferencesManager = get()
+            preferencesManager = get(),
+            authRepository = get()
         )
     }
 
@@ -86,7 +87,8 @@ val presentationModule = module {
     viewModel {
         HistoryViewModel(
             getConversationsUseCase = get(),
-            deleteConversationUseCase = get()
+            deleteConversationUseCase = get(),
+            appContext = androidContext()
         )
     }
 

@@ -16,9 +16,23 @@ From repo root:
 ```bash
 scripts/run_store_screenshots.sh
 ```
-Artifacts: `artifacts/ios/<device>/<locale>/*.png` and `artifacts/android/<device>/<locale>/*.png`.
+This entrypoint now delegates to the unified runner (`scripts/run_screenshots.sh --store`).
 
-The script auto-selects simulators from the currently installed set (prefers iPhone 17/16 Pro Max, a medium phone, a legacy phone, and an iPad Pro). Override by setting `IOS_DEVICES` env var with a space-separated list, or edit the candidate lists in the script.
+Artifacts are always written under the repo `artifacts/` folder (git-ignored), including logs and debug output.
+The unified runner now automatically performs a post-run visual QC step and writes:
+- `artifacts/visual_qc/summary.json`
+- `artifacts/visual_qc/contact_sheet__*.png`
+
+The script auto-selects simulators from the currently installed set and supports `--ios` / `--android` platform filtering.
+
+For targeted validation (single screen/locale/scenario), use:
+```bash
+scripts/run_targeted_screenshots.sh --screen auth --android
+```
+or directly:
+```bash
+scripts/run_screenshots.sh --targeted --screen auth --android
+```
 
 ## Manual commands
 ### iOS (single device/locale)

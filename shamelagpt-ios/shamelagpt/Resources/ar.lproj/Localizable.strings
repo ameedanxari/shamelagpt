@@ -33,6 +33,8 @@
 "chat.newConversationWarningMessageLoggedIn" = "سيتم إخفاء محادثتك الحالية، ويمكنك فتحها مرة أخرى من السجل.";
 "chat.newConversationWarningMessageLoggedOut" = "سيتم إخفاء محادثتك الحالية، وبصفتك ضيفًا لن تتمكن من العودة إليها.";
 "chat.viewHistory" = "عرض السجل";
+"chat.mode.research" = "بحث";
+"chat.mode.factCheck" = "تحقق من الحقائق";
 
 // MARK: - History Screen
 
@@ -50,6 +52,12 @@
 "history.deleteAllFailed" = "تعذر حذف جميع المحادثات.";
 "history.loadingConversations" = "جاري تحميل المحادثات...";
 "common.share" = "مشاركة";
+"share.conversationTitle" = "محادثة شاملة GPT";
+"share.messagesCount" = "%1$d رسائل في هذه المحادثة";
+"share.lastUpdated" = "آخر تحديث: %1$s";
+"share.preview" = "معاينة:";
+"share.readFull" = "اقرأ المحادثة الكاملة:";
+"share.poweredBy" = "مدعوم بواسطة شاملة GPT - مساعد المعرفة الإسلامية الخاص بك";
 "common.delete" = "حذف";
 "history.localOnly" = "محلي فقط";
 
@@ -247,6 +255,13 @@
 "auth.needAccount" = "ليس لديك حساب؟ إنشاء حساب";
 "auth.haveAccount" = "لديك حساب؟ تسجيل الدخول";
 "auth.signInButton" = "تسجيل الدخول";
+"auth.invalidCredentials" = "تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور ثم حاول مرة أخرى.";
+"auth.emailExistsUseLogin" = "هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول.";
+"auth.signInWithGoogle" = "تسجيل الدخول بحساب جوجل";
+"auth.googleSignInFailed" = "فشل تسجيل الدخول بحساب جوجل. يرجى المحاولة مرة أخرى.";
+"auth.signInWithApple" = "تسجيل الدخول بحساب آبل";
+"auth.appleSignInFailed" = "فشل تسجيل الدخول بحساب آبل. يرجى المحاولة مرة أخرى.";
+"auth.orDivider" = "أو";
 
 "settings.pref.length.title" = "طول الإجابة";
 "settings.pref.length.short" = "قصيرة";
