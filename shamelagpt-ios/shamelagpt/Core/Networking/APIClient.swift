@@ -336,7 +336,7 @@ final class APIClient: APIClientProtocol {
         }
 
         // Validate response
-        try validateResponse(response)
+        try validateResponse(response, data: data)
 
         // Decode response
         do {
@@ -367,13 +367,16 @@ final class APIClient: APIClientProtocol {
         }
     }
 
-    /// Validates the HTTP response
-    private func validateResponse(_ response: URLResponse) throws {
+    /// Validates the HTTP response, logging the body on failure
+    private func validateResponse(_ response: URLResponse, data: Data) throws {
         guard let httpResponse = response as? HTTPURLResponse else {
+            AppLogger.network.logWarning("validateResponse: not an HTTPURLResponse")
             throw NetworkError.invalidResponse
         }
 
         guard (200...299).contains(httpResponse.statusCode) else {
+            let bodyPreview = String(data: data, encoding: .utf8).map { String($0.prefix(500)) } ?? "<non-UTF8>"
+            AppLogger.network.logWarning("HTTP error status=\(httpResponse.statusCode) url=\(httpResponse.url?.absoluteString ?? "?") body=\(bodyPreview)")
             throw NetworkError.httpError(statusCode: httpResponse.statusCode)
         }
     }
@@ -423,7 +426,7 @@ final class APIClient: APIClientProtocol {
             AppLogger.network.logDebug("SSE response headers: \(httpResp.allHeaderFields)")
         }
 
-        try validateResponse(response)
+        try validateResponse(response, data: Data())
 
         let stream = AsyncThrowingStream<String, Error> { continuation in
             Task {

@@ -145,18 +145,27 @@ final class AuthViewModel: ObservableObject {
     }
 
     func appleSignIn(idToken: String, onSuccess: @escaping () -> Void) {
+        print("[Auth] apple sign-in: ViewModel sending to repository idTokenLength=\(idToken.count)")
+        AppLogger.auth.logInfo("apple sign-in: ViewModel sending to repository idTokenLength=\(idToken.count)")
         Task {
             isLoading = true
             errorMessage = nil
             do {
-                AppLogger.auth.logInfo("apple sign-in request started")
+                AppLogger.auth.logDebug("apple sign-in: calling authRepository.appleSignIn")
                 _ = try await authRepository.appleSignIn(request: AppleSignInRequest(idToken: idToken))
                 isLoading = false
-                AppLogger.auth.logInfo("apple sign-in success")
+                print("[Auth] apple sign-in: success — navigating")
+                AppLogger.auth.logInfo("apple sign-in: success — navigating")
                 onSuccess()
             } catch {
                 isLoading = false
-                AppLogger.auth.logWarning("apple sign-in failed reason=\(type(of: error))")
+                let nsError = error as NSError
+                print("[Auth] apple sign-in failed: domain=\(nsError.domain) code=\(nsError.code) message=\(error.localizedDescription)")
+                AppLogger.auth.logWarning("apple sign-in failed domain=\(nsError.domain) code=\(nsError.code) reason=\(type(of: error)) message=\(error.localizedDescription)")
+                if let networkError = error as? NetworkError {
+                    print("[Auth] apple sign-in NetworkError: \(networkError)")
+                    AppLogger.auth.logWarning("apple sign-in NetworkError detail=\(networkError)")
+                }
                 AppLogger.auth.logError("apple sign-in error", error: error)
                 errorMessage = error.userFacingMessage
             }

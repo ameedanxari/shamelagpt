@@ -69,13 +69,21 @@ final class AuthRepositoryImpl: AuthRepository {
 
     func appleSignIn(request: AppleSignInRequest) async throws -> AuthResponse {
         do {
-            AppLogger.auth.logDebug("apple sign-in request started")
+            print("[Auth] apple sign-in: repository → APIClient POST /api/auth/apple idTokenLength=\(request.idToken.count)")
+            AppLogger.auth.logDebug("apple sign-in: repository → APIClient POST /api/auth/apple idTokenLength=\(request.idToken.count)")
             let response = try await apiClient.appleSignIn(request)
             persistSession(from: response)
-            AppLogger.auth.logInfo("apple sign-in request succeeded")
+            print("[Auth] apple sign-in: repository succeeded")
+            AppLogger.auth.logInfo("apple sign-in: repository succeeded token=\(response.token.prefix(10))... expiresIn=\(response.expiresIn)")
             return response
         } catch {
-            AppLogger.auth.logWarning("apple sign-in request failed reason=\(type(of: error))")
+            let nsError = error as NSError
+            print("[Auth] apple sign-in: repository failed domain=\(nsError.domain) code=\(nsError.code) message=\(error.localizedDescription)")
+            AppLogger.auth.logWarning("apple sign-in: repository failed domain=\(nsError.domain) code=\(nsError.code) type=\(type(of: error)) message=\(error.localizedDescription)")
+            if let networkError = error as? NetworkError {
+                print("[Auth] apple sign-in: NetworkError=\(networkError)")
+                AppLogger.auth.logWarning("apple sign-in: NetworkError=\(networkError)")
+            }
             throw normalizeError(error)
         }
     }

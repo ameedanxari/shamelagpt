@@ -26,8 +26,12 @@ struct AuthView: View {
 
     var body: some View {
         ZStack {
+            // Background tap to dismiss keyboard — sits behind all interactive elements
             DesignSystem.Colors.background(colorScheme)
                 .ignoresSafeArea()
+                .onTapGesture {
+                    dismissKeyboard()
+                }
 
             VStack(spacing: DesignSystem.Spacing.md) {
                 Text(viewModel.isLoginMode ? LocalizationKeys.authSignIn.localizedKey : LocalizationKeys.authCreateAccount.localizedKey)
@@ -103,17 +107,19 @@ struct AuthView: View {
                     guard !viewModel.isLoading else { return }
                     handleGoogleSignIn()
                 }
-                .frame(width: 220)
                 .accessibilityIdentifier(AccessibilityID.Auth.googleSignInButton)
 
-                SignInWithAppleButton(.signIn) { request in
+                SignInWithAppleButton(viewModel.isLoginMode ? .signIn : .signUp) { request in
+                    print("[Auth] apple sign-in: button tapped — requesting scopes (isLoading=\(viewModel.isLoading))")
+                    AppLogger.auth.logInfo("apple sign-in: button tapped — requesting scopes")
                     request.requestedScopes = [.fullName, .email]
                 } onCompletion: { result in
+                    print("[Auth] apple sign-in: onCompletion fired")
+                    AppLogger.auth.logInfo("apple sign-in: onCompletion fired")
                     handleAppleSignIn(result)
                 }
                 .signInWithAppleButtonStyle(appleSignInButtonStyle)
-                .frame(width: 220, height: 44)
-                .disabled(viewModel.isLoading)
+                .frame(height: 44)
                 .accessibilityIdentifier(AccessibilityID.Auth.appleSignInButton)
 
                 Button {
@@ -138,10 +144,6 @@ struct AuthView: View {
                 .accessibilityIdentifier(AccessibilityID.Auth.toggleModeButton)
             }
             .padding(DesignSystem.Spacing.lg)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                dismissKeyboard()
-            }
         }
     }
 
@@ -194,30 +196,44 @@ struct AuthView: View {
     }
 
     private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
+        print("[Auth] apple sign-in: ASAuthorization result received")
+        AppLogger.auth.logInfo("apple sign-in: ASAuthorization result received")
         switch result {
         case .success(let authorization):
+            print("[Auth] apple sign-in: authorization succeeded, credential type=\(type(of: authorization.credential))")
+            AppLogger.auth.logDebug("apple sign-in: authorization succeeded, credential type=\(type(of: authorization.credential))")
             guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-                AppLogger.auth.logWarning("apple sign-in failed: unexpected credential type")
+                print("[Auth] apple sign-in failed: unexpected credential type=\(type(of: authorization.credential))")
+                AppLogger.auth.logWarning("apple sign-in failed: unexpected credential type=\(type(of: authorization.credential))")
                 viewModel.setError(LocalizationKeys.authAppleSignInFailed.localized)
                 return
             }
+
+            print("[Auth] apple sign-in: userID=\(appleIDCredential.user) email=\(appleIDCredential.email ?? "nil") authorizationCode=\(appleIDCredential.authorizationCode != nil ? "present" : "nil")")
+            AppLogger.auth.logDebug("apple sign-in: userID=\(appleIDCredential.user) email=\(appleIDCredential.email ?? "nil") fullName=\(appleIDCredential.fullName?.givenName ?? "nil") authorizationCode=\(appleIDCredential.authorizationCode != nil ? "present" : "nil")")
 
             guard let identityTokenData = appleIDCredential.identityToken,
                   let idToken = String(data: identityTokenData, encoding: .utf8),
                   !idToken.isEmpty else {
-                AppLogger.auth.logWarning("apple sign-in failed: missing identity token")
+                print("[Auth] apple sign-in failed: missing identity token — identityToken=\(appleIDCredential.identityToken == nil ? "nil" : "present but not UTF8 decodable")")
+                AppLogger.auth.logWarning("apple sign-in failed: missing identity token — identityToken=\(appleIDCredential.identityToken == nil ? "nil" : "present but not UTF8 decodable")")
                 viewModel.setError(LocalizationKeys.authAppleSignInFailed.localized)
                 return
             }
 
+            print("[Auth] apple sign-in: idToken obtained length=\(idToken.count)")
+            AppLogger.auth.logInfo("apple sign-in: idToken obtained length=\(idToken.count) prefix=\(String(idToken.prefix(20)))...")
             viewModel.appleSignIn(idToken: idToken, onSuccess: onAuthenticated)
 
         case .failure(let error):
             if isAppleSignInCancellation(error) {
+                print("[Auth] apple sign-in: cancelled by user")
                 AppLogger.auth.logInfo("apple sign-in cancelled by user")
                 return
             }
-            AppLogger.auth.logWarning("apple sign-in failed reason=\(type(of: error))")
+            let nsError = error as NSError
+            print("[Auth] apple sign-in failed: domain=\(nsError.domain) code=\(nsError.code) description=\(error.localizedDescription)")
+            AppLogger.auth.logWarning("apple sign-in failed domain=\(nsError.domain) code=\(nsError.code) reason=\(type(of: error))")
             AppLogger.auth.logError("apple sign-in error", error: error)
             viewModel.setError(LocalizationKeys.authAppleSignInFailed.localized)
         }

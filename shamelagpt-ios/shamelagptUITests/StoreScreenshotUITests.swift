@@ -75,6 +75,51 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
         XCTAssertTrue(settingsLoaded, "Settings view should load")
         takeScreenshot(name: "settings_main")
 
+        // Donation sheet screenshot
+        let donateButton = app.buttons[UITestID.Settings.donateButton]
+        let donateVisible = donateButton.waitForExistence(timeout: 5) || scrollToElement(donateButton, maxSwipes: 6)
+        if donateVisible && donateButton.isHittable {
+            donateButton.tap()
+
+            // Wait for the sheet navigation bar to appear (title or cancel button)
+            let cancelCandidates = localizedCandidates(for: "common.cancel")
+            var sheetIndicator: XCUIElement?
+            for label in cancelCandidates {
+                let btn = app.buttons.matching(NSPredicate(format: "label == %@", label)).firstMatch
+                if btn.waitForExistence(timeout: 8) {
+                    sheetIndicator = btn
+                    break
+                }
+            }
+            // Fallback: any navigation bar cancel button
+            if sheetIndicator == nil {
+                let navCancel = app.navigationBars.buttons.firstMatch
+                if navCancel.waitForExistence(timeout: 3) {
+                    sheetIndicator = navCancel
+                }
+            }
+
+            if sheetIndicator != nil {
+                // Wait for StoreKit products to load (spinner disappears)
+                let spinner = app.activityIndicators.firstMatch
+                if spinner.exists {
+                    _ = spinner.waitForExistence(timeout: 10)
+                    // Wait for spinner to go away — products loaded
+                    let deadline = Date().addingTimeInterval(10)
+                    while spinner.exists && Date() < deadline {
+                        RunLoop.current.run(until: Date().addingTimeInterval(0.3))
+                    }
+                }
+                // Extra settle time for product rows to render
+                sleep(2)
+                takeScreenshot(name: "settings_donation_sheet")
+                sheetIndicator?.tap()
+                sleep(1)
+            } else {
+                print("⚠️ Donation sheet did not appear — StoreKit products may not be configured")
+            }
+        }
+
         UITestLauncher.launch(
             app: app,
             includeReset: true,
@@ -600,6 +645,19 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
         default:
             return "Unable to sign in. Check your email and password and try again."
         }
+    }
+
+    private func scrollToElement(_ element: XCUIElement, maxSwipes: Int = 6) -> Bool {
+        if element.waitForExistence(timeout: 1), element.isHittable { return true }
+        for _ in 0..<maxSwipes {
+            app.swipeUp()
+            if element.exists, element.isHittable { return true }
+        }
+        return element.exists
+    }
+
+    private func localizedString(_ key: String) -> String {
+        UITestLocalization.localizedString(for: key, language: currentLanguage)
     }
 
     private func jsonString(_ object: Any) -> String {

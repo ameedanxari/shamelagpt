@@ -26,7 +26,7 @@ from PIL import Image, ImageDraw, ImageFile, ImageStat, UnidentifiedImageError
 
 ImageFile.LOAD_TRUNCATED_IMAGES = False
 
-SCREEN_KEYS = ("auth", "chat", "settings", "history", "welcome")
+SCREEN_KEYS = ("auth", "chat", "settings_donation_sheet", "settings", "history", "welcome")
 LOCALES = ("en", "ar", "ur")
 APPEARANCES = ("light", "dark")
 
@@ -35,6 +35,7 @@ APPEARANCES = ("light", "dark")
 class ImageRecord:
     path: Path
     platform: str
+    device_type: str
     screen: str
     locale: str
     appearance: str
@@ -44,7 +45,29 @@ class ImageRecord:
 
     @property
     def group_key(self) -> str:
-        return f"{self.platform}/{self.screen}/{self.locale}/{self.appearance}"
+        return f"{self.platform}/{self.device_type}/{self.screen}/{self.locale}/{self.appearance}"
+
+
+def infer_device_type(path: Path) -> str:
+    """Extract device type from directory path or filename."""
+    # First check directory path (Android style)
+    parts = [p.lower() for p in path.parts]
+    for part in parts:
+        if part in ("phone", "tablet"):
+            return part
+    
+    # Then check filename for iOS device patterns
+    filename = path.name.lower()
+    
+    # iOS phone patterns
+    if any(p in filename for p in ("iphone", "ipod")):
+        return "phone"
+    
+    # iOS tablet patterns
+    if any(p in filename for p in ("ipad", "tablet")):
+        return "tablet"
+    
+    return "unknown"
 
 
 def infer_platform(path: Path) -> str:
@@ -102,6 +125,7 @@ def load_records(image_paths: Iterable[Path]) -> tuple[list[ImageRecord], list[d
 
     for path in image_paths:
         platform = infer_platform(path)
+        device_type = infer_device_type(path)
         screen = infer_screen(path)
         locale = infer_locale(path)
         appearance = infer_appearance(path)
@@ -114,6 +138,7 @@ def load_records(image_paths: Iterable[Path]) -> tuple[list[ImageRecord], list[d
                 ImageRecord(
                     path=path,
                     platform=platform,
+                    device_type=device_type,
                     screen=screen,
                     locale=locale,
                     appearance=appearance,
@@ -187,7 +212,9 @@ def main() -> int:
     image_paths = sorted(
         p
         for p in artifacts_dir.rglob("*.png")
-        if "visual_qc" not in p.parts and "debug" not in p.parts
+        if "visual_qc" not in p.parts 
+        and "debug" not in p.parts
+        and "derived_data" not in p.parts
     )
 
     if not image_paths:

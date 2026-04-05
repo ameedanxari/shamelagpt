@@ -28,14 +28,16 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <StoreKitConfigurationFileReference
+         identifier = "../../ShamelaGPT.storekit">
+      </StoreKitConfigurationFileReference>
       <TestPlans>
          <TestPlanReference
             reference = "container:ShamelaGPT.xctestplan"
             default = "YES">
          </TestPlanReference>
          <TestPlanReference
-            reference = "container:StoreScreenshots.xctestplan"
-            default = "NO">
+            reference = "container:StoreScreenshots.xctestplan">
          </TestPlanReference>
       </TestPlans>
       <Testables>
@@ -83,6 +85,9 @@
             ReferencedContainer = "container:ShamelaGPT.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <StoreKitConfigurationFileReference
+         identifier = "../../ShamelaGPT.storekit">
+      </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

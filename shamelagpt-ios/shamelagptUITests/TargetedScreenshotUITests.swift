@@ -208,6 +208,46 @@ final class TargetedScreenshotUITests: LocalizedUITestCase {
             XCTAssertTrue(settingsView.waitForExistence(timeout: 5))
             
             try captureScreenshot(name: "settings_main_\(currentLocale)_\(appearance == .dark ? "dark" : "light")")
+
+            // Donation sheet screenshot
+            let donateButton = app.buttons[UITestID.Settings.donateButton]
+            var donateVisible = donateButton.waitForExistence(timeout: 5)
+            if !donateVisible {
+                for _ in 0..<6 { app.swipeUp(); if donateButton.exists { donateVisible = true; break } }
+            }
+            if donateVisible && donateButton.isHittable {
+                donateButton.tap()
+
+                // Wait for sheet — try all locale candidates for cancel label
+                let cancelCandidates = localizedCandidates(for: "common.cancel")
+                var cancelBtn: XCUIElement?
+                for label in cancelCandidates {
+                    let btn = app.buttons.matching(NSPredicate(format: "label == %@", label)).firstMatch
+                    if btn.waitForExistence(timeout: 8) { cancelBtn = btn; break }
+                }
+                if cancelBtn == nil {
+                    let navBtn = app.navigationBars.buttons.firstMatch
+                    if navBtn.waitForExistence(timeout: 3) { cancelBtn = navBtn }
+                }
+
+                if cancelBtn != nil {
+                    // Wait for StoreKit spinner to clear
+                    let spinner = app.activityIndicators.firstMatch
+                    if spinner.exists {
+                        let deadline = Date().addingTimeInterval(10)
+                        while spinner.exists && Date() < deadline {
+                            RunLoop.current.run(until: Date().addingTimeInterval(0.3))
+                        }
+                    }
+                    sleep(2)
+                    let appearanceSuffix = appearance == .dark ? "dark" : "light"
+                    try captureScreenshot(name: "settings_donation_sheet_\(currentLocale)_\(appearanceSuffix)")
+                    cancelBtn?.tap()
+                    sleep(1)
+                } else {
+                    print("⚠️ Donation sheet did not appear for locale \(currentLocale) — StoreKit products may not be configured")
+                }
+            }
             app.terminate()
         }
     }
