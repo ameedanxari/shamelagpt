@@ -67,6 +67,19 @@ final class AuthRepositoryImpl: AuthRepository {
         }
     }
 
+    func appleSignIn(request: AppleSignInRequest) async throws -> AuthResponse {
+        do {
+            AppLogger.auth.logDebug("apple sign-in request started")
+            let response = try await apiClient.appleSignIn(request)
+            persistSession(from: response)
+            AppLogger.auth.logInfo("apple sign-in request succeeded")
+            return response
+        } catch {
+            AppLogger.auth.logWarning("apple sign-in request failed reason=\(type(of: error))")
+            throw normalizeError(error)
+        }
+    }
+
     func refreshToken(request: RefreshTokenRequest) async throws -> AuthResponse {
         do {
             AppLogger.auth.logInfo("refresh token request started")

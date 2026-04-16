@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AuthenticationServices
 
 struct AuthView: View {
     @ObservedObject var viewModel: AuthViewModel
@@ -79,6 +80,44 @@ struct AuthView: View {
             .buttonStyle(.secondary)
             .disabled(viewModel.isLoading)
             .accessibilityIdentifier(AccessibilityID.Auth.continueAsGuestButton)
+
+            // Divider
+            HStack {
+                Rectangle().frame(height: 1).foregroundColor(DesignSystem.Colors.textSecondary(colorScheme).opacity(0.3))
+                Text("OR")
+                    .font(DesignSystem.Typography.footnote)
+                    .foregroundColor(DesignSystem.Colors.textSecondary(colorScheme))
+                Rectangle().frame(height: 1).foregroundColor(DesignSystem.Colors.textSecondary(colorScheme).opacity(0.3))
+            }
+            .padding(.vertical, DesignSystem.Spacing.xs)
+
+            // Apple Sign-In button
+            SignInWithAppleButton(
+                viewModel.isLoginMode ? .signIn : .signUp,
+                onRequest: { request in
+                    request.requestedScopes = [.fullName, .email]
+                },
+                onCompletion: { result in
+                    switch result {
+                    case .success(let authorization):
+                        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
+                           let identityTokenData = appleIDCredential.identityToken,
+                           let idToken = String(data: identityTokenData, encoding: .utf8) {
+                            viewModel.appleSignIn(idToken: idToken, onSuccess: onAuthenticated)
+                        } else {
+                            viewModel.errorMessage = "Failed to get Apple ID token"
+                        }
+                    case .failure(let error):
+                        if (error as NSError).code != ASAuthorizationError.canceled.rawValue {
+                            viewModel.errorMessage = error.localizedDescription
+                        }
+                    }
+                }
+            )
+            .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+            .frame(height: 50)
+            .cornerRadius(DesignSystem.CornerRadius.md)
+            .disabled(viewModel.isLoading)
 
             // Toggle mode link
             Button {
