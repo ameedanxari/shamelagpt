@@ -42,6 +42,10 @@ final class APIClient: APIClientProtocol {
 
     private let baseURL: URL
     private let session: URLSession
+    /// Dedicated session for SSE streaming with longer timeouts.
+    /// The RAG pipeline can take 30-60s of processing before the first
+    /// response chunk, which exceeds the default 30s idle timeout.
+    private let streamSession: URLSession
     private let jsonEncoder: JSONEncoder
     private let jsonDecoder: JSONDecoder
     private let authTokenProvider: (() -> String?)?
@@ -54,6 +58,8 @@ final class APIClient: APIClientProtocol {
     private struct Configuration {
         static let baseURLString = "https://shamelagpt.com"
         static let timeoutInterval: TimeInterval = 30.0
+        static let streamTimeoutInterval: TimeInterval = 120.0
+        static let streamResourceTimeout: TimeInterval = 300.0
         static let defaultHeaders = [
             "Content-Type": "application/json",
             "Accept": "application/json"
@@ -80,6 +86,7 @@ final class APIClient: APIClientProtocol {
         let isUITesting = Self.isUITestEnvironment()
         if let providedSession = session {
             self.session = providedSession
+            self.streamSession = providedSession  // tests use same session
         } else if isUITesting {
             let configuration = URLSessionConfiguration.ephemeral
             configuration.timeoutIntervalForRequest = Configuration.timeoutInterval
@@ -88,7 +95,9 @@ final class APIClient: APIClientProtocol {
             configuration.waitsForConnectivity = true
             configuration.protocolClasses = [MockURLProtocol.self]
             AppLogger.network.logInfo("APIClient init - using MockURLProtocol because UI-Testing is enabled, args: \(CommandLine.arguments), env has XCTestConfig: \(ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil)")
-            self.session = URLSession(configuration: configuration)
+            let sess = URLSession(configuration: configuration)
+            self.session = sess
+            self.streamSession = sess  // tests use same session
         } else {
             let configuration = URLSessionConfiguration.default
             configuration.timeoutIntervalForRequest = Configuration.timeoutInterval
@@ -96,6 +105,14 @@ final class APIClient: APIClientProtocol {
             configuration.httpAdditionalHeaders = Configuration.defaultHeaders
             configuration.waitsForConnectivity = true
             self.session = URLSession(configuration: configuration)
+
+            // Separate session for SSE streaming with longer timeouts
+            let streamConfig = URLSessionConfiguration.default
+            streamConfig.timeoutIntervalForRequest = Configuration.streamTimeoutInterval
+            streamConfig.timeoutIntervalForResource = Configuration.streamResourceTimeout
+            streamConfig.httpAdditionalHeaders = Configuration.defaultHeaders
+            streamConfig.waitsForConnectivity = true
+            self.streamSession = URLSession(configuration: streamConfig)
         }
 
         // Configure JSON encoder/decoder
@@ -397,7 +414,7 @@ final class APIClient: APIClientProtocol {
             AppLogger.network.logDebug("SSE request body (first 2000 chars): \(bodyString.prefix(2000))")
         }
 
-        let (bytes, response) = try await session.bytes(for: request)
+        let (bytes, response) = try await streamSession.bytes(for: request)
 
         if let httpResp = response as? HTTPURLResponse {
             AppLogger.network.logInfo("SSE response status: \(httpResp.statusCode)")
