@@ -114,6 +114,20 @@
     <string name="feedback_prompt_message">کیا آپ ہماری ٹیم کو ای میل کے ذریعے فیڈبیک بھیجنا چاہتے ہیں؟</string>
     <string name="feedback_email_subject">شاملہ جی پی ٹی فیڈبیک</string>
 
+    <!-- Donation -->
+    <string name="donate_sheet_title">شاملہ AI کی مدد کریں</string>
+    <string name="donate_sheet_subtitle">اسلامی علم کی تصدیق، غلط معلومات سے لڑنے، اور ایک زیادہ جامع دنیا بنانے میں ہماری مدد کریں۔</string>
+    <string name="donate_footer_android">Google Play سبسکرپشنز خودکار طور پر تجدید ہوتی ہیں۔ آپ Google Play سبسکرپشنز میں کسی بھی وقت منسوخ کر سکتے ہیں۔</string>
+    <string name="donate_load_failed">عطیہ کے اختیارات لوڈ نہیں ہو سکے۔ براہ کرم اپنا کنکشن چیک کریں اور دوبارہ کوشش کریں۔</string>
+    <string name="donate_product_unavailable">عطیہ کا یہ اختیار فی الحال دستیاب نہیں ہے۔</string>
+    <string name="donate_purchase_failed">عطیہ شروع نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="donate_purchase_pending">آپ کا عطیہ زیر التوا ہے۔ ادائیگی مکمل ہونے پر Google Play ہمیں اطلاع دے گا۔</string>
+    <string name="donate_current">موجودہ</string>
+    <string name="donate_current_status">موجودہ عطیہ: %1$s</string>
+    <string name="donate_paypal_title">اس کے بجائے PayPal سے عطیہ دیں</string>
+    <string name="donate_success_title">شکریہ</string>
+    <string name="donate_success_message">آپ کی مدد ہمیں غلط معلومات سے لڑنے اور سب کے لیے درست اسلامی علم کو فروغ دینے میں مدد کرتی ہے۔</string>
+
     <!-- Language Selection -->
     <string name="select_language">زبان منتخب کریں</string>
     <string name="english">English</string>

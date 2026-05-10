@@ -141,6 +141,20 @@
     <string name="feedback_prompt_message">هل ترغب في إرسال ملاحظات عبر البريد إلى فريقنا؟</string>
     <string name="feedback_email_subject">ملاحظات حول شاملة جي بي تي</string>
 
+    <!-- Donation -->
+    <string name="donate_sheet_title">ادعم شاملة AI</string>
+    <string name="donate_sheet_subtitle">ساعدنا في التحقق من المعرفة الإسلامية، ومكافحة المعلومات المضللة، وبناء عالم أكثر شمولاً.</string>
+    <string name="donate_footer_android">تتجدد اشتراكات Google Play تلقائياً. يمكنك الإلغاء في أي وقت من اشتراكات Google Play.</string>
+    <string name="donate_load_failed">تعذّر تحميل خيارات التبرع. يرجى التحقق من اتصالك والمحاولة مجدداً.</string>
+    <string name="donate_product_unavailable">خيار التبرع هذا غير متاح حالياً.</string>
+    <string name="donate_purchase_failed">تعذّر بدء التبرع. يرجى المحاولة مجدداً.</string>
+    <string name="donate_purchase_pending">تبرعك قيد الانتظار. سيبلغنا Google Play عند اكتمال الدفع.</string>
+    <string name="donate_current">الحالي</string>
+    <string name="donate_current_status">التبرع الحالي: %1$s</string>
+    <string name="donate_paypal_title">تبرع عبر PayPal بدلاً من ذلك</string>
+    <string name="donate_success_title">شكراً لك</string>
+    <string name="donate_success_message">دعمك يساعدنا في مكافحة المعلومات المضللة وتعزيز المعرفة الإسلامية الدقيقة للجميع.</string>
+
     <!-- Language Selection -->
     <string name="select_language">اختر اللغة</string>
     <string name="english">English</string>
