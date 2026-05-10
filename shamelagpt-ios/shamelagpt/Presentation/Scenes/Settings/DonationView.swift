@@ -16,6 +16,7 @@ struct DonationView: View {
             ScrollView {
                 VStack(spacing: DesignSystem.Spacing.lg) {
                     headerSection
+                    currentDonationSection
                     if viewModel.isLoading {
                         ProgressView()
                             .padding(.top, DesignSystem.Spacing.xl)
@@ -80,7 +81,8 @@ struct DonationView: View {
             ForEach(viewModel.products, id: \.productIdentifier) { product in
                 DonationTierRow(
                     product: product,
-                    isPurchasing: viewModel.isPurchasing
+                    isPurchasing: viewModel.isPurchasing,
+                    isCurrent: viewModel.isCurrentDonation(product)
                 ) {
                     viewModel.purchase(product)
                 }
@@ -96,6 +98,26 @@ struct DonationView: View {
             .font(DesignSystem.Typography.subheadline)
             .multilineTextAlignment(.center)
             .padding()
+    }
+
+    // MARK: - Current Donation
+
+    @ViewBuilder
+    private var currentDonationSection: some View {
+        if let activeTitle = viewModel.activeDonationTitle() {
+            HStack(spacing: DesignSystem.Spacing.sm) {
+                Image(systemName: "checkmark.seal.fill")
+                    .foregroundColor(.green)
+                Text(String(format: LocalizationKeys.donateCurrentStatus.localized, activeTitle))
+                    .font(DesignSystem.Typography.subheadline.weight(.semibold))
+                    .foregroundColor(DesignSystem.Colors.textPrimary(colorScheme))
+                Spacer(minLength: 0)
+            }
+            .padding()
+            .background(DesignSystem.Colors.surface(colorScheme))
+            .cornerRadius(AppTheme.Layout.cornerRadius)
+            .accessibilityIdentifier("donationCurrentStatus")
+        }
     }
 
     // MARK: - Footer
@@ -122,6 +144,7 @@ struct DonationView: View {
 private struct DonationTierRow: View {
     let product: SKProduct
     let isPurchasing: Bool
+    let isCurrent: Bool
     let onTap: () -> Void
     @Environment(\.colorScheme) private var colorScheme
 
@@ -140,6 +163,18 @@ private struct DonationTierRow: View {
                 Spacer()
                 if isPurchasing {
                     ProgressView()
+                } else if isCurrent {
+                    HStack(spacing: 4) {
+                        Image(systemName: "checkmark")
+                            .font(.caption.weight(.bold))
+                        Text(LocalizationKeys.donateCurrent.localizedKey)
+                    }
+                    .font(DesignSystem.Typography.footnote.weight(.semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, DesignSystem.Spacing.sm)
+                    .padding(.vertical, DesignSystem.Spacing.xs)
+                    .background(Color.green)
+                    .cornerRadius(AppTheme.Layout.cornerRadius)
                 } else {
                     Text(product.localizedPrice)
                         .font(DesignSystem.Typography.body.weight(.semibold))
@@ -154,7 +189,7 @@ private struct DonationTierRow: View {
             .background(DesignSystem.Colors.surface(colorScheme))
             .cornerRadius(AppTheme.Layout.cornerRadius)
         }
-        .disabled(isPurchasing)
+        .disabled(isPurchasing || isCurrent)
         .accessibilityIdentifier("donationTier_\(product.productIdentifier)")
     }
 }

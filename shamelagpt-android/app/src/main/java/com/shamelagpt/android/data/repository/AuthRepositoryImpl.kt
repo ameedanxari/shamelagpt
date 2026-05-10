@@ -14,6 +14,9 @@ import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
 import com.shamelagpt.android.data.remote.dto.RefreshTokenRequest
 import com.shamelagpt.android.domain.repository.AuthRepository
+import com.shamelagpt.android.core.util.Logger
+
+private const val TAG = "AuthRepositoryImpl"
 
 class AuthRepositoryImpl(
     private val authRemoteDataSource: AuthRemoteDataSource,
@@ -40,8 +43,14 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun googleSignIn(idToken: String): Result<AuthResponse> {
+        Logger.i(TAG, "repository google sign-in started")
+        Logger.d(TAG, "repository google sign-in id_token length=${idToken.length}")
         val result = authRemoteDataSource.googleSignIn(GoogleSignInRequest(idToken))
         result.onSuccess { persistSession(it) }
+        result.onFailure { ex ->
+            Logger.w(TAG, "repository google sign-in failed reason=${ex::class.simpleName}")
+            Logger.e(TAG, "repository google sign-in error", ex)
+        }
         return result
     }
 

@@ -33,6 +33,7 @@ coreSplashscreen = "1.2.0"
 materialComponents = "1.13.0"
 credentialManager = "1.5.0-beta01"
 googleid = "1.1.1"
+billing = "8.3.0"
 
 [libraries]
 # Core
@@ -120,10 +121,12 @@ credentials = { group = "androidx.credentials", name = "credentials", version.re
 credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialManager" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 
+# Google Play Billing
+play-billing = { group = "com.android.billingclient", name = "billing", version.ref = "billing" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-

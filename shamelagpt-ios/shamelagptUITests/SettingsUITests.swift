@@ -198,6 +198,43 @@ final class SettingsUITests: LocalizedUITestCase {
         )
     }
 
+    // MARK: - Donation Tests
+
+    func testDonateButtonVisibleInSupportSection() throws {
+        launchToSettings()
+        let donateButton = app.buttons[UITestID.Settings.donateButton]
+        XCTAssertTrue(scrollToElement(donateButton), "Donate button should be visible in Support section")
+    }
+
+    func testDonateButtonOpensDonationSheet() throws {
+        launchToSettings()
+        let donateButton = app.buttons[UITestID.Settings.donateButton]
+        XCTAssertTrue(scrollToElement(donateButton), "Donate button should exist")
+        donateButton.tap()
+
+        // Sheet should appear — look for the cancel button or sheet title
+        let cancelButton = app.buttons[localized("common.cancel")]
+        XCTAssertTrue(
+            cancelButton.waitForExistence(timeout: 5),
+            "Donation sheet should open with a cancel button"
+        )
+    }
+
+    func testDonationSheetCanBeDismissed() throws {
+        launchToSettings()
+        let donateButton = app.buttons[UITestID.Settings.donateButton]
+        XCTAssertTrue(scrollToElement(donateButton))
+        donateButton.tap()
+
+        let cancelButton = app.buttons[localized("common.cancel")]
+        XCTAssertTrue(cancelButton.waitForExistence(timeout: 5))
+        cancelButton.tap()
+
+        // After dismiss, settings should still be visible
+        let languageRow = app.buttons[UITestID.Settings.languageRow]
+        XCTAssertTrue(languageRow.waitForExistence(timeout: 3), "Settings should be visible after dismissing donation sheet")
+    }
+
     // MARK: - About/Legal Tests
 
     func testLegalPagesAccessible() throws {

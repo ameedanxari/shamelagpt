@@ -37,6 +37,12 @@ enum AppLogger {
     /// Logger for authentication operations
     static let auth = Logger(subsystem: subsystem, category: "Auth")
 
+    /// Logger for Sign in with Apple diagnostics
+    static let appleAuth = Logger(subsystem: subsystem, category: LogPrefix.appleAuth)
+
+    /// Logger for Apple donation subscription diagnostics
+    static let appleDonation = Logger(subsystem: subsystem, category: LogPrefix.appleDonation)
+
     /// Logger for persisted session/token lifecycle
     static let session = Logger(subsystem: subsystem, category: "Session")
 
@@ -46,6 +52,13 @@ enum AppLogger {
     // MARK: - Private Properties
 
     private static let subsystem = Bundle.main.bundleIdentifier ?? "com.shamelagpt"
+
+    enum LogPrefix {
+        static let apple = "SGPApple"
+        static let appleAuth = "SGPApple.Auth"
+        static let appleDonation = "SGPApple.Donation"
+        static let authState = "SGPAuth.State"
+    }
 
     static func redactedEmail(_ email: String?) -> String {
         guard let email, !email.isEmpty, let atIndex = email.firstIndex(of: "@"), atIndex > email.startIndex else {
@@ -58,6 +71,23 @@ enum AppLogger {
         guard let value, !value.isEmpty else { return "null" }
         guard value.count > 4 else { return "***" }
         return "***\(value.suffix(4))"
+    }
+
+    static func redactedUserPayloadId(_ user: [String: AnyCodable]) -> String {
+        redactedId(stringValue(from: user, keys: ["id", "uid", "userId", "firebaseUid"]))
+    }
+
+    static func redactedUserPayloadEmail(_ user: [String: AnyCodable]) -> String {
+        redactedEmail(stringValue(from: user, keys: ["email"]))
+    }
+
+    private static func stringValue(from payload: [String: AnyCodable], keys: [String]) -> String? {
+        for key in keys {
+            if let string = payload[key]?.value as? String, !string.isEmpty {
+                return string
+            }
+        }
+        return nil
     }
 }
 
@@ -100,6 +130,34 @@ extension Logger {
             self.fault("[\(fileName):\(line)] \(function) - \(message): \(error.localizedDescription)")
         } else {
             self.fault("[\(fileName):\(line)] \(function) - \(message)")
+        }
+    }
+
+    /// Logs a debug message that begins with a stable prefix for console filtering.
+    func logDebug(prefix: String, _ message: String, file: String = #file, function: String = #function, line: Int = #line) {
+        let fileName = (file as NSString).lastPathComponent
+        self.debug("\(prefix) [\(fileName):\(line)] \(function) - \(message)")
+    }
+
+    /// Logs an info message that begins with a stable prefix for console filtering.
+    func logInfo(prefix: String, _ message: String, file: String = #file, function: String = #function, line: Int = #line) {
+        let fileName = (file as NSString).lastPathComponent
+        self.info("\(prefix) [\(fileName):\(line)] \(function) - \(message)")
+    }
+
+    /// Logs a warning message that begins with a stable prefix for console filtering.
+    func logWarning(prefix: String, _ message: String, file: String = #file, function: String = #function, line: Int = #line) {
+        let fileName = (file as NSString).lastPathComponent
+        self.warning("\(prefix) [\(fileName):\(line)] \(function) - \(message)")
+    }
+
+    /// Logs an error message that begins with a stable prefix for console filtering.
+    func logError(prefix: String, _ message: String, error: Error? = nil, file: String = #file, function: String = #function, line: Int = #line) {
+        let fileName = (file as NSString).lastPathComponent
+        if let error = error {
+            self.error("\(prefix) [\(fileName):\(line)] \(function) - \(message): \(error.localizedDescription)")
+        } else {
+            self.error("\(prefix) [\(fileName):\(line)] \(function) - \(message)")
         }
     }
 }

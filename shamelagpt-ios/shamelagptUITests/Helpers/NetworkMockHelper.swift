@@ -37,6 +37,7 @@ class NetworkMockHelper {
         static let uiTesting = "UI_TESTING"
         static let resetAppState = "RESET_APP_STATE"
         static let skipWelcome = "SKIP_WELCOME"
+        static let authMode = "UITEST_AUTH_MODE"
     }
 
     /// Base environment for UI tests with a successful chat response

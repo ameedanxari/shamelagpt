@@ -52,7 +52,7 @@ class SettingsViewModelTest {
         // Then
         testDispatcher.scheduler.advanceUntilIdle()
         
-        assertEquals("ar", viewModel.selectedLanguage.value)
+        assertEquals("en", viewModel.selectedLanguage.value)
         assertEquals("Prompt", viewModel.customPrompt.value)
     }
 

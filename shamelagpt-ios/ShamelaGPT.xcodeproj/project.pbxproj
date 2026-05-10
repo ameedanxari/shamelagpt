@@ -7,13 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E22B21562F162DA100FF9C77 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2D28BB12EF3E47500AB186F /* UniformTypeIdentifiers.framework */; };
-		E22B21612F162DA100FF9C77 /* FactCheckAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E22B21552F162DA000FF9C77 /* FactCheckAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AA11BB22CC33DD44EE55FF66 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = BB22CC33DD44EE55FF66AA11 /* GoogleSignInSwift */; };
 		E20A4466D14D48E5B208C001 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 4BA0A98F4DEAB2E089B1A001 /* GoogleSignIn */; };
 		E20A4467D14D48E5B208C002 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 7C59C4F7E2A34FDDA1E2E110 /* GoogleSignIn */; };
+		E22B21562F162DA100FF9C77 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2D28BB12EF3E47500AB186F /* UniformTypeIdentifiers.framework */; };
+		E22B21612F162DA100FF9C77 /* FactCheckAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E22B21552F162DA000FF9C77 /* FactCheckAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E2D28BB22EF3E47600AB186F /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2D28BB12EF3E47500AB186F /* UniformTypeIdentifiers.framework */; };
 		E2D28BBE2EF3E47600AB186F /* FactCheckShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E2D28BAF2EF3E47500AB186F /* FactCheckShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E2E5118B2FADBC1F008F6C4D /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2E5118A2FADBC1F008F6C4D /* StoreKit.framework */; };
 		F1AB67148246C02958D2CCBE /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = F10682626469EB36E392DC16 /* GoogleSignIn */; };
 /* End PBXBuildFile section */
 
@@ -71,10 +72,12 @@
 		E2926EDE2F0095C3006A4E37 /* ShamelaGPT.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ShamelaGPT.xctestplan; sourceTree = "<group>"; };
 		E2D28BAF2EF3E47500AB186F /* FactCheckShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FactCheckShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2D28BB12EF3E47500AB186F /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
+		E2E5118A2FADBC1F008F6C4D /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		E2F0A1B12F00C00100A1B2C3 /* StoreScreenshots.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreScreenshots.xctestplan; sourceTree = "<group>"; };
+		E2F1963F2F82704700E8A87C /* ShamelaGPT.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = ShamelaGPT.storekit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-	/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		E1F3A9013B5A9D0F00A1BEEF /* Exceptions for "shamelagpt" folder in "ShamelaGPT" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -148,6 +151,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2E5118B2FADBC1F008F6C4D /* StoreKit.framework in Frameworks */,
 				AA11BB22CC33DD44EE55FF66 /* GoogleSignInSwift in Frameworks */,
 				F1AB67148246C02958D2CCBE /* GoogleSignIn in Frameworks */,
 			);
@@ -183,6 +187,7 @@
 		E24643CC2EBAF683008F6234 = {
 			isa = PBXGroup;
 			children = (
+				E2F1963F2F82704700E8A87C /* ShamelaGPT.storekit */,
 				E2926EDE2F0095C3006A4E37 /* ShamelaGPT.xctestplan */,
 				E2F0A1B12F00C00100A1B2C3 /* StoreScreenshots.xctestplan */,
 				E24643D72EBAF683008F6234 /* shamelagpt */,
@@ -210,6 +215,7 @@
 		E2D28BB02EF3E47500AB186F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E2E5118A2FADBC1F008F6C4D /* StoreKit.framework */,
 				E2D28BB12EF3E47500AB186F /* UniformTypeIdentifiers.framework */,
 			);
 			name = Frameworks;
@@ -503,7 +509,7 @@
 				DEVELOPMENT_TEAM = SSTKXHNR6U;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FactCheckAction/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaGPT";
+				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaAI";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -533,7 +539,7 @@
 				DEVELOPMENT_TEAM = SSTKXHNR6U;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FactCheckAction/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaGPT";
+				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaAI";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -687,8 +693,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SSTKXHNR6U;
 				ENABLE_PREVIEWS = YES;
-					GENERATE_INFOPLIST_FILE = NO;
-					INFOPLIST_FILE = shamelagpt/Info.plist;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = shamelagpt/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -713,8 +719,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SSTKXHNR6U;
 				ENABLE_PREVIEWS = YES;
-					GENERATE_INFOPLIST_FILE = NO;
-					INFOPLIST_FILE = shamelagpt/Info.plist;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = shamelagpt/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -811,7 +817,7 @@
 				DEVELOPMENT_TEAM = SSTKXHNR6U;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FactCheckShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaGPT";
+				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaAI";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -843,7 +849,7 @@
 				DEVELOPMENT_TEAM = SSTKXHNR6U;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FactCheckShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaGPT";
+				INFOPLIST_KEY_CFBundleDisplayName = "Fact Check with ShamelaAI";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (

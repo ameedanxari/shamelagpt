@@ -120,27 +120,6 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
             }
         }
 
-        UITestLauncher.launch(
-            app: app,
-            includeReset: true,
-            overrides: [
-                NetworkMockHelper.LaunchEnvironmentKeys.mockChatError: """
-                {"error":"Network error","status_code":500}
-                """,
-                "SKIP_WELCOME": "1"
-            ],
-            appearance: appearanceArgument
-        )
-
-        let errorChatInput = app.textViews["messageInputField"]
-        XCTAssertTrue(errorChatInput.waitForExistence(timeout: 5))
-        errorChatInput.tap()
-        errorChatInput.typeText(localizedChatErrorPrompt())
-        let errorSendButton = app.buttons["sendButton"]
-        XCTAssertTrue(errorSendButton.waitForExistence(timeout: 3))
-        errorSendButton.tap()
-        sleep(1)
-        takeScreenshot(name: "chat_error")
     }
 
     private func assertNoErrorBanners(context: String) {
@@ -223,7 +202,7 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
         XCTAssertTrue(getStartedButton.waitForExistence(timeout: 5))
     }
 
-    /// Generates screenshots for login and signup authentication screens
+    /// Generates the curated signup authentication screenshot
     func test_storeScreenshots_auth() throws {
         try runAuth(appearance: .light)
         try runAuth(appearance: .dark)
@@ -235,7 +214,8 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
             app: app,
             includeReset: true,
             overrides: [
-                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0"
+                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0",
+                NetworkMockHelper.LaunchEnvironmentKeys.authMode: "signup"
             ],
             appearance: appearanceArgument
         )
@@ -246,173 +226,19 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
         }
         XCTAssertTrue(authGetStartedButton.waitForExistence(timeout: 5))
         authGetStartedButton.tap()
-        
+
         let emailField = app.textFields["emailTextField"]
         XCTAssertTrue(emailField.waitForExistence(timeout: 5))
-        replaceText(in: emailField, with: localizedLoginEmail())
-        
+        emailField.tap()
+        emailField.typeText("abdullah.khan@shamela.app")
+
         let passwordField = app.secureTextFields["passwordTextField"]
-        if passwordField.waitForExistence(timeout: 2) {
-            passwordField.tap()
-            passwordField.typeText("12345678\n")
-        }
+        XCTAssertTrue(passwordField.waitForExistence(timeout: 3))
+        passwordField.tap()
+        passwordField.typeText("12345678\n")
         waitForKeyboardToDismiss()
 
-        takeScreenshot(name: "auth_login")
-
-        UITestLauncher.launch(
-            app: app,
-            includeReset: true,
-            overrides: [
-                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0"
-            ],
-            appearance: appearanceArgument
-        )
-
-        let signupGetStartedButton = app.buttons["GetStartedButton"]
-        if !signupGetStartedButton.isHittable {
-            app.swipeUp()
-        }
-        XCTAssertTrue(signupGetStartedButton.waitForExistence(timeout: 5))
-        signupGetStartedButton.tap()
-
-        let signupToggleButton = app.buttons["toggleModeButton"]
-        XCTAssertTrue(signupToggleButton.waitForExistence(timeout: 3))
-        signupToggleButton.tap()
-
-        let signupEmailField = app.textFields["emailTextField"]
-        XCTAssertTrue(signupEmailField.waitForExistence(timeout: 3))
-        signupEmailField.tap()
-        signupEmailField.typeText("abdullah.khan@shamela.app")
-
-        let signupPasswordField = app.secureTextFields["passwordTextField"]
-        XCTAssertTrue(signupPasswordField.waitForExistence(timeout: 3))
-        signupPasswordField.tap()
-        signupPasswordField.typeText("12345678")
-
-        let displayNameField = app.textFields["displayNameTextField"]
-        XCTAssertTrue(displayNameField.waitForExistence(timeout: 3))
-        displayNameField.tap()
-        displayNameField.typeText(localizedSignupDisplayName() + "\n")
-        waitForKeyboardToDismiss()
         takeScreenshot(name: "auth_signup")
-
-        UITestLauncher.launch(
-            app: app,
-            includeReset: true,
-            overrides: [
-                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0",
-                NetworkMockHelper.LaunchEnvironmentKeys.mockAuthError: invalidLoginCredentialsErrorJSON()
-            ],
-            appearance: appearanceArgument
-        )
-
-        let invalidLoginGetStartedButton = app.buttons["GetStartedButton"]
-        if !invalidLoginGetStartedButton.isHittable {
-            app.swipeUp()
-        }
-        XCTAssertTrue(invalidLoginGetStartedButton.waitForExistence(timeout: 5))
-        invalidLoginGetStartedButton.tap()
-
-        let invalidLoginEmailField = app.textFields["emailTextField"]
-        XCTAssertTrue(invalidLoginEmailField.waitForExistence(timeout: 5))
-        replaceText(in: invalidLoginEmailField, with: localizedLoginEmail())
-
-        let invalidLoginPasswordField = app.secureTextFields["passwordTextField"]
-        XCTAssertTrue(invalidLoginPasswordField.waitForExistence(timeout: 3))
-        invalidLoginPasswordField.tap()
-        invalidLoginPasswordField.typeText("wrong-pass")
-
-        let invalidLoginButton = app.buttons["signInButton"]
-        XCTAssertTrue(invalidLoginButton.waitForExistence(timeout: 3))
-        invalidLoginButton.tap()
-
-        let invalidLoginErrorLabel = app.staticTexts["errorLabel"]
-        XCTAssertTrue(invalidLoginErrorLabel.waitForExistence(timeout: 5))
-        XCTAssertEqual(invalidLoginErrorLabel.label, localizedInvalidCredentialsMessage())
-        takeScreenshot(name: "auth_invalid_credentials")
-
-        UITestLauncher.launch(
-            app: app,
-            includeReset: true,
-            overrides: [
-                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0",
-                NetworkMockHelper.LaunchEnvironmentKeys.mockAuthError: existingEmailSignupErrorJSON()
-            ],
-            appearance: appearanceArgument
-        )
-
-        let existingEmailGetStartedButton = app.buttons["GetStartedButton"]
-        if !existingEmailGetStartedButton.isHittable {
-            app.swipeUp()
-        }
-        XCTAssertTrue(existingEmailGetStartedButton.waitForExistence(timeout: 5))
-        existingEmailGetStartedButton.tap()
-
-        let existingEmailField = app.textFields["emailTextField"]
-        XCTAssertTrue(existingEmailField.waitForExistence(timeout: 5))
-
-        let existingToggleButton = app.buttons["toggleModeButton"]
-        XCTAssertTrue(existingToggleButton.waitForExistence(timeout: 3))
-        existingToggleButton.tap()
-
-        let existingSignupEmailField = app.textFields["emailTextField"]
-        XCTAssertTrue(existingSignupEmailField.waitForExistence(timeout: 3))
-        existingSignupEmailField.tap()
-        existingSignupEmailField.typeText("abdullah.khan@shamela.app")
-
-        let existingPasswordField = app.secureTextFields["passwordTextField"]
-        XCTAssertTrue(existingPasswordField.waitForExistence(timeout: 3))
-        existingPasswordField.tap()
-        existingPasswordField.typeText("12345678")
-
-        let existingDisplayNameField = app.textFields["displayNameTextField"]
-        XCTAssertTrue(existingDisplayNameField.waitForExistence(timeout: 3))
-        existingDisplayNameField.tap()
-        existingDisplayNameField.typeText(localizedSignupDisplayName())
-
-        let signUpButton = app.buttons["signUpButton"]
-        XCTAssertTrue(signUpButton.waitForExistence(timeout: 3))
-        signUpButton.tap()
-
-        let existingEmailErrorLabel = app.staticTexts["errorLabel"]
-        XCTAssertTrue(existingEmailErrorLabel.waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["switchToSignInButton"].exists)
-        takeScreenshot(name: "auth_existing_email")
-
-        UITestLauncher.launch(
-            app: app,
-            includeReset: true,
-            overrides: [
-                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0",
-                NetworkMockHelper.LaunchEnvironmentKeys.mockNetworkError: "1"
-            ],
-            appearance: appearanceArgument
-        )
-
-        let errorGetStartedButton = app.buttons["GetStartedButton"]
-        if !errorGetStartedButton.isHittable {
-            app.swipeUp()
-        }
-        XCTAssertTrue(errorGetStartedButton.waitForExistence(timeout: 5))
-        errorGetStartedButton.tap()
-
-        let errorEmailField = app.textFields["emailTextField"]
-        XCTAssertTrue(errorEmailField.waitForExistence(timeout: 5))
-        replaceText(in: errorEmailField, with: localizedLoginEmail())
-
-        let errorPasswordField = app.secureTextFields["passwordTextField"]
-        XCTAssertTrue(errorPasswordField.waitForExistence(timeout: 3))
-        errorPasswordField.tap()
-        errorPasswordField.typeText("12345678")
-
-        let signInButton = app.buttons["signInButton"]
-        XCTAssertTrue(signInButton.waitForExistence(timeout: 3))
-        signInButton.tap()
-
-        let errorLabel = app.staticTexts["errorLabel"]
-        XCTAssertTrue(errorLabel.waitForExistence(timeout: 5))
-        takeScreenshot(name: "auth_error")
     }
 
     // MARK: - Helper Methods

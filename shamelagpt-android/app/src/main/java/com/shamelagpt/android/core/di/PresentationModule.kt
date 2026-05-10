@@ -4,10 +4,13 @@ import com.shamelagpt.android.core.preferences.PreferencesManager
 import com.shamelagpt.android.core.util.LanguageManager
 import com.shamelagpt.android.core.util.OCRManager
 import com.shamelagpt.android.core.util.VoiceInputManager
+import com.shamelagpt.android.data.billing.GooglePlayDonationBillingService
+import com.shamelagpt.android.domain.billing.DonationBillingService
 import com.shamelagpt.android.domain.usecase.DeleteConversationUseCase
 import com.shamelagpt.android.domain.usecase.GetConversationsUseCase
 import com.shamelagpt.android.presentation.chat.ChatViewModel
 import com.shamelagpt.android.presentation.history.HistoryViewModel
+import com.shamelagpt.android.presentation.settings.DonationViewModel
 import com.shamelagpt.android.presentation.settings.SettingsViewModel
 import com.shamelagpt.android.presentation.welcome.WelcomeViewModel
 import com.shamelagpt.android.presentation.auth.AuthViewModel
@@ -58,6 +61,11 @@ val presentationModule = module {
         OCRManager(androidContext())
     }
 
+    // Google Play Billing for donation subscriptions
+    single<DonationBillingService> {
+        GooglePlayDonationBillingService(androidContext())
+    }
+
     // Use Cases
     factory {
         GetConversationsUseCase(conversationRepository = get())
@@ -98,6 +106,13 @@ val presentationModule = module {
             languageManager = get(),
             authRepository = get(),
             preferencesRepository = get()
+        )
+    }
+
+    // DonationViewModel
+    viewModel {
+        DonationViewModel(
+            billingService = get()
         )
     }
 

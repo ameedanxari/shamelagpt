@@ -22,10 +22,12 @@ struct ShamelaGPTApp: App {
     private let sessionManager: SessionManager
     private let authRepository: AuthRepository
     @StateObject private var startupViewModel: AppStartupViewModel
+    @StateObject private var authViewModel: AuthViewModel
     private let forcedColorScheme: ColorScheme?
 
     @State private var isAuthenticated: Bool
     @State private var isGuest: Bool = false
+    @State private var isPresentingAuth: Bool = false
     @StateObject private var shakeDetector = ShakeDetector()
     @StateObject private var languageManager = LanguageManager.shared
     @State private var showFeedbackPrompt = false
@@ -33,16 +35,19 @@ struct ShamelaGPTApp: App {
     @State private var hasMetMinimumStartupDuration = false
     
     private func presentAuth() {
+        AppLogger.auth.logInfo(
+            prefix: AppLogger.LogPrefix.authState,
+            "event=auth.present requested isAuthenticated=\(isAuthenticated) isGuest=\(isGuest) startupBootstrapping=\(startupViewModel.isBootstrapping)"
+        )
         isAuthenticated = false
-        isGuest = false
-        self.sessionManager.setGuest(false)
+        isPresentingAuth = true
         chatSessionState.resetToNew()
         coordinator.shouldShowWelcome = false
         coordinator.resetTabSelectionToChat()
     }
 
     private var shouldShowStartupRestore: Bool {
-        !isGuest && (!hasMetMinimumStartupDuration || startupViewModel.isBootstrapping)
+        !isPresentingAuth && !isGuest && (!hasMetMinimumStartupDuration || startupViewModel.isBootstrapping)
     }
 
     private func beginStartupGateIfNeeded() {
@@ -170,6 +175,9 @@ struct ShamelaGPTApp: App {
                 sessionManager: resolvedSessionManager,
                 initiallyAuthenticated: initialAuthState
             )
+        )
+        _authViewModel = StateObject(
+            wrappedValue: AuthViewModel(authRepository: resolvedAuthRepository)
         )
     }
 
@@ -454,7 +462,7 @@ struct ShamelaGPTApp: App {
                     StartupRestoreView()
                         .transition(.opacity)
                         .zIndex(2)
-                } else if coordinator.shouldShowWelcome && !isAuthenticated && !isGuest {
+                } else if coordinator.shouldShowWelcome && !isAuthenticated && !isGuest && !isPresentingAuth {
                     // Determine which view to show
                     WelcomeView(
                         onGetStarted: {
@@ -465,6 +473,7 @@ struct ShamelaGPTApp: App {
                         onSkipToChat: {
                             // Enable guest mode and dismiss welcome
                             isGuest = true
+                            isPresentingAuth = false
                             self.sessionManager.setGuest(true)
                             chatSessionState.resetToNew()
                             coordinator.dismissWelcome()
@@ -472,6 +481,39 @@ struct ShamelaGPTApp: App {
                     )
                     .transition(.opacity)
                     .zIndex(1)
+                } else if isPresentingAuth || (!isAuthenticated && !isGuest) {
+                    // Auth screen
+                    AuthView(
+                        viewModel: authViewModel,
+                        onAuthenticated: {
+                            AppLogger.auth.logInfo(
+                                prefix: AppLogger.LogPrefix.authState,
+                                "event=auth.completed previousGuest=\(isGuest)"
+                            )
+                            isAuthenticated = true
+                            isGuest = false
+                            isPresentingAuth = false
+                            self.sessionManager.setGuest(false)
+                            chatSessionState.refreshFromStorage()
+                            coordinator.shouldShowWelcome = false
+                            coordinator.resetTabSelectionToChat()
+                            coordinator.start()
+                        },
+                        onContinueAsGuest: {
+                            AppLogger.auth.logInfo(
+                                prefix: AppLogger.LogPrefix.authState,
+                                "event=auth.continueAsGuest"
+                            )
+                            isAuthenticated = false
+                            isGuest = true
+                            isPresentingAuth = false
+                            self.sessionManager.setGuest(true)
+                            chatSessionState.resetToNew()
+                            coordinator.shouldShowWelcome = false
+                            coordinator.resetTabSelectionToChat()
+                            coordinator.start()
+                        }
+                    )
                 } else if isAuthenticated || isGuest {
                     // Main tab view
                     MainTabView(
@@ -481,9 +523,14 @@ struct ShamelaGPTApp: App {
                         isAuthenticated: isAuthenticated,
                         isGuest: isGuest,
                         onLogout: {
+                            AppLogger.auth.logInfo(
+                                prefix: AppLogger.LogPrefix.authState,
+                                "event=auth.logout requested isAuthenticated=\(isAuthenticated) isGuest=\(isGuest)"
+                            )
                             authRepository.logout()
                             isAuthenticated = false
                             isGuest = false
+                            isPresentingAuth = false
                             self.sessionManager.setGuest(false)
                             chatSessionState.resetToNew()
                             coordinator.shouldShowWelcome = true
@@ -491,27 +538,6 @@ struct ShamelaGPTApp: App {
                         },
                         onRequireAuth: {
                             presentAuth()
-                        }
-                    )
-                } else {
-                    // Auth overlay
-                    AuthView(
-                        viewModel: AuthViewModel(authRepository: authRepository),
-                        onAuthenticated: {
-                            isAuthenticated = true
-                            self.sessionManager.setGuest(false)
-                            chatSessionState.refreshFromStorage()
-                            coordinator.shouldShowWelcome = false
-                            coordinator.resetTabSelectionToChat()
-                            coordinator.start()
-                        },
-                        onContinueAsGuest: {
-                            isGuest = true
-                            self.sessionManager.setGuest(true)
-                            chatSessionState.resetToNew()
-                            coordinator.shouldShowWelcome = false
-                            coordinator.resetTabSelectionToChat()
-                            coordinator.start()
                         }
                     )
                 }
@@ -547,7 +573,7 @@ struct ShamelaGPTApp: App {
                 }
             }
             .onAppear {
-                if !isGuest {
+                if !isGuest && !isPresentingAuth {
                     beginStartupGateIfNeeded()
                     startupViewModel.bootstrap()
                 }
@@ -557,15 +583,24 @@ struct ShamelaGPTApp: App {
             }
             .onChange(of: startupViewModel.isBootstrapping) { doneBootstrapping in
                 guard !doneBootstrapping else { return }
-                guard !isGuest else { return }
+                guard !isGuest, !isPresentingAuth else { return }
                 if startupViewModel.isAuthenticated {
+                    AppLogger.auth.logInfo(
+                        prefix: AppLogger.LogPrefix.authState,
+                        "event=startup.authRestored"
+                    )
                     isAuthenticated = true
                     isGuest = false
+                    isPresentingAuth = false
                     self.sessionManager.setGuest(false)
                     chatSessionState.refreshFromStorage()
                     coordinator.shouldShowWelcome = false
                     coordinator.resetTabSelectionToChat()
                 } else if !isGuest {
+                    AppLogger.auth.logInfo(
+                        prefix: AppLogger.LogPrefix.authState,
+                        "event=startup.unauthenticated"
+                    )
                     isAuthenticated = false
                     coordinator.shouldShowWelcome = true
                     coordinator.resetTabSelectionToChat()

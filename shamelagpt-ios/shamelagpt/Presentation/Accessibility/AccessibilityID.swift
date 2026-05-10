@@ -64,6 +64,7 @@ enum AccessibilityID {
     }
 
     enum Settings {
+        static let donateButton = "DonateButton"
         static let languageRow = "LanguageRow"
         static let customPromptRow = "CustomPromptRow"
         static let preferenceLengthRow = "PreferenceLengthRow"

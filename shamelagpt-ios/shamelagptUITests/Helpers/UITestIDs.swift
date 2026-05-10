@@ -61,6 +61,8 @@ enum UITestID {
         static let aboutRow = "AboutRow"
         static let privacyRow = "PrivacyRow"
         static let termsRow = "TermsRow"
+        static let donateButton = "DonateButton"
+        static func donationTier(_ productID: String) -> String { "donationTier_\(productID)" }
         static func languageOption(_ code: String) -> String { "LanguageOption_\(code)" }
         static func languageCheckmark(_ code: String) -> String { "LanguageSelectedCheckmark_\(code)" }
     }

@@ -206,7 +206,8 @@ final class ChatViewModel: ObservableObject {
     // MARK: - Public Methods
 
     var canToggleModePreference: Bool {
-        !isGuest && authRepository != nil
+        guard !isGuest, let authRepository else { return false }
+        return authRepository.isLoggedIn()
     }
 
     var isFactCheckModeEnabled: Bool {
@@ -221,7 +222,21 @@ final class ChatViewModel: ObservableObject {
     }
 
     func loadModePreference() async {
-        guard let authRepository = authRepository, !isGuest else { return }
+        guard let authRepository else {
+            AppLogger.chat.logDebug("Skipping mode preference load: auth repository unavailable")
+            return
+        }
+        guard !isGuest else {
+            AppLogger.chat.logDebug("Skipping mode preference load: guest session")
+            return
+        }
+        guard authRepository.isLoggedIn() else {
+            AppLogger.auth.logInfo(
+                prefix: AppLogger.LogPrefix.authState,
+                "event=modePreference.load.skipped reason=notAuthenticated"
+            )
+            return
+        }
         isModePreferenceLoading = true
         defer { isModePreferenceLoading = false }
         do {
@@ -229,11 +244,26 @@ final class ChatViewModel: ObservableObject {
             modePreference = response.modePreference
         } catch {
             AppLogger.chat.logWarning("Failed to load mode preference reason=\(type(of: error))")
+            errorMessage = ChatOperationError.warningMessage(for: .modePreference)
         }
     }
 
     func updateModePreference(_ mode: Int) async {
-        guard let authRepository = authRepository, !isGuest else { return }
+        guard let authRepository else {
+            AppLogger.chat.logDebug("Skipping mode preference update: auth repository unavailable")
+            return
+        }
+        guard !isGuest else {
+            AppLogger.chat.logDebug("Skipping mode preference update: guest session")
+            return
+        }
+        guard authRepository.isLoggedIn() else {
+            AppLogger.auth.logInfo(
+                prefix: AppLogger.LogPrefix.authState,
+                "event=modePreference.update.skipped reason=notAuthenticated requestedMode=\(mode)"
+            )
+            return
+        }
         isModePreferenceLoading = true
         defer { isModePreferenceLoading = false }
         do {
@@ -241,6 +271,7 @@ final class ChatViewModel: ObservableObject {
             modePreference = response.modePreference
         } catch {
             AppLogger.chat.logWarning("Failed to update mode preference reason=\(type(of: error))")
+            errorMessage = ChatOperationError.warningMessage(for: .modePreference)
         }
     }
 
@@ -304,10 +335,10 @@ final class ChatViewModel: ObservableObject {
                     // Try to save user message locally if this conversation is local-only or authenticated (so history persists)
                     var shouldSaveAssistant = !isGuestFlow
                     if let chatRepo = Optional(self.chatRepository) {
-                        if let conv = try? await chatRepo.fetchConversation(byId: activeConversationId), conv.isLocalOnly {
+                        if let conv = try await chatRepo.fetchConversation(byId: activeConversationId), conv.isLocalOnly {
                             shouldSaveAssistant = true
                             // Save user message locally so it's persisted for guest local-only conversations
-                            _ = try? await chatRepo.addMessage(
+                            _ = try await chatRepo.addMessage(
                                 toConversation: activeConversationId,
                                 content: messageText,
                                 isUserMessage: true,
@@ -315,7 +346,7 @@ final class ChatViewModel: ObservableObject {
                             )
                         } else if !isGuestFlow {
                             // Authenticated flow: persist user message immediately
-                            _ = try? await chatRepo.addMessage(
+                            _ = try await chatRepo.addMessage(
                                 toConversation: activeConversationId,
                                 content: messageText,
                                 isUserMessage: true,
@@ -332,6 +363,7 @@ final class ChatViewModel: ObservableObject {
                     
                     var assembled = ""
                     var assistantMessageId: String? = nil
+                    var sawDone = false
                     
                     for try await event in stream {
                         switch event {
@@ -352,8 +384,17 @@ final class ChatViewModel: ObservableObject {
                             assembled += piece
                             upsertAssistantMessage(content: assembled, assistantMessageId: &assistantMessageId, activeConversationId: activeConversationId)
                         case .done(let finalAnswer):
+                            sawDone = true
                             if let final = finalAnswer {
                                 assembled = final
+                            }
+                            guard !assembled.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                                throw ChatOperationException(
+                                    operation: .sendMessage,
+                                    code: "E-CHAT-EMPTY-RESPONSE",
+                                    retryable: true,
+                                    description: "Stream completed without response content"
+                                )
                             }
                             if isAwaitingFirstResponseChunk {
                                 isAwaitingFirstResponseChunk = false
@@ -364,16 +405,22 @@ final class ChatViewModel: ObservableObject {
                             await persistThreadIdIfNeeded()
                         case .error(let error):
                             AppLogger.chat.logError("Stream error", error: error)
-                            isAwaitingFirstResponseChunk = false
-                            thinkingMessages.removeAll()
-                            isLoading = false
+                            throw error
                         }
+                    }
+                    if !sawDone {
+                        throw ChatOperationException(
+                            operation: .sendMessage,
+                            code: "E-CHAT-STREAM-INCOMPLETE",
+                            retryable: true,
+                            description: "Stream ended before completion"
+                        )
                     }
 
                     // Stream finished - persist assistant message if needed
                     if shouldSaveAssistant, let assistantId = assistantMessageId, let chatRepo = Optional(self.chatRepository) {
                         if let assistant = messages.first(where: { $0.id == assistantId }) {
-                            _ = try? await chatRepo.addMessage(
+                            _ = try await chatRepo.addMessage(
                                 toConversation: activeConversationId,
                                 content: assistant.content,
                                 isUserMessage: false,
@@ -411,7 +458,7 @@ final class ChatViewModel: ObservableObject {
 
             } catch {
                 AppLogger.chat.logError("Failed to send message", error: error)
-                handleError(error)
+                handleError(error, operation: .sendMessage)
                 isAwaitingFirstResponseChunk = false
                 isLoading = false
                 thinkingMessages.removeAll()
@@ -428,8 +475,15 @@ final class ChatViewModel: ObservableObject {
 
     /// Creates or fetches a conversation for a new outgoing message
     private func ensureConversationForSend(firstMessage: String) async throws -> String {
-        if let existingId = conversationId,
-           let existingConversation = try? await chatRepository.fetchConversation(byId: existingId) {
+        if let existingId = conversationId {
+            guard let existingConversation = try await chatRepository.fetchConversation(byId: existingId) else {
+                throw ChatOperationException(
+                    operation: .loadConversation,
+                    code: "E-CHAT-MISSING-CONVERSATION",
+                    retryable: true,
+                    description: "Conversation not found"
+                )
+            }
             forceGuestForConversation = existingConversation.isLocalOnly
             // If this conversation already has history but no threadId, fall back to server conversation id for continuity
             if threadId == nil,
@@ -438,7 +492,7 @@ final class ChatViewModel: ObservableObject {
                 threadId = existingConversation.threadId ?? existingConversation.id
                 if let tid = threadId {
                     AppLogger.chat.logInfo("ensureConversationForSend - assigning fallback threadId \(tid) for existing conversation \(existingId)")
-                    try? await chatRepository.updateConversationThreadId(id: existingId, threadId: tid)
+                    try await chatRepository.updateConversationThreadId(id: existingId, threadId: tid)
                 }
             }
             AppLogger.chat.logDebug("ensureConversationForSend - reusing conversation \(existingId) threadId:\(threadId ?? "nil")")
@@ -473,12 +527,13 @@ final class ChatViewModel: ObservableObject {
         guard let newThreadId = threadId,
               let conversationId = conversationId else { return }
         do {
-            if let conversation = try await chatRepository.fetchConversation(byId: conversationId) {
+            if try await chatRepository.fetchConversation(byId: conversationId) != nil {
                 try await chatRepository.updateConversationThreadId(id: conversationId, threadId: newThreadId)
                 AppLogger.chat.logInfo("Persisted threadId \(newThreadId) for conversation \(conversationId)")
             }
         } catch {
             AppLogger.chat.logError("Failed to persist threadId \(threadId ?? "nil") for conversation \(conversationId)", error: error)
+            errorMessage = ChatOperationError.warningMessage(for: .continuity)
         }
     }
 
@@ -539,12 +594,17 @@ final class ChatViewModel: ObservableObject {
                     // Fallback: use server conversation id as thread id when history exists but threadId is missing
                     threadId = conversationId
                     AppLogger.chat.logInfo("loadMessages - threadId missing; defaulting to conversationId for continuity: \(conversationId)")
-                    try? await chatRepository.updateConversationThreadId(id: conversationId, threadId: conversationId)
+                    do {
+                        try await chatRepository.updateConversationThreadId(id: conversationId, threadId: conversationId)
+                    } catch {
+                        AppLogger.chat.logError("Failed to persist fallback threadId", error: error)
+                        errorMessage = ChatOperationError.warningMessage(for: .continuity)
+                    }
                 }
             }
         } catch {
             AppLogger.chat.logError("Failed to load messages", error: error)
-            handleError(error)
+            handleError(error, operation: .loadConversation)
         }
     }
 
@@ -623,6 +683,8 @@ final class ChatViewModel: ObservableObject {
             if let voiceError = error as? VoiceInputError {
                 AppLogger.voiceInput.logWarning("Voice input start failed with VoiceInputError=\(voiceError.userMessageWithCode)")
                 voiceInputError = voiceError
+            } else {
+                errorMessage = error.userFacingMessage
             }
         }
     }
@@ -641,19 +703,15 @@ final class ChatViewModel: ObservableObject {
 
     // MARK: - Error Handling
 
-    private func handleError(_ error: Error) {
+    private func handleError(_ error: Error, operation: ChatOperation = .sendMessage) {
         AppLogger.chat.logError("handleError called with error: \(error)")
         self.error = error
-        if let networkError = error as? NetworkError {
-            errorMessage = networkError.userMessageWithCode
-            if case .httpError(let status) = networkError, status == 401 || status == 403 {
-                requiresAuth = true
-            }
-            AppLogger.chat.logInfo("Set errorMessage from NetworkError with debugCode: \(networkError.debugCode)")
-        } else {
-            errorMessage = error.userFacingMessage
-            AppLogger.chat.logInfo("Set errorMessage from userFacingMessage for error type: \(type(of: error))")
+        let failure = ChatOperationError.from(error, operation: operation)
+        errorMessage = failure.userMessage
+        if failure.requiresAuth {
+            requiresAuth = true
         }
+        AppLogger.chat.logInfo("Set errorMessage from ChatOperationError code=\(failure.debugCode) operation=\(operation)")
         
         // DEBUG: Log error message state for screenshot debugging
         AppLogger.chat.logDebug("ERROR STATE DEBUG - error: \(self.error?.localizedDescription ?? "nil"), errorMessage: \(self.errorMessage ?? "nil"), requiresAuth: \(self.requiresAuth)")
@@ -830,6 +888,8 @@ final class ChatViewModel: ObservableObject {
             AppLogger.ocr.logError("OCR processing failed", error: error)
             if let ocrError = error as? OCRError {
                 self.ocrError = ocrError
+            } else {
+                self.ocrError = .recognitionFailed(error.localizedDescription)
             }
         }
     }
@@ -862,10 +922,19 @@ final class ChatViewModel: ObservableObject {
             return
         }
 
-        guard imageData != nil else {
-            AppLogger.chat.logError("Missing image data for fact-checking", error: nil)
-            return
-        }
+            guard imageData != nil else {
+                AppLogger.chat.logError("Missing image data for fact-checking", error: nil)
+                handleError(
+                    ChatOperationException(
+                        operation: .factCheck,
+                        code: "E-CHAT-FACT-MISSING-IMAGE",
+                        retryable: true,
+                        description: "Missing image data"
+                    ),
+                    operation: .factCheck
+                )
+                return
+            }
 
         AppLogger.chat.logInfo("Sending fact-check message: '\(trimmedText.prefix(50))...' in conversation: \(conversationId ?? "new-conversation")")
 
@@ -935,6 +1004,7 @@ final class ChatViewModel: ObservableObject {
 
                     assembled = ""
                     assistantMessageId = nil
+                    var sawDone = false
 
                     for try await event in stream {
                         switch event {
@@ -952,8 +1022,17 @@ final class ChatViewModel: ObservableObject {
                             assembled += piece
                             upsertAssistantMessage(content: assembled, assistantMessageId: &assistantMessageId, activeConversationId: activeConversationId)
                         case .done(let finalAnswer):
+                            sawDone = true
                             if let final = finalAnswer {
                                 assembled = final
+                            }
+                            guard !assembled.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                                throw ChatOperationException(
+                                    operation: .factCheck,
+                                    code: "E-CHAT-FACT-EMPTY-RESPONSE",
+                                    retryable: true,
+                                    description: "Fact-check stream completed without response content"
+                                )
                             }
                             if isAwaitingFirstResponseChunk {
                                 isAwaitingFirstResponseChunk = false
@@ -963,10 +1042,16 @@ final class ChatViewModel: ObservableObject {
                             isLoading = false
                         case .error(let error):
                             AppLogger.chat.logError("Fact-check stream error", error: error)
-                            isAwaitingFirstResponseChunk = false
-                            thinkingMessages.removeAll()
-                            isLoading = false
+                            throw error
                         }
+                    }
+                    if !sawDone {
+                        throw ChatOperationException(
+                            operation: .factCheck,
+                            code: "E-CHAT-FACT-INCOMPLETE",
+                            retryable: true,
+                            description: "Fact-check stream ended before completion"
+                        )
                     }
 
                     if resolvedImageUrl == nil {
@@ -993,7 +1078,7 @@ final class ChatViewModel: ObservableObject {
 
             // Persist final message
             if let aid = assistantMessageId, let assistant = messages.first(where: { $0.id == aid }) {
-                _ = try? await chatRepository.addMessage(
+                _ = try await chatRepository.addMessage(
                     toConversation: activeConversationId,
                     content: assistant.content,
                     isUserMessage: false,
@@ -1007,7 +1092,7 @@ final class ChatViewModel: ObservableObject {
 
         } catch {
             AppLogger.chat.logError("Fact-check stream failed", error: error)
-            handleError(error)
+            handleError(error, operation: .factCheck)
             isAwaitingFirstResponseChunk = false
             isLoading = false
             thinkingMessages.removeAll()
@@ -1092,7 +1177,20 @@ final class ChatViewModel: ObservableObject {
 
     /// Handles a fact-check payload imported via extension deep link.
     func handleImportedFactCheckIfAvailable() {
-        guard let payload = FactCheckImportManager.shared.consume() else { return }
+        guard let payload = FactCheckImportManager.shared.consume() else {
+            if FactCheckImportManager.shared.consumeImportFailure() {
+                handleError(
+                    ChatOperationException(
+                        operation: .shareImport,
+                        code: "E-CHAT-SHARE-MISSING",
+                        retryable: true,
+                        description: "Missing shared fact-check payload"
+                    ),
+                    operation: .shareImport
+                )
+            }
+            return
+        }
 
         Task {
             let importedText = payload.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""

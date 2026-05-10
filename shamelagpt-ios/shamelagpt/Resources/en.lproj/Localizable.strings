@@ -10,7 +10,7 @@
 "chat" = "Chat";
 "history" = "History";
 "settings" = "Settings";
-"shamelaGPT" = "ShamelaGPT";
+"shamelaGPT" = "ShamelaAI";
 "back" = "Back";
 "done" = "Done";
 "common.cancel" = "Cancel";
@@ -35,6 +35,14 @@
 "chat.viewHistory" = "View History";
 "chat.mode.research" = "Research";
 "chat.mode.factCheck" = "Fact Check";
+"chat.error.sendFailed" = "We could not send your message. Please try again.";
+"chat.error.conversationUnavailable" = "This conversation is unavailable. Please reopen it from History and try again.";
+"chat.error.factCheckFailed" = "We could not complete the fact-check. Please try again.";
+"chat.error.shareImportFailed" = "We could not import the shared content. Please try sharing it again.";
+"chat.error.requestCancelled" = "The request was cancelled. Please try again.";
+"chat.warning.showingSavedMessages" = "Could not refresh from the server. Showing saved messages.";
+"chat.warning.continuityNotSaved" = "Conversation context may not have been saved. Future replies may lose context.";
+"chat.warning.modePreferenceNotSaved" = "Could not sync chat mode. Your last saved mode is still being used.";
 
 // MARK: - History Screen
 
@@ -257,9 +265,9 @@
 "auth.invalidCredentials" = "Unable to sign in. Check your email and password and try again.";
 "auth.emailExistsUseLogin" = "This email is already registered. Please sign in.";
 "auth.signInWithGoogle" = "Sign in with Google";
-"auth.googleSignInFailed" = "Google sign-in failed. Please try again.";
+"auth.googleSignInFailed" = "We couldn’t sign you in with Google. Please try again.";
 "auth.signInWithApple" = "Sign in with Apple";
-"auth.appleSignInFailed" = "Apple sign-in failed. Please try again.";
+"auth.appleSignInFailed" = "We couldn’t sign you in with Apple. Please try again.";
 "auth.orDivider" = "or";
 
 // MARK: - AI Preference Options
@@ -278,3 +286,23 @@
 "settings.pref.focus.practical" = "Practical";
 "settings.pref.focus.theoretical" = "Theoretical";
 "settings.pref.focus.historical" = "Historical";
+
+// MARK: - Donation
+
+"settings.donate" = "❤️ Donate";
+"settings.donate.monthly" = "Monthly";
+"settings.donate.yearly" = "Yearly";
+"settings.donate.amount.1" = "$1/month - Coffee for our researchers";
+"settings.donate.amount.5" = "$5/month - Support daily fact-checking";
+"settings.donate.amount.10" = "$10/month - Help expand our knowledge base";
+"settings.donate.amount.100" = "$100/year - Become a patron of Islamic knowledge";
+"settings.donate.sheet.title" = "Support ShamelaGPT";
+"settings.donate.sheet.subtitle" = "Help us verify Islamic knowledge, fight misinformation, and build a more inclusive world.";
+"settings.donate.footer" = "Subscriptions renew automatically. Cancel anytime in your Apple ID settings.";
+"settings.donate.restore" = "Restore Purchases";
+"settings.donate.success.title" = "Thank You ❤️";
+"settings.donate.success.message" = "Your support helps us fight misinformation and promote accurate Islamic knowledge for everyone.";
+"settings.donate.loadFailed" = "Could not load donation options. Please check your connection and try again.";
+"settings.donate.paymentsDisabled" = "In-app purchases are disabled on this device.";
+"settings.donate.current" = "Current";
+"settings.donate.currentStatus" = "Current donation: %@";

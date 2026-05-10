@@ -69,20 +69,32 @@ final class AuthRepositoryImpl: AuthRepository {
 
     func appleSignIn(request: AppleSignInRequest) async throws -> AuthResponse {
         do {
-            print("[Auth] apple sign-in: repository → APIClient POST /api/auth/apple idTokenLength=\(request.idToken.count)")
-            AppLogger.auth.logDebug("apple sign-in: repository → APIClient POST /api/auth/apple idTokenLength=\(request.idToken.count)")
+            AppLogger.appleAuth.logDebug(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=repository.appleSignIn.apiCall.start endpoint=/api/auth/apple idTokenLength=\(request.idToken.count)"
+            )
             let response = try await apiClient.appleSignIn(request)
+            AppLogger.appleAuth.logDebug(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=repository.appleSignIn.persistSession.start tokenPresent=\(!response.token.isEmpty) refreshTokenPresent=\(!response.refreshToken.isEmpty) expiresIn=\(response.expiresIn)"
+            )
             persistSession(from: response)
-            print("[Auth] apple sign-in: repository succeeded")
-            AppLogger.auth.logInfo("apple sign-in: repository succeeded token=\(response.token.prefix(10))... expiresIn=\(response.expiresIn)")
+            AppLogger.appleAuth.logInfo(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=repository.appleSignIn.success userId=\(AppLogger.redactedUserPayloadId(response.user)) email=\(AppLogger.redactedUserPayloadEmail(response.user)) tokenPresent=\(!response.token.isEmpty) refreshTokenPresent=\(!response.refreshToken.isEmpty) expiresIn=\(response.expiresIn)"
+            )
             return response
         } catch {
             let nsError = error as NSError
-            print("[Auth] apple sign-in: repository failed domain=\(nsError.domain) code=\(nsError.code) message=\(error.localizedDescription)")
-            AppLogger.auth.logWarning("apple sign-in: repository failed domain=\(nsError.domain) code=\(nsError.code) type=\(type(of: error)) message=\(error.localizedDescription)")
+            AppLogger.appleAuth.logWarning(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=repository.appleSignIn.failure domain=\(nsError.domain) code=\(nsError.code) errorType=\(type(of: error)) message=\(error.localizedDescription)"
+            )
             if let networkError = error as? NetworkError {
-                print("[Auth] apple sign-in: NetworkError=\(networkError)")
-                AppLogger.auth.logWarning("apple sign-in: NetworkError=\(networkError)")
+                AppLogger.appleAuth.logWarning(
+                    prefix: AppLogger.LogPrefix.appleAuth,
+                    "event=repository.appleSignIn.networkError detail=\(networkError)"
+                )
             }
             throw normalizeError(error)
         }

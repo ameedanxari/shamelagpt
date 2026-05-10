@@ -30,6 +30,10 @@ final class DonationViewModelTests: XCTestCase {
         XCTAssertFalse(sut.isPurchasing)
         XCTAssertFalse(sut.purchaseSuccess)
         XCTAssertNil(sut.errorMessage)
+        XCTAssertFalse(sut.hasActiveDonation)
+        XCTAssertNil(sut.activeDonationProductID)
+        XCTAssertNil(sut.activeDonationExpirationDate)
+        XCTAssertFalse(sut.isRefreshingDonationStatus)
     }
 
     // MARK: - Product IDs
@@ -53,6 +57,12 @@ final class DonationViewModelTests: XCTestCase {
 
     func testProductIDCountIsFour() {
         XCTAssertEqual(DonationViewModel.productIDs.count, 4)
+    }
+
+    func testAppleDonationLogPrefixIsFilterable() {
+        XCTAssertEqual(AppLogger.LogPrefix.apple, "SGPApple")
+        XCTAssertEqual(AppLogger.LogPrefix.appleDonation, "SGPApple.Donation")
+        XCTAssertTrue(AppLogger.LogPrefix.appleDonation.hasPrefix(AppLogger.LogPrefix.apple))
     }
 
     func testProductIDsContainThreeMonthlyAndOneYearly() {
@@ -103,6 +113,8 @@ final class DonationViewModelTests: XCTestCase {
             LocalizationKeys.donateSuccessMessage,
             LocalizationKeys.donateLoadFailed,
             LocalizationKeys.donatePaymentsDisabled,
+            LocalizationKeys.donateCurrent,
+            LocalizationKeys.donateCurrentStatus,
         ]
         for key in keys {
             XCTAssertFalse(key.isEmpty, "Key should not be empty")
@@ -120,6 +132,8 @@ final class DonationViewModelTests: XCTestCase {
             LocalizationKeys.donateSuccessMessage,
             LocalizationKeys.donateLoadFailed,
             LocalizationKeys.donatePaymentsDisabled,
+            LocalizationKeys.donateCurrent,
+            LocalizationKeys.donateCurrentStatus,
         ]
         for key in keys {
             let resolved = NSLocalizedString(key, bundle: .main, comment: "")

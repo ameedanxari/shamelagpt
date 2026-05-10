@@ -88,7 +88,7 @@ fun ChatScreen(
 
     // Consume one-shot share payload (if app was opened via Android share sheet).
     LaunchedEffect(Unit) {
-        val payload = FactCheckSharePayloadStore.consume()
+        val payload = FactCheckSharePayloadStore.consume(context)
         if (payload == null) return@LaunchedEffect
 
         viewModel.startNewConversationForShare()
@@ -105,6 +105,10 @@ fun ChatScreen(
             viewModel.updateInputText(payload.text)
         } else {
             Logger.w("ChatScreen", "Share payload consumed but no processable text/image found")
+            snackbarHostState.showSnackbar(
+                message = context.getString(R.string.chat_error_share_import_failed),
+                duration = SnackbarDuration.Short
+            )
         }
     }
 

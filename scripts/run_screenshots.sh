@@ -7,8 +7,8 @@ set -euo pipefail
 # Merges store and targeted screenshot generation for iOS + Android.
 #
 # Modes:
-#   store    - full store/AppStore/PlayStore screenshots across all screens
-#   targeted - focused validation by screen/locale/scenario/device
+#   store    - curated App Store / Play Store upload screenshots
+#   targeted - full/default validation, optionally filtered by screen/locale/scenario/device
 #
 # Artifacts:
 #   All outputs are written under <repo>/artifacts so they remain git-ignored.
@@ -63,29 +63,40 @@ print_list_options() {
     echo "  auth_error"
     echo "  chat_happy"
     echo "  chat_error"
+    echo "  settings_donation_sheet"
     echo "  settings_main"
     echo "  history_list"
     echo "  welcome_main"
+    echo ""
+    echo "Curated store scenarios:"
+    echo "  welcome_main"
+    echo "  auth_signup"
+    echo "  chat_happy"
+    echo "  history_list"
+    echo "  settings_main"
+    echo "  settings_donation_sheet"
 }
 
 print_help() {
     echo "Usage: $0 [OPTIONS]"
     echo ""
     echo "MODE OPTIONS:"
-    echo "  --store                  Run full store screenshots"
-    echo "  --targeted               Run targeted screenshot validation"
+    echo "  --store                  Run curated App Store / Play Store upload screenshots"
+    echo "  --targeted               Run full screenshot validation, optionally filtered"
     echo "  --mode <store|targeted>  Explicitly select mode"
     echo ""
     echo "PLATFORM OPTIONS:"
     echo "  --ios                    Run iOS screenshots only"
     echo "  --android                Run Android screenshots only"
     echo ""
-    echo "TARGETED OPTIONS (targeted mode):"
+    echo "FILTER OPTIONS:"
+    echo "  --locale <code>          Limit screenshots to a locale"
+    echo "  --device <type>          Limit screenshots to a device type (phone, tablet)"
+    echo ""
+    echo "FULL VALIDATION OPTIONS (default/targeted mode):"
     echo "  --screen <name>          Target specific screen"
-    echo "  --locale <code>          Target specific locale"
     echo "  --scenario <pattern>     Target specific scenario pattern"
     echo "  --dark-only              Generate dark mode screenshots only"
-    echo "  --device <type>          Target device type (phone, tablet)"
     echo ""
     echo "GENERAL OPTIONS:"
     echo "  --list-options           Show valid screen/locale/device/scenario options"
@@ -93,12 +104,15 @@ print_help() {
     echo "  --help                   Show this help message"
     echo ""
     echo "NOTES:"
+    echo "  - No mode runs the maximum screenshot validation pass"
+    echo "  - --store runs only: welcome_main, auth_signup, chat_happy, history_list, settings_main, settings_donation_sheet"
     echo "  - Outputs are always written under: <repo>/artifacts"
     echo "  - Legacy positional artifacts path argument is ignored intentionally"
     echo ""
     echo "EXAMPLES:"
     echo "  $0 --store"
-    echo "  $0 --store --ios"
+    echo "  $0 --store --ios --locale en"
+    echo "  $0 --android --device phone"
     echo "  $0 --targeted --screen auth --android"
     echo "  $0 --targeted --screen chat --locale en --device phone"
     echo "  $0 --mode targeted --scenario auth_login --dark-only"
@@ -229,11 +243,7 @@ done
 
 # Auto mode selection (if not explicit)
 if [[ -z "$MODE" ]]; then
-    if [[ -n "$TARGET_SCREEN" || -n "$TARGET_LOCALE" || -n "$TARGET_SCENARIO" || "$DARK_ONLY" == true || -n "$TARGET_DEVICE" || "$DRY_RUN" == true ]]; then
-        MODE="targeted"
-    else
-        MODE="store"
-    fi
+    MODE="targeted"
 fi
 
 # Validate mode
@@ -266,8 +276,8 @@ fi
 
 # Guard against unsupported filters in store mode
 if [[ "$MODE" == "store" ]]; then
-    if [[ -n "$TARGET_SCREEN" || -n "$TARGET_LOCALE" || -n "$TARGET_SCENARIO" || "$DARK_ONLY" == true ]]; then
-        echo "Error: --screen/--locale/--scenario/--dark-only require targeted mode."
+    if [[ -n "$TARGET_SCREEN" || -n "$TARGET_SCENARIO" || "$DARK_ONLY" == true ]]; then
+        echo "Error: --screen/--scenario/--dark-only require targeted mode."
         echo "Use: $0 --targeted ..."
         exit 1
     fi
@@ -284,19 +294,22 @@ echo "Platforms: iOS=$RUN_IOS, Android=$RUN_ANDROID"
 if [[ -n "$TARGET_DEVICE" ]]; then
     echo "Target Device: $TARGET_DEVICE"
 fi
-if [[ "$MODE" == "targeted" ]]; then
-    if [[ -n "$TARGET_SCREEN" ]]; then
-        echo "Target Screen: $TARGET_SCREEN"
-    fi
-    if [[ -n "$TARGET_LOCALE" ]]; then
-        echo "Target Locale: $TARGET_LOCALE"
-    fi
-    if [[ -n "$TARGET_SCENARIO" ]]; then
-        echo "Target Scenario: $TARGET_SCENARIO"
-    fi
-    if [[ "$DARK_ONLY" == true ]]; then
-        echo "Dark Mode Only: Yes"
-    fi
+if [[ -n "$TARGET_LOCALE" ]]; then
+    echo "Target Locale: $TARGET_LOCALE"
+fi
+if [[ "$MODE" == "store" ]]; then
+    echo "Store Scenarios: welcome_main, auth_signup, chat_happy, history_list, settings_main, settings_donation_sheet"
+else
+    echo "Validation Scope: full screenshot set"
+fi
+if [[ "$MODE" == "targeted" && -n "$TARGET_SCREEN" ]]; then
+    echo "Target Screen: $TARGET_SCREEN"
+fi
+if [[ "$MODE" == "targeted" && -n "$TARGET_SCENARIO" ]]; then
+    echo "Target Scenario: $TARGET_SCENARIO"
+fi
+if [[ "$MODE" == "targeted" && "$DARK_ONLY" == true ]]; then
+    echo "Dark Mode Only: Yes"
 fi
 echo "Artifacts Directory: $ARTIFACTS_DIR"
 echo "Dry Run: $DRY_RUN"
@@ -472,6 +485,11 @@ run_ios_store_screenshots() {
     echo "== iOS Store Screenshots =="
     echo "============================================"
 
+    local store_locales_label="all"
+    if [[ -n "$TARGET_LOCALE" ]]; then
+        store_locales_label="$TARGET_LOCALE"
+    fi
+
     for device in "${IOS_DEVICES[@]}"; do
         local device_name
         device_name=$(echo "$device" | cut -d',' -f1 | sed 's/name://')
@@ -480,11 +498,21 @@ run_ios_store_screenshots() {
         device_id=$(echo "${AVAILABLE_SIMS:-}" | grep "name:$device_name" | head -1 | grep -o 'id:[^,)]*' | cut -d':' -f2 || echo "$device_name")
 
         echo "--------------------------------------------"
-        echo "Device: $device_name | All Store Scenarios"
+        echo "Device: $device_name | Curated Store Scenarios | Locales: $store_locales_label"
         echo "--------------------------------------------"
+
+        local -a xcode_env
+        xcode_env=(
+            "SCREENSHOT_OUTPUT_DIR=$ARTIFACTS_DIR/ios"
+            "SCREENSHOT_DEVICE=$device_name"
+        )
+        if [[ -n "$TARGET_LOCALE" ]]; then
+            xcode_env+=("UITEST_LANGUAGES=$TARGET_LOCALE")
+        fi
 
         if [[ "$DRY_RUN" == true ]]; then
             echo "[DRY RUN] Would run iOS store screenshots for: $device_name"
+            echo "[DRY RUN] Env: ${xcode_env[*]}"
             echo "[DRY RUN] Command: xcodebuild test -project $ROOT_DIR/shamelagpt-ios/ShamelaGPT.xcodeproj -scheme ShamelaGPT -destination 'platform=iOS Simulator,id=$device_id' -only-testing:ShamelaGPTUITests/StoreScreenshotUITests"
             continue
         fi
@@ -500,10 +528,7 @@ run_ios_store_screenshots() {
         rm -rf "/tmp/screenshots" 2>/dev/null || true
         mkdir -p "/tmp/screenshots"
 
-        if ! env \
-            SCREENSHOT_OUTPUT_DIR="$ARTIFACTS_DIR/ios" \
-            SCREENSHOT_DEVICE="$device_name" \
-            xcodebuild test \
+        if ! env "${xcode_env[@]}" xcodebuild test \
                 -project "$ROOT_DIR/shamelagpt-ios/ShamelaGPT.xcodeproj" \
                 -scheme ShamelaGPT \
                 -destination "platform=iOS Simulator,id=$device_id" \
@@ -679,13 +704,42 @@ setup_android_environment() {
     fi
 
     if [ -n "${ANDROID_HOME:-}" ]; then
-        export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+        # Add platform-tools and emulator to PATH (these are most likely to exist)
+        export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+
+        # Also try cmdline-tools/latest if it exists
+        if [ -d "$ANDROID_HOME/cmdline-tools/latest/bin" ]; then
+            export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+        else
+            # Fallback: try any versioned cmdline-tools directory
+            for cmdline_dir in "$ANDROID_HOME"/cmdline-tools/*/bin; do
+                if [ -d "$cmdline_dir" ]; then
+                    export PATH="$cmdline_dir:$PATH"
+                    break
+                fi
+            done
+        fi
     fi
 
+    # Verify adb is available
     if ! command -v adb >/dev/null 2>&1; then
-        echo "Warning: Android SDK not found (adb missing). Skipping Android screenshots."
-        return 1
+        # If not in PATH, try direct location
+        if [ -f "$ANDROID_HOME/platform-tools/adb" ]; then
+            export PATH="$ANDROID_HOME/platform-tools:$PATH"
+        else
+            echo "Warning: Android SDK not found (adb missing). Skipping Android screenshots."
+            return 1
+        fi
     fi
+
+    # Verify emulator is available
+    if ! command -v emulator >/dev/null 2>&1; then
+        if [ ! -f "$ANDROID_HOME/emulator/emulator" ]; then
+            echo "Warning: Android emulator not found. Skipping Android screenshots."
+            return 1
+        fi
+    fi
+
     return 0
 }
 
@@ -732,7 +786,8 @@ find_or_create_avd() {
         echo "Warning: Android 36 image unavailable; falling back to $image" >&2
     fi
 
-    local desired_sysdir="${image//;/\/}/"
+    local desired_sysdir
+    desired_sysdir="$(printf "%s" "$image" | tr ';' '/')/"
 
     # If AVD exists, ensure it targets the selected image. Recreate when outdated.
     if emulator -list-avds 2>/dev/null | grep -q "^${avd_name}$"; then
@@ -740,6 +795,8 @@ find_or_create_avd() {
         local current_sysdir=""
         if [ -f "$avd_config" ]; then
             current_sysdir="$(awk -F'=' '/^image.sysdir.1/ {gsub(/^ +| +$/, "", $2); print $2; exit}' "$avd_config")"
+            current_sysdir="${current_sysdir#./}"
+            current_sysdir="${current_sysdir%/}/"
         fi
         if [ -n "$current_sysdir" ] && [ "$current_sysdir" = "$desired_sysdir" ]; then
             echo "$avd_name"
@@ -890,6 +947,13 @@ run_android_store_screenshots() {
         devices=("phone" "tablet")
     fi
 
+    local store_locales=()
+    if [[ -n "$TARGET_LOCALE" ]]; then
+        store_locales=("$TARGET_LOCALE")
+    else
+        store_locales=("${ANDROID_LOCALES[@]}")
+    fi
+
     local android_test_timeout_secs="${ANDROID_TEST_TIMEOUT_SECS:-900}"
     for type in "${devices[@]}"; do
         local candidates=()
@@ -901,7 +965,7 @@ run_android_store_screenshots() {
 
         if [[ "$DRY_RUN" == true ]]; then
             echo "[DRY RUN] Would run Android store screenshots for: $type"
-            for locale in "${ANDROID_LOCALES[@]}"; do
+            for locale in "${store_locales[@]}"; do
                 echo "[DRY RUN] Command: ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=$store_class -Pandroid.testInstrumentationRunnerArguments.locale=$locale"
             done
             continue
@@ -939,7 +1003,7 @@ run_android_store_screenshots() {
             continue
         fi
 
-        for locale in "${ANDROID_LOCALES[@]}"; do
+        for locale in "${store_locales[@]}"; do
             echo "Generating Android $type store screenshots for locale: $locale"
 
             if ! ensure_android_target_isolated; then
@@ -948,7 +1012,7 @@ run_android_store_screenshots() {
             fi
 
             local gradle_log="$ARTIFACTS_DIR/debug/android_store_${type}_${locale}.log"
-            local gradle_cmd="cd '$ROOT_DIR/shamelagpt-android' && ANDROID_SERIAL='$ANDROID_SERIAL' ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=$store_class -Pandroid.testInstrumentationRunnerArguments.locale=$locale --info 2>&1 | tee '$gradle_log'"
+            local gradle_cmd="cd '$ROOT_DIR/shamelagpt-android' && ANDROID_SERIAL='$ANDROID_SERIAL' ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=$store_class -Pandroid.testInstrumentationRunnerArguments.locale=$locale -Pshamela.skipAndroidTestCoverage=true --info 2>&1 | tee '$gradle_log'"
 
             if ! run_android_gradle_with_timeout "$android_test_timeout_secs" "$gradle_cmd"; then
                 fail_soft "Android $type store tests failed for locale=$locale"
@@ -1044,7 +1108,7 @@ run_android_targeted_screenshots() {
         if [[ "$DRY_RUN" == true ]]; then
             echo "[DRY RUN] Would run Android targeted screenshots for: $type"
             for locale in "${locales[@]}"; do
-                local dry_gradle_args="-Pandroid.testInstrumentationRunnerArguments.class=$test_class -Pandroid.testInstrumentationRunnerArguments.method=$test_method"
+                local dry_gradle_args="-Pandroid.testInstrumentationRunnerArguments.class=$test_class#$test_method"
                 if [[ "$locale" != "all" ]]; then
                     dry_gradle_args="$dry_gradle_args -Pandroid.testInstrumentationRunnerArguments.locale=$locale"
                 fi
@@ -1100,8 +1164,7 @@ run_android_targeted_screenshots() {
                 continue
             fi
 
-            local gradle_args="-Pandroid.testInstrumentationRunnerArguments.class=$test_class"
-            gradle_args="$gradle_args -Pandroid.testInstrumentationRunnerArguments.method=$test_method"
+            local gradle_args="-Pandroid.testInstrumentationRunnerArguments.class=$test_class#$test_method"
 
             if [[ "$locale" != "all" ]]; then
                 gradle_args="$gradle_args -Pandroid.testInstrumentationRunnerArguments.locale=$locale"
@@ -1116,7 +1179,7 @@ run_android_targeted_screenshots() {
             fi
 
             local gradle_log="$ARTIFACTS_DIR/debug/android_targeted_${type}_${locale_label}.log"
-            local gradle_cmd="cd '$ROOT_DIR/shamelagpt-android' && ANDROID_SERIAL='$ANDROID_SERIAL' ./gradlew :app:connectedDebugAndroidTest $gradle_args --info 2>&1 | tee '$gradle_log'"
+            local gradle_cmd="cd '$ROOT_DIR/shamelagpt-android' && ANDROID_SERIAL='$ANDROID_SERIAL' ./gradlew :app:connectedDebugAndroidTest $gradle_args -Pshamela.skipAndroidTestCoverage=true --info 2>&1 | tee '$gradle_log'"
 
             if ! run_android_gradle_with_timeout "$android_test_timeout_secs" "$gradle_cmd"; then
                 fail_soft "Android $type targeted tests failed for locale=$locale_label"

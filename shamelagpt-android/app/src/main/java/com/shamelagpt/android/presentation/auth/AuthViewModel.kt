@@ -142,16 +142,22 @@ class AuthViewModel(
 
     fun googleSignIn(idToken: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
+            Logger.i(TAG, "google sign-in requested")
+            Logger.d(TAG, "google sign-in id_token length=${idToken.length}")
             _uiState.update { it.copy(isLoading = true, error = null) }
             val result = authRepository.googleSignIn(idToken)
             result.fold(
                 onSuccess = {
+                    Logger.i(TAG, "google sign-in succeeded")
                     onSuccess()
                     _uiState.update { it.copy(isLoading = false) }
                 },
                 onFailure = { ex ->
                     Logger.w(TAG, "google sign-in failed reason=${ex::class.simpleName}")
                     Logger.e(TAG, "google sign-in error", ex)
+                    if (ex is NetworkError) {
+                        Logger.d(TAG, "google sign-in network error detail=${ex.getUserMessage(appContext)}")
+                    }
                     _uiState.update {
                         it.copy(
                             isLoading = false,

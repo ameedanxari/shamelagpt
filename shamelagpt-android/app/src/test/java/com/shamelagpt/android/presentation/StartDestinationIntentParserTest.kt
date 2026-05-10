@@ -135,11 +135,9 @@ class StartDestinationIntentParserTest {
                 scheme = "https",
                 host = "shamelagpt.com",
                 path = "/shared",
-                queryConversationId = "conv-xyz" // note: helper function only queries "id" but we will override below
+                queryChatId = "conv-xyz"
             )
         )
-        // hack: mocking getQueryParameter for chatid
-        every { intent.data?.getQueryParameter("chatid") } returns "conv-xyz"
 
         val route = StartDestinationIntentParser.parse(intent)
 
@@ -178,13 +176,15 @@ class StartDestinationIntentParserTest {
         scheme: String,
         host: String?,
         path: String,
-        queryConversationId: String? = null
+        queryConversationId: String? = null,
+        queryChatId: String? = null
     ): android.net.Uri {
         return mockk {
             every { this@mockk.scheme } returns scheme
             every { this@mockk.host } returns host
             every { this@mockk.path } returns path
             every { getQueryParameter("id") } returns queryConversationId
+            every { getQueryParameter("chatid") } returns queryChatId
         }
     }
 }

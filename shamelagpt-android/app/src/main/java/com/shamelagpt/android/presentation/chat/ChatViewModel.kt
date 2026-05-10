@@ -20,9 +20,9 @@ import com.shamelagpt.android.domain.usecase.SendMessageUseCase
 import com.shamelagpt.android.domain.usecase.StreamMessageUseCase
 import com.shamelagpt.android.domain.usecase.OCRUseCase
 import com.shamelagpt.android.domain.usecase.ConfirmFactCheckUseCase
-import com.shamelagpt.android.data.remote.dto.ChatResponse
-import com.shamelagpt.android.core.error.AppError
-import com.shamelagpt.android.core.error.UserErrorMessage
+import com.shamelagpt.android.core.error.ChatOperation
+import com.shamelagpt.android.core.error.ChatOperationError
+import com.shamelagpt.android.core.error.ChatOperationException
 import com.shamelagpt.android.core.network.NetworkError
 import com.shamelagpt.android.core.preferences.PreferencesManager
 import com.shamelagpt.android.domain.repository.AuthRepository
@@ -88,6 +88,7 @@ class ChatViewModel(
                 _modePreference.value = response.modePreference
             }.onFailure {
                 Logger.e(TAG, "Failed to load mode preference: ${it.message}")
+                _events.send(ChatEvent.ShowToast(ChatOperationError.warning(context, ChatOperation.MODE_PREFERENCE)))
             }
             _isModeLoading.value = false
         }
@@ -102,6 +103,7 @@ class ChatViewModel(
                 _modePreference.value = response.modePreference
             }.onFailure {
                 Logger.e(TAG, "Failed to update mode preference: ${it.message}")
+                _events.send(ChatEvent.ShowToast(ChatOperationError.warning(context, ChatOperation.MODE_PREFERENCE)))
             }
             _isModeLoading.value = false
         }
@@ -206,10 +208,19 @@ class ChatViewModel(
                                     conversationId = normalizedConversationId,
                                     forceRefresh = true
                                 ).onFailure { failure ->
+                                    val warning = ChatOperationError.warning(context, ChatOperation.SYNC_MESSAGES)
                                     Logger.w(
                                         TAG,
                                         "Forced refresh failed for conversationId=${Logger.redactedId(normalizedConversationId)} reason=${failure.message}"
                                     )
+                                    if (messages.isEmpty()) {
+                                        _uiState.update { state ->
+                                            state.copy(error = ChatOperationError.from(context, ChatOperation.SYNC_MESSAGES, failure).userMessage)
+                                        }
+                                        _events.send(ChatEvent.ShowError(ChatOperationError.from(context, ChatOperation.SYNC_MESSAGES, failure).userMessage))
+                                    } else {
+                                        _events.send(ChatEvent.ShowToast(warning))
+                                    }
                                 }
                             }
 
@@ -369,6 +380,7 @@ class ChatViewModel(
                 var assembledContent = ""
                 var assistantMessageId: String? = null
                 var eventCount = 0
+                var sawDone = false
 
                 stream.collect { event ->
                     eventCount++
@@ -415,7 +427,15 @@ class ChatViewModel(
                             }
                         }
                         "done" -> {
+                            sawDone = true
                             val finalContent = event.fullAnswer ?: event.content ?: assembledContent
+                            if (finalContent.isBlank()) {
+                                throw ChatOperationException(
+                                    operation = ChatOperation.SEND_MESSAGE,
+                                    code = "E-CHAT-EMPTY-RESPONSE",
+                                    message = "Stream completed without response content"
+                                )
+                            }
                             ChatFlowDiagnostics.markPhase(
                                 phaseName = "chat.send.persistFinal",
                                 conversationId = actualConversationId,
@@ -445,7 +465,28 @@ class ChatViewModel(
                             _events.send(ChatEvent.MessageSent)
                             _events.send(ChatEvent.ScrollToBottom)
                         }
+                        "error" -> {
+                            throw ChatOperationException(
+                                operation = ChatOperation.SEND_MESSAGE,
+                                code = "E-CHAT-STREAM-BACKEND",
+                                message = event.message ?: event.error ?: event.content ?: "Backend stream error"
+                            )
+                        }
+                        else -> {
+                            throw ChatOperationException(
+                                operation = ChatOperation.SEND_MESSAGE,
+                                code = "E-CHAT-STREAM-UNKNOWN",
+                                message = "Unknown stream event type '${event.type}'"
+                            )
+                        }
                     }
+                }
+                if (!sawDone) {
+                    throw ChatOperationException(
+                        operation = ChatOperation.SEND_MESSAGE,
+                        code = "E-CHAT-STREAM-INCOMPLETE",
+                        message = "Stream ended before completion"
+                    )
                 }
                 val totalMs = SystemClock.elapsedRealtime() - sendStartedAt
                 Logger.i(
@@ -461,11 +502,8 @@ class ChatViewModel(
                     threadId = _uiState.value.threadId,
                     detail = e::class.java.simpleName
                 )
-                val userMessage = when (e) {
-                    is NetworkError -> e.getUserMessageWithCode(context)
-                    is AppError -> UserErrorMessage.format(context, e.getUserMessage(context), e.debugCode)
-                    else -> UserErrorMessage.from(context, e)
-                }
+                val failure = ChatOperationError.from(context, ChatOperation.SEND_MESSAGE, e)
+                val userMessage = failure.userMessage
                 _uiState.update { state ->
                     state.copy(
                         isLoading = false,
@@ -477,8 +515,8 @@ class ChatViewModel(
                     )
                 }
                 
-                val message = when (e) {
-                    is NetworkError.Unauthorized -> {
+                val message = when {
+                    failure.requiresAuth || e is NetworkError.Unauthorized -> {
                         _events.send(ChatEvent.RequireAuth)
                         userMessage
                     }
@@ -830,6 +868,17 @@ class ChatViewModel(
 
         if (imageData == null) {
             Logger.e("ChatVM", "Missing image data for fact-check confirmation")
+            val failure = ChatOperationError.from(
+                context,
+                ChatOperation.FACT_CHECK,
+                ChatOperationException(
+                    operation = ChatOperation.FACT_CHECK,
+                    code = "E-CHAT-FACT-MISSING-IMAGE",
+                    message = "Missing image data"
+                )
+            )
+            _uiState.update { it.copy(error = failure.userMessage, imageInputState = ImageInputState()) }
+            viewModelScope.launch { _events.send(ChatEvent.ShowError(failure.userMessage)) }
             return
         }
 
@@ -905,6 +954,7 @@ class ChatViewModel(
                         var assembledContent = ""
                         var assistantMessageId: String? = null
                         var eventCount = 0
+                        var sawDone = false
 
                         stream.collect { event ->
                             eventCount++
@@ -948,7 +998,15 @@ class ChatViewModel(
                                     }
                                 }
                                 "done" -> {
+                                    sawDone = true
                                     val finalContent = event.fullAnswer ?: event.content ?: assembledContent
+                                    if (finalContent.isBlank()) {
+                                        throw ChatOperationException(
+                                            operation = ChatOperation.FACT_CHECK,
+                                            code = "E-CHAT-FACT-EMPTY-RESPONSE",
+                                            message = "Fact-check stream completed without response content"
+                                        )
+                                    }
                                     ChatFlowDiagnostics.markPhase(
                                         phaseName = "chat.factCheck.persistFinal",
                                         conversationId = actualConversationId,
@@ -976,7 +1034,28 @@ class ChatViewModel(
                                     _events.send(ChatEvent.MessageSent)
                                     _events.send(ChatEvent.ScrollToBottom)
                                 }
+                                "error" -> {
+                                    throw ChatOperationException(
+                                        operation = ChatOperation.FACT_CHECK,
+                                        code = "E-CHAT-FACT-BACKEND",
+                                        message = event.message ?: event.error ?: event.content ?: "Backend fact-check error"
+                                    )
+                                }
+                                else -> {
+                                    throw ChatOperationException(
+                                        operation = ChatOperation.FACT_CHECK,
+                                        code = "E-CHAT-FACT-UNKNOWN",
+                                        message = "Unknown fact-check event type '${event.type}'"
+                                    )
+                                }
                             }
+                        }
+                        if (!sawDone) {
+                            throw ChatOperationException(
+                                operation = ChatOperation.FACT_CHECK,
+                                code = "E-CHAT-FACT-INCOMPLETE",
+                                message = "Fact-check stream ended before completion"
+                            )
                         }
 
                         if (resolvedImageUrl == null) {
@@ -1011,8 +1090,19 @@ class ChatViewModel(
                     threadId = _uiState.value.threadId,
                     detail = e::class.java.simpleName
                 )
-                _uiState.update { it.copy(isLoading = false, error = e.message ?: "Fact-check failed") }
-                _events.send(ChatEvent.ShowError(e.message ?: "Fact-check failed"))
+                val failure = ChatOperationError.from(context, ChatOperation.FACT_CHECK, e)
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = failure.userMessage,
+                        streamingMessage = null,
+                        thinkingMessages = emptyList()
+                    )
+                }
+                if (failure.requiresAuth) {
+                    _events.send(ChatEvent.RequireAuth)
+                }
+                _events.send(ChatEvent.ShowError(failure.userMessage))
                 ChatFlowDiagnostics.clear(detail = "chat.factCheck.error")
             }
         }
@@ -1154,6 +1244,7 @@ class ChatViewModel(
             }
         }.onFailure { error ->
             Logger.w(TAG, "Failed to save continuity token for conversationId=${Logger.redactedId(conversationId)}: ${error.message}")
+            _events.send(ChatEvent.ShowToast(ChatOperationError.warning(context, ChatOperation.CONTINUITY)))
         }
     }
 

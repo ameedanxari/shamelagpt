@@ -690,7 +690,7 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.requestHandler = { urlRequest in
             XCTAssertEqual(urlRequest.url?.path, "/api/auth/me/mode")
             XCTAssertEqual(urlRequest.httpMethod, "PUT")
-            capturedRequestBody = urlRequest.httpBody
+            capturedRequestBody = Self.requestBody(from: urlRequest)
             let response = HTTPURLResponse(url: urlRequest.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
             return (response, responseData)
         }
@@ -704,6 +704,30 @@ final class APIClientTests: XCTestCase {
         let body = try XCTUnwrap(capturedRequestBody)
         let json = try XCTUnwrap(try JSONSerialization.jsonObject(with: body) as? [String: Any])
         XCTAssertEqual(json["mode_preference"] as? Int, 1)
+    }
+
+    private static func requestBody(from request: URLRequest) -> Data? {
+        if let body = request.httpBody {
+            return body
+        }
+        guard let stream = request.httpBodyStream else {
+            return nil
+        }
+        stream.open()
+        defer { stream.close() }
+        let bufferSize = 1024
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+        defer { buffer.deallocate() }
+        var data = Data()
+        while true {
+            let read = stream.read(buffer, maxLength: bufferSize)
+            if read > 0 {
+                data.append(buffer, count: read)
+            } else {
+                break
+            }
+        }
+        return data
     }
 
     // MARK: - Encoding/Decoding Tests

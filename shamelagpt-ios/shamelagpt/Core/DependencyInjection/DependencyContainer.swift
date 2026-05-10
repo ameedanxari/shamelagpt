@@ -102,20 +102,62 @@ class DependencyContainer {
         let isUITesting = Self.isUITestEnvironment()
         AppLogger.network.logInfo("DependencyContainer.registerNetworkLayer - isUITesting: \(isUITesting)")
 
+        var concreteAPIClient: APIClient!
+        let refreshHandler: () async -> Bool = {
+            guard let sessionManager = self.resolve(SessionManager.self),
+                  let refresh = sessionManager.refreshToken(),
+                  !refresh.isEmpty else {
+                AppLogger.auth.logInfo(
+                    prefix: AppLogger.LogPrefix.authState,
+                    "event=request.refresh.skipped reason=noRefreshToken"
+                )
+                return false
+            }
+            do {
+                AppLogger.auth.logInfo(
+                    prefix: AppLogger.LogPrefix.authState,
+                    "event=request.refresh.start"
+                )
+                let response = try await concreteAPIClient.refreshToken(
+                    RefreshTokenRequest(refreshToken: refresh)
+                )
+                sessionManager.saveSession(
+                    token: response.token,
+                    refreshToken: response.refreshToken,
+                    expiresInSeconds: Double(response.expiresIn)
+                )
+                AppLogger.auth.logInfo(
+                    prefix: AppLogger.LogPrefix.authState,
+                    "event=request.refresh.success expiresIn=\(response.expiresIn) refreshTokenPresent=\(!response.refreshToken.isEmpty)"
+                )
+                return true
+            } catch {
+                AppLogger.auth.logWarning(
+                    prefix: AppLogger.LogPrefix.authState,
+                    "event=request.refresh.failure reason=\(type(of: error)) message=\(error.localizedDescription)"
+                )
+                return false
+            }
+        }
+
         if isUITesting {
             // Create a URLSession with mock protocol for testing
             let configuration = URLSessionConfiguration.ephemeral
             configuration.protocolClasses = [MockURLProtocol.self]
             let mockSession = URLSession(configuration: configuration)
             AppLogger.network.logInfo("Using MockURLProtocol for URLSession")
-            apiClient = APIClient(
+            concreteAPIClient = APIClient(
                 session: mockSession,
-                authTokenProvider: { self.resolve(SessionManager.self)?.token() }
+                authTokenProvider: { self.resolve(SessionManager.self)?.token() },
+                authRefreshHandler: refreshHandler
             )
+            apiClient = concreteAPIClient
         } else {
-            apiClient = APIClient(
-                authTokenProvider: { self.resolve(SessionManager.self)?.token() }
+            concreteAPIClient = APIClient(
+                authTokenProvider: { self.resolve(SessionManager.self)?.token() },
+                authRefreshHandler: refreshHandler
             )
+            apiClient = concreteAPIClient
         }
         register(APIClientProtocol.self, instance: apiClient)
     }

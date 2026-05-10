@@ -20,6 +20,10 @@ final class AuthViewModel: ObservableObject {
 
     init(authRepository: AuthRepository) {
         self.authRepository = authRepository
+        if ProcessInfo.processInfo.environment["UI_TESTING"] == "1",
+           ProcessInfo.processInfo.environment["UITEST_AUTH_MODE"]?.lowercased() == "signup" {
+            isLoginMode = false
+        }
     }
 
     func toggleMode() {
@@ -31,11 +35,21 @@ final class AuthViewModel: ObservableObject {
         errorMessage = message
     }
 
+    func clearError() {
+        errorMessage = nil
+    }
+
     func authenticate(onSuccess: @escaping () -> Void) {
         let mode = isLoginMode ? "login" : "signup"
-        AppLogger.auth.logInfo("authenticate requested mode=\(mode)")
+        AppLogger.auth.logInfo(
+            prefix: AppLogger.LogPrefix.authState,
+            "event=form.authenticate.requested mode=\(mode) email=\(AppLogger.redactedEmail(email)) displayNamePresent=\(!displayName.isEmpty)"
+        )
         guard !email.isEmpty, !password.isEmpty else {
-            AppLogger.auth.logWarning("authenticate validation failed: missing required fields")
+            AppLogger.auth.logWarning(
+                prefix: AppLogger.LogPrefix.authState,
+                "event=form.authenticate.validationFailed mode=\(mode) reason=missingRequiredFields emailPresent=\(!email.isEmpty) passwordPresent=\(!password.isEmpty)"
+            )
             errorMessage = "Email and password are required"
             return
         }
@@ -45,12 +59,18 @@ final class AuthViewModel: ObservableObject {
             errorMessage = nil
             do {
                 if isLoginMode {
-                    AppLogger.auth.logDebug("sending login request")
+                    AppLogger.auth.logDebug(
+                        prefix: AppLogger.LogPrefix.authState,
+                        "event=form.login.repositoryCall.start email=\(AppLogger.redactedEmail(email))"
+                    )
                     _ = try await authRepository.login(
                         request: LoginRequest(email: email, password: password)
                     )
                 } else {
-                    AppLogger.auth.logDebug("sending signup request")
+                    AppLogger.auth.logDebug(
+                        prefix: AppLogger.LogPrefix.authState,
+                        "event=form.signup.repositoryCall.start email=\(AppLogger.redactedEmail(email)) displayNamePresent=\(!displayName.isEmpty)"
+                    )
                     _ = try await authRepository.signup(
                         request: SignupRequest(
                             email: email,
@@ -60,11 +80,17 @@ final class AuthViewModel: ObservableObject {
                     )
                 }
                 isLoading = false
-                AppLogger.auth.logInfo("authentication success mode=\(mode)")
+                AppLogger.auth.logInfo(
+                    prefix: AppLogger.LogPrefix.authState,
+                    "event=form.authenticate.success mode=\(mode)"
+                )
                 onSuccess()
             } catch {
                 isLoading = false
-                AppLogger.auth.logWarning("authentication failed mode=\(mode) reason=\(type(of: error))")
+                AppLogger.auth.logWarning(
+                    prefix: AppLogger.LogPrefix.authState,
+                    "event=form.authenticate.failure mode=\(mode) reason=\(type(of: error)) message=\(error.localizedDescription)"
+                )
                 if shouldShowInvalidCredentialsError(error: error, isLoginMode: isLoginMode) {
                     AppLogger.auth.logWarning("login rejected for invalid credentials; showing friendly copy")
                     errorMessage = LocalizationKeys.authInvalidCredentials.localized
@@ -139,35 +165,58 @@ final class AuthViewModel: ObservableObject {
                 isLoading = false
                 AppLogger.auth.logWarning("google sign-in failed reason=\(type(of: error))")
                 AppLogger.auth.logError("google sign-in error", error: error)
-                errorMessage = error.userFacingMessage
+                errorMessage = LocalizationKeys.authGoogleSignInFailed.localized
             }
         }
     }
 
     func appleSignIn(idToken: String, onSuccess: @escaping () -> Void) {
-        print("[Auth] apple sign-in: ViewModel sending to repository idTokenLength=\(idToken.count)")
-        AppLogger.auth.logInfo("apple sign-in: ViewModel sending to repository idTokenLength=\(idToken.count)")
+        AppLogger.appleAuth.logInfo(
+            prefix: AppLogger.LogPrefix.appleAuth,
+            "event=viewModel.appleSignIn.start idTokenLength=\(idToken.count)"
+        )
         Task {
             isLoading = true
             errorMessage = nil
+            AppLogger.appleAuth.logDebug(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=viewModel.appleSignIn.loadingState isLoading=true errorCleared=true"
+            )
             do {
-                AppLogger.auth.logDebug("apple sign-in: calling authRepository.appleSignIn")
+                AppLogger.appleAuth.logDebug(
+                    prefix: AppLogger.LogPrefix.appleAuth,
+                    "event=viewModel.appleSignIn.repositoryCall.start"
+                )
                 _ = try await authRepository.appleSignIn(request: AppleSignInRequest(idToken: idToken))
                 isLoading = false
-                print("[Auth] apple sign-in: success — navigating")
-                AppLogger.auth.logInfo("apple sign-in: success — navigating")
+                AppLogger.appleAuth.logInfo(
+                    prefix: AppLogger.LogPrefix.appleAuth,
+                    "event=viewModel.appleSignIn.success isLoading=false navigate=true"
+                )
                 onSuccess()
             } catch {
                 isLoading = false
                 let nsError = error as NSError
-                print("[Auth] apple sign-in failed: domain=\(nsError.domain) code=\(nsError.code) message=\(error.localizedDescription)")
-                AppLogger.auth.logWarning("apple sign-in failed domain=\(nsError.domain) code=\(nsError.code) reason=\(type(of: error)) message=\(error.localizedDescription)")
+                AppLogger.appleAuth.logWarning(
+                    prefix: AppLogger.LogPrefix.appleAuth,
+                    "event=viewModel.appleSignIn.failure domain=\(nsError.domain) code=\(nsError.code) errorType=\(type(of: error)) message=\(error.localizedDescription)"
+                )
                 if let networkError = error as? NetworkError {
-                    print("[Auth] apple sign-in NetworkError: \(networkError)")
-                    AppLogger.auth.logWarning("apple sign-in NetworkError detail=\(networkError)")
+                    AppLogger.appleAuth.logWarning(
+                        prefix: AppLogger.LogPrefix.appleAuth,
+                        "event=viewModel.appleSignIn.networkError detail=\(networkError)"
+                    )
                 }
-                AppLogger.auth.logError("apple sign-in error", error: error)
-                errorMessage = error.userFacingMessage
+                AppLogger.appleAuth.logError(
+                    prefix: AppLogger.LogPrefix.appleAuth,
+                    "event=viewModel.appleSignIn.error",
+                    error: error
+                )
+                errorMessage = LocalizationKeys.authAppleSignInFailed.localized
+                AppLogger.appleAuth.logDebug(
+                    prefix: AppLogger.LogPrefix.appleAuth,
+                    "event=viewModel.appleSignIn.userFacingError message=\(errorMessage ?? "nil")"
+                )
             }
         }
     }

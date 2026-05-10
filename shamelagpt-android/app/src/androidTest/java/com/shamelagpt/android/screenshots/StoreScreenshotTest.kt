@@ -13,8 +13,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.core.view.drawToBitmap
@@ -30,6 +33,7 @@ import com.shamelagpt.android.presentation.auth.AuthViewModel
 import com.shamelagpt.android.presentation.chat.ChatEvent
 import com.shamelagpt.android.presentation.chat.ChatScreen
 import com.shamelagpt.android.presentation.chat.ChatUiState
+import com.shamelagpt.android.presentation.common.TestTags
 import com.shamelagpt.android.presentation.settings.SettingsScreen
 import com.shamelagpt.android.presentation.history.HistoryScreen
 import com.shamelagpt.android.presentation.welcome.WelcomeScreen
@@ -64,38 +68,16 @@ class StoreScreenshotTest {
 
     private enum class Screen { Chat, Settings, History, Welcome, Auth }
 
-    private val baseScenarios = listOf(
-        Scenario(id = "chat_happy", locale = "en", screen = Screen.Chat, uiState = happyChatState("en")),
-        Scenario(id = "chat_happy", locale = "ar", screen = Screen.Chat, uiState = happyChatState("ar")),
-        Scenario(id = "chat_happy", locale = "ur", screen = Screen.Chat, uiState = happyChatState("ur")),
-        Scenario(id = "chat_error", locale = "en", screen = Screen.Chat, uiState = errorChatState("en")),
-        Scenario(id = "chat_error", locale = "ar", screen = Screen.Chat, uiState = errorChatState("ar")),
-        Scenario(id = "chat_error", locale = "ur", screen = Screen.Chat, uiState = errorChatState("ur")),
-        Scenario(id = "settings_main", locale = "en", screen = Screen.Settings),
-        Scenario(id = "settings_main", locale = "ar", screen = Screen.Settings),
-        Scenario(id = "settings_main", locale = "ur", screen = Screen.Settings),
-        Scenario(id = "history_list", locale = "en", screen = Screen.History),
-        Scenario(id = "history_list", locale = "ar", screen = Screen.History),
-        Scenario(id = "history_list", locale = "ur", screen = Screen.History),
-        Scenario(id = "welcome_main", locale = "en", screen = Screen.Welcome),
-        Scenario(id = "welcome_main", locale = "ar", screen = Screen.Welcome),
-        Scenario(id = "welcome_main", locale = "ur", screen = Screen.Welcome),
-        Scenario(id = "auth_login", locale = "en", screen = Screen.Auth, authUiState = loginAuthState("en")),
-        Scenario(id = "auth_login", locale = "ar", screen = Screen.Auth, authUiState = loginAuthState("ar")),
-        Scenario(id = "auth_login", locale = "ur", screen = Screen.Auth, authUiState = loginAuthState("ur")),
-        Scenario(id = "auth_signup", locale = "en", screen = Screen.Auth, authUiState = signupAuthState("en")),
-        Scenario(id = "auth_signup", locale = "ar", screen = Screen.Auth, authUiState = signupAuthState("ar")),
-        Scenario(id = "auth_signup", locale = "ur", screen = Screen.Auth, authUiState = signupAuthState("ur")),
-        Scenario(id = "auth_invalid_credentials", locale = "en", screen = Screen.Auth, authUiState = invalidCredentialsAuthState("en")),
-        Scenario(id = "auth_invalid_credentials", locale = "ar", screen = Screen.Auth, authUiState = invalidCredentialsAuthState("ar")),
-        Scenario(id = "auth_invalid_credentials", locale = "ur", screen = Screen.Auth, authUiState = invalidCredentialsAuthState("ur")),
-        Scenario(id = "auth_existing_email", locale = "en", screen = Screen.Auth, authUiState = signupExistingEmailState("en")),
-        Scenario(id = "auth_existing_email", locale = "ar", screen = Screen.Auth, authUiState = signupExistingEmailState("ar")),
-        Scenario(id = "auth_existing_email", locale = "ur", screen = Screen.Auth, authUiState = signupExistingEmailState("ur")),
-        Scenario(id = "auth_error", locale = "en", screen = Screen.Auth, authUiState = authErrorState("en")),
-        Scenario(id = "auth_error", locale = "ar", screen = Screen.Auth, authUiState = authErrorState("ar")),
-        Scenario(id = "auth_error", locale = "ur", screen = Screen.Auth, authUiState = authErrorState("ur"))
-    )
+    private val baseScenarios = listOf("en", "ar", "ur").flatMap { locale ->
+        listOf(
+            Scenario(id = "welcome_main", locale = locale, screen = Screen.Welcome),
+            Scenario(id = "auth_signup", locale = locale, screen = Screen.Auth, authUiState = signupAuthState(locale)),
+            Scenario(id = "chat_happy", locale = locale, screen = Screen.Chat, uiState = happyChatState(locale)),
+            Scenario(id = "history_list", locale = locale, screen = Screen.History),
+            Scenario(id = "settings_main", locale = locale, screen = Screen.Settings),
+            Scenario(id = "settings_donation_sheet", locale = locale, screen = Screen.Settings)
+        )
+    }
 
     private val scenarios = baseScenarios.flatMap { scenario ->
         listOf(
@@ -171,12 +153,21 @@ class StoreScreenshotTest {
             scenarioState.value = scenario
 
             composeRule.waitForIdle()
+            prepareScenarioForCapture(scenario)
             val image = captureScenarioBitmap()
             val dir = File(baseDir, "$device/${scenario.locale}/${scenario.screen.name.lowercase()}")
             dir.mkdirs()
             val suffix = if (scenario.isDark) "_dark" else ""
             val file = File(dir, "${scenario.id}$suffix.png")
             saveImage(image, file)
+        }
+    }
+
+    private fun prepareScenarioForCapture(scenario: Scenario) {
+        if (scenario.id == "settings_donation_sheet") {
+            composeRule.onNodeWithTag(TestTags.Settings.List)
+                .performScrollToNode(hasTestTag(TestTags.Settings.SupportItem))
+            composeRule.waitForIdle()
         }
     }
 

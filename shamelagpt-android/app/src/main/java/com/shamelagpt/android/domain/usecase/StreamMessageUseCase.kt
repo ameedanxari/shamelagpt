@@ -1,12 +1,13 @@
 package com.shamelagpt.android.domain.usecase
 
 import android.util.Log
+import com.shamelagpt.android.core.error.ChatOperation
+import com.shamelagpt.android.core.error.ChatOperationException
 import com.shamelagpt.android.data.remote.dto.StreamEvent
 import com.shamelagpt.android.domain.repository.ChatRepository
 import com.shamelagpt.android.domain.repository.ConversationRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.first
 import java.util.Locale
 
 private const val TAG = "StreamMessageUseCase"
@@ -43,6 +44,15 @@ class StreamMessageUseCase(
             throw IllegalArgumentException("Question cannot be empty")
         }
 
+        val existingConversation = conversationId?.let {
+            conversationRepository.getConversationById(it)
+                ?: throw ChatOperationException(
+                    operation = ChatOperation.LOAD_CONVERSATION,
+                    code = "E-CHAT-MISSING-CONVERSATION",
+                    message = "Conversation not found"
+                )
+        }
+
         // Get or create conversation (similar to SendMessageUseCase)
         val actualConversationId = conversationId ?: run {
             Log.d(TAG, "No conversation ID provided, creating new conversation...")
@@ -50,6 +60,18 @@ class StreamMessageUseCase(
             val conversation = conversationRepository.createConversation(title)
             Log.d(TAG, "Created new conversation: ${conversation.id}")
             conversation.id
+        }
+        val resolvedThreadId = if (
+            existingConversation != null &&
+            !existingConversation.isLocalOnly &&
+            existingConversation.threadId.isNullOrBlank() &&
+            conversationRepository.getMessagesByConversationId(existingConversation.id).first().isNotEmpty()
+        ) {
+            Log.d(TAG, "Thread ID missing; defaulting to conversationId for continuity")
+            conversationRepository.updateConversationThread(existingConversation.id, existingConversation.id)
+            existingConversation.id
+        } else {
+            existingConversation?.threadId ?: threadId
         }
 
         // Send message to repository for streaming
@@ -60,7 +82,7 @@ class StreamMessageUseCase(
         val stream = chatRepository.streamMessage(
             question = question,
             conversationId = actualConversationId,
-            threadId = threadId,
+            threadId = resolvedThreadId,
             promptConfig = promptConfig,
             languagePreference = resolvedLanguagePreference,
             customSystemPrompt = customSystemPrompt,

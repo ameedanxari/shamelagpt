@@ -1,10 +1,10 @@
 <resources>
     <!-- App -->
-    <string name="app_name">ShamelaGPT</string>
+    <string name="app_name">ShamelaAI</string>
 
     <!-- Welcome Screen -->
-    <string name="welcome_title">Welcome to ShamelaGPT</string>
-    <string name="welcome_message">ShamelaGPT is built upon the vast and trusted library of Shamela.ws, bringing authentic Islamic knowledge closer to everyone.\n\nOur mission is to make reliable, reference-based information accessible in a natural and conversational way — across languages, backgrounds, and levels of understanding.\n\nWhether you seek deeper insight, quick clarifications, or evidence-backed answers to common misconceptions, ShamelaGPT helps you explore Islam\'s rich heritage with accuracy, respect, and ease.\n\n\"Seek knowledge from the cradle to the grave.\" — Let this be your companion on that journey.</string>
+    <string name="welcome_title">Welcome to ShamelaAI</string>
+    <string name="welcome_message">ShamelaAI is built upon the vast and trusted library of Shamela.ws, bringing authentic Islamic knowledge closer to everyone.\n\nOur mission is to make reliable, reference-based information accessible in a natural and conversational way — across languages, backgrounds, and levels of understanding.\n\nWhether you seek deeper insight, quick clarifications, or evidence-backed answers to common misconceptions, ShamelaAI helps you explore Islam\'s rich heritage with accuracy, respect, and ease.\n\n"Seek knowledge from the cradle to the grave." — Let this be your companion on that journey.</string>
     <string name="welcome_sign_in_title">Sign In for a Better Experience</string>
     <string name="welcome_sign_in_message">Log in to save your conversations, revisit your past questions, and share meaningful discussions with others.\n\nCreating an account also helps us improve your learning experience — personalizing insights, language preferences, and reference trails for you.\n\nSign in now and continue your journey of knowledge with consistency and clarity.</string>
     <string name="get_started">Get Started</string>
@@ -33,18 +33,18 @@
     <string name="google_web_client_id" translatable="false">1056619207445-fr9fddgs6ge4980dl19nd4ksogisft9u.apps.googleusercontent.com</string>
 
     <!-- Chat Screen -->
-    <string name="chat_title">ShamelaGPT</string>
+    <string name="chat_title">ShamelaAI</string>
     <string name="chat_placeholder">Ask a question about Islam...</string>
     <string name="send">Send</string>
     <string name="typing">AI is typing...</string>
     <string name="copy">Copy</string>
     <string name="common_share">Share</string>
-    <string name="share_conversation_title">ShamelaGPT Conversation</string>
+    <string name="share_conversation_title">ShamelaAI Conversation</string>
     <string name="share_messages_count">%1$d messages in this conversation</string>
     <string name="share_last_updated">Last updated: %1$s</string>
     <string name="share_preview">Preview:</string>
     <string name="share_read_full">Read the full conversation:</string>
-    <string name="share_powered_by">Powered by ShamelaGPT - Your Islamic Knowledge Assistant</string>
+    <string name="share_powered_by">Powered by ShamelaAI - Your Islamic Knowledge Assistant</string>
     <string name="copied">Copied to clipboard</string>
     <string name="start_conversation">Start a conversation</string>
     <string name="ask_anything">Ask me anything about Islam or use the camera to fact-check text</string>
@@ -75,9 +75,9 @@
     <string name="settings_language">Language</string>
     <string name="settings_ai_preferences">AI Preferences</string>
     <string name="settings_support">Support</string>
-    <string name="settings_support_shamelagpt">Support ShamelaGPT</string>
+    <string name="settings_support_shamelagpt">Support ShamelaAI</string>
     <string name="settings_about">About</string>
-    <string name="about_shamelagpt_intro">ShamelaGPT is an AI-powered Islamic knowledge assistant built upon the vast and trusted library of Shamela.ws. Our mission is to make reliable, reference-based Islamic knowledge accessible to everyone in a natural and conversational way.\n\nWe combine cutting-edge AI technology with authentic Islamic sources to provide accurate answers, backed by proper references from classical and contemporary Islamic scholarship.</string>
+    <string name="about_shamelagpt_intro">ShamelaAI is an AI-powered Islamic knowledge assistant built upon the vast and trusted library of Shamela.ws. Our mission is to make reliable, reference-based Islamic knowledge accessible to everyone in a natural and conversational way.\n\nWe combine cutting-edge AI technology with authentic Islamic sources to provide accurate answers, backed by proper references from classical and contemporary Islamic scholarship.</string>
     <string name="about_mission_title">Our Mission</string>
     <string name="about_mission">To provide reliable, AI-powered access to authentic Islamic knowledge for research, education, and fact-checking—without replacing scholarship or religious authority.</string>
     <string name="about_mission_point_support">Support students, researchers, educators, and developers</string>
@@ -92,7 +92,7 @@
     <string name="about_vision_point_children">Children and new reverts receive age-appropriate, compassionate explanations</string>
     <string name="about_vision_point_developers">Developers and institutions can build on open, auditable knowledge infrastructure</string>
     <string name="about_goal_title">Our Goal</string>
-    <string name="about_goal">ShamelaGPT was created to help close this gap by offering AI tools grounded in authentic sources, with transparency, traceability, and context at the core.</string>
+    <string name="about_goal">ShamelaAI was created to help close this gap by offering AI tools grounded in authentic sources, with transparency, traceability, and context at the core.</string>
     <string name="about_data_source_title">Data Source</string>
     <string name="about_data_source">All responses are generated using the comprehensive library of Shamela.ws, one of the most trusted and extensive digital Islamic libraries available today.</string>
     <string name="about_data_handling_title">How we handle your data</string>
@@ -145,6 +145,20 @@
     <string name="feedback_prompt_message">Would you like to email feedback to our team?</string>
     <string name="feedback_email_subject">ShamelaGPT Feedback</string>
 
+    <!-- Donation -->
+    <string name="donate_sheet_title">Support ShamelaAI</string>
+    <string name="donate_sheet_subtitle">Help us verify Islamic knowledge, fight misinformation, and build a more inclusive world.</string>
+    <string name="donate_footer_android">Google Play subscriptions renew automatically. You can cancel anytime in Google Play subscriptions.</string>
+    <string name="donate_load_failed">Could not load donation options. Please check your connection and try again.</string>
+    <string name="donate_product_unavailable">This donation option is not available right now.</string>
+    <string name="donate_purchase_failed">Could not start the donation. Please try again.</string>
+    <string name="donate_purchase_pending">Your donation is pending. Google Play will notify us when payment is complete.</string>
+    <string name="donate_current">Current</string>
+    <string name="donate_current_status">Current donation: %1$s</string>
+    <string name="donate_paypal_title">Donate with PayPal instead</string>
+    <string name="donate_success_title">Thank You</string>
+    <string name="donate_success_message">Your support helps us fight misinformation and promote accurate Islamic knowledge for everyone.</string>
+
     <!-- Language Selection -->
     <string name="select_language">Select Language</string>
     <string name="english">English</string>
@@ -191,6 +205,14 @@
     <string name="ocr_error_failed">Text recognition failed. Please try again.</string>
     <string name="ocr_error_image_data_missing">Image data is missing. Please select the image again.</string>
     <string name="offline_mode">You are offline. Messages will be sent when connection is restored.</string>
+    <string name="chat_error_send_failed">We could not send your message. Please try again.</string>
+    <string name="chat_error_conversation_unavailable">This conversation is unavailable. Please reopen it from History and try again.</string>
+    <string name="chat_error_fact_check_failed">We could not complete the fact-check. Please try again.</string>
+    <string name="chat_error_share_import_failed">We could not import the shared content. Please try sharing it again.</string>
+    <string name="chat_error_request_cancelled">The request was cancelled. Please try again.</string>
+    <string name="chat_warning_showing_saved_messages">Could not refresh from the server. Showing saved messages.</string>
+    <string name="chat_warning_continuity_not_saved">Conversation context may not have been saved. Future replies may lose context.</string>
+    <string name="chat_warning_mode_preference_not_saved">Could not sync chat mode. Your last saved mode is still being used.</string>
     
     <!-- Network Error Messages (user-friendly) -->
     <string name="network_no_connection">No internet connection. Please check your network settings.</string>

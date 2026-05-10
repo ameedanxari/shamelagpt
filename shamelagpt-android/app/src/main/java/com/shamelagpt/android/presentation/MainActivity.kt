@@ -156,7 +156,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun parseIntentForStartDestination(intent: Intent?): Any? {
-        FactCheckSharePayloadStore.storeFromIntent(intent)
+        FactCheckSharePayloadStore.storeFromIntent(this, intent)
         return StartDestinationIntentParser.parse(intent)
     }
 

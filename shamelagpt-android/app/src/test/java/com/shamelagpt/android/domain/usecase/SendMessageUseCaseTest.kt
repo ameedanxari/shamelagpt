@@ -1,6 +1,7 @@
 package com.shamelagpt.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
+import com.shamelagpt.android.core.error.ChatOperationException
 import com.shamelagpt.android.core.network.NetworkError
 import com.shamelagpt.android.data.remote.dto.ChatResponse
 import com.shamelagpt.android.mock.MockChatRepository
@@ -50,6 +51,9 @@ class SendMessageUseCaseTest {
         val question = "What is the ruling on prayer?"
         val conversationId = UUID.randomUUID().toString()
         val threadId = "thread_123"
+        conversationRepository.addConversation(
+            TestData.createConversation(id = conversationId, threadId = null)
+        )
 
         // When
         val result = useCase.invoke(question, conversationId, threadId)
@@ -72,6 +76,7 @@ class SendMessageUseCaseTest {
 
         val question = "Language check"
         val conversationId = UUID.randomUUID().toString()
+        conversationRepository.addConversation(TestData.createConversation(id = conversationId))
 
         // When
         useCase.invoke(question, conversationId, threadId = null)
@@ -122,6 +127,7 @@ class SendMessageUseCaseTest {
         // Given
         val question = "Test question"
         val conversationId = UUID.randomUUID().toString()
+        conversationRepository.addConversation(TestData.createConversation(id = conversationId))
 
         // When
         val result = useCase.invoke(question, conversationId, null)
@@ -171,6 +177,9 @@ class SendMessageUseCaseTest {
         val question = "Test question"
         val conversationId = UUID.randomUUID().toString()
         val threadId = "thread_abc123"
+        conversationRepository.addConversation(
+            TestData.createConversation(id = conversationId, threadId = null)
+        )
 
         // When
         useCase.invoke(question, conversationId, threadId)
@@ -184,6 +193,7 @@ class SendMessageUseCaseTest {
         // Given
         val question = "Test question"
         val conversationId = UUID.randomUUID().toString()
+        conversationRepository.addConversation(TestData.createConversation(id = conversationId))
 
         // When
         useCase.invoke(question, conversationId, null, saveUserMessage = true)
@@ -197,6 +207,7 @@ class SendMessageUseCaseTest {
         // Given
         val question = "Test question"
         val conversationId = UUID.randomUUID().toString()
+        conversationRepository.addConversation(TestData.createConversation(id = conversationId))
 
         // When
         useCase.invoke(question, conversationId, null, saveUserMessage = false)
@@ -240,6 +251,7 @@ class SendMessageUseCaseTest {
         val question = "Test question"
         val conversationId = UUID.randomUUID().toString()
         val error = RuntimeException("API Error")
+        conversationRepository.addConversation(TestData.createConversation(id = conversationId))
         chatRepository.sendMessageResult = Result.failure(error)
 
         // When
@@ -256,6 +268,7 @@ class SendMessageUseCaseTest {
         val question = "Test question"
         val conversationId = UUID.randomUUID().toString()
         val networkError = Exception("No internet connection")
+        conversationRepository.addConversation(TestData.createConversation(id = conversationId))
         chatRepository.sendMessageResult = Result.failure(networkError)
 
         // When
@@ -271,6 +284,7 @@ class SendMessageUseCaseTest {
         // Given
         val question = "Test question"
         val conversationId = UUID.randomUUID().toString()
+        conversationRepository.addConversation(TestData.createConversation(id = conversationId))
         val scenarios = listOf(
             MockScenarioId.HTTP_400,
             MockScenarioId.HTTP_401,
@@ -301,6 +315,23 @@ class SendMessageUseCaseTest {
                 else -> assertThat(actualError).isEqualTo(expectedError)
             }
         }
+    }
+
+    @Test
+    fun testInvokeWithMissingExistingConversationFailsBeforeSend() = runTest {
+        // Given
+        val question = "Follow-up question"
+        val conversationId = UUID.randomUUID().toString()
+
+        // When
+        val result = useCase.invoke(question, conversationId, threadId = null)
+
+        // Then
+        assertThat(result.isFailure).isTrue()
+        val error = result.exceptionOrNull()
+        assertThat(error).isInstanceOf(ChatOperationException::class.java)
+        assertThat((error as ChatOperationException).code).isEqualTo("E-CHAT-MISSING-CONVERSATION")
+        assertThat(chatRepository.sendMessageCallCount).isEqualTo(0)
     }
 
     @Test

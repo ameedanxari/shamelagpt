@@ -24,9 +24,16 @@ final class ChatViewModelTests: XCTestCase {
         mockSendMessageUseCase = MockSendMessageUseCase()
         mockChatRepository = MockChatRepository()
         mockAuthRepository = MockAuthRepository()
+        mockAuthRepository.mockIsLoggedIn = true
         mockVoiceInputManager = MockVoiceInputManager()
         mockOCRManager = MockOCRManager()
         cancellables = Set<AnyCancellable>()
+        mockChatRepository.mockConversation = Conversation(
+            id: "test-conversation-id",
+            threadId: nil,
+            title: "Test Conversation",
+            messages: []
+        )
 
         viewModel = ChatViewModel(
             conversationId: "test-conversation-id",
@@ -153,6 +160,54 @@ final class ChatViewModelTests: XCTestCase {
         // Then
         XCTAssertFalse(guestViewModel.canToggleModePreference)
         XCTAssertEqual(guestAuthRepository.getModePreferenceCallCount, 0)
+    }
+
+    func testUnauthenticatedUserDoesNotLoadModePreference() async throws {
+        // Given
+        let unauthenticatedAuthRepository = MockAuthRepository()
+        unauthenticatedAuthRepository.mockIsLoggedIn = false
+        let unauthenticatedViewModel = ChatViewModel(
+            conversationId: "test-conversation-id",
+            sendMessageUseCase: mockSendMessageUseCase,
+            chatRepository: mockChatRepository,
+            apiClient: nil,
+            authRepository: unauthenticatedAuthRepository,
+            isGuest: false,
+            guestSessionId: nil,
+            voiceInputManager: mockVoiceInputManager,
+            ocrManager: mockOCRManager
+        )
+
+        // When
+        try await Task.sleep(nanoseconds: 120_000_000)
+
+        // Then
+        XCTAssertFalse(unauthenticatedViewModel.canToggleModePreference)
+        XCTAssertEqual(unauthenticatedAuthRepository.getModePreferenceCallCount, 0)
+    }
+
+    func testUnauthenticatedUserDoesNotUpdateModePreference() async throws {
+        // Given
+        let unauthenticatedAuthRepository = MockAuthRepository()
+        unauthenticatedAuthRepository.mockIsLoggedIn = false
+        let unauthenticatedViewModel = ChatViewModel(
+            conversationId: "test-conversation-id",
+            sendMessageUseCase: mockSendMessageUseCase,
+            chatRepository: mockChatRepository,
+            apiClient: nil,
+            authRepository: unauthenticatedAuthRepository,
+            isGuest: false,
+            guestSessionId: nil,
+            voiceInputManager: mockVoiceInputManager,
+            ocrManager: mockOCRManager
+        )
+
+        // When
+        await unauthenticatedViewModel.updateModePreference(2)
+
+        // Then
+        XCTAssertEqual(unauthenticatedAuthRepository.setModePreferenceCallCount, 0)
+        XCTAssertEqual(unauthenticatedViewModel.modePreference, 1)
     }
 
     func testSendMessageWithWhitespaceOnlyIsIgnored() async throws {

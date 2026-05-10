@@ -36,7 +36,9 @@ android {
         debug {
             // Enable coverage for unit + androidTest
             enableUnitTestCoverage = true
-            enableAndroidTestCoverage = true
+            enableAndroidTestCoverage = !providers.gradleProperty("shamela.skipAndroidTestCoverage")
+                .map { it.toBoolean() }
+                .getOrElse(false)
         }
     }
     compileOptions {
@@ -208,6 +210,9 @@ dependencies {
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
+
+    // Google Play Billing
+    implementation(libs.play.billing)
 
     // Testing - Unit Tests
     testImplementation(libs.junit)

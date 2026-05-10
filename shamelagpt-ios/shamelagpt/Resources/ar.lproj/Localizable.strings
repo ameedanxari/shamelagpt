@@ -10,7 +10,7 @@
 "chat" = "المحادثة";
 "history" = "السجل";
 "settings" = "الإعدادات";
-"shamelaGPT" = "شاملة جي بي تي";
+"shamelaGPT" = "شاملة اي";
 "back" = "رجوع";
 "done" = "تم";
 "common.cancel" = "إلغاء";
@@ -35,6 +35,14 @@
 "chat.viewHistory" = "عرض السجل";
 "chat.mode.research" = "بحث";
 "chat.mode.factCheck" = "تحقق من الحقائق";
+"chat.error.sendFailed" = "تعذر إرسال رسالتك. يرجى المحاولة مرة أخرى.";
+"chat.error.conversationUnavailable" = "هذه المحادثة غير متاحة. يرجى فتحها من السجل والمحاولة مرة أخرى.";
+"chat.error.factCheckFailed" = "تعذر إكمال التحقق. يرجى المحاولة مرة أخرى.";
+"chat.error.shareImportFailed" = "تعذر استيراد المحتوى المُشارَك. يرجى مشاركته مرة أخرى.";
+"chat.error.requestCancelled" = "تم إلغاء الطلب. يرجى المحاولة مرة أخرى.";
+"chat.warning.showingSavedMessages" = "تعذر التحديث من الخادم. يتم عرض الرسائل المحفوظة.";
+"chat.warning.continuityNotSaved" = "قد لا يكون سياق المحادثة قد حُفظ. قد تفقد الردود القادمة السياق.";
+"chat.warning.modePreferenceNotSaved" = "تعذر مزامنة وضع الدردشة. سيتم استخدام آخر وضع محفوظ.";
 
 // MARK: - History Screen
 
@@ -258,9 +266,9 @@
 "auth.invalidCredentials" = "تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور ثم حاول مرة أخرى.";
 "auth.emailExistsUseLogin" = "هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول.";
 "auth.signInWithGoogle" = "تسجيل الدخول بحساب جوجل";
-"auth.googleSignInFailed" = "فشل تسجيل الدخول بحساب جوجل. يرجى المحاولة مرة أخرى.";
+"auth.googleSignInFailed" = "تعذّر تسجيل الدخول بحساب جوجل. يرجى المحاولة مرة أخرى.";
 "auth.signInWithApple" = "تسجيل الدخول بحساب آبل";
-"auth.appleSignInFailed" = "فشل تسجيل الدخول بحساب آبل. يرجى المحاولة مرة أخرى.";
+"auth.appleSignInFailed" = "تعذّر تسجيل الدخول بحساب آبل. يرجى المحاولة مرة أخرى.";
 "auth.orDivider" = "أو";
 
 "settings.pref.length.title" = "طول الإجابة";
@@ -275,3 +283,23 @@
 "settings.pref.focus.practical" = "عملي";
 "settings.pref.focus.theoretical" = "نظري";
 "settings.pref.focus.historical" = "تاريخي";
+
+// MARK: - Donation
+
+"settings.donate" = "❤️ تبرع";
+"settings.donate.monthly" = "شهري";
+"settings.donate.yearly" = "سنوي";
+"settings.donate.amount.1" = "$1/شهر - قهوة للباحثين لدينا";
+"settings.donate.amount.5" = "$5/شهر - دعم التحقق اليومي من الحقائق";
+"settings.donate.amount.10" = "$10/شهر - مساعدة في توسيع قاعدة المعرفة لدينا";
+"settings.donate.amount.100" = "$100/سنة - اصبح راعياً للمعرفة الإسلامية";
+"settings.donate.sheet.title" = "ادعم شاملة GPT";
+"settings.donate.sheet.subtitle" = "ساعدنا في التحقق من المعرفة الإسلامية، ومكافحة المعلومات المضللة، وبناء عالم أكثر شمولاً.";
+"settings.donate.footer" = "تتجدد الاشتراكات تلقائياً. يمكنك الإلغاء في أي وقت من إعدادات Apple ID.";
+"settings.donate.restore" = "استعادة المشتريات";
+"settings.donate.success.title" = "شكراً لك ❤️";
+"settings.donate.success.message" = "دعمك يساعدنا في مكافحة المعلومات المضللة وتعزيز المعرفة الإسلامية الدقيقة للجميع.";
+"settings.donate.loadFailed" = "تعذّر تحميل خيارات التبرع. يرجى التحقق من اتصالك والمحاولة مجدداً.";
+"settings.donate.paymentsDisabled" = "المشتريات داخل التطبيق معطّلة على هذا الجهاز.";
+"settings.donate.current" = "الحالي";
+"settings.donate.currentStatus" = "التبرع الحالي: %@";

@@ -8,7 +8,7 @@
 "chat" = "گفتگو";
 "history" = "تاریخچہ";
 "settings" = "ترتیبات";
-"shamelaGPT" = "شاملہ جی پی ٹی";
+"shamelaGPT" = "شاملہ AI";
 "back" = "واپس";
 "done" = "ہو گیا";
 "common.cancel" = "منسوخ کریں";
@@ -33,6 +33,14 @@
 "chat.viewHistory" = "تاریخچہ دیکھیں";
 "chat.mode.research" = "تحقیق";
 "chat.mode.factCheck" = "فیکٹ چیک";
+"chat.error.sendFailed" = "آپ کا پیغام نہیں بھیجا جا سکا۔ براہ کرم دوبارہ کوشش کریں۔";
+"chat.error.conversationUnavailable" = "یہ گفتگو دستیاب نہیں ہے۔ براہ کرم اسے ہسٹری سے دوبارہ کھول کر کوشش کریں۔";
+"chat.error.factCheckFailed" = "فیکٹ چیک مکمل نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔";
+"chat.error.shareImportFailed" = "شیئر کیا گیا مواد درآمد نہیں ہو سکا۔ براہ کرم دوبارہ شیئر کریں۔";
+"chat.error.requestCancelled" = "درخواست منسوخ ہو گئی۔ براہ کرم دوبارہ کوشش کریں۔";
+"chat.warning.showingSavedMessages" = "سرور سے تازہ کاری نہیں ہو سکی۔ محفوظ پیغامات دکھائے جا رہے ہیں۔";
+"chat.warning.continuityNotSaved" = "گفتگو کا سیاق محفوظ نہیں ہو سکا۔ آئندہ جوابات میں سیاق ضائع ہو سکتا ہے۔";
+"chat.warning.modePreferenceNotSaved" = "چیٹ موڈ ہم آہنگ نہیں ہو سکا۔ آخری محفوظ موڈ استعمال ہو گا۔";
 
 // MARK: - History Screen
 
@@ -256,9 +264,9 @@
 "auth.invalidCredentials" = "سائن اِن نہیں ہو سکا۔ اپنا ای میل اور پاس ورڈ چیک کریں اور دوبارہ کوشش کریں۔";
 "auth.emailExistsUseLogin" = "یہ ای میل پہلے سے رجسٹرڈ ہے۔ براہ کرم سائن اِن کریں۔";
 "auth.signInWithGoogle" = "گوگل سے سائن اِن کریں";
-"auth.googleSignInFailed" = "گوگل سائن اِن ناکام ہوا۔ براہ کرم دوبارہ کوشش کریں۔";
+"auth.googleSignInFailed" = "گوگل کے ساتھ سائن اِن نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔";
 "auth.signInWithApple" = "ایپل سے سائن اِن کریں";
-"auth.appleSignInFailed" = "ایپل سائن اِن ناکام ہوا۔ براہ کرم دوبارہ کوشش کریں۔";
+"auth.appleSignInFailed" = "ایپل کے ساتھ سائن اِن نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔";
 "auth.orDivider" = "یا";
 
 // MARK: - AI Preference Options
@@ -277,3 +285,23 @@
 "settings.pref.focus.practical" = "عملی";
 "settings.pref.focus.theoretical" = "نظری";
 "settings.pref.focus.historical" = "تاریخی";
+
+// MARK: - Donation
+
+"settings.donate" = "❤️ عطیہ دیں";
+"settings.donate.monthly" = "ماہانہ";
+"settings.donate.yearly" = "سالانہ";
+"settings.donate.amount.1" = "$1/ماہ - ہمارے محققین کے لیے کافی";
+"settings.donate.amount.5" = "$5/ماہ - روزانہ حقیقت جانچ کی حمایت";
+"settings.donate.amount.10" = "$10/ماہ - علم کی بنیاد کو وسعت دینے میں مدد";
+"settings.donate.amount.100" = "$100/سال - اسلامی علم کے سرپرست بنیں";
+"settings.donate.sheet.title" = "شاملہ GPT کی حمایت کریں";
+"settings.donate.sheet.subtitle" = "اسلامی علم کی تصدیق، غلط معلومات سے لڑنے اور ایک زیادہ جامع دنیا بنانے میں ہماری مدد کریں۔";
+"settings.donate.footer" = "سبسکرپشن خودکار طور پر تجدید ہوتی ہے۔ Apple ID ترتیبات میں کسی بھی وقت منسوخ کریں۔";
+"settings.donate.restore" = "خریداری بحال کریں";
+"settings.donate.success.title" = "شکریہ ❤️";
+"settings.donate.success.message" = "آپ کی حمایت ہمیں غلط معلومات سے لڑنے اور سب کے لیے درست اسلامی علم کو فروغ دینے میں مدد کرتی ہے۔";
+"settings.donate.loadFailed" = "عطیہ کے اختیارات لوڈ نہیں ہو سکے۔ براہ کرم اپنا کنکشن چیک کریں اور دوبارہ کوشش کریں۔";
+"settings.donate.paymentsDisabled" = "اس ڈیوائس پر ایپ کے اندر خریداری غیر فعال ہے۔";
+"settings.donate.current" = "موجودہ";
+"settings.donate.currentStatus" = "موجودہ عطیہ: %@";

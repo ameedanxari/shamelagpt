@@ -60,10 +60,21 @@ struct AuthView: View {
                 }
 
                 if let error = viewModel.errorMessage {
-                    Text(error)
-                        .foregroundColor(DesignSystem.Colors.error)
-                        .font(DesignSystem.Typography.subheadline)
-                        .accessibilityIdentifier(AccessibilityID.Auth.errorLabel)
+                    HStack(alignment: .top, spacing: DesignSystem.Spacing.xs) {
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .foregroundColor(DesignSystem.Colors.error)
+                        Text(error)
+                            .foregroundColor(DesignSystem.Colors.error)
+                            .font(DesignSystem.Typography.subheadline)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(DesignSystem.Spacing.sm)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(DesignSystem.Colors.error.opacity(0.08))
+                    .cornerRadius(AppTheme.Layout.cornerRadius)
+                    .accessibilityIdentifier(AccessibilityID.Auth.errorLabel)
                 }
 
                 Button {
@@ -110,12 +121,17 @@ struct AuthView: View {
                 .accessibilityIdentifier(AccessibilityID.Auth.googleSignInButton)
 
                 SignInWithAppleButton(viewModel.isLoginMode ? .signIn : .signUp) { request in
-                    print("[Auth] apple sign-in: button tapped — requesting scopes (isLoading=\(viewModel.isLoading))")
-                    AppLogger.auth.logInfo("apple sign-in: button tapped — requesting scopes")
+                    viewModel.clearError()
+                    AppLogger.appleAuth.logInfo(
+                        prefix: AppLogger.LogPrefix.appleAuth,
+                        "event=view.appleButton.request mode=\(viewModel.isLoginMode ? "signIn" : "signUp") isLoading=\(viewModel.isLoading) scopes=fullName,email"
+                    )
                     request.requestedScopes = [.fullName, .email]
                 } onCompletion: { result in
-                    print("[Auth] apple sign-in: onCompletion fired")
-                    AppLogger.auth.logInfo("apple sign-in: onCompletion fired")
+                    AppLogger.appleAuth.logInfo(
+                        prefix: AppLogger.LogPrefix.appleAuth,
+                        "event=view.appleButton.completion"
+                    )
                     handleAppleSignIn(result)
                 }
                 .signInWithAppleButtonStyle(appleSignInButtonStyle)
@@ -144,7 +160,21 @@ struct AuthView: View {
                 .accessibilityIdentifier(AccessibilityID.Auth.toggleModeButton)
             }
             .padding(DesignSystem.Spacing.lg)
+            .onAppear {
+                applyUITestAuthMode()
+            }
         }
+    }
+
+    private func applyUITestAuthMode() {
+        let environment = ProcessInfo.processInfo.environment
+        guard environment["UI_TESTING"] == "1",
+              environment["UITEST_AUTH_MODE"]?.lowercased() == "signup",
+              viewModel.isLoginMode else {
+            return
+        }
+        viewModel.isLoginMode = false
+        viewModel.errorMessage = nil
     }
 
     private func dismissKeyboard() {
@@ -161,6 +191,7 @@ struct AuthView: View {
     }
 
     private func handleGoogleSignIn() {
+        viewModel.clearError()
         guard let presentingViewController = activePresentingViewController() else {
             AppLogger.auth.logWarning("google sign-in aborted: no presenting view controller")
             viewModel.setError(LocalizationKeys.authGoogleSignInFailed.localized)
@@ -196,45 +227,68 @@ struct AuthView: View {
     }
 
     private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
-        print("[Auth] apple sign-in: ASAuthorization result received")
-        AppLogger.auth.logInfo("apple sign-in: ASAuthorization result received")
+        AppLogger.appleAuth.logInfo(
+            prefix: AppLogger.LogPrefix.appleAuth,
+            "event=view.handleAppleSignIn.resultReceived"
+        )
         switch result {
         case .success(let authorization):
-            print("[Auth] apple sign-in: authorization succeeded, credential type=\(type(of: authorization.credential))")
-            AppLogger.auth.logDebug("apple sign-in: authorization succeeded, credential type=\(type(of: authorization.credential))")
+            AppLogger.appleAuth.logDebug(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=view.handleAppleSignIn.authorizationSuccess credentialType=\(type(of: authorization.credential))"
+            )
             guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-                print("[Auth] apple sign-in failed: unexpected credential type=\(type(of: authorization.credential))")
-                AppLogger.auth.logWarning("apple sign-in failed: unexpected credential type=\(type(of: authorization.credential))")
+                AppLogger.appleAuth.logWarning(
+                    prefix: AppLogger.LogPrefix.appleAuth,
+                    "event=view.handleAppleSignIn.unexpectedCredential credentialType=\(type(of: authorization.credential))"
+                )
                 viewModel.setError(LocalizationKeys.authAppleSignInFailed.localized)
                 return
             }
 
-            print("[Auth] apple sign-in: userID=\(appleIDCredential.user) email=\(appleIDCredential.email ?? "nil") authorizationCode=\(appleIDCredential.authorizationCode != nil ? "present" : "nil")")
-            AppLogger.auth.logDebug("apple sign-in: userID=\(appleIDCredential.user) email=\(appleIDCredential.email ?? "nil") fullName=\(appleIDCredential.fullName?.givenName ?? "nil") authorizationCode=\(appleIDCredential.authorizationCode != nil ? "present" : "nil")")
+            let authorizationCodeState = appleIDCredential.authorizationCode.map { "present(length=\($0.count))" } ?? "nil"
+            let identityTokenState = appleIDCredential.identityToken.map { "present(length=\($0.count))" } ?? "nil"
+            AppLogger.appleAuth.logDebug(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=view.handleAppleSignIn.credential userId=\(AppLogger.redactedId(appleIDCredential.user)) email=\(AppLogger.redactedEmail(appleIDCredential.email)) fullNameGivenPresent=\(appleIDCredential.fullName?.givenName?.isEmpty == false) fullNameFamilyPresent=\(appleIDCredential.fullName?.familyName?.isEmpty == false) identityToken=\(identityTokenState) authorizationCode=\(authorizationCodeState)"
+            )
 
             guard let identityTokenData = appleIDCredential.identityToken,
                   let idToken = String(data: identityTokenData, encoding: .utf8),
                   !idToken.isEmpty else {
-                print("[Auth] apple sign-in failed: missing identity token — identityToken=\(appleIDCredential.identityToken == nil ? "nil" : "present but not UTF8 decodable")")
-                AppLogger.auth.logWarning("apple sign-in failed: missing identity token — identityToken=\(appleIDCredential.identityToken == nil ? "nil" : "present but not UTF8 decodable")")
+                AppLogger.appleAuth.logWarning(
+                    prefix: AppLogger.LogPrefix.appleAuth,
+                    "event=view.handleAppleSignIn.missingIdentityToken identityToken=\(appleIDCredential.identityToken == nil ? "nil" : "presentButNotUTF8Decodable")"
+                )
                 viewModel.setError(LocalizationKeys.authAppleSignInFailed.localized)
                 return
             }
 
-            print("[Auth] apple sign-in: idToken obtained length=\(idToken.count)")
-            AppLogger.auth.logInfo("apple sign-in: idToken obtained length=\(idToken.count) prefix=\(String(idToken.prefix(20)))...")
+            AppLogger.appleAuth.logInfo(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=view.handleAppleSignIn.identityTokenReady idTokenLength=\(idToken.count)"
+            )
+            logAppleIdentityTokenDiagnostics(idToken)
             viewModel.appleSignIn(idToken: idToken, onSuccess: onAuthenticated)
 
         case .failure(let error):
             if isAppleSignInCancellation(error) {
-                print("[Auth] apple sign-in: cancelled by user")
-                AppLogger.auth.logInfo("apple sign-in cancelled by user")
+                AppLogger.appleAuth.logInfo(
+                    prefix: AppLogger.LogPrefix.appleAuth,
+                    "event=view.handleAppleSignIn.cancelled"
+                )
                 return
             }
             let nsError = error as NSError
-            print("[Auth] apple sign-in failed: domain=\(nsError.domain) code=\(nsError.code) description=\(error.localizedDescription)")
-            AppLogger.auth.logWarning("apple sign-in failed domain=\(nsError.domain) code=\(nsError.code) reason=\(type(of: error))")
-            AppLogger.auth.logError("apple sign-in error", error: error)
+            AppLogger.appleAuth.logWarning(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=view.handleAppleSignIn.failure domain=\(nsError.domain) code=\(nsError.code) errorType=\(type(of: error)) description=\(error.localizedDescription)"
+            )
+            AppLogger.appleAuth.logError(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=view.handleAppleSignIn.error",
+                error: error
+            )
             viewModel.setError(LocalizationKeys.authAppleSignInFailed.localized)
         }
     }
@@ -279,5 +333,75 @@ struct AuthView: View {
             return false
         }
         return authError.code == .canceled
+    }
+
+    private func logAppleIdentityTokenDiagnostics(_ idToken: String) {
+        let parts = idToken.split(separator: ".", omittingEmptySubsequences: false)
+        guard parts.count >= 2,
+              let header = decodeJWTPart(parts[0]),
+              let payload = decodeJWTPart(parts[1]) else {
+            AppLogger.appleAuth.logWarning(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=view.handleAppleSignIn.identityTokenClaims.decodeFailed partCount=\(parts.count)"
+            )
+            return
+        }
+
+        let now = Int(Date().timeIntervalSince1970)
+        let expiresIn = intValue(payload["exp"]).map { $0 - now }.map(String.init) ?? "nil"
+        let issuedAgo = intValue(payload["iat"]).map { now - $0 }.map(String.init) ?? "nil"
+        AppLogger.appleAuth.logInfo(
+            prefix: AppLogger.LogPrefix.appleAuth,
+            "event=view.handleAppleSignIn.identityTokenClaims kid=\(stringValue(header["kid"])) alg=\(stringValue(header["alg"])) iss=\(stringValue(payload["iss"])) aud=\(audienceValue(payload["aud"])) sub=\(AppLogger.redactedId(stringValue(payload["sub"]))) email=\(AppLogger.redactedEmail(stringValue(payload["email"]))) emailVerified=\(stringValue(payload["email_verified"])) expiresInSeconds=\(expiresIn) issuedAgoSeconds=\(issuedAgo)"
+        )
+    }
+
+    private func decodeJWTPart(_ part: Substring) -> [String: Any]? {
+        var base64 = String(part)
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        let padding = base64.count % 4
+        if padding > 0 {
+            base64.append(String(repeating: "=", count: 4 - padding))
+        }
+        guard let data = Data(base64Encoded: base64),
+              let object = try? JSONSerialization.jsonObject(with: data),
+              let dictionary = object as? [String: Any] else {
+            return nil
+        }
+        return dictionary
+    }
+
+    private func stringValue(_ value: Any?) -> String {
+        switch value {
+        case let value as String:
+            return value
+        case let value as NSNumber:
+            return value.stringValue
+        case .some(let value):
+            return String(describing: value)
+        case .none:
+            return "nil"
+        }
+    }
+
+    private func audienceValue(_ value: Any?) -> String {
+        if let values = value as? [String] {
+            return values.joined(separator: ",")
+        }
+        return stringValue(value)
+    }
+
+    private func intValue(_ value: Any?) -> Int? {
+        switch value {
+        case let value as Int:
+            return value
+        case let value as NSNumber:
+            return value.intValue
+        case let value as String:
+            return Int(value)
+        default:
+            return nil
+        }
     }
 }

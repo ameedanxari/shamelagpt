@@ -162,7 +162,7 @@ final class AuthViewModelTests: XCTestCase {
         XCTAssertNil(sut.errorMessage)
     }
 
-    func testGoogleSignInFailureShowsUserFacingError() async {
+    func testGoogleSignInFailureShowsFriendlyProviderError() async {
         mockRepository.shouldFail = true
         mockRepository.errorToThrow = NSError(
             domain: "test",
@@ -180,11 +180,7 @@ final class AuthViewModelTests: XCTestCase {
 
         XCTAssertEqual(mockRepository.googleSignInCallCount, 1)
         XCTAssertFalse(sut.isLoading)
-        let expectedMessage = UserErrorFormatter.format(
-            messageKey: LocalizationKeys.somethingWentWrong,
-            code: "E-APP-000"
-        )
-        XCTAssertEqual(sut.errorMessage, expectedMessage)
+        XCTAssertEqual(sut.errorMessage, LocalizationKeys.authGoogleSignInFailed.localized)
 
         await fulfillment(of: [expectation], timeout: 0.1)
     }
@@ -203,7 +199,13 @@ final class AuthViewModelTests: XCTestCase {
         XCTAssertNil(sut.errorMessage)
     }
 
-    func testAppleSignInFailureShowsUserFacingError() async {
+    func testAppleAuthLogPrefixIsFilterable() {
+        XCTAssertEqual(AppLogger.LogPrefix.apple, "SGPApple")
+        XCTAssertEqual(AppLogger.LogPrefix.appleAuth, "SGPApple.Auth")
+        XCTAssertTrue(AppLogger.LogPrefix.appleAuth.hasPrefix(AppLogger.LogPrefix.apple))
+    }
+
+    func testAppleSignInFailureShowsFriendlyProviderError() async {
         mockRepository.shouldFail = true
         mockRepository.errorToThrow = NSError(
             domain: "test",
@@ -221,11 +223,26 @@ final class AuthViewModelTests: XCTestCase {
 
         XCTAssertEqual(mockRepository.appleSignInCallCount, 1)
         XCTAssertFalse(sut.isLoading)
-        let expectedMessage = UserErrorFormatter.format(
-            messageKey: LocalizationKeys.somethingWentWrong,
-            code: "E-APP-000"
-        )
-        XCTAssertEqual(sut.errorMessage, expectedMessage)
+        XCTAssertEqual(sut.errorMessage, LocalizationKeys.authAppleSignInFailed.localized)
+
+        await fulfillment(of: [expectation], timeout: 0.1)
+    }
+
+    func testAppleSignInUnauthorizedShowsFriendlyProviderError() async {
+        mockRepository.shouldFail = true
+        mockRepository.errorToThrow = NetworkError.httpError(statusCode: 401)
+        let expectation = XCTestExpectation(description: "Apple Sign-In should fail")
+        expectation.isInverted = true
+
+        sut.appleSignIn(idToken: "apple-id-token") {
+            expectation.fulfill()
+        }
+
+        try? await Task.sleep(nanoseconds: 100_000_000)
+
+        XCTAssertEqual(mockRepository.appleSignInCallCount, 1)
+        XCTAssertFalse(sut.isLoading)
+        XCTAssertEqual(sut.errorMessage, LocalizationKeys.authAppleSignInFailed.localized)
 
         await fulfillment(of: [expectation], timeout: 0.1)
     }

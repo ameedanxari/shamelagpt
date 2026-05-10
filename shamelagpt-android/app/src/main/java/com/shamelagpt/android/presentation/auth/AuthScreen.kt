@@ -59,6 +59,10 @@ import org.koin.androidx.compose.koinViewModel
 
 import androidx.compose.ui.platform.testTag
 
+import com.shamelagpt.android.core.util.Logger
+
+private const val TAG = "AuthScreen"
+
 @Composable
 fun AuthScreen(
     onAuthenticated: () -> Unit,
@@ -187,6 +191,7 @@ fun AuthScreen(
         // Google Sign-In button
         Button(
             onClick = {
+                Logger.i(TAG, "google sign-in button clicked")
                 focusManager.clearFocus(force = true)
                 val credentialManager = CredentialManager.create(context)
                 val googleIdOption = GetGoogleIdOption.Builder()
@@ -199,15 +204,19 @@ fun AuthScreen(
 
                 scope.launch {
                     try {
+                        Logger.d(TAG, "requesting google credential")
                         val result = credentialManager.getCredential(
                             context = context as android.app.Activity,
                             request = request
                         )
+                        Logger.d(TAG, "google credential received, extracting token")
                         val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(result.credential.data)
+                        Logger.d(TAG, "google sign-in token extracted, length=${googleIdTokenCredential.idToken.length}")
                         viewModel.googleSignIn(googleIdTokenCredential.idToken, onAuthenticated)
                     } catch (_: GetCredentialCancellationException) {
-                        // User cancelled — do nothing
+                        Logger.i(TAG, "google sign-in cancelled by user")
                     } catch (e: Exception) {
+                        Logger.e(TAG, "google sign-in credential error", e)
                         viewModel.setError(context.getString(R.string.google_sign_in_failed))
                     }
                 }
