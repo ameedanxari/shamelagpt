@@ -97,6 +97,9 @@ class DonationViewModelTest {
 
     @Test
     fun `completed purchase marks success and active product`() = runTest {
+        billingService.activeDonationResult = Result.success(monthlyProduct.productId)
+        advanceUntilIdle()
+
         billingService.events.emit(DonationPurchaseEvent.Completed(monthlyProduct.productId))
         advanceUntilIdle()
 
