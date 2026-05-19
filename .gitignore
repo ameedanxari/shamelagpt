@@ -164,6 +164,10 @@ working_copy/
 artifacts
 shamelagpt-android/app/release
 
+# AI Prompt Library generated planning outputs
+prompts/outputs/
+prompts/archive/
+
 # Secrets / credentials
 *.jks
 *.json.enc

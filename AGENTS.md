@@ -27,3 +27,23 @@ Cache & API minimization (compact): prefer server single source-of-truth + local
 References: see `.claude/*` atomic files.
 
 
+
+## AI Prompt Library Steering (Auto-Managed — do not edit)
+
+Load these files (in order) before handling any non-trivial request:
+1. `.ai-prompts/prompts/AGENTS.md` — authoritative instructions.
+2. `.ai-prompts/prompts/orchestrators/ai-agent-entry-point.md` — entry point.
+3. `.ai-prompts/prompts/orchestrators/drill-down-engine.md` — the 3-step engine.
+
+If `MY_PROJECT.md` lists external material or the project already has
+source code, also load:
+4. `.ai-prompts/prompts/orchestrators/external-input-handler.md`
+
+Do NOT auto-load anything else under `.ai-prompts/prompts/orchestrators/`
+without following the entry-point routing.
+
+Follow the entry point's checkpoint protocol exactly. At every engine
+checkpoint, stop, summarize progress, and wait for the user to say
+`Continue` before moving to the next step. Do not auto-advance across
+planning checkpoints.
+<!-- /AI Prompt Library Steering (Auto-Managed) -->
