@@ -473,11 +473,12 @@ class ChatViewModel(
                             )
                         }
                         else -> {
-                            throw ChatOperationException(
-                                operation = ChatOperation.SEND_MESSAGE,
-                                code = "E-CHAT-STREAM-UNKNOWN",
-                                message = "Unknown stream event type '${event.type}'"
-                            )
+                            // Forward-compatible: silently ignore unknown event
+                            // types. See ChatRemoteDataSourceImpl.validateStreamEvent
+                            // for context — new SSE event types from the backend
+                            // (e.g. "title", "fact_check_result") used to crash
+                            // every new-conversation send with E-CHAT-STREAM-UNKNOWN.
+                            Logger.d(TAG, "Ignoring unknown stream event type '${event.type}'")
                         }
                     }
                 }

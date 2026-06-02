@@ -217,11 +217,15 @@ class ChatRemoteDataSourceImpl(
                 code = "E-CHAT-STREAM-BACKEND",
                 message = event.message ?: event.error ?: event.content ?: "Backend stream error"
             )
-            else -> throw ChatOperationException(
-                operation = ChatOperation.SEND_MESSAGE,
-                code = "E-CHAT-STREAM-UNKNOWN",
-                message = "Unknown stream event type '${event.type}' in $raw"
-            )
+            else -> {
+                // Forward-compatible: silently ignore unknown event types.
+                // Backend adds new SSE event types over time (e.g. "title" in
+                // shamela-qa-rag#72, "fact_check_result" in fact-check mode);
+                // throwing here surfaced them as E-CHAT-STREAM-UNKNOWN and broke
+                // every new-conversation send. iOS does the same in
+                // StreamingMessageHandler.swift. Log so we notice new types.
+                Log.d(TAG, "Ignoring unknown stream event type '${event.type}' (raw='${raw.take(120)}')")
+            }
         }
     }
 
