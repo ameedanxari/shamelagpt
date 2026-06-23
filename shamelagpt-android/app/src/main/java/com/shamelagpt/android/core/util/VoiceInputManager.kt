@@ -233,7 +233,7 @@ class VoiceInputManager(private val context: Context) {
         }
         Logger.i(
             TAG,
-            "voice capability resolved: $capability recognitionAvailable=$directAvailable recognitionServices=$serviceCount intentHandlers=$intentHandlerCount handlers=${handlers.joinToString(",") { it.activityInfo.packageName }}"
+            "voice capability resolved: $capability recognitionAvailable=$directAvailable recognitionServices=$serviceCount intentHandlers=$intentHandlerCount handlers=${handlers.mapNotNull { it.activityInfo?.packageName }.joinToString(",")}"
         )
         return capability
     }
