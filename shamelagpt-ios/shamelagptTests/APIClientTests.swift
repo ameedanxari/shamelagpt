@@ -656,6 +656,80 @@ final class APIClientTests: XCTestCase {
         }
     }
 
+    func testGetModePreferenceUsesCorrectEndpointAndDecodesResponse() async throws {
+        // Given
+        let expected = ModePreferenceResponse(modePreference: 2, modeName: "fact_check")
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        let responseData = try encoder.encode(expected)
+
+        MockURLProtocol.requestHandler = { urlRequest in
+            XCTAssertEqual(urlRequest.url?.path, "/api/auth/me/mode")
+            XCTAssertEqual(urlRequest.httpMethod, "GET")
+            let response = HTTPURLResponse(url: urlRequest.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, responseData)
+        }
+
+        // When
+        let response = try await sut.getModePreference()
+
+        // Then
+        XCTAssertEqual(response.modePreference, 2)
+        XCTAssertEqual(response.modeName, "fact_check")
+    }
+
+    func testSetModePreferenceUsesCorrectEndpointAndEncodesBody() async throws {
+        // Given
+        let request = ModePreferenceRequest(modePreference: 1)
+        let expected = ModePreferenceResponse(modePreference: 1, modeName: "research")
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        let responseData = try encoder.encode(expected)
+        var capturedRequestBody: Data?
+
+        MockURLProtocol.requestHandler = { urlRequest in
+            XCTAssertEqual(urlRequest.url?.path, "/api/auth/me/mode")
+            XCTAssertEqual(urlRequest.httpMethod, "PUT")
+            capturedRequestBody = Self.requestBody(from: urlRequest)
+            let response = HTTPURLResponse(url: urlRequest.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, responseData)
+        }
+
+        // When
+        let response = try await sut.setModePreference(request)
+
+        // Then
+        XCTAssertEqual(response.modePreference, 1)
+        XCTAssertEqual(response.modeName, "research")
+        let body = try XCTUnwrap(capturedRequestBody)
+        let json = try XCTUnwrap(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+        XCTAssertEqual(json["mode_preference"] as? Int, 1)
+    }
+
+    private static func requestBody(from request: URLRequest) -> Data? {
+        if let body = request.httpBody {
+            return body
+        }
+        guard let stream = request.httpBodyStream else {
+            return nil
+        }
+        stream.open()
+        defer { stream.close() }
+        let bufferSize = 1024
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+        defer { buffer.deallocate() }
+        var data = Data()
+        while true {
+            let read = stream.read(buffer, maxLength: bufferSize)
+            if read > 0 {
+                data.append(buffer, count: read)
+            } else {
+                break
+            }
+        }
+        return data
+    }
+
     // MARK: - Encoding/Decoding Tests
 
     func testRequestEncodingSnakeCaseCorrect() async throws {

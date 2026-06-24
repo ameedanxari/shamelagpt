@@ -1,11 +1,14 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.shamelagpt.android",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_YOUR_RELEASE_KEY_SHA256"
+        "4A:FB:79:14:AA:8D:43:EF:44:66:08:24:15:8A:B4:83:19:02:E5:FD:4D:81:07:B2:F4:87:5D:6F:85:76:77:02"
       ]
     }
   }

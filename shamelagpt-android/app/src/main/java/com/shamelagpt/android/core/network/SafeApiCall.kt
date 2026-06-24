@@ -5,6 +5,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.concurrent.CancellationException
 
 /**
  * Wrapper function for safe API calls with user-friendly error handling.
@@ -30,7 +31,14 @@ suspend fun <T> safeApiCall(
         Logger.w(tag, "http error status=$status")
         if ((status == 401 || status == 403) && authRetry != null) {
             Logger.i(tag, "attempting auth retry for status=$status")
-            val relogged = try { authRetry() } catch (_: Exception) { false }
+            val relogged = try {
+                authRetry()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (retryError: Exception) {
+                Logger.w(tag, "auth retry threw ${retryError::class.simpleName}")
+                false
+            }
             if (relogged) {
                 Logger.i(tag, "auth retry succeeded; repeating request once")
                 // Retry once without another authRetry to avoid loops
@@ -65,6 +73,9 @@ suspend fun <T> safeApiCall(
                 )
             )
         }
+    } catch (e: CancellationException) {
+        Logger.i(tag, "api call cancelled")
+        throw e
     } catch (e: Exception) {
         Logger.e(tag, "unexpected error during api call", e)
         Result.failure(

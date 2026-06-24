@@ -14,6 +14,7 @@ struct SettingsView: View {
     let onSignIn: () -> Void
     @StateObject private var languageManager = LanguageManager.shared
     @State private var showDonationLink = false
+    @State private var showDonationSheet = false
     @State private var customPrompt: String = ""
     @State private var lengthPref: String = ""
     @State private var stylePref: String = ""
@@ -28,7 +29,6 @@ struct SettingsView: View {
     private let preferencesRepository: PreferencesRepository? = DependencyContainer.shared.resolve(PreferencesRepository.self)
     private let authRepository: AuthRepository? = DependencyContainer.shared.resolve(AuthRepository.self)
 
-    private let donationURL = URL(string: "https://www.paypal.com/donate/?hosted_button_id=MSBDG5ESU2AMU")!
 
     var body: some View {
         Form {
@@ -220,25 +220,21 @@ struct SettingsView: View {
 
             // Support Section
             Section(header: Text(LocalizationKeys.support.localizedKey)) {
-//                Button(action: {
-//                    showDonationLink = true
-//                }) {
-//                    HStack {
-//                        Image(systemName: "heart.fill")
-//                            .foregroundColor(.red)
-//                            .frame(width: AppTheme.Layout.iconSize)
-//
-//                        Text(LocalizationKeys.supportShamelaGPT.localizedKey)
-//                            .font(AppTheme.Typography.body)
-//                            .foregroundColor(AppTheme.Colors.primaryText)
-//
-//                        Spacer()
-//
-//                        Image(systemName: "arrow.up.right")
-//                            .font(.system(size: 12))
-//                            .foregroundColor(AppTheme.Colors.tertiaryText)
-//                    }
-//                }
+                Button(action: { showDonationSheet = true }) {
+                    HStack {
+                        Image(systemName: "heart.fill")
+                            .foregroundColor(.red)
+                            .frame(width: AppTheme.Layout.iconSize)
+                        Text(LocalizationKeys.donate.localizedKey)
+                            .font(AppTheme.Typography.body)
+                            .foregroundColor(AppTheme.Colors.primaryText)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.Colors.tertiaryText)
+                    }
+                }
+                .accessibilityIdentifier(AccessibilityID.Settings.donateButton)
 
                 Button(action: {
                     sendFeedback()
@@ -333,9 +329,8 @@ struct SettingsView: View {
         .id("settings-form-\(languageManager.currentLanguage.rawValue)")
         .navigationTitle(LocalizationKeys.settings.localizedKey)
         .navigationBarTitleDisplayMode(.large)
-        .sheet(isPresented: $showDonationLink) {
-            SafariView(url: donationURL)
-                .ignoresSafeArea()
+        .sheet(isPresented: $showDonationSheet) {
+            DonationView()
         }
         .alert(LocalizationKeys.feedbackPromptTitle.localizedKey, isPresented: $showFeedbackPrompt) {
             Button(LocalizationKeys.feedbackSend.localizedKey, role: .none) {

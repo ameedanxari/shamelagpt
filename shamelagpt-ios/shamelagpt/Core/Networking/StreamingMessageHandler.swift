@@ -42,7 +42,7 @@ class StreamingMessageHandler: StreamingMessageHandlerProtocol {
                         
                         if trimmed.isEmpty {
                             if !eventBuffer.isEmpty {
-                                processEventLines(eventBuffer, continuation: continuation)
+                                try processEventLines(eventBuffer, continuation: continuation)
                                 eventBuffer.removeAll()
                             }
                         } else {
@@ -56,14 +56,14 @@ class StreamingMessageHandler: StreamingMessageHandlerProtocol {
                                 // Preliminary check to see if it's a complete JSON. 
                                 // Simple heuristic: if it has both { and } it might be a complete event.
                                 // For robust SSE, a blank line is the true delimiter, but we support both.
-                                processEventLines(eventBuffer, continuation: continuation)
+                                try processEventLines(eventBuffer, continuation: continuation)
                                 eventBuffer.removeAll()
                             }
                         }
                     }
                     
                     if !eventBuffer.isEmpty {
-                        processEventLines(eventBuffer, continuation: continuation)
+                        try processEventLines(eventBuffer, continuation: continuation)
                     }
                     
                     continuation.finish()
@@ -80,9 +80,11 @@ class StreamingMessageHandler: StreamingMessageHandlerProtocol {
         let sessionId: String?
         let threadId: String?
         let fullAnswer: String?
+        let message: String?
+        let error: String?
     }
 
-    private func processEventLines(_ lines: [String], continuation: AsyncThrowingStream<StreamEvent, Error>.Continuation) {
+    private func processEventLines(_ lines: [String], continuation: AsyncThrowingStream<StreamEvent, Error>.Continuation) throws {
         // Collect all 'data:' payload lines from this event
         let payloadLines = lines.compactMap { line -> String? in
             let trimmed = line.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
@@ -102,29 +104,41 @@ class StreamingMessageHandler: StreamingMessageHandlerProtocol {
         // while others send one JSON object spread across multiple 'data:' lines.
         // We first try parsing each line individually.
         for line in payloadLines {
-            if line == "[DONE]" { continue }
+            if line == "[DONE]" {
+                continuation.yield(.done(fullAnswer: nil))
+                continue
+            }
             
             guard let data = line.data(using: .utf8) else { continue }
             
             do {
                 let rawEvent = try decoder.decode(RawStreamEvent.self, from: data)
-                yieldEvent(rawEvent, continuation: continuation)
+                try yieldEvent(rawEvent, continuation: continuation)
             } catch {
+                if error is ChatOperationException {
+                    throw error
+                }
                 // If single-line parse fails, it might be a multi-line JSON.
                 // We'll try concatenating all lines and parsing the whole block.
                 let combined = payloadLines.joined(separator: "")
                 if let combinedData = combined.data(using: .utf8) {
                     if let rawEvent = try? decoder.decode(RawStreamEvent.self, from: combinedData) {
-                        yieldEvent(rawEvent, continuation: continuation)
+                        try yieldEvent(rawEvent, continuation: continuation)
                         return // Exit after parsing combined block to avoid duplicate yields
                     }
                 }
                 AppLogger.network.logDebug("Failed to parse SSE data: \(line.prefix(100))...")
+                throw ChatOperationException(
+                    operation: .sendMessage,
+                    code: "E-CHAT-STREAM-PARSE",
+                    retryable: true,
+                    description: "Failed to parse stream event"
+                )
             }
         }
     }
 
-    private func yieldEvent(_ rawEvent: RawStreamEvent, continuation: AsyncThrowingStream<StreamEvent, Error>.Continuation) {
+    private func yieldEvent(_ rawEvent: RawStreamEvent, continuation: AsyncThrowingStream<StreamEvent, Error>.Continuation) throws {
         switch rawEvent.type {
         case "metadata":
             if let tid = rawEvent.threadId ?? rawEvent.sessionId {
@@ -138,8 +152,20 @@ class StreamingMessageHandler: StreamingMessageHandlerProtocol {
             continuation.yield(.chunk(rawEvent.content ?? ""))
         case "done":
             continuation.yield(.done(fullAnswer: rawEvent.fullAnswer ?? rawEvent.content))
+        case "error":
+            throw ChatOperationException(
+                operation: .sendMessage,
+                code: "E-CHAT-STREAM-BACKEND",
+                retryable: true,
+                description: rawEvent.message ?? rawEvent.error ?? rawEvent.content ?? "Backend stream error"
+            )
         default:
-            break
+            throw ChatOperationException(
+                operation: .sendMessage,
+                code: "E-CHAT-STREAM-UNKNOWN",
+                retryable: true,
+                description: "Unknown stream event type '\(rawEvent.type)'"
+            )
         }
     }
 }

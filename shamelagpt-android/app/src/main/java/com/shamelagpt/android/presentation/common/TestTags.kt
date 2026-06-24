@@ -23,6 +23,7 @@ object TestTags {
         const val SignUpButton = "signUpButton"
         const val ContinueAsGuestButton = "continueAsGuestButton"
         const val ToggleModeButton = "toggleModeButton"
+        const val GoogleSignInButton = "googleSignInButton"
     }
 
     object Chat {
@@ -37,6 +38,7 @@ object TestTags {
         const val SendButton = "sendButton"
         const val CameraButton = "cameraButton"
         const val MicButton = "micButton"
+        const val ModeToggleChip = "modeToggleChip"
         const val NewChatButton = "newChatButton"
         const val ErrorBanner = "chatErrorBanner"
         const val ErrorBannerDismissButton = "chatErrorBannerDismissButton"
@@ -58,6 +60,10 @@ object TestTags {
         const val SavePreferencesButton = "savePreferencesButton"
         const val SignInButton = "settingsSignInButton"
         const val SupportItem = "settingsSupportItem"
+        const val DonationSheet = "donationSheet"
+        const val DonationPayPalButton = "donationPayPalButton"
+        const val DonationRetryButton = "donationRetryButton"
+        fun donationProduct(productId: String): String = "donationProduct_$productId"
         const val AboutItem = "settingsAboutItem"
         const val LogoutItem = "settingsLogoutItem"
         fun languageOption(code: String): String = "LanguageOption_$code"

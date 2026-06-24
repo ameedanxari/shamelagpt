@@ -4,6 +4,7 @@ import com.shamelagpt.android.data.remote.dto.AuthResponse
 import com.shamelagpt.android.data.remote.dto.LoginRequest
 import com.shamelagpt.android.data.remote.dto.SignupRequest
 import com.shamelagpt.android.data.remote.dto.UpdateUserRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
 import com.shamelagpt.android.data.remote.dto.UserPreferencesRequest
 import com.shamelagpt.android.data.remote.dto.UserResponse
 
@@ -19,6 +20,8 @@ interface AuthRepository {
     suspend fun verifyToken(): Result<Unit>
     suspend fun getPreferences(): Result<com.shamelagpt.android.data.remote.dto.UserPreferencesRequest>
     suspend fun setPreferences(request: UserPreferencesRequest): Result<Unit>
+    suspend fun getModePreference(): Result<ModePreferenceResponse>
+    suspend fun setModePreference(modePreference: Int): Result<ModePreferenceResponse>
     fun logout()
     fun getToken(): String?
     fun isLoggedIn(): Boolean

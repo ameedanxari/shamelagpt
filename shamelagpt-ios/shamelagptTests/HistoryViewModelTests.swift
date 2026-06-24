@@ -477,6 +477,7 @@ final class HistoryViewModelTests: XCTestCase {
         // Then
         XCTAssertTrue(exportedText.contains("ShamelaGPT Chat: Export Test"))
         XCTAssertTrue(exportedText.contains("Link:"))
+        XCTAssertTrue(exportedText.contains("/shared?chatid="))
         XCTAssertTrue(exportedText.contains("Last updated:"))
         XCTAssertTrue(exportedText.contains("Preview:"))
         XCTAssertTrue(exportedText.contains("Assistant answer"))
@@ -511,6 +512,7 @@ final class HistoryViewModelTests: XCTestCase {
 
         // Then
         XCTAssertTrue(exportedText.contains("ShamelaGPT Chat: Export Test"))
+        XCTAssertTrue(exportedText.contains("/shared?chatid="))
         XCTAssertTrue(exportedText.contains("Answer with source"))
     }
 
@@ -528,6 +530,7 @@ final class HistoryViewModelTests: XCTestCase {
         // Then
         XCTAssertTrue(exportedText.contains("ShamelaGPT Chat: Empty Conversation"))
         XCTAssertTrue(exportedText.contains("Link:"))
+        XCTAssertTrue(exportedText.contains("/shared?chatid="))
         XCTAssertTrue(exportedText.contains("Last updated:"))
         XCTAssertTrue(exportedText.contains("Preview:"))
         XCTAssertTrue(exportedText.contains("No messages"))

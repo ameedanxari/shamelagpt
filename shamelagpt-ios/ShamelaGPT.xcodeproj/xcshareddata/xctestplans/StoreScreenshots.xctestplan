@@ -10,6 +10,7 @@
   ],
   "defaultOptions" : {
     "performanceAntipatternCheckerEnabled" : true,
+    "storeKitConfigurationFileReference" : "../../ShamelaGPT.storekit",
     "targetForVariableExpansion" : {
       "containerPath" : "container:ShamelaGPT.xcodeproj",
       "identifier" : "E24643D42EBAF683008F6234",

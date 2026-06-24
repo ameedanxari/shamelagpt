@@ -8,6 +8,8 @@ import com.google.gson.annotations.SerializedName
 data class StreamEvent(
     val type: String,
     val content: String? = null,
+    val message: String? = null,
+    val error: String? = null,
     @SerializedName("session_id")
     val sessionId: String? = null,
     @SerializedName("thread_id")

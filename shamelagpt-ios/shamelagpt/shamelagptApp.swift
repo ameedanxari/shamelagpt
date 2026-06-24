@@ -5,6 +5,7 @@
 //  Created by Ameed Khalid on 04/11/2025.
 //
 
+import GoogleSignIn
 import SwiftUI
 import UIKit
 
@@ -21,10 +22,12 @@ struct ShamelaGPTApp: App {
     private let sessionManager: SessionManager
     private let authRepository: AuthRepository
     @StateObject private var startupViewModel: AppStartupViewModel
+    @StateObject private var authViewModel: AuthViewModel
     private let forcedColorScheme: ColorScheme?
 
     @State private var isAuthenticated: Bool
     @State private var isGuest: Bool = false
+    @State private var isPresentingAuth: Bool = false
     @StateObject private var shakeDetector = ShakeDetector()
     @StateObject private var languageManager = LanguageManager.shared
     @State private var showFeedbackPrompt = false
@@ -32,16 +35,19 @@ struct ShamelaGPTApp: App {
     @State private var hasMetMinimumStartupDuration = false
     
     private func presentAuth() {
+        AppLogger.auth.logInfo(
+            prefix: AppLogger.LogPrefix.authState,
+            "event=auth.present requested isAuthenticated=\(isAuthenticated) isGuest=\(isGuest) startupBootstrapping=\(startupViewModel.isBootstrapping)"
+        )
         isAuthenticated = false
-        isGuest = false
-        self.sessionManager.setGuest(false)
+        isPresentingAuth = true
         chatSessionState.resetToNew()
         coordinator.shouldShowWelcome = false
         coordinator.resetTabSelectionToChat()
     }
 
     private var shouldShowStartupRestore: Bool {
-        !isGuest && (!hasMetMinimumStartupDuration || startupViewModel.isBootstrapping)
+        !isPresentingAuth && !isGuest && (!hasMetMinimumStartupDuration || startupViewModel.isBootstrapping)
     }
 
     private func beginStartupGateIfNeeded() {
@@ -70,6 +76,7 @@ struct ShamelaGPTApp: App {
         self.forcedColorScheme = Self.uiTestForcedColorScheme(isUITesting: isUITesting)
         // Keep tab ordering semantic (Chat, History, Settings) independent of RTL mirroring.
         UITabBar.appearance().semanticContentAttribute = .forceLeftToRight
+        GoogleSignInConfiguration.configureSharedInstance()
 
         // Handle test mode
         if isUITesting {
@@ -169,6 +176,9 @@ struct ShamelaGPTApp: App {
                 initiallyAuthenticated: initialAuthState
             )
         )
+        _authViewModel = StateObject(
+            wrappedValue: AuthViewModel(authRepository: resolvedAuthRepository)
+        )
     }
 
     private static func isUITestEnvironment() -> Bool {
@@ -213,6 +223,8 @@ struct ShamelaGPTApp: App {
         let mockKeys = [
             "isUITesting",
             "mockScenarioId",
+            "mockAuthResponse",
+            "mockAuthError",
             "mockChatResponse",
             "mockChatError",
             "mockNetworkError",
@@ -248,6 +260,8 @@ struct ShamelaGPTApp: App {
         // Clear any existing mock configuration first to prevent state leakage
         let mockKeys = [
             "mockScenarioId",
+            "mockAuthResponse",
+            "mockAuthError",
             "mockChatResponse",
             "mockChatError",
             "mockNetworkError",
@@ -330,9 +344,19 @@ struct ShamelaGPTApp: App {
             AppLogger.app.logDebug("MOCK_CONFIG: Set custom mock response")
         }
 
+        if let mockAuthResponse = environment["MOCK_AUTH_RESPONSE"] {
+            UserDefaults.standard.set(mockAuthResponse, forKey: "mockAuthResponse")
+            AppLogger.app.logDebug("MOCK_CONFIG: Set custom auth response")
+        }
+
         if let mockError = environment["MOCK_CHAT_ERROR"] {
             UserDefaults.standard.set(mockError, forKey: "mockChatError")
             AppLogger.app.logDebug("MOCK_CONFIG: Set custom mock error")
+        }
+
+        if let mockAuthError = environment["MOCK_AUTH_ERROR"] {
+            UserDefaults.standard.set(mockAuthError, forKey: "mockAuthError")
+            AppLogger.app.logDebug("MOCK_CONFIG: Set custom auth error")
         }
 
         if let delay = environment["MOCK_DELAY"], let delayValue = Double(delay) {
@@ -380,6 +404,8 @@ struct ShamelaGPTApp: App {
         let finalConfig: [String: Any] = [
             "mockNetworkError": UserDefaults.standard.bool(forKey: "mockNetworkError"),
             "mockTimeoutError": UserDefaults.standard.bool(forKey: "mockTimeoutError"),
+            "mockAuthError": UserDefaults.standard.string(forKey: "mockAuthError") ?? "nil",
+            "mockAuthResponse": UserDefaults.standard.string(forKey: "mockAuthResponse")?.prefix(100) ?? "nil",
             "mockChatError": UserDefaults.standard.string(forKey: "mockChatError") ?? "nil",
             "mockChatResponse": UserDefaults.standard.string(forKey: "mockChatResponse")?.prefix(100) ?? "nil",
             "mockDelay": UserDefaults.standard.double(forKey: "mockDelay"),
@@ -436,7 +462,7 @@ struct ShamelaGPTApp: App {
                     StartupRestoreView()
                         .transition(.opacity)
                         .zIndex(2)
-                } else if coordinator.shouldShowWelcome && !isAuthenticated && !isGuest {
+                } else if coordinator.shouldShowWelcome && !isAuthenticated && !isGuest && !isPresentingAuth {
                     // Determine which view to show
                     WelcomeView(
                         onGetStarted: {
@@ -447,6 +473,7 @@ struct ShamelaGPTApp: App {
                         onSkipToChat: {
                             // Enable guest mode and dismiss welcome
                             isGuest = true
+                            isPresentingAuth = false
                             self.sessionManager.setGuest(true)
                             chatSessionState.resetToNew()
                             coordinator.dismissWelcome()
@@ -454,6 +481,39 @@ struct ShamelaGPTApp: App {
                     )
                     .transition(.opacity)
                     .zIndex(1)
+                } else if isPresentingAuth || (!isAuthenticated && !isGuest) {
+                    // Auth screen
+                    AuthView(
+                        viewModel: authViewModel,
+                        onAuthenticated: {
+                            AppLogger.auth.logInfo(
+                                prefix: AppLogger.LogPrefix.authState,
+                                "event=auth.completed previousGuest=\(isGuest)"
+                            )
+                            isAuthenticated = true
+                            isGuest = false
+                            isPresentingAuth = false
+                            self.sessionManager.setGuest(false)
+                            chatSessionState.refreshFromStorage()
+                            coordinator.shouldShowWelcome = false
+                            coordinator.resetTabSelectionToChat()
+                            coordinator.start()
+                        },
+                        onContinueAsGuest: {
+                            AppLogger.auth.logInfo(
+                                prefix: AppLogger.LogPrefix.authState,
+                                "event=auth.continueAsGuest"
+                            )
+                            isAuthenticated = false
+                            isGuest = true
+                            isPresentingAuth = false
+                            self.sessionManager.setGuest(true)
+                            chatSessionState.resetToNew()
+                            coordinator.shouldShowWelcome = false
+                            coordinator.resetTabSelectionToChat()
+                            coordinator.start()
+                        }
+                    )
                 } else if isAuthenticated || isGuest {
                     // Main tab view
                     MainTabView(
@@ -463,9 +523,14 @@ struct ShamelaGPTApp: App {
                         isAuthenticated: isAuthenticated,
                         isGuest: isGuest,
                         onLogout: {
+                            AppLogger.auth.logInfo(
+                                prefix: AppLogger.LogPrefix.authState,
+                                "event=auth.logout requested isAuthenticated=\(isAuthenticated) isGuest=\(isGuest)"
+                            )
                             authRepository.logout()
                             isAuthenticated = false
                             isGuest = false
+                            isPresentingAuth = false
                             self.sessionManager.setGuest(false)
                             chatSessionState.resetToNew()
                             coordinator.shouldShowWelcome = true
@@ -473,27 +538,6 @@ struct ShamelaGPTApp: App {
                         },
                         onRequireAuth: {
                             presentAuth()
-                        }
-                    )
-                } else {
-                    // Auth overlay
-                    AuthView(
-                        viewModel: AuthViewModel(authRepository: authRepository),
-                        onAuthenticated: {
-                            isAuthenticated = true
-                            self.sessionManager.setGuest(false)
-                            chatSessionState.refreshFromStorage()
-                            coordinator.shouldShowWelcome = false
-                            coordinator.resetTabSelectionToChat()
-                            coordinator.start()
-                        },
-                        onContinueAsGuest: {
-                            isGuest = true
-                            self.sessionManager.setGuest(true)
-                            chatSessionState.resetToNew()
-                            coordinator.shouldShowWelcome = false
-                            coordinator.resetTabSelectionToChat()
-                            coordinator.start()
                         }
                     )
                 }
@@ -517,6 +561,8 @@ struct ShamelaGPTApp: App {
                 (languageManager.currentLanguage == .arabic || languageManager.currentLanguage == .urdu) ? .rightToLeft : .leftToRight
             )
             .onOpenURL { url in
+                // Handle Google Sign-In callback
+                GIDSignIn.sharedInstance.handle(url)
                 // Handle deep links (custom URL schemes / onOpenURL)
                 _ = coordinator.handleDeepLink(url)
             }
@@ -527,7 +573,7 @@ struct ShamelaGPTApp: App {
                 }
             }
             .onAppear {
-                if !isGuest {
+                if !isGuest && !isPresentingAuth {
                     beginStartupGateIfNeeded()
                     startupViewModel.bootstrap()
                 }
@@ -537,15 +583,24 @@ struct ShamelaGPTApp: App {
             }
             .onChange(of: startupViewModel.isBootstrapping) { doneBootstrapping in
                 guard !doneBootstrapping else { return }
-                guard !isGuest else { return }
+                guard !isGuest, !isPresentingAuth else { return }
                 if startupViewModel.isAuthenticated {
+                    AppLogger.auth.logInfo(
+                        prefix: AppLogger.LogPrefix.authState,
+                        "event=startup.authRestored"
+                    )
                     isAuthenticated = true
                     isGuest = false
+                    isPresentingAuth = false
                     self.sessionManager.setGuest(false)
                     chatSessionState.refreshFromStorage()
                     coordinator.shouldShowWelcome = false
                     coordinator.resetTabSelectionToChat()
                 } else if !isGuest {
+                    AppLogger.auth.logInfo(
+                        prefix: AppLogger.LogPrefix.authState,
+                        "event=startup.unauthenticated"
+                    )
                     isAuthenticated = false
                     coordinator.shouldShowWelcome = true
                     coordinator.resetTabSelectionToChat()
