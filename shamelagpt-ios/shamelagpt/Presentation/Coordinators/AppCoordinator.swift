@@ -218,6 +218,10 @@ class AppCoordinator: ObservableObject {
                     return true
                 }
                 AppLogger.app.logWarning("Fact-check deep link received but no payload found in pasteboard")
+                FactCheckImportManager.shared.setPendingImportFailure()
+                resetTabSelectionToChat()
+                startNewConversation()
+                NotificationCenter.default.post(name: .importFactCheckPayload, object: nil)
                 return false
 
             default:
@@ -279,14 +283,25 @@ final class FactCheckImportManager {
 
     private let pasteboardType = "com.shamelagpt.factcheck"
     private var pendingPayload: FactCheckPayload?
+    private var pendingImportFailure = false
 
     func setPending(_ payload: FactCheckPayload) {
         pendingPayload = payload
+        pendingImportFailure = false
+    }
+
+    func setPendingImportFailure() {
+        pendingImportFailure = true
     }
 
     func consume() -> FactCheckPayload? {
         defer { pendingPayload = nil }
         return pendingPayload
+    }
+
+    func consumeImportFailure() -> Bool {
+        defer { pendingImportFailure = false }
+        return pendingImportFailure
     }
 
     func ingestFromPasteboard() -> FactCheckPayload? {

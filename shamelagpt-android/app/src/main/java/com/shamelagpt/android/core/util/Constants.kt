@@ -3,7 +3,7 @@ package com.shamelagpt.android.core.util
 object Constants {
     // API Constants
     const val BASE_URL = "https://api.shamelagpt.com/"
-    const val API_TIMEOUT = 30L // seconds
+    const val API_TIMEOUT = 120L // seconds
 
     // Database Constants
     const val DATABASE_NAME = "shamela_gpt_database"

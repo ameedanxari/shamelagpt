@@ -319,6 +319,21 @@ class HistoryViewModelTest {
         assertThat(displayedConversation.messages).isEmpty()
     }
 
+    // MARK: - Export Tests
+
+    @Test
+    fun testExportConversationGeneratesSharedUrl() {
+        // Given
+        val conversation = TestData.createConversation(id = "conv-export")
+
+        // When
+        val exported = viewModel.exportConversation(conversation)
+
+        // Then
+        assertThat(exported).contains("ShamelaGPT Chat")
+        assertThat(exported).contains("/shared?chatid=")
+    }
+
     // MARK: - Conversation Type Tests
 
     @Test

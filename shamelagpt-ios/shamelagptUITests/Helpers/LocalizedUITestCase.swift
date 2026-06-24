@@ -153,11 +153,12 @@ class LocalizedUITestCase: XCTestCase {
     }
 
     func tabButton(identifier: String, labelKey: String) -> XCUIElement {
-        // Prefer stable accessibility identifier across container types.
+        // Use `firstMatch` queries so floating tab bar duplicates on iPad resolve to a
+        // single tappable element instead of an ambiguous multi-match lookup.
         let identifierMatches: [XCUIElement] = [
-            app.tabBars.buttons[identifier],
-            app.buttons[identifier],
-            app.otherElements[identifier],
+            app.tabBars.buttons.matching(identifier: identifier).firstMatch,
+            app.buttons.matching(identifier: identifier).firstMatch,
+            app.otherElements.matching(identifier: identifier).firstMatch,
             app.descendants(matching: .any).matching(identifier: identifier).firstMatch
         ]
 
@@ -168,9 +169,9 @@ class LocalizedUITestCase: XCTestCase {
         let labels = localizedCandidates(for: labelKey)
         for label in labels {
             let labelMatches: [XCUIElement] = [
-                app.tabBars.buttons[label],
-                app.buttons[label],
-                app.otherElements[label]
+                app.tabBars.buttons.matching(NSPredicate(format: "label == %@", label)).firstMatch,
+                app.buttons.matching(NSPredicate(format: "label == %@", label)).firstMatch,
+                app.otherElements.matching(NSPredicate(format: "label == %@", label)).firstMatch
             ]
 
             for match in labelMatches where match.exists {
@@ -191,6 +192,46 @@ class LocalizedUITestCase: XCTestCase {
 
     func settingsTabButton() -> XCUIElement {
         tabButton(identifier: UITestID.Tab.settings, labelKey: "settings")
+    }
+
+    func dismissKeyboardIfPresent(preferredTapTarget: XCUIElement? = nil) {
+        guard app.keyboards.firstMatch.exists else { return }
+
+        if let preferredTapTarget, preferredTapTarget.exists, preferredTapTarget.isHittable {
+            preferredTapTarget.tap()
+        } else {
+            // Fall back to a blank area near the top of the screen for flows that
+            // do not expose a stable non-editable target.
+            let topBlankArea = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08))
+            topBlankArea.tap()
+        }
+
+        if app.keyboards.firstMatch.waitForExistence(timeout: 1) {
+            let doneButton = app.buttons["Done"]
+            if doneButton.exists && doneButton.isHittable {
+                doneButton.tap()
+            }
+        }
+    }
+
+    func waitForKeyboardToDismiss(timeout: TimeInterval = 2) {
+        let deadline = Date().addingTimeInterval(timeout)
+        while app.keyboards.firstMatch.exists && Date() < deadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+        }
+    }
+
+    func replaceText(in element: XCUIElement, with text: String) {
+        element.tap()
+
+        let existingCount = (element.value as? String)?.count ?? 0
+        // Some simulators report truncated/placeholder values for text fields, so use
+        // a generous delete buffer instead of trusting the reported string length.
+        let deleteCount = max(existingCount, text.count, 64)
+        let deleteSequence = String(repeating: XCUIKeyboardKey.delete.rawValue, count: deleteCount)
+        element.typeText(deleteSequence)
+
+        element.typeText(text)
     }
 
     @discardableResult

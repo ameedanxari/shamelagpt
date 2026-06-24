@@ -55,7 +55,10 @@ class ConversationRepositoryImpl(
         Log.d(TAG, "User isLoggedIn: $isLoggedIn")
         val remoteCreated = if (isLoggedIn && conversationRemoteDataSource != null) {
             Log.d(TAG, "Creating conversation on remote server...")
-            conversationRemoteDataSource.createConversation(ConversationRequest(title = title)).getOrNull()
+            conversationRemoteDataSource.createConversation(ConversationRequest(title = title)).getOrElse { error ->
+                Log.e(TAG, "Remote conversation create failed", error)
+                throw error
+            }
         } else null
         val isLocalOnly = !isLoggedIn
 

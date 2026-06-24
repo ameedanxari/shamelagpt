@@ -15,8 +15,8 @@ android {
         applicationId = "com.shamelagpt.android"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.0"
+        versionCode = 6
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,7 +36,9 @@ android {
         debug {
             // Enable coverage for unit + androidTest
             enableUnitTestCoverage = true
-            enableAndroidTestCoverage = true
+            enableAndroidTestCoverage = !providers.gradleProperty("shamela.skipAndroidTestCoverage")
+                .map { it.toBoolean() }
+                .getOrElse(false)
         }
     }
     compileOptions {
@@ -186,6 +188,9 @@ dependencies {
     // Google Play Services Tasks (for ML Kit)
     implementation(libs.play.services.tasks)
 
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+
     // Kotlinx Coroutines Play Services (for await() extension)
     implementation(libs.kotlinx.coroutines.play.services)
 
@@ -200,6 +205,14 @@ dependencies {
 
     // Material Components (for Theme.Material3.DayNight.NoActionBar in XML)
     implementation(libs.material)
+
+    // Google Credential Manager (Google Sign-In)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
+
+    // Google Play Billing
+    implementation(libs.play.billing)
 
     // Testing - Unit Tests
     testImplementation(libs.junit)

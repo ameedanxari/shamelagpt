@@ -12,8 +12,8 @@ Welcome to the ShamelaGPT documentation. This index helps you navigate through t
 ## 🏗️ Architecture
 - [Architecture Overview](architecture/OVERVIEW.md) - High-level system design.
 - [Architecture Decision Records (ADR)](architecture/decisions/README.md) - Key technical decisions.
-- [iOS Architecture](architecture/iOS/README.md) - Detailed iOS design.
-- [Android Architecture](architecture/Android/README.md) - Detailed Android design.
+- [iOS Architecture](../shamelagpt-ios/docs/01_Architecture.md) - Detailed iOS design.
+- [Android Architecture](../shamelagpt-android/docs/01_Architecture.md) - Detailed Android design.
 
 ## 🧪 Testing
 - [iOS Test Plan](testing/iOS_TEST_PLAN.md)
@@ -31,6 +31,3 @@ Welcome to the ShamelaGPT documentation. This index helps you navigate through t
 
 ## 🤖 AI Agents
 - [AI Agent Guide](guides/AI_AGENT_GUIDE.md) - Best practices for AI-assisted development.
-
-## 📊 Project Operations
-- [Project Operations Docs](project/README.md) - Execution tracking and handoff files.

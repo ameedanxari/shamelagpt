@@ -18,6 +18,7 @@ protocol APIClientProtocol {
     func login(_ request: LoginRequest) async throws -> AuthResponse
     func forgotPassword(_ email: String) async throws
     func googleSignIn(_ request: GoogleSignInRequest) async throws -> AuthResponse
+    func appleSignIn(_ request: AppleSignInRequest) async throws -> AuthResponse
     func refreshToken(_ request: RefreshTokenRequest) async throws -> AuthResponse
     func getCurrentUser() async throws -> UserResponse
     func updateCurrentUser(_ request: UpdateUserRequest) async throws -> UserResponse
@@ -25,6 +26,8 @@ protocol APIClientProtocol {
     func verifyToken() async throws
     func getPreferences() async throws -> UserPreferencesRequest
     func setPreferences(_ request: UserPreferencesRequest) async throws
+    func getModePreference() async throws -> ModePreferenceResponse
+    func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse
     func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data
     func listConversations() async throws -> [ConversationResponse]
     func createConversation(_ request: ConversationRequest) async throws -> ConversationResponse
@@ -49,6 +52,7 @@ final class APIClient: APIClientProtocol {
     private let jsonEncoder: JSONEncoder
     private let jsonDecoder: JSONDecoder
     private let authTokenProvider: (() -> String?)?
+    private let authRefreshHandler: (() async -> Bool)?
 
     /// Lightweight empty response placeholder
     private struct EmptyResponse: Decodable {}
@@ -71,7 +75,8 @@ final class APIClient: APIClientProtocol {
     init(
         baseURL: URL? = nil,
         session: URLSession? = nil,
-        authTokenProvider: (() -> String?)? = nil
+        authTokenProvider: (() -> String?)? = nil,
+        authRefreshHandler: (() async -> Bool)? = nil
     ) {
         // Use provided base URL or default
         if let baseURL = baseURL {
@@ -90,7 +95,7 @@ final class APIClient: APIClientProtocol {
         } else if isUITesting {
             let configuration = URLSessionConfiguration.ephemeral
             configuration.timeoutIntervalForRequest = Configuration.timeoutInterval
-            configuration.timeoutIntervalForResource = Configuration.timeoutInterval * 2
+            configuration.timeoutIntervalForResource = Configuration.timeoutInterval
             configuration.httpAdditionalHeaders = Configuration.defaultHeaders
             configuration.waitsForConnectivity = true
             configuration.protocolClasses = [MockURLProtocol.self]
@@ -101,7 +106,7 @@ final class APIClient: APIClientProtocol {
         } else {
             let configuration = URLSessionConfiguration.default
             configuration.timeoutIntervalForRequest = Configuration.timeoutInterval
-            configuration.timeoutIntervalForResource = Configuration.timeoutInterval * 2
+            configuration.timeoutIntervalForResource = Configuration.timeoutInterval
             configuration.httpAdditionalHeaders = Configuration.defaultHeaders
             configuration.waitsForConnectivity = true
             self.session = URLSession(configuration: configuration)
@@ -123,6 +128,7 @@ final class APIClient: APIClientProtocol {
         self.jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
 
         self.authTokenProvider = authTokenProvider
+        self.authRefreshHandler = authRefreshHandler
     }
 
     /// Detects UI test environment (arguments, env, or runner bundle path)
@@ -196,6 +202,30 @@ final class APIClient: APIClientProtocol {
         return try await performRequest(url: endpoint, method: "POST", body: request)
     }
 
+    /// Apple Sign-In
+    func appleSignIn(_ request: AppleSignInRequest) async throws -> AuthResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/apple")
+        AppLogger.appleAuth.logInfo(
+            prefix: AppLogger.LogPrefix.appleAuth,
+            "event=apiClient.appleSignIn.request.start method=POST path=\(endpoint.path) host=\(endpoint.host ?? "nil") idTokenLength=\(request.idToken.count)"
+        )
+        do {
+            let response: AuthResponse = try await performRequest(url: endpoint, method: "POST", body: request)
+            AppLogger.appleAuth.logInfo(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=apiClient.appleSignIn.request.success userId=\(AppLogger.redactedUserPayloadId(response.user)) email=\(AppLogger.redactedUserPayloadEmail(response.user)) tokenPresent=\(!response.token.isEmpty) refreshTokenPresent=\(!response.refreshToken.isEmpty) expiresIn=\(response.expiresIn)"
+            )
+            return response
+        } catch {
+            let nsError = error as NSError
+            AppLogger.appleAuth.logWarning(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=apiClient.appleSignIn.request.failure domain=\(nsError.domain) code=\(nsError.code) errorType=\(type(of: error)) message=\(error.localizedDescription)"
+            )
+            throw error
+        }
+    }
+
     /// Refresh token
     func refreshToken(_ request: RefreshTokenRequest) async throws -> AuthResponse {
         let endpoint = baseURL.appendingPathComponent("api/auth/refresh")
@@ -235,6 +265,16 @@ final class APIClient: APIClientProtocol {
     func setPreferences(_ request: UserPreferencesRequest) async throws {
         let endpoint = baseURL.appendingPathComponent("api/auth/me/preferences")
         _ = try await performRequest(url: endpoint, method: "PUT", body: request) as EmptyResponse
+    }
+
+    func getModePreference() async throws -> ModePreferenceResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me/mode")
+        return try await performRequest(url: endpoint, method: "GET")
+    }
+
+    func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me/mode")
+        return try await performRequest(url: endpoint, method: "PUT", body: request)
     }
 
     /// Title generation
@@ -293,7 +333,8 @@ final class APIClient: APIClientProtocol {
     private func performRequest<T: Decodable>(
         url: URL,
         method: String,
-        body: Encodable? = nil
+        body: Encodable? = nil,
+        allowAuthRetry: Bool = true
     ) async throws -> T {
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -309,7 +350,7 @@ final class APIClient: APIClientProtocol {
                 let encodedBody = try jsonEncoder.encode(body)
                 request.httpBody = encodedBody
                 if let bodyString = String(data: encodedBody, encoding: .utf8) {
-                    AppLogger.network.logDebug("Request body: \(bodyString)")
+                    AppLogger.network.logDebug("Request body: \(redactedRequestBodyLog(bodyString, url: url))")
                 }
             } catch {
                 AppLogger.network.logError("Failed to encode request body", error: error)
@@ -334,7 +375,21 @@ final class APIClient: APIClientProtocol {
         }
 
         // Validate response
-        try validateResponse(response)
+        do {
+            try validateResponse(response, data: data)
+        } catch NetworkError.httpError(let statusCode)
+            where allowAuthRetry && shouldAttemptAuthRetry(statusCode: statusCode, url: url) {
+            AppLogger.auth.logInfo("HTTP \(statusCode) received; attempting token refresh and one retry")
+            if await authRefreshHandler?() == true {
+                return try await performRequest(
+                    url: url,
+                    method: method,
+                    body: body,
+                    allowAuthRetry: false
+                )
+            }
+            throw NetworkError.httpError(statusCode: statusCode)
+        }
 
         // Decode response
         do {
@@ -365,13 +420,16 @@ final class APIClient: APIClientProtocol {
         }
     }
 
-    /// Validates the HTTP response
-    private func validateResponse(_ response: URLResponse) throws {
+    /// Validates the HTTP response, logging the body on failure
+    private func validateResponse(_ response: URLResponse, data: Data) throws {
         guard let httpResponse = response as? HTTPURLResponse else {
+            AppLogger.network.logWarning("validateResponse: not an HTTPURLResponse")
             throw NetworkError.invalidResponse
         }
 
         guard (200...299).contains(httpResponse.statusCode) else {
+            let bodyPreview = String(data: data, encoding: .utf8).map { String($0.prefix(500)) } ?? "<non-UTF8>"
+            AppLogger.network.logWarning("HTTP error status=\(httpResponse.statusCode) url=\(httpResponse.url?.absoluteString ?? "?") body=\(bodyPreview)")
             throw NetworkError.httpError(statusCode: httpResponse.statusCode)
         }
     }
@@ -395,7 +453,8 @@ final class APIClient: APIClientProtocol {
     /// Streams SSE responses as text chunks
     private func streamRequest(
         url: URL,
-        body: Encodable
+        body: Encodable,
+        allowAuthRetry: Bool = true
     ) async throws -> AsyncThrowingStream<String, Error> {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -414,14 +473,32 @@ final class APIClient: APIClientProtocol {
             AppLogger.network.logDebug("SSE request body (first 2000 chars): \(bodyString.prefix(2000))")
         }
 
-        let (bytes, response) = try await streamSession.bytes(for: request)
+        let bytesAndResponse: (URLSession.AsyncBytes, URLResponse)
+        do {
+            bytesAndResponse = try await streamSession.bytes(for: request)
+        } catch {
+            if let urlError = error as? URLError {
+                throw mapURLError(urlError)
+            }
+            throw NetworkError.unknown(error)
+        }
+        let (bytes, response) = bytesAndResponse
 
         if let httpResp = response as? HTTPURLResponse {
             AppLogger.network.logInfo("SSE response status: \(httpResp.statusCode)")
             AppLogger.network.logDebug("SSE response headers: \(httpResp.allHeaderFields)")
         }
 
-        try validateResponse(response)
+        do {
+            try validateResponse(response, data: Data())
+        } catch NetworkError.httpError(let statusCode)
+            where allowAuthRetry && shouldAttemptAuthRetry(statusCode: statusCode, url: url) {
+            AppLogger.auth.logInfo("SSE HTTP \(statusCode) received; attempting token refresh and one retry")
+            if await authRefreshHandler?() == true {
+                return try await streamRequest(url: url, body: body, allowAuthRetry: false)
+            }
+            throw NetworkError.httpError(statusCode: statusCode)
+        }
 
         let stream = AsyncThrowingStream<String, Error> { continuation in
             Task {
@@ -440,6 +517,41 @@ final class APIClient: APIClientProtocol {
         }
 
         return stream
+    }
+
+    private func shouldAttemptAuthRetry(statusCode: Int, url: URL) -> Bool {
+        guard statusCode == 401 || statusCode == 403 else { return false }
+        let path = url.path.lowercased()
+        return !path.contains("/api/auth/")
+    }
+
+    private func redactedRequestBodyLog(_ bodyString: String, url: URL) -> String {
+        let path = url.path.lowercased()
+        if path.contains("/api/auth/apple") || path.contains("/api/auth/google") || path.contains("/api/auth/refresh") {
+            return redactSensitiveJSONFields(
+                bodyString,
+                sensitiveKeys: ["id_token", "idToken", "refresh_token", "refreshToken"]
+            )
+        }
+        return bodyString
+    }
+
+    private func redactSensitiveJSONFields(_ bodyString: String, sensitiveKeys: Set<String>) -> String {
+        guard let data = bodyString.data(using: .utf8),
+              var object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return "<redacted sensitive request body>"
+        }
+
+        for key in sensitiveKeys where object[key] != nil {
+            object[key] = "<redacted>"
+        }
+
+        guard let redactedData = try? JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]),
+              let redactedString = String(data: redactedData, encoding: .utf8) else {
+            return "<redacted sensitive request body>"
+        }
+
+        return redactedString
     }
 }
 
@@ -577,6 +689,17 @@ final class PreviewMockAPIClient: APIClientProtocol {
         return
     }
 
+    func getModePreference() async throws -> ModePreferenceResponse {
+        ModePreferenceResponse(modePreference: 1, modeName: "research")
+    }
+
+    func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse {
+        ModePreferenceResponse(
+            modePreference: request.modePreference,
+            modeName: request.modePreference == 2 ? "fact_check" : "research"
+        )
+    }
+
     func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data {
         return Data("{\"title\":\"Mock Title\"}".utf8)
     }
@@ -602,6 +725,10 @@ final class PreviewMockAPIClient: APIClientProtocol {
     }
 
     func googleSignIn(_ request: GoogleSignInRequest) async throws -> AuthResponse {
+        return mockAuthResponse
+    }
+
+    func appleSignIn(_ request: AppleSignInRequest) async throws -> AuthResponse {
         return mockAuthResponse
     }
 

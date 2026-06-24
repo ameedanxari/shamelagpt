@@ -22,6 +22,7 @@ Purpose: authoritative, exhaustive use-case list for iOS v1.0 to align unit/UI t
 #### Website & Universal Links
 - The app supports universal links for `https://shamelagpt.com` and `https://www.shamelagpt.com`.
 - URLs like `https://shamelagpt.com/chat?id=<conversationId>` must open the app and route to the specified conversation (or start a new chat if `id` is absent).
+- New shared URLs (`https://shamelagpt.com/shared?chatid=<conversationId>`) are also supported and should behave identically. These are generated when a user taps “Share conversation”.
 - The site must host an `apple-app-site-association` file at `/.well-known/apple-app-site-association` (or at the site root) with the correct `appID` and paths (`/chat` and `/chat/*`).
 
 ### Authentication (Email/Password + Guest)

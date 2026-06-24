@@ -30,6 +30,7 @@ class MockAPIClient: APIClientProtocol {
     )
     var mockCreateConversationResponse: ConversationResponse?
     var mockUserPreferencesResponse: UserPreferencesRequest?
+    var mockModePreferenceResponse = ModePreferenceResponse(modePreference: 1, modeName: "research")
 
     // Track calls
     var healthCheckCallCount = 0
@@ -44,9 +45,12 @@ class MockAPIClient: APIClientProtocol {
     var verifyTokenCallCount = 0
     var forgotPasswordCallCount = 0
     var googleSignInCallCount = 0
+    var appleSignInCallCount = 0
     var refreshTokenCallCount = 0
     var getPreferencesCallCount = 0
     var setPreferencesCallCount = 0
+    var getModePreferenceCallCount = 0
+    var setModePreferenceCallCount = 0
     var generateTitleCallCount = 0
     var listConversationsCallCount = 0
     var createConversationCallCount = 0
@@ -55,6 +59,7 @@ class MockAPIClient: APIClientProtocol {
     var getMessagesCallCount = 0
     var lastSendMessageRequest: ChatRequest?
     var lastSetPreferencesRequest: UserPreferencesRequest?
+    var lastSetModePreferenceRequest: ModePreferenceRequest?
 
     func healthCheck() async throws -> HealthResponse {
         healthCheckCallCount += 1
@@ -163,6 +168,17 @@ class MockAPIClient: APIClientProtocol {
         )
     }
 
+    func appleSignIn(_ request: AppleSignInRequest) async throws -> AuthResponse {
+        appleSignInCallCount += 1
+        if shouldFail { throw errorToThrow }
+        return AuthResponse(
+            token: "mock-token",
+            refreshToken: "mock-refresh",
+            expiresIn: "3600",
+            user: ["uid": AnyCodable("apple-123")]
+        )
+    }
+
     func refreshToken(_ request: RefreshTokenRequest) async throws -> AuthResponse {
         refreshTokenCallCount += 1
         if shouldFail { throw errorToThrow }
@@ -244,6 +260,29 @@ class MockAPIClient: APIClientProtocol {
             try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
         }
         if shouldFail { throw errorToThrow }
+    }
+
+    func getModePreference() async throws -> ModePreferenceResponse {
+        getModePreferenceCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return mockModePreferenceResponse
+    }
+
+    func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse {
+        setModePreferenceCallCount += 1
+        lastSetModePreferenceRequest = request
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        mockModePreferenceResponse = ModePreferenceResponse(
+            modePreference: request.modePreference,
+            modeName: request.modePreference == 2 ? "fact_check" : "research"
+        )
+        return mockModePreferenceResponse
     }
 
     func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data {
@@ -354,6 +393,8 @@ class MockAPIClient: APIClientProtocol {
         refreshTokenCallCount = 0
         getPreferencesCallCount = 0
         setPreferencesCallCount = 0
+        getModePreferenceCallCount = 0
+        setModePreferenceCallCount = 0
         generateTitleCallCount = 0
         listConversationsCallCount = 0
         createConversationCallCount = 0
@@ -367,6 +408,8 @@ class MockAPIClient: APIClientProtocol {
         streamGuestMessageError = nil
         mockUserPreferencesResponse = nil
         lastSetPreferencesRequest = nil
+        mockModePreferenceResponse = ModePreferenceResponse(modePreference: 1, modeName: "research")
+        lastSetModePreferenceRequest = nil
     }
 }
 

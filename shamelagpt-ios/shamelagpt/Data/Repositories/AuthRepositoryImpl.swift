@@ -67,6 +67,39 @@ final class AuthRepositoryImpl: AuthRepository {
         }
     }
 
+    func appleSignIn(request: AppleSignInRequest) async throws -> AuthResponse {
+        do {
+            AppLogger.appleAuth.logDebug(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=repository.appleSignIn.apiCall.start endpoint=/api/auth/apple idTokenLength=\(request.idToken.count)"
+            )
+            let response = try await apiClient.appleSignIn(request)
+            AppLogger.appleAuth.logDebug(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=repository.appleSignIn.persistSession.start tokenPresent=\(!response.token.isEmpty) refreshTokenPresent=\(!response.refreshToken.isEmpty) expiresIn=\(response.expiresIn)"
+            )
+            persistSession(from: response)
+            AppLogger.appleAuth.logInfo(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=repository.appleSignIn.success userId=\(AppLogger.redactedUserPayloadId(response.user)) email=\(AppLogger.redactedUserPayloadEmail(response.user)) tokenPresent=\(!response.token.isEmpty) refreshTokenPresent=\(!response.refreshToken.isEmpty) expiresIn=\(response.expiresIn)"
+            )
+            return response
+        } catch {
+            let nsError = error as NSError
+            AppLogger.appleAuth.logWarning(
+                prefix: AppLogger.LogPrefix.appleAuth,
+                "event=repository.appleSignIn.failure domain=\(nsError.domain) code=\(nsError.code) errorType=\(type(of: error)) message=\(error.localizedDescription)"
+            )
+            if let networkError = error as? NetworkError {
+                AppLogger.appleAuth.logWarning(
+                    prefix: AppLogger.LogPrefix.appleAuth,
+                    "event=repository.appleSignIn.networkError detail=\(networkError)"
+                )
+            }
+            throw normalizeError(error)
+        }
+    }
+
     func refreshToken(request: RefreshTokenRequest) async throws -> AuthResponse {
         do {
             AppLogger.auth.logInfo("refresh token request started")
@@ -124,6 +157,22 @@ final class AuthRepositoryImpl: AuthRepository {
     func setPreferences(_ request: UserPreferencesRequest) async throws {
         do {
             try await apiClient.setPreferences(request)
+        } catch {
+            throw normalizeError(error)
+        }
+    }
+
+    func getModePreference() async throws -> ModePreferenceResponse {
+        do {
+            return try await apiClient.getModePreference()
+        } catch {
+            throw normalizeError(error)
+        }
+    }
+
+    func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse {
+        do {
+            return try await apiClient.setModePreference(request)
         } catch {
             throw normalizeError(error)
         }

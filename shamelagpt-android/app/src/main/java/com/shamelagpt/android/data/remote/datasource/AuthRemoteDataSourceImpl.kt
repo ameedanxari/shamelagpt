@@ -1,6 +1,7 @@
 package com.shamelagpt.android.data.remote.datasource
 
 import com.shamelagpt.android.core.network.safeApiCall
+import com.shamelagpt.android.core.util.Logger
 import com.shamelagpt.android.data.remote.ApiService
 import com.shamelagpt.android.data.remote.dto.AuthResponse
 import com.shamelagpt.android.data.remote.dto.LoginRequest
@@ -11,7 +12,11 @@ import com.shamelagpt.android.data.remote.dto.UserResponse
 import com.shamelagpt.android.data.remote.dto.EmptyResponse
 import com.shamelagpt.android.data.remote.dto.ForgotPasswordRequest
 import com.shamelagpt.android.data.remote.dto.GoogleSignInRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
+import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
 import com.shamelagpt.android.data.remote.dto.RefreshTokenRequest
+
+private const val TAG = "AuthRemoteDataSourceImpl"
 
 class AuthRemoteDataSourceImpl(
     private val apiService: ApiService,
@@ -34,8 +39,17 @@ class AuthRemoteDataSourceImpl(
         apiService.forgotPassword(request)
     }
 
-    override suspend fun googleSignIn(request: GoogleSignInRequest): Result<AuthResponse> = safeApiCall {
-        apiService.googleSignIn(request)
+    override suspend fun googleSignIn(request: GoogleSignInRequest): Result<AuthResponse> {
+        Logger.i(TAG, "datasource google sign-in started")
+        Logger.d(TAG, "datasource google sign-in id_token length=${request.idToken.length}")
+        val result = safeApiCall {
+            apiService.googleSignIn(request)
+        }
+        result.onFailure { ex ->
+            Logger.w(TAG, "datasource google sign-in failed reason=${ex::class.simpleName}")
+            Logger.e(TAG, "datasource google sign-in error", ex)
+        }
+        return result
     }
 
     override suspend fun refreshToken(request: RefreshTokenRequest): Result<AuthResponse> = safeApiCall {
@@ -64,5 +78,13 @@ class AuthRemoteDataSourceImpl(
 
     override suspend fun setPreferences(request: UserPreferencesRequest): Result<EmptyResponse> = callWithAuth {
         apiService.setPreferences(request)
+    }
+
+    override suspend fun getModePreference(): Result<ModePreferenceResponse> = callWithAuth {
+        apiService.getModePreference()
+    }
+
+    override suspend fun setModePreference(request: ModePreferenceRequest): Result<ModePreferenceResponse> = callWithAuth {
+        apiService.setModePreference(request)
     }
 }

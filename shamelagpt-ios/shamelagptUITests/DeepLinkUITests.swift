@@ -45,6 +45,10 @@ final class DeepLinkUITests: LocalizedUITestCase {
         let url = URL(string: "shamelagpt://chat?id=deeplink-ui")!
         app.open(url)
 
+        // also verify new shared link format opens chat and leaves input ready
+        let sharedUrl = URL(string: "https://shamelagpt.com/shared?chatid=deeplink-ui")!
+        app.open(sharedUrl)
+
         let input = app.textViews["messageInputField"]
         XCTAssertTrue(waitForElement(input), "Chat input should appear after chat deep link")
         XCTAssertTrue(input.isHittable, "Chat input should be ready after deep link navigation")

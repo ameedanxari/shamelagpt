@@ -1,10 +1,10 @@
 <resources>
     <!-- App -->
-    <string name="app_name">شاملہ GPT</string>
+    <string name="app_name">شاملہ AI</string>
 
     <!-- Welcome Screen -->
-    <string name="welcome_title">شاملہ جی پی ٹی میں خوش آمدید</string>
-    <string name="welcome_message">شاملہ جی پی ٹی قابلِ اعتماد Shamela.ws لائبریری پر مبنی ہے، تاکہ مستند اسلامی علم سب کے قریب لایا جا سکے.\n\nہمارا مقصد یہ ہے کہ مستند، حوالہ شدہ معلومات کو قدرتی اور مکالماتی انداز میں — زبانوں، پس منظر اور سمجھ کے مختلف درجات میں — دستیاب کیا جائے.\n\nچاہے آپ گہری بصیرت چاہتے ہوں، تیز وضاحتیں، یا عام غلط فہمیوں پر دلائل کے ساتھ جواب، شاملہ جی پی ٹی آپ کو اسلامی ورثہ احترام، دقت اور آسانی کے ساتھ دریافت کرنے میں مدد دیتا ہے.\n\n\"گہوارے سے گور تک علم حاصل کرو\" — یہ ایپ اس سفر میں آپ کی رفیق بنے.</string>
+    <string name="welcome_title">شاملہ AI میں خوش آمدید</string>
+    <string name="welcome_message">شاملہ AI قابلِ اعتماد Shamela.ws لائبریری پر مبنی ہے، تاکہ مستند اسلامی علم سب کے قریب لایا جا سکے.\n\nہمارا مقصد یہ ہے کہ مستند، حوالہ شدہ معلومات کو قدرتی اور مکالماتی انداز میں — زبانوں، پس منظر اور سمجھ کے مختلف درجات میں — دستیاب کیا جائے.\n\nچاہے آپ گہری بصیرت چاہتے ہوں، تیز وضاحتیں، یا عام غلط فہمیوں پر دلائل کے ساتھ جواب، شاملہ AI آپ کو اسلامی ورثہ احترام، دقت اور آسانی کے ساتھ دریافت کرنے میں مدد دیتا ہے.\n\n"گہوارے سے گور تک علم حاصل کرو" — یہ ایپ اس سفر میں آپ کی رفیق بنے.</string>
     <string name="welcome_sign_in_title">بہتر تجربے کے لیے سائن اِن کریں</string>
     <string name="welcome_sign_in_message">اپنی گفتگوئیں محفوظ کرنے، سابقہ سوالات دوبارہ دیکھنے، اور بامعنی مباحث شیئر کرنے کے لیے لاگ اِن کریں.\n\nاکاؤنٹ بنانے سے ہم آپ کے سیکھنے کے تجربے کو بہتر بنا سکتے ہیں — بصیرت، زبان کی ترجیحات، اور حوالہ جاتی راستوں کو آپ کے لیے ذاتی بنا کر.\n\nابھی سائن اِن کریں اور علم کی اس راہ پر مستقل مزاجی اور وضاحت کے ساتھ چلتے رہیں.</string>
     <string name="get_started">شروع کریں</string>
@@ -25,14 +25,25 @@
     <string name="continue_as_guest">بطور مہمان جاری رکھیں</string>
     <string name="need_account">اکاؤنٹ نہیں ہے؟ نیا بنائیں</string>
     <string name="have_account">اکاؤنٹ ہے؟ سائن اِن کریں</string>
+    <string name="auth_invalid_credentials">سائن اِن نہیں ہو سکا۔ اپنا ای میل اور پاس ورڈ چیک کریں اور دوبارہ کوشش کریں۔</string>
+    <string name="auth_email_exists_use_login">یہ ای میل پہلے سے رجسٹرڈ ہے۔ براہ کرم سائن اِن کریں۔</string>
+    <string name="sign_in_with_google">گوگل سے سائن اِن کریں</string>
+    <string name="auth_or_divider">یا</string>
+    <string name="google_sign_in_failed">گوگل سائن اِن ناکام ہوا۔ براہ کرم دوبارہ کوشش کریں۔</string>
 
     <!-- Chat Screen -->
-    <string name="chat_title">شاملہ GPT</string>
+    <string name="chat_title">شاملہ AI</string>
     <string name="chat_placeholder">اسلام کے بارے میں کوئی سوال پوچھیں...</string>
     <string name="send">بھیجیں</string>
     <string name="typing">AI جواب تیار کر رہا ہے...</string>
     <string name="copy">کاپی کریں</string>
     <string name="common_share">شیئر کریں</string>
+    <string name="share_conversation_title">شاملہ AI گفتگو</string>
+    <string name="share_messages_count">اس گفتگو میں %1$d پیغامات ہیں</string>
+    <string name="share_last_updated">آپڈیٹ ہوا: %1$s</string>
+    <string name="share_preview">پیش نظارہ:</string>
+    <string name="share_read_full">مکمل گفتگو پڑھیں:</string>
+    <string name="share_powered_by">شاملہ AI کی طاقت سے - آپا کا اسلامی علمی معاون</string>
     <string name="copied">کاپی کلپ بورڈ پر ہو گئی</string>
     <string name="start_conversation">گفتگو شروع کریں</string>
     <string name="ask_anything">اسلام کے بارے میں کچھ بھی پوچھیں یا متن کی تصدیق کے لیے کیمرہ استعمال کریں</string>
@@ -62,7 +73,7 @@
     <string name="settings_language">زبان</string>
     <string name="settings_ai_preferences">اے آئی ترجیحات</string>
     <string name="settings_support">مدد</string>
-    <string name="settings_support_shamelagpt">شاملہ جی پی ٹی کی مدد کریں</string>
+    <string name="settings_support_shamelagpt">شاملہ AI کی مدد کریں</string>
     <string name="settings_about">متعلق</string>
     <string name="support">مدد</string>
     <string name="support_shamelagpt">شاملہ جی پی ٹی کی مدد کریں</string>
@@ -77,6 +88,9 @@
     <string name="settings_custom_prompt">مخصوص سسٹم پرامپٹ</string>
     <string name="settings_custom_prompt_optional">اختیاری</string>
     <string name="settings_not_set">سیٹ نہیں ہے</string>
+    <string name="settings_mode_preference">چیٹ موڈ</string>
+    <string name="settings_mode_research">تحقیق</string>
+    <string name="settings_mode_fact_check">فیکٹ چیک</string>
     <string name="settings_save_preferences">ترجیحات محفوظ کریں</string>
     <string name="settings_sign_out">سائن آؤٹ</string>
     <string name="sign_out_confirmation_title">سائن آؤٹ؟</string>
@@ -99,6 +113,20 @@
     <string name="feedback_prompt_title">فیڈبیک بھیجیں</string>
     <string name="feedback_prompt_message">کیا آپ ہماری ٹیم کو ای میل کے ذریعے فیڈبیک بھیجنا چاہتے ہیں؟</string>
     <string name="feedback_email_subject">شاملہ جی پی ٹی فیڈبیک</string>
+
+    <!-- Donation -->
+    <string name="donate_sheet_title">شاملہ AI کی مدد کریں</string>
+    <string name="donate_sheet_subtitle">اسلامی علم کی تصدیق، غلط معلومات سے لڑنے، اور ایک زیادہ جامع دنیا بنانے میں ہماری مدد کریں۔</string>
+    <string name="donate_footer_android">Google Play سبسکرپشنز خودکار طور پر تجدید ہوتی ہیں۔ آپ Google Play سبسکرپشنز میں کسی بھی وقت منسوخ کر سکتے ہیں۔</string>
+    <string name="donate_load_failed">عطیہ کے اختیارات لوڈ نہیں ہو سکے۔ براہ کرم اپنا کنکشن چیک کریں اور دوبارہ کوشش کریں۔</string>
+    <string name="donate_product_unavailable">عطیہ کا یہ اختیار فی الحال دستیاب نہیں ہے۔</string>
+    <string name="donate_purchase_failed">عطیہ شروع نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="donate_purchase_pending">آپ کا عطیہ زیر التوا ہے۔ ادائیگی مکمل ہونے پر Google Play ہمیں اطلاع دے گا۔</string>
+    <string name="donate_current">موجودہ</string>
+    <string name="donate_current_status">موجودہ عطیہ: %1$s</string>
+    <string name="donate_paypal_title">اس کے بجائے PayPal سے عطیہ دیں</string>
+    <string name="donate_success_title">شکریہ</string>
+    <string name="donate_success_message">آپ کی مدد ہمیں غلط معلومات سے لڑنے اور سب کے لیے درست اسلامی علم کو فروغ دینے میں مدد کرتی ہے۔</string>
 
     <!-- Language Selection -->
     <string name="select_language">زبان منتخب کریں</string>
@@ -146,6 +174,14 @@
     <string name="ocr_error_failed">متن شناخت نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔</string>
     <string name="ocr_error_image_data_missing">تصویری ڈیٹا دستیاب نہیں۔ براہ کرم تصویر دوبارہ منتخب کریں۔</string>
     <string name="offline_mode">آپ آف لائن ہیں۔ کنکشن بحال ہونے پر پیغامات بھیجے جائیں گے.</string>
+    <string name="chat_error_send_failed">آپ کا پیغام نہیں بھیجا جا سکا۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="chat_error_conversation_unavailable">یہ گفتگو دستیاب نہیں ہے۔ براہ کرم اسے ہسٹری سے دوبارہ کھول کر کوشش کریں۔</string>
+    <string name="chat_error_fact_check_failed">فیکٹ چیک مکمل نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="chat_error_share_import_failed">شیئر کیا گیا مواد درآمد نہیں ہو سکا۔ براہ کرم دوبارہ شیئر کریں۔</string>
+    <string name="chat_error_request_cancelled">درخواست منسوخ ہو گئی۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="chat_warning_showing_saved_messages">سرور سے تازہ کاری نہیں ہو سکی۔ محفوظ پیغامات دکھائے جا رہے ہیں۔</string>
+    <string name="chat_warning_continuity_not_saved">گفتگو کا سیاق محفوظ نہیں ہو سکا۔ آئندہ جوابات میں سیاق ضائع ہو سکتا ہے۔</string>
+    <string name="chat_warning_mode_preference_not_saved">چیٹ موڈ ہم آہنگ نہیں ہو سکا۔ آخری محفوظ موڈ استعمال ہو گا۔</string>
 
     <!-- Network Error Messages (user-friendly) -->
     <string name="network_no_connection">انٹرنیٹ کنکشن نہیں۔ براہ کرم نیٹ ورک سیٹنگز چیک کریں.</string>

@@ -11,7 +11,7 @@ enum Constants {
     // MARK: - API Configuration
     enum API {
         static let baseURL = "https://api.shamelagpt.com"
-        static let timeoutInterval: TimeInterval = 30.0
+        static let timeoutInterval: TimeInterval = 120.0
 
         enum Endpoints {
             static let health = "/api/health"

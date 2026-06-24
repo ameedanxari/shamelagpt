@@ -1,6 +1,8 @@
 package com.shamelagpt.android.data.remote.datasource
 
 import android.os.SystemClock
+import com.shamelagpt.android.core.error.ChatOperation
+import com.shamelagpt.android.core.error.ChatOperationException
 import com.shamelagpt.android.core.network.safeApiCall
 import com.shamelagpt.android.data.remote.ApiService
 import com.shamelagpt.android.data.remote.dto.ChatRequest
@@ -134,30 +136,50 @@ class ChatRemoteDataSourceImpl(
                     val trimmed = line.trim()
                     if (trimmed.startsWith("data:")) {
                         val data = trimmed.substring(5).trim()
-                        if (data == "[DONE]") break
+                        if (data == "[DONE]") {
+                            emit(StreamEvent(type = "done"))
+                            emittedCount++
+                            break
+                        }
                         if (data.isEmpty()) continue
 
                         try {
                             val event = gson.fromJson(data, StreamEvent::class.java)
+                            validateStreamEvent(event, data)
                             emit(event)
                             emittedCount++
                             if (emittedCount <= 3 || emittedCount % 25 == 0) {
                                 Log.d(TAG, "SSE event emitted type=${event.type} count=$emittedCount")
                             }
                         } catch (e: Exception) {
+                            if (e is ChatOperationException) throw e
                             Log.e(TAG, "Error parsing SSE chunk: $data", e)
+                            throw ChatOperationException(
+                                operation = ChatOperation.SEND_MESSAGE,
+                                code = "E-CHAT-STREAM-PARSE",
+                                message = "Failed to parse stream event",
+                                cause = e
+                            )
                         }
                     } else if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
                         // Some guest streams might send raw JSON objects without "data:" prefix
                         try {
                             val event = gson.fromJson(trimmed, StreamEvent::class.java)
+                            validateStreamEvent(event, trimmed)
                             emit(event)
                             emittedCount++
                             if (emittedCount <= 3 || emittedCount % 25 == 0) {
                                 Log.d(TAG, "raw JSON event emitted type=${event.type} count=$emittedCount")
                             }
                         } catch (e: Exception) {
+                            if (e is ChatOperationException) throw e
                             Log.e(TAG, "Error parsing raw JSON chunk: $trimmed", e)
+                            throw ChatOperationException(
+                                operation = ChatOperation.SEND_MESSAGE,
+                                code = "E-CHAT-STREAM-PARSE",
+                                message = "Failed to parse stream event",
+                                cause = e
+                            )
                         }
                     }
                 }
@@ -177,6 +199,29 @@ class ChatRemoteDataSourceImpl(
                 it
             )
             throw it 
+        }
+    }
+
+    private fun validateStreamEvent(event: StreamEvent?, raw: String) {
+        if (event == null) {
+            throw ChatOperationException(
+                operation = ChatOperation.SEND_MESSAGE,
+                code = "E-CHAT-STREAM-PARSE",
+                message = "Stream event was empty"
+            )
+        }
+        when (event.type) {
+            "metadata", "thinking", "chunk", "done" -> Unit
+            "error" -> throw ChatOperationException(
+                operation = ChatOperation.SEND_MESSAGE,
+                code = "E-CHAT-STREAM-BACKEND",
+                message = event.message ?: event.error ?: event.content ?: "Backend stream error"
+            )
+            else -> throw ChatOperationException(
+                operation = ChatOperation.SEND_MESSAGE,
+                code = "E-CHAT-STREAM-UNKNOWN",
+                message = "Unknown stream event type '${event.type}' in $raw"
+            )
         }
     }
 

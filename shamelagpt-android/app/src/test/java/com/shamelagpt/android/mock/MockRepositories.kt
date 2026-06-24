@@ -323,6 +323,18 @@ class MockAuthRepository : com.shamelagpt.android.domain.repository.AuthReposito
         responsePreferences = null
     ))
     override suspend fun setPreferences(request: com.shamelagpt.android.data.remote.dto.UserPreferencesRequest): Result<Unit> = Result.success(Unit)
+    override suspend fun getModePreference(): Result<com.shamelagpt.android.data.remote.dto.ModePreferenceResponse> = Result.success(
+        com.shamelagpt.android.data.remote.dto.ModePreferenceResponse(
+            modePreference = 1,
+            modeName = "research"
+        )
+    )
+    override suspend fun setModePreference(modePreference: Int): Result<com.shamelagpt.android.data.remote.dto.ModePreferenceResponse> = Result.success(
+        com.shamelagpt.android.data.remote.dto.ModePreferenceResponse(
+            modePreference = modePreference,
+            modeName = if (modePreference == 2) "fact_check" else "research"
+        )
+    )
     override fun logout() {}
     override fun getToken(): String? = "mock_token"
     override fun isLoggedIn(): Boolean = true
