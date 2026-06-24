@@ -116,7 +116,7 @@ struct AuthView: View {
             )
             .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
             .frame(height: 50)
-            .cornerRadius(DesignSystem.CornerRadius.md)
+            .cornerRadius(DesignSystem.Layout.cornerRadius)
             .disabled(viewModel.isLoading)
 
             // Toggle mode link
