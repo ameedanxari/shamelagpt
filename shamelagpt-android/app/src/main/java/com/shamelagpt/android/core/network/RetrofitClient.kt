@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
 object RetrofitClient {
 
     private const val BASE_URL = "https://shamelagpt.com/"
-    private const val TIMEOUT_SECONDS = 30L
+    private const val TIMEOUT_SECONDS = 120L
 
     /**
      * Creates a configured OkHttpClient.

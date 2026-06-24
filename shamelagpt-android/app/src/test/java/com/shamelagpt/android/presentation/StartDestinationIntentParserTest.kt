@@ -129,6 +129,22 @@ class StartDestinationIntentParserTest {
     }
 
     @Test
+    fun parseHttpsSharedPathWithChatIdRoutesToChatConversation() {
+        val intent = mockIntent(
+            data = mockUri(
+                scheme = "https",
+                host = "shamelagpt.com",
+                path = "/shared",
+                queryChatId = "conv-xyz"
+            )
+        )
+
+        val route = StartDestinationIntentParser.parse(intent)
+
+        assertThat(route).isEqualTo(ChatRoute("conv-xyz"))
+    }
+
+    @Test
     fun parseUnknownDeepLinkReturnsNull() {
         val intent = mockIntent(
             data = mockUri(
@@ -160,13 +176,15 @@ class StartDestinationIntentParserTest {
         scheme: String,
         host: String?,
         path: String,
-        queryConversationId: String? = null
+        queryConversationId: String? = null,
+        queryChatId: String? = null
     ): android.net.Uri {
         return mockk {
             every { this@mockk.scheme } returns scheme
             every { this@mockk.host } returns host
             every { this@mockk.path } returns path
             every { getQueryParameter("id") } returns queryConversationId
+            every { getQueryParameter("chatid") } returns queryChatId
         }
     }
 }

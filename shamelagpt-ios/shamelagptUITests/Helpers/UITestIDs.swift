@@ -23,6 +23,8 @@ enum UITestID {
         static let errorLabel = "errorLabel"
         static let signInButton = "signInButton"
         static let signUpButton = "signUpButton"
+        static let googleSignInButton = "googleSignInButton"
+        static let appleSignInButton = "appleSignInButton"
         static let continueAsGuestButton = "continueAsGuestButton"
         static let toggleModeButton = "toggleModeButton"
     }
@@ -32,6 +34,8 @@ enum UITestID {
         static let cameraButton = "cameraButton"
         static let micButton = "micButton"
         static let sendButton = "sendButton"
+        static let modeToggleButton = "chatModeToggleButton"
+        static let modeToggleProgress = "chatModeToggleProgress"
         static let typingIndicator = "TypingIndicator"
         static let thinkingBubble = "ThinkingBubble"
         static let messageBubble = "MessageBubble"
@@ -57,6 +61,8 @@ enum UITestID {
         static let aboutRow = "AboutRow"
         static let privacyRow = "PrivacyRow"
         static let termsRow = "TermsRow"
+        static let donateButton = "DonateButton"
+        static func donationTier(_ productID: String) -> String { "donationTier_\(productID)" }
         static func languageOption(_ code: String) -> String { "LanguageOption_\(code)" }
         static func languageCheckmark(_ code: String) -> String { "LanguageSelectedCheckmark_\(code)" }
     }

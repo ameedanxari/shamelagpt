@@ -1,0 +1,203 @@
+{
+  "identifier" : "ShamelaGPT",
+  "nonConsumableProducts" : [
+
+  ],
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Overlay"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Token Exchange"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Renewal"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21588882",
+      "localizations" : [
+        {
+          "customAppName" : "ShamelaGPT",
+          "displayName" : "Support ShamelaGPT",
+          "locale" : "en_US"
+        },
+        {
+          "customAppName" : "شاملة GPT",
+          "displayName" : "ادعم شاملة GPT",
+          "locale" : "ar_SA"
+        }
+      ],
+      "name" : "Support ShamelaGPT",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "0.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "donation_1monthly",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Support our researchers with a monthly coffee. Help us verify Islamic texts and fight misinformation.",
+              "displayName" : "$1 Monthly Support",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "ادعم باحثينا بقهوة شهرية. ساعدنا في التحقق من النصوص الإسلامية ومكافحة المعلومات المضللة.",
+              "displayName" : "دعم شهري بقيمة $1",
+              "locale" : "ar_SA"
+            }
+          ],
+          "productID" : "com.shamelagpt.ios.donation.1monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "$1 Monthly Support",
+          "subscriptionGroupID" : "21588882",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "donation_5monthly",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Support daily fact-checking of Islamic texts and fatwas. Help us become a trusted authority on Islamic knowledge.",
+              "displayName" : "$5 Monthly Support",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "ادعم التحقق اليومي من الحقائق للنصوص الإسلامية والفتاوى. ساعدنا لنصبح مرجعاً موثوقاً للمعرفة الإسلامية.",
+              "displayName" : "دعم شهري بقيمة $5",
+              "locale" : "ar_SA"
+            }
+          ],
+          "productID" : "com.shamelagpt.ios.donation.5monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "$5 Monthly Support",
+          "subscriptionGroupID" : "21588882",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
+          "familyShareable" : false,
+          "groupNumber" : 3,
+          "internalID" : "donation_10monthly",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Help expand our knowledge base and improve AI accuracy. Support our mission to fight islamophobia and promote inter-faith harmony.",
+              "displayName" : "$10 Monthly Support",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "ساعد في توسيع قاعدة معرفتنا وتحسين دقة الذكاء الاصطناعي. ادعم مهمتنا لمكافحة الإسلاموفوبيا وتعزيز الانسجام بين الأديان.",
+              "displayName" : "دعم شهري بقيمة $10",
+              "locale" : "ar_SA"
+            }
+          ],
+          "productID" : "com.shamelagpt.ios.donation.10monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "$10 Monthly Support",
+          "subscriptionGroupID" : "21588882",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "99.99",
+          "familyShareable" : false,
+          "groupNumber" : 4,
+          "internalID" : "donation_100yearly",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Become a patron of Islamic knowledge. Your annual support helps us build the world's most trusted source for verifying Islamic texts and combating religious misinformation.",
+              "displayName" : "$100 Yearly Patron",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "كن راعياً للمعرفة الإسلامية. دعمك السنوي يساعدنا في بناء المصدر الأكثر موثوقية في العالم للتحقق من النصوص الإسلامية ومكافحة المعلومات الدينية المضللة.",
+              "displayName" : "راعي سنوي بقيمة $100",
+              "locale" : "ar_SA"
+            }
+          ],
+          "productID" : "com.shamelagpt.ios.donation.100yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "$100 Yearly Patron",
+          "subscriptionGroupID" : "21588882",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

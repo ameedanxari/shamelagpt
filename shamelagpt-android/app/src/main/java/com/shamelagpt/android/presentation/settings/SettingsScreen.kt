@@ -41,12 +41,15 @@ fun SettingsScreen(
     onNavigateToAuth: () -> Unit,
     onLogout: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel(),
+    donationViewModel: DonationViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val selectedLanguage by viewModel.selectedLanguage.collectAsState()
     val isAuthenticatedState by viewModel.isAuthenticated.collectAsState()
+    val donationUiState by donationViewModel.uiState.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showDonationSheet by remember { mutableStateOf(false) }
 
 
     Scaffold(
@@ -372,7 +375,7 @@ fun SettingsScreen(
                     subtitle = stringResource(R.string.settings_support_subtitle),
                     icon = Icons.Default.Favorite,
                     onClick = {
-                        DonationLinkHandler.openDonationLink(context)
+                        showDonationSheet = true
                     },
                     modifier = Modifier.testTag(TestTags.Settings.SupportItem)
                 )
@@ -451,6 +454,18 @@ fun SettingsScreen(
 
                 }
             }
+        }
+
+        if (showDonationSheet) {
+            DonationSheet(
+                uiState = donationUiState,
+                onDismiss = { showDonationSheet = false },
+                onLoadProducts = { donationViewModel.loadProducts() },
+                onRetry = { donationViewModel.loadProducts(forceRefresh = true) },
+                onPurchase = donationViewModel::purchase,
+                onOpenPayPal = { DonationLinkHandler.openDonationLink(context) },
+                onClearSuccess = donationViewModel::clearPurchaseSuccess
+            )
         }
     }
 }

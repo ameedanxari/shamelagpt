@@ -1,9 +1,12 @@
 package com.shamelagpt.android.domain.usecase
 
 import android.util.Log
+import com.shamelagpt.android.core.error.ChatOperation
+import com.shamelagpt.android.core.error.ChatOperationException
 import com.shamelagpt.android.data.remote.dto.ChatResponse
 import com.shamelagpt.android.domain.repository.ChatRepository
 import com.shamelagpt.android.domain.repository.ConversationRepository
+import kotlinx.coroutines.flow.first
 import java.util.Locale
 
 private const val TAG = "SendMessageUseCase"
@@ -51,6 +54,17 @@ class SendMessageUseCase(
             return Result.failure(IllegalArgumentException("Question cannot be empty"))
         }
 
+        val existingConversation = conversationId?.let {
+            conversationRepository.getConversationById(it)
+                ?: return Result.failure(
+                    ChatOperationException(
+                        operation = ChatOperation.LOAD_CONVERSATION,
+                        code = "E-CHAT-MISSING-CONVERSATION",
+                        message = "Conversation not found"
+                    )
+                )
+        }
+
         // Get or create conversation
         val actualConversationId = conversationId ?: run {
             Log.d(TAG, "No conversation ID provided, creating new conversation...")
@@ -59,6 +73,17 @@ class SendMessageUseCase(
             val conversation = conversationRepository.createConversation(title)
             Log.d(TAG, "Created new conversation: ${conversation.id}")
             conversation.id
+        }
+        val resolvedThreadId = if (
+            existingConversation != null &&
+            !existingConversation.isLocalOnly &&
+            existingConversation.threadId.isNullOrBlank() &&
+            conversationRepository.getMessagesByConversationId(existingConversation.id).first().isNotEmpty()
+        ) {
+            conversationRepository.updateConversationThread(existingConversation.id, existingConversation.id)
+            existingConversation.id
+        } else {
+            existingConversation?.threadId ?: threadId
         }
 
         // Send message to API
@@ -70,7 +95,7 @@ class SendMessageUseCase(
         val result = chatRepository.sendMessage(
             question = question,
             conversationId = actualConversationId,
-            threadId = threadId,
+            threadId = resolvedThreadId,
             saveUserMessage = saveUserMessage,
             promptConfig = promptConfig,
             languagePreference = resolvedLanguagePreference,

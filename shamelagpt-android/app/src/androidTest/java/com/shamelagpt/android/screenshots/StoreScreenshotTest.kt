@@ -13,8 +13,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.core.view.drawToBitmap
@@ -30,6 +33,7 @@ import com.shamelagpt.android.presentation.auth.AuthViewModel
 import com.shamelagpt.android.presentation.chat.ChatEvent
 import com.shamelagpt.android.presentation.chat.ChatScreen
 import com.shamelagpt.android.presentation.chat.ChatUiState
+import com.shamelagpt.android.presentation.common.TestTags
 import com.shamelagpt.android.presentation.settings.SettingsScreen
 import com.shamelagpt.android.presentation.history.HistoryScreen
 import com.shamelagpt.android.presentation.welcome.WelcomeScreen
@@ -64,32 +68,16 @@ class StoreScreenshotTest {
 
     private enum class Screen { Chat, Settings, History, Welcome, Auth }
 
-    private val baseScenarios = listOf(
-        Scenario(id = "chat_happy", locale = "en", screen = Screen.Chat, uiState = happyChatState("en")),
-        Scenario(id = "chat_happy", locale = "ar", screen = Screen.Chat, uiState = happyChatState("ar")),
-        Scenario(id = "chat_happy", locale = "ur", screen = Screen.Chat, uiState = happyChatState("ur")),
-        Scenario(id = "chat_error", locale = "en", screen = Screen.Chat, uiState = errorChatState("en")),
-        Scenario(id = "chat_error", locale = "ar", screen = Screen.Chat, uiState = errorChatState("ar")),
-        Scenario(id = "chat_error", locale = "ur", screen = Screen.Chat, uiState = errorChatState("ur")),
-        Scenario(id = "settings_main", locale = "en", screen = Screen.Settings),
-        Scenario(id = "settings_main", locale = "ar", screen = Screen.Settings),
-        Scenario(id = "settings_main", locale = "ur", screen = Screen.Settings),
-        Scenario(id = "history_list", locale = "en", screen = Screen.History),
-        Scenario(id = "history_list", locale = "ar", screen = Screen.History),
-        Scenario(id = "history_list", locale = "ur", screen = Screen.History),
-        Scenario(id = "welcome_main", locale = "en", screen = Screen.Welcome),
-        Scenario(id = "welcome_main", locale = "ar", screen = Screen.Welcome),
-        Scenario(id = "welcome_main", locale = "ur", screen = Screen.Welcome),
-        Scenario(id = "auth_login", locale = "en", screen = Screen.Auth, authUiState = loginAuthState("en")),
-        Scenario(id = "auth_login", locale = "ar", screen = Screen.Auth, authUiState = loginAuthState("ar")),
-        Scenario(id = "auth_login", locale = "ur", screen = Screen.Auth, authUiState = loginAuthState("ur")),
-        Scenario(id = "auth_signup", locale = "en", screen = Screen.Auth, authUiState = signupAuthState("en")),
-        Scenario(id = "auth_signup", locale = "ar", screen = Screen.Auth, authUiState = signupAuthState("ar")),
-        Scenario(id = "auth_signup", locale = "ur", screen = Screen.Auth, authUiState = signupAuthState("ur")),
-        Scenario(id = "auth_error", locale = "en", screen = Screen.Auth, authUiState = authErrorState("en")),
-        Scenario(id = "auth_error", locale = "ar", screen = Screen.Auth, authUiState = authErrorState("ar")),
-        Scenario(id = "auth_error", locale = "ur", screen = Screen.Auth, authUiState = authErrorState("ur"))
-    )
+    private val baseScenarios = listOf("en", "ar", "ur").flatMap { locale ->
+        listOf(
+            Scenario(id = "welcome_main", locale = locale, screen = Screen.Welcome),
+            Scenario(id = "auth_signup", locale = locale, screen = Screen.Auth, authUiState = signupAuthState(locale)),
+            Scenario(id = "chat_happy", locale = locale, screen = Screen.Chat, uiState = happyChatState(locale)),
+            Scenario(id = "history_list", locale = locale, screen = Screen.History),
+            Scenario(id = "settings_main", locale = locale, screen = Screen.Settings),
+            Scenario(id = "settings_donation_sheet", locale = locale, screen = Screen.Settings)
+        )
+    }
 
     private val scenarios = baseScenarios.flatMap { scenario ->
         listOf(
@@ -165,12 +153,21 @@ class StoreScreenshotTest {
             scenarioState.value = scenario
 
             composeRule.waitForIdle()
+            prepareScenarioForCapture(scenario)
             val image = captureScenarioBitmap()
             val dir = File(baseDir, "$device/${scenario.locale}/${scenario.screen.name.lowercase()}")
             dir.mkdirs()
             val suffix = if (scenario.isDark) "_dark" else ""
             val file = File(dir, "${scenario.id}$suffix.png")
             saveImage(image, file)
+        }
+    }
+
+    private fun prepareScenarioForCapture(scenario: Scenario) {
+        if (scenario.id == "settings_donation_sheet") {
+            composeRule.onNodeWithTag(TestTags.Settings.List)
+                .performScrollToNode(hasTestTag(TestTags.Settings.SupportItem))
+            composeRule.waitForIdle()
         }
     }
 
@@ -288,7 +285,13 @@ class StoreScreenshotTest {
             isLoading = false
         )
         val stateFlow = MutableStateFlow(uiState)
+        val searchFlow = MutableStateFlow("")
         every { vm.uiState } returns stateFlow
+        every { vm.searchQuery } returns searchFlow
+        every { vm.getFilteredConversations() } returns mockConversations
+        every { vm.updateSearchQuery(any()) } answers {
+            searchFlow.value = firstArg()
+        }
         every { vm.displayTitle(any()) } answers { firstArg<com.shamelagpt.android.domain.model.Conversation>().title }
         every { vm.messagePreview(any()) } answers {
             firstArg<com.shamelagpt.android.domain.model.Conversation>()
@@ -421,6 +424,43 @@ class StoreScreenshotTest {
         )
     }
 
+    private fun signupExistingEmailState(locale: String): AuthUiState {
+        val displayName = when (locale) {
+            "ar" -> "عبدالله السلمي"
+            "ur" -> "عبداللہ خان"
+            else -> "Abdullah Khan"
+        }
+        val error = when (locale) {
+            "ar" -> "هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول."
+            "ur" -> "یہ ای میل پہلے سے رجسٹرڈ ہے۔ براہ کرم سائن اِن کریں۔"
+            else -> "This email is already registered. Please sign in."
+        }
+        return AuthUiState(
+            email = "abdullah.khan@shamela.app",
+            password = "••••••••",
+            displayName = displayName,
+            isLoginMode = false,
+            isLoading = false,
+            error = error
+        )
+    }
+
+    private fun invalidCredentialsAuthState(locale: String): AuthUiState {
+        val error = when (locale) {
+            "ar" -> "تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور ثم حاول مرة أخرى."
+            "ur" -> "سائن اِن نہیں ہو سکا۔ اپنا ای میل اور پاس ورڈ چیک کریں اور دوبارہ کوشش کریں۔"
+            else -> "Unable to sign in. Check your email and password and try again."
+        }
+        return AuthUiState(
+            email = "support@shamela.app",
+            password = "••••••••",
+            displayName = "",
+            isLoginMode = true,
+            isLoading = false,
+            error = error
+        )
+    }
+
     private fun errorChatState(locale: String): ChatUiState {
         val now = System.currentTimeMillis()
         val prompt = when (locale) {
@@ -487,18 +527,67 @@ class StoreScreenshotTest {
     private fun captureScenarioBitmap(): Bitmap {
         repeat(2) { attempt ->
             try {
-                return composeRule.onRoot().captureToImage().asAndroidBitmap()
-            } catch (_: Throwable) {
-                composeRule.waitForIdle()
-                if (attempt == 1) {
-                    // fall through to fallback
+                val bitmap = composeRule.onRoot().captureToImage().asAndroidBitmap()
+                if (!looksBlank(bitmap)) {
+                    return bitmap
                 }
+            } catch (_: Throwable) {
             }
+            composeRule.waitForIdle()
+        }
+        val deviceScreenshot = captureDeviceBitmap()
+        if (deviceScreenshot != null && !looksBlank(deviceScreenshot)) {
+            return deviceScreenshot
         }
         return composeRule.runOnIdle {
             val rootView = composeRule.activity.findViewById<android.view.View>(android.R.id.content)
             rootView.drawToBitmap()
         }
+    }
+
+    private fun captureDeviceBitmap(): Bitmap? {
+        val fullBitmap = InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot() ?: return null
+        return composeRule.runOnIdle {
+            val rootView = composeRule.activity.findViewById<android.view.View>(android.R.id.content)
+            val location = IntArray(2)
+            rootView.getLocationOnScreen(location)
+            val left = location[0].coerceIn(0, fullBitmap.width)
+            val top = location[1].coerceIn(0, fullBitmap.height)
+            val width = rootView.width.coerceAtMost(fullBitmap.width - left)
+            val height = rootView.height.coerceAtMost(fullBitmap.height - top)
+            if (width > 0 && height > 0) {
+                Bitmap.createBitmap(fullBitmap, left, top, width, height)
+            } else {
+                fullBitmap
+            }
+        }
+    }
+
+    private fun looksBlank(bitmap: Bitmap): Boolean {
+        if (bitmap.width == 0 || bitmap.height == 0) return true
+        val samplesPerAxis = 6
+        var brightSamples = 0
+        var variedSamples = 0
+        var firstColor: Int? = null
+        for (xIndex in 0 until samplesPerAxis) {
+            for (yIndex in 0 until samplesPerAxis) {
+                val x = (bitmap.width - 1) * xIndex / (samplesPerAxis - 1)
+                val y = (bitmap.height - 1) * yIndex / (samplesPerAxis - 1)
+                val color = bitmap.getPixel(x, y)
+                if (firstColor == null) {
+                    firstColor = color
+                } else if (color != firstColor) {
+                    variedSamples++
+                }
+                val red = color shr 16 and 0xFF
+                val green = color shr 8 and 0xFF
+                val blue = color and 0xFF
+                if ((red + green + blue) > 30) {
+                    brightSamples++
+                }
+            }
+        }
+        return brightSamples <= 1 && variedSamples <= 1
     }
 
     private fun setLocale(tag: String, isDark: Boolean = false) {

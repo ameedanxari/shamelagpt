@@ -4,7 +4,13 @@
       "id" : "71507C8D-7F89-4AC8-BEE5-618FD8C54F9F",
       "name" : "Store Screenshots",
       "options" : {
-
+        "environmentVariableEntries" : [
+          {
+            "key" : "STOREKIT_SANDBOX_EMAIL",
+            "value" : "sandbox-tester@shamela.app"
+          }
+        ],
+        "storeKitConfigurationFile" : "container:ShamelaGPT.storekit"
       }
     }
   ],

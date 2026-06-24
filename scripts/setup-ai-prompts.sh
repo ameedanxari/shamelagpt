@@ -1,86 +1,48 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Setup AI Prompt Library Integration
-# This script initializes the .ai-prompts submodule and installs its dependencies
+# Setup AI Prompt Library integration for this project.
 
-set -e
+set -euo pipefail
 
-echo "🚀 Setting up AI Prompt Library..."
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
+echo "Setting up AI Prompt Library..."
+
 echo ""
-
-# Step 1: Initialize git submodule
-echo "📦 Step 1: Initializing git submodule..."
-if [ ! -f ".ai-prompts/.git" ]; then
-    git submodule init
-    git submodule update --remote
-    echo "✓ Submodule initialized"
+echo "[1/4] Initializing .ai-prompts submodule"
+if git -C .ai-prompts rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo ".ai-prompts already initialized"
 else
-    echo "✓ Submodule already initialized"
+  git submodule update --init --recursive .ai-prompts
 fi
 
-# Step 2: Verify submodule is cloned
 echo ""
-echo "📂 Step 2: Verifying submodule clone..."
-if [ ! -d ".ai-prompts/node_modules" ]; then
-    echo "   Installing npm dependencies in .ai-prompts..."
-    cd .ai-prompts
-    npm install
-    cd ..
-    echo "✓ Dependencies installed"
+echo "[2/4] Installing prompt-library dependencies"
+if [ -f ".ai-prompts/package-lock.json" ]; then
+  npm --prefix .ai-prompts ci
 else
-    echo "✓ Dependencies already installed"
+  npm --prefix .ai-prompts install
 fi
 
-# Step 3: Verify critical files
 echo ""
-echo "🔍 Step 3: Verifying library structure..."
-required_files=(
-    ".ai-prompts/package.json"
-    ".ai-prompts/prompts/orchestrators/execution-orchestrator.md"
-    ".ai-prompts/PREVENTION_CHECKLIST.md"
-    ".ai-prompts/COMMIT_GUIDELINES.md"
-)
-
-all_present=true
-for file in "${required_files[@]}"; do
-    if [ -f "$file" ]; then
-        echo "   ✓ $file"
-    else
-        echo "   ✗ MISSING: $file"
-        all_present=false
-    fi
-done
-
-if [ "$all_present" = false ]; then
-    echo ""
-    echo "⚠️  Some library files are missing. Try:"
-    echo "   git submodule update --remote"
-    echo "   git submodule update --init --recursive"
-    exit 1
-fi
-
-# Step 4: Setup hooks
-echo ""
-echo "⚙️  Step 4: Setting up git hooks..."
-if [ -f ".ai-prompts/.husky" ]; then
-    echo "   Linking husky hooks from ai-prompt-library..."
-    # Note: husky manages hooks automatically during npm install
-    echo "✓ Hooks configured"
+echo "[3/4] Bootstrapping project steering"
+if [ -f "AGENTS.md" ] && grep -q "AI Prompt Library Steering (Auto-Managed)" AGENTS.md; then
+  echo "Project steering block already present"
+  mkdir -p prompts/outputs/current prompts/working_copy prompts/archive
 else
-    echo "   ℹ️  No husky configuration found"
+  bash .ai-prompts/scripts/bootstrap-project-integration.sh
 fi
 
 echo ""
-echo "✨ AI Prompt Library setup complete!"
+echo "[4/4] Validating integration"
+./validate-integration.sh
+
 echo ""
-echo "Next steps:"
-echo "1. Read the PREVENTION_CHECKLIST.md before making changes"
-echo "2. Invoke the Execution Orchestrator:"
-echo "   prompts/orchestrators/execution-orchestrator.md"
-echo "3. Use the Task Prompt Template for code generation:"
-echo "   .ai-prompts/prompts/templates/task-prompt-template.md"
+echo "AI Prompt Library setup complete."
 echo ""
-echo "📖 Documentation:"
-echo "   .ai-prompts/README.md         - Library overview"
-echo "   .ai-prompts/CONTRIBUTING.md   - Development guidelines"
-echo "   .ai-prompts/docs/SAFEGUARDS.md - Protection framework"
+echo "Current entry points:"
+echo "- .ai-prompts/prompts/AGENTS.md"
+echo "- .ai-prompts/prompts/orchestrators/ai-agent-entry-point.md"
+echo "- .ai-prompts/prompts/orchestrators/drill-down-engine.md"
+echo "- .ai-prompts/prompts/orchestrators/audit-and-remediate.md"

@@ -56,3 +56,7 @@
 
 # Source objects are persisted as JSON in Room converters/mappers.
 -keep class com.shamelagpt.android.domain.model.Source { *; }
+
+# Google Credential Manager + Google Identity
+-keep class com.google.android.libraries.identity.googleid.** { *; }
+-keep class androidx.credentials.** { *; }

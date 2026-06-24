@@ -75,27 +75,51 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
         XCTAssertTrue(settingsLoaded, "Settings view should load")
         takeScreenshot(name: "settings_main")
 
-        UITestLauncher.launch(
-            app: app,
-            includeReset: true,
-            overrides: [
-                NetworkMockHelper.LaunchEnvironmentKeys.mockChatError: """
-                {"error":"Network error","status_code":500}
-                """,
-                "SKIP_WELCOME": "1"
-            ],
-            appearance: appearanceArgument
-        )
+        // Donation sheet screenshot
+        let donateButton = app.buttons[UITestID.Settings.donateButton]
+        let donateVisible = donateButton.waitForExistence(timeout: 5) || scrollToElement(donateButton, maxSwipes: 6)
+        if donateVisible && donateButton.isHittable {
+            donateButton.tap()
 
-        let errorChatInput = app.textViews["messageInputField"]
-        XCTAssertTrue(errorChatInput.waitForExistence(timeout: 5))
-        errorChatInput.tap()
-        errorChatInput.typeText(localizedChatErrorPrompt())
-        let errorSendButton = app.buttons["sendButton"]
-        XCTAssertTrue(errorSendButton.waitForExistence(timeout: 3))
-        errorSendButton.tap()
-        sleep(1)
-        takeScreenshot(name: "chat_error")
+            // Wait for the sheet navigation bar to appear (title or cancel button)
+            let cancelCandidates = localizedCandidates(for: "common.cancel")
+            var sheetIndicator: XCUIElement?
+            for label in cancelCandidates {
+                let btn = app.buttons.matching(NSPredicate(format: "label == %@", label)).firstMatch
+                if btn.waitForExistence(timeout: 8) {
+                    sheetIndicator = btn
+                    break
+                }
+            }
+            // Fallback: any navigation bar cancel button
+            if sheetIndicator == nil {
+                let navCancel = app.navigationBars.buttons.firstMatch
+                if navCancel.waitForExistence(timeout: 3) {
+                    sheetIndicator = navCancel
+                }
+            }
+
+            if sheetIndicator != nil {
+                // Wait for StoreKit products to load (spinner disappears)
+                let spinner = app.activityIndicators.firstMatch
+                if spinner.exists {
+                    _ = spinner.waitForExistence(timeout: 10)
+                    // Wait for spinner to go away — products loaded
+                    let deadline = Date().addingTimeInterval(10)
+                    while spinner.exists && Date() < deadline {
+                        RunLoop.current.run(until: Date().addingTimeInterval(0.3))
+                    }
+                }
+                // Extra settle time for product rows to render
+                sleep(2)
+                takeScreenshot(name: "settings_donation_sheet")
+                sheetIndicator?.tap()
+                sleep(1)
+            } else {
+                print("⚠️ Donation sheet did not appear — StoreKit products may not be configured")
+            }
+        }
+
     }
 
     private func assertNoErrorBanners(context: String) {
@@ -178,7 +202,7 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
         XCTAssertTrue(getStartedButton.waitForExistence(timeout: 5))
     }
 
-    /// Generates screenshots for login and signup authentication screens
+    /// Generates the curated signup authentication screenshot
     func test_storeScreenshots_auth() throws {
         try runAuth(appearance: .light)
         try runAuth(appearance: .dark)
@@ -190,7 +214,8 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
             app: app,
             includeReset: true,
             overrides: [
-                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0"
+                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0",
+                NetworkMockHelper.LaunchEnvironmentKeys.authMode: "signup"
             ],
             appearance: appearanceArgument
         )
@@ -201,75 +226,19 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
         }
         XCTAssertTrue(authGetStartedButton.waitForExistence(timeout: 5))
         authGetStartedButton.tap()
-        
+
         let emailField = app.textFields["emailTextField"]
         XCTAssertTrue(emailField.waitForExistence(timeout: 5))
         emailField.tap()
-        emailField.typeText(localizedLoginEmail())
-        
+        emailField.typeText("abdullah.khan@shamela.app")
+
         let passwordField = app.secureTextFields["passwordTextField"]
-        if passwordField.waitForExistence(timeout: 2) {
-            passwordField.tap()
-            passwordField.typeText("12345678")
-        }
-        
-        takeScreenshot(name: "auth_login")
+        XCTAssertTrue(passwordField.waitForExistence(timeout: 3))
+        passwordField.tap()
+        passwordField.typeText("12345678\n")
+        waitForKeyboardToDismiss()
 
-        let toggleButton = app.buttons["toggleModeButton"]
-        XCTAssertTrue(toggleButton.waitForExistence(timeout: 3))
-        toggleButton.tap()
-        
-        let displayNameField = app.textFields["displayNameTextField"]
-        XCTAssertTrue(displayNameField.waitForExistence(timeout: 3))
-
-        if emailField.exists {
-            emailField.tap()
-            emailField.press(forDuration: 1.0)
-            let selectAll = app.menuItems["Select All"]
-            if selectAll.waitForExistence(timeout: 1) {
-                selectAll.tap()
-            }
-            emailField.typeText("abdullah.khan@shamela.app")
-        }
-        
-        displayNameField.tap()
-        displayNameField.typeText(localizedSignupDisplayName())
         takeScreenshot(name: "auth_signup")
-
-        UITestLauncher.launch(
-            app: app,
-            includeReset: true,
-            overrides: [
-                NetworkMockHelper.LaunchEnvironmentKeys.skipWelcome: "0",
-                NetworkMockHelper.LaunchEnvironmentKeys.mockNetworkError: "1"
-            ],
-            appearance: appearanceArgument
-        )
-
-        let errorGetStartedButton = app.buttons["GetStartedButton"]
-        if !errorGetStartedButton.isHittable {
-            app.swipeUp()
-        }
-        XCTAssertTrue(errorGetStartedButton.waitForExistence(timeout: 5))
-        errorGetStartedButton.tap()
-
-        let errorEmailField = app.textFields["emailTextField"]
-        XCTAssertTrue(errorEmailField.waitForExistence(timeout: 5))
-        errorEmailField.tap()
-        errorEmailField.typeText(localizedLoginEmail())
-
-        let errorPasswordField = app.secureTextFields["passwordTextField"]
-        XCTAssertTrue(errorPasswordField.waitForExistence(timeout: 3))
-        errorPasswordField.tap()
-        errorPasswordField.typeText("12345678")
-
-        let signInButton = app.buttons["signInButton"]
-        XCTAssertTrue(signInButton.waitForExistence(timeout: 3))
-        signInButton.tap()
-
-        let errorLabel = app.staticTexts["errorLabel"]
-        XCTAssertTrue(errorLabel.waitForExistence(timeout: 5))
-        takeScreenshot(name: "auth_error")
     }
 
     // MARK: - Helper Methods
@@ -479,6 +448,42 @@ final class StoreScreenshotUITests: LocalizedUITestCase {
         default:
             return "Abdullah Khan"
         }
+    }
+
+    private func existingEmailSignupErrorJSON() -> String {
+        """
+        {"detail":"Email already exists. Please use /api/auth/login instead.","status_code":400}
+        """
+    }
+
+    private func invalidLoginCredentialsErrorJSON() -> String {
+        """
+        {"detail":"Invalid email or password.","status_code":401}
+        """
+    }
+
+    private func localizedInvalidCredentialsMessage() -> String {
+        switch currentLanguage {
+        case "ar":
+            return "تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور ثم حاول مرة أخرى."
+        case "ur":
+            return "سائن اِن نہیں ہو سکا۔ اپنا ای میل اور پاس ورڈ چیک کریں اور دوبارہ کوشش کریں۔"
+        default:
+            return "Unable to sign in. Check your email and password and try again."
+        }
+    }
+
+    private func scrollToElement(_ element: XCUIElement, maxSwipes: Int = 6) -> Bool {
+        if element.waitForExistence(timeout: 1), element.isHittable { return true }
+        for _ in 0..<maxSwipes {
+            app.swipeUp()
+            if element.exists, element.isHittable { return true }
+        }
+        return element.exists
+    }
+
+    private func localizedString(_ key: String) -> String {
+        UITestLocalization.localizedString(for: key, language: currentLanguage)
     }
 
     private func jsonString(_ object: Any) -> String {

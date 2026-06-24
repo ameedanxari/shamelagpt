@@ -61,7 +61,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
            let apiClient = apiClient,
            let networkMonitor = networkMonitor,
            networkMonitor.isConnected {
-            remoteConversation = try? await apiClient.createConversation(
+            remoteConversation = try await apiClient.createConversation(
                 ConversationRequest(title: title)
             )
         }
@@ -388,7 +388,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
                 let parsed = ResponseParser.parseMarkdownResponse(content)
 
                 // Persist raw content; extract sources for UI but avoid mutating payload
-                _ = try? await addMessage(
+                _ = try await addMessage(
                     toConversation: conversationId,
                     content: content,
                     isUserMessage: isUser,
@@ -410,6 +410,9 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
             }
         } catch {
             AppLogger.network.logError("Failed to fetch remote messages for conversation \(conversationId)", error: error)
+            if localMessages.isEmpty {
+                throw error
+            }
             return localMessages
         }
     }
