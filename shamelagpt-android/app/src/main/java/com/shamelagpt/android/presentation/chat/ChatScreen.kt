@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.automirrored.filled.FactCheck
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -84,6 +85,20 @@ fun ChatScreen(
     // Load conversation when composable is first created
     LaunchedEffect(conversationId) {
         viewModel.loadConversation(conversationId)
+    }
+
+    // Recover streaming response when app returns from background
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            when (event) {
+                androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> viewModel.onAppBackgrounded()
+                androidx.lifecycle.Lifecycle.Event.ON_RESUME -> viewModel.onAppResumed()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     // Consume one-shot share payload (if app was opened via Android share sheet).

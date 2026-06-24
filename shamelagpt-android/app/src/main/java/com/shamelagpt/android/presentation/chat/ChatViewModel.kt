@@ -113,6 +113,10 @@ class ChatViewModel(
     private var messageCollectionJob: Job? = null
     private var activeConversationLoadId: String? = null
 
+    // Track if streaming was interrupted by app backgrounding
+    private var streamInterrupted = false
+    private var interruptedConversationId: String? = null
+
     /**
      * Loads a conversation by ID.
      * If conversationId is null, starts a new conversation.
@@ -526,6 +530,43 @@ class ChatViewModel(
                 ChatFlowDiagnostics.clear(detail = "chat.send.error")
             }
         }
+    }
+
+    /**
+     * Called when the app goes to background during streaming.
+     * Marks the stream as interrupted so we can recover on resume.
+     */
+    fun onAppBackgrounded() {
+        if (_uiState.value.isLoading || _uiState.value.streamingMessage != null) {
+            streamInterrupted = true
+            interruptedConversationId = _uiState.value.conversationId
+            Logger.i(TAG, "Stream interrupted by backgrounding, conversationId=${Logger.redactedId(interruptedConversationId)}")
+        }
+    }
+
+    /**
+     * Called when the app returns from background.
+     * If streaming was interrupted, reload the conversation to recover the saved response.
+     */
+    fun onAppResumed() {
+        if (!streamInterrupted) return
+        streamInterrupted = false
+        val conversationId = interruptedConversationId ?: return
+        interruptedConversationId = null
+
+        Logger.i(TAG, "Recovering interrupted stream for conversationId=${Logger.redactedId(conversationId)}")
+
+        // Clear streaming state
+        _uiState.update { state ->
+            state.copy(
+                isLoading = false,
+                streamingMessage = null,
+                thinkingMessages = emptyList()
+            )
+        }
+
+        // Reload conversation from backend to get the saved partial/full response
+        loadConversation(conversationId, showHydrationUi = false)
     }
 
     /**
