@@ -160,12 +160,13 @@ class StreamingMessageHandler: StreamingMessageHandlerProtocol {
                 description: rawEvent.message ?? rawEvent.error ?? rawEvent.content ?? "Backend stream error"
             )
         default:
-            throw ChatOperationException(
-                operation: .sendMessage,
-                code: "E-CHAT-STREAM-UNKNOWN",
-                retryable: true,
-                description: "Unknown stream event type '\(rawEvent.type)'"
-            )
+            // Forward-compatible: silently ignore unknown event types.
+            // Backend adds new SSE event types over time (e.g. "title" from
+            // shamela-qa-rag#72, "fact_check_result" in fact-check mode);
+            // throwing here surfaced them as E-CHAT-STREAM-UNKNOWN and broke
+            // every new-conversation send. Android mirrors this in
+            // ChatRemoteDataSourceImpl.validateStreamEvent.
+            AppLogger.network.logDebug("Ignoring unknown stream event type '\(rawEvent.type)'")
         }
     }
 }
