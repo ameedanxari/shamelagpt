@@ -45,13 +45,15 @@ class SettingsViewModelTest {
         // Given
         val prefs = UserPreferences(languagePreference = "ar", customSystemPrompt = "Prompt", responsePreferences = ResponsePreferences())
         coEvery { preferencesRepository.fetchPreferences() } returns Result.success(prefs)
-        
+
         // Re-init viewModel to trigger loading with new mock
         viewModel = SettingsViewModel(languageManager, authRepository, preferencesRepository)
 
         // Then
         testDispatcher.scheduler.advanceUntilIdle()
-        
+
+        // selectedLanguage stays from LanguageManager — server prefs intentionally do
+        // not override the locally-applied locale (see SettingsViewModel.loadPreferences).
         assertEquals("en", viewModel.selectedLanguage.value)
         assertEquals("Prompt", viewModel.customPrompt.value)
     }
