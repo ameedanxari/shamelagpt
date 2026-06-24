@@ -23,20 +23,6 @@ jobs:
       - name: Select Xcode Version
         run: sudo xcode-select -s /Applications/Xcode_16.2.app
 
-      - name: iOS Simulator diagnostic (TEMPORARY — remove once destination is settled)
-        run: |
-          echo "=== Active Xcode version ==="
-          xcodebuild -version || true
-          echo
-          echo "=== Installed SDKs ==="
-          xcodebuild -showsdks || true
-          echo
-          echo "=== Simulator runtimes ==="
-          xcrun simctl list runtimes || true
-          echo
-          echo "=== Available simulator devices ==="
-          xcrun simctl list devices available || true
-
       - name: Cache Swift Packages
         uses: actions/cache@v4
         with:
@@ -51,7 +37,7 @@ jobs:
           xcodebuild test \
             -project shamelagpt-ios/ShamelaGPT.xcodeproj \
             -scheme ShamelaGPT \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
             -only-testing:ShamelaGPTTests \
             CODE_SIGNING_ALLOWED=NO \
             -resultBundlePath "$IOS_ARTIFACTS_DIR/TestResults.xcresult"
@@ -97,7 +83,7 @@ jobs:
           xcodebuild test \
             -project shamelagpt-ios/ShamelaGPT.xcodeproj \
             -scheme ShamelaGPT \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
             -only-testing:ShamelaGPTUITests \
             CODE_SIGNING_ALLOWED=NO \
             -resultBundlePath "$IOS_ARTIFACTS_DIR/UITestResults.xcresult"

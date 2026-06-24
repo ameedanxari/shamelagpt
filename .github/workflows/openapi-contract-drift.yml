@@ -68,7 +68,7 @@ jobs:
           xcodebuild test \
             -project shamelagpt-ios/ShamelaGPT.xcodeproj \
             -scheme ShamelaGPT \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
             -only-testing:ShamelaGPTTests/OpenAPIContractMappingTests \
             CODE_SIGNING_ALLOWED=NO \
             -resultBundlePath "$IOS_ARTIFACTS_DIR/OpenAPIContractResults.xcresult"
