@@ -161,8 +161,8 @@ class DonationViewModel(
         val productIds = listOf(
             "com.shamelagpt.android.donation.1monthly",
             "com.shamelagpt.android.donation.5monthly",
-            "com.shamelagpt.android.donation.10monthly",
-            "com.shamelagpt.android.donation.100yearly"
+            "com.shamelagpt.android.donation.10month",
+            "com.shamelagpt.android.donation.100year"
         )
     }
 }
