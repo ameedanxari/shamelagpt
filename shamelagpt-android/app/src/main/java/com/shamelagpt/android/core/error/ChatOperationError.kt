@@ -34,6 +34,12 @@ class ChatOperationException(
 object ChatOperationError {
     fun from(context: Context, operation: ChatOperation, throwable: Throwable): ChatOperationFailure {
         return when (throwable) {
+            is NetworkError.GuestQuotaExceeded -> ChatOperationFailure(
+                userMessage = throwable.getUserMessage(context),
+                debugCode = throwable.debugCode,
+                retryable = throwable.isRetryable,
+                requiresAuth = true
+            )
             is NetworkError -> ChatOperationFailure(
                 userMessage = throwable.getUserMessageWithCode(context),
                 debugCode = throwable.debugCode,

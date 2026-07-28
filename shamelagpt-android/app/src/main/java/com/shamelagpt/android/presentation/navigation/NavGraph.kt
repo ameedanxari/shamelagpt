@@ -38,8 +38,11 @@ fun ShamelaGPTNavGraph(
         modifier = modifier
     ) {
         // Auth Screen
-        composable<AuthRoute> {
+        composable<AuthRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<AuthRoute>()
             AuthScreen(
+                startInSignup = route.startInSignup,
+                initialMessage = route.guestLimitMessage,
                 onAuthenticated = {
                     navController.navigate(ChatRoute()) {
                         popUpTo<AuthRoute> { inclusive = true }
@@ -58,7 +61,7 @@ fun ShamelaGPTNavGraph(
             WelcomeScreen(
                 onGetStarted = {
                     // Navigate to auth and clear backstack
-                    navController.navigate(AuthRoute) {
+                    navController.navigate(AuthRoute()) {
                         popUpTo<WelcomeRoute> { inclusive = true }
                     }
                 },
@@ -81,7 +84,17 @@ fun ShamelaGPTNavGraph(
                     // Optional: Implement menu/drawer functionality
                 },
                 onRequireAuth = {
-                    navController.navigate(AuthRoute) {
+                    navController.navigate(AuthRoute()) {
+                        popUpTo<ChatRoute> { inclusive = true }
+                    }
+                },
+                onRequireSignup = { message ->
+                    navController.navigate(
+                        AuthRoute(
+                            startInSignup = true,
+                            guestLimitMessage = message
+                        )
+                    ) {
                         popUpTo<ChatRoute> { inclusive = true }
                     }
                 }
@@ -96,7 +109,7 @@ fun ShamelaGPTNavGraph(
                     navController.navigate(ChatRoute(conversationId = conversationId))
                 },
                 onNavigateToAuth = {
-                    navController.navigate(AuthRoute) {
+                    navController.navigate(AuthRoute()) {
                         popUpTo<ChatRoute> { inclusive = true }
                     }
                 }
@@ -115,12 +128,12 @@ fun ShamelaGPTNavGraph(
                     navController.navigate(AboutRoute)
                 },
                 onNavigateToAuth = {
-                    navController.navigate(AuthRoute) {
+                    navController.navigate(AuthRoute()) {
                         popUpTo<ChatRoute> { inclusive = true }
                     }
                 },
                 onLogout = {
-                    navController.navigate(AuthRoute) {
+                    navController.navigate(AuthRoute()) {
                         popUpTo<ChatRoute> { inclusive = true }
                     }
                 },

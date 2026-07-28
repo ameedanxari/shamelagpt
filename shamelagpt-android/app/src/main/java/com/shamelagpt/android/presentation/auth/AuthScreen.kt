@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -65,6 +66,8 @@ private const val TAG = "AuthScreen"
 
 @Composable
 fun AuthScreen(
+    startInSignup: Boolean = false,
+    initialMessage: String? = null,
     onAuthenticated: () -> Unit,
     onContinueAsGuest: () -> Unit,
     viewModel: AuthViewModel = koinViewModel()
@@ -73,6 +76,13 @@ fun AuthScreen(
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(startInSignup, initialMessage) {
+        viewModel.prepareEntry(
+            startInSignup = startInSignup,
+            initialMessage = initialMessage
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -148,7 +158,11 @@ fun AuthScreen(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = state.error ?: "",
-                color = MaterialTheme.colorScheme.error,
+                color = if (state.isGuestLimitPrompt) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.error
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.testTag(TestTags.Auth.ErrorLabel)
             )

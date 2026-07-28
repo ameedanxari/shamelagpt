@@ -13,7 +13,10 @@ object WelcomeRoute
 
 @Keep
 @Serializable
-object AuthRoute
+data class AuthRoute(
+    val startInSignup: Boolean = false,
+    val guestLimitMessage: String? = null
+)
 
 @Keep
 @Serializable

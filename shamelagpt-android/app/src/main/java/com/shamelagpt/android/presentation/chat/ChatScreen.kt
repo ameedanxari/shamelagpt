@@ -63,7 +63,8 @@ fun ChatScreen(
     isAuthenticated: Boolean = false,
     viewModel: ChatViewModel = koinViewModel(),
     onMenuClick: () -> Unit = {},
-    onRequireAuth: () -> Unit = {}
+    onRequireAuth: () -> Unit = {},
+    onRequireSignup: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -167,6 +168,9 @@ fun ChatScreen(
                 }
                 ChatEvent.RequireAuth -> {
                     onRequireAuth()
+                }
+                is ChatEvent.RequireSignup -> {
+                    onRequireSignup(event.message)
                 }
                 is ChatEvent.LaunchVoiceRecognition -> {
                     voiceRecognitionLauncher.launch(event.intent)

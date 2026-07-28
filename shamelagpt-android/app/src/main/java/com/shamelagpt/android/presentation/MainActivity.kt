@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                         val finalStartDestination = startDestination.value ?: if (startupUiState.isAuthenticated) {
                             ChatRoute()
                         } else {
-                            AuthRoute
+                            AuthRoute()
                         }
                         ShamelaGPTApp(startDestination = finalStartDestination)
                     } else {
@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                         WelcomeScreen(
                             onGetStarted = {
                                 // Set explicit start destination to Auth
-                                startDestination.value = AuthRoute
+                                startDestination.value = AuthRoute()
                                 showWelcome.value = false
                             },
                             onSkipToChat = {

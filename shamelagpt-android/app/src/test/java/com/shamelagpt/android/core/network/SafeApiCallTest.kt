@@ -3,6 +3,8 @@ package com.shamelagpt.android.core.network
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.mockk
+import okhttp3.Protocol
+import okhttp3.Request
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Test
@@ -132,6 +134,32 @@ class SafeApiCallTest {
         assertThat(result.isFailure).isTrue()
         val error = result.exceptionOrNull()
         assertThat(error).isEqualTo(NetworkError.TooManyRequests)
+    }
+
+    @Test
+    fun testSafeApiCallGuestLimit429MapsToGuestQuotaExceeded() = runTest {
+        // Given
+        val rawResponse = okhttp3.Response.Builder()
+            .request(Request.Builder().url("https://example.com/api/guest/chat/stream").build())
+            .protocol(Protocol.HTTP_1_1)
+            .code(429)
+            .message("Too Many Requests")
+            .addHeader("X-Guest-Limit-Reached", "true")
+            .build()
+        val response = Response.error<Any>(
+            """{"detail":"You have reached the limit of 10 messages in guest mode. Please sign in to continue."}"""
+                .toResponseBody(),
+            rawResponse
+        )
+        val httpException = HttpException(response)
+        val apiCall: suspend () -> String = { throw httpException }
+
+        // When
+        val result = safeApiCall { apiCall() }
+
+        // Then
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(NetworkError.GuestQuotaExceeded)
     }
 
     @Test

@@ -42,14 +42,25 @@ class AuthViewModel(
     }
 
     fun setError(message: String) {
-        _uiState.update { it.copy(error = message) }
+        _uiState.update { it.copy(error = message, isGuestLimitPrompt = false) }
+    }
+
+    fun prepareEntry(startInSignup: Boolean, initialMessage: String?) {
+        _uiState.update {
+            it.copy(
+                isLoginMode = !startInSignup,
+                error = initialMessage,
+                isGuestLimitPrompt = !initialMessage.isNullOrBlank()
+            )
+        }
     }
 
     fun toggleMode() {
         _uiState.update {
             it.copy(
                 isLoginMode = !it.isLoginMode,
-                error = null
+                error = null,
+                isGuestLimitPrompt = false
             )
         }
     }
@@ -63,14 +74,15 @@ class AuthViewModel(
             Logger.w(TAG, "authenticate validation failed: missing required fields")
             _uiState.update {
                 it.copy(
-                    error = "Email and password are required"
+                    error = "Email and password are required",
+                    isGuestLimitPrompt = false
                 )
             }
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true, error = null, isGuestLimitPrompt = false) }
             
             val trimmedEmail = state.email.trim()
             val trimmedPassword = state.password.trim()
@@ -105,7 +117,8 @@ class AuthViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = mappedError.message
+                            error = mappedError.message,
+                            isGuestLimitPrompt = false
                         )
                     }
                 }
@@ -115,16 +128,16 @@ class AuthViewModel(
 
     fun forgotPassword(email: String) {
         if (email.isBlank()) {
-            _uiState.update { it.copy(error = "Email is required") }
+            _uiState.update { it.copy(error = "Email is required", isGuestLimitPrompt = false) }
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true, error = null, isGuestLimitPrompt = false) }
             val result = authRepository.forgotPassword(email)
             result.fold(
                 onSuccess = {
-                    _uiState.update { it.copy(isLoading = false, error = "Password reset email sent (if account exists)") }
+                    _uiState.update { it.copy(isLoading = false, error = "Password reset email sent (if account exists)", isGuestLimitPrompt = false) }
                 },
                 onFailure = { ex ->
                     Logger.w(TAG, "forgot password failed reason=${ex::class.simpleName}")
@@ -132,7 +145,8 @@ class AuthViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = ex.toUserFacingMessage()
+                            error = ex.toUserFacingMessage(),
+                            isGuestLimitPrompt = false
                         )
                     }
                 }
@@ -144,7 +158,7 @@ class AuthViewModel(
         viewModelScope.launch {
             Logger.i(TAG, "google sign-in requested")
             Logger.d(TAG, "google sign-in id_token length=${idToken.length}")
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true, error = null, isGuestLimitPrompt = false) }
             val result = authRepository.googleSignIn(idToken)
             result.fold(
                 onSuccess = {
@@ -161,7 +175,8 @@ class AuthViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = ex.toUserFacingMessage()
+                            error = ex.toUserFacingMessage(),
+                            isGuestLimitPrompt = false
                         )
                     }
                 }

@@ -222,6 +222,7 @@
     <string name="network_access_forbidden">Access forbidden.</string>
     <string name="network_not_found">Resource not found.</string>
     <string name="network_too_many_requests">Too many requests. Please try again later.</string>
+    <string name="guest_limit_signup_prompt">You reached your 10 free questions. Sign up for free to continue.</string>
     <string name="network_invalid_request">Invalid request. Please check your input and try again.</string>
     <string name="network_generic_error">An error occurred. Please try again.</string>
     <string name="network_connection_error">Unable to connect to the server. Please try again later.</string>

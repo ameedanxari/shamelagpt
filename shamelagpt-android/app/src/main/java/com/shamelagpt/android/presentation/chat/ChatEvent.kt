@@ -33,6 +33,11 @@ sealed class ChatEvent {
     object RequireAuth : ChatEvent()
 
     /**
+     *  route to signup with context.
+     */
+    data class RequireSignup(val message: String) : ChatEvent()
+
+    /**
      * Launch fallback voice recognition activity.
      */
     data class LaunchVoiceRecognition(val intent: Intent) : ChatEvent()
