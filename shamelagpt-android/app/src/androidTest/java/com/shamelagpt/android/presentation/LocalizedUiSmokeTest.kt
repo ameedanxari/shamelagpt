@@ -89,6 +89,7 @@ class LocalizedUiSmokeTest(private val localeTag: String) {
         )
         val state = MutableStateFlow(HistoryUiState(conversations = conversations, isLoading = false))
         every { mockViewModel.uiState } returns state
+        every { mockViewModel.searchQuery } returns MutableStateFlow("")
         every { mockViewModel.loadConversations() } just Runs
         every { mockViewModel.deleteConversation(any()) } just Runs
         every { mockViewModel.getFilteredConversations() } returns conversations

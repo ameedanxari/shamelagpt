@@ -43,6 +43,7 @@ class HistoryScreenTest {
         every { viewModel.uiState } returns MutableStateFlow(
             HistoryUiState(conversations = conversations, isLoading = false)
         )
+        every { viewModel.searchQuery } returns MutableStateFlow("")
         every { viewModel.loadConversations() } just Runs
         every { viewModel.deleteConversation(any()) } just Runs
         every { viewModel.getFilteredConversations() } returns conversations
@@ -71,6 +72,7 @@ class HistoryScreenTest {
     fun guestStateShowsSignInCtaAndNavigatesToAuth() {
         val viewModel = mockk<HistoryViewModel>(relaxed = true, relaxUnitFun = true)
         every { viewModel.uiState } returns MutableStateFlow(HistoryUiState())
+        every { viewModel.searchQuery } returns MutableStateFlow("")
         every { viewModel.getFilteredConversations() } returns emptyList()
 
         var authNavigationTriggered = false
