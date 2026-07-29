@@ -228,7 +228,7 @@ fun HistoryScreen(
         // Delete confirmation dialog
         conversationToDelete?.let { conversation ->
             DeleteConfirmationDialog(
-                conversationTitle = conversation.title,
+                conversationTitle = viewModel.displayTitle(conversation),
                 onConfirm = {
                     viewModel.deleteConversation(conversation.id)
                 },
