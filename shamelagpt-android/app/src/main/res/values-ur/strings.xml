@@ -191,7 +191,7 @@
     <string name="network_auth_required">توثیق درکار ہے۔ براہ کرم سائن اِن کریں۔</string>
     <string name="network_access_forbidden">رسائی ممنوع ہے۔</string>
     <string name="network_not_found">وسیلہ نہیں ملا۔</string>
-    <string name="network_too_many_requests">درخواستیں بہت زیادہ ہیں۔ بعد میں کوشش کریں۔</string>
+    <string name="network_too_many_requests">آپ بہت تیزی سے پیغام بھیج رہے ہیں۔ چند سیکنڈ انتظار کر کے دوبارہ کوشش کریں۔</string>
     <string name="network_invalid_request">غلط درخواست۔ براہ کرم اپنے اندراج کی جانچ کریں۔</string>
     <string name="network_generic_error">کوئی خرابی پیش آئی۔ دوبارہ کوشش کریں۔</string>
     <string name="network_connection_error">سرور سے جڑنے میں مسئلہ۔ براہ کرم بعد میں کوشش کریں۔</string>

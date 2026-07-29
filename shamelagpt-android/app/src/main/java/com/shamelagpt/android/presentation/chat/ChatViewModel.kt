@@ -529,11 +529,13 @@ class ChatViewModel(
                     conversationId = currentState.conversationId,
                     messages = currentState.messages
                 )
+                val isTemporaryRateLimit = e is NetworkError.TooManyRequests && !isGuestQuotaExceeded
                 val signupPrompt = if (isGuestQuotaExceeded) guestLimitSignupMessage() else userMessage
                 _uiState.update { state ->
                     state.copy(
                         isLoading = false,
-                        error = if (isGuestQuotaExceeded) null else userMessage,
+                        // Snackbar-only for temporary throttle; skip red inline banner.
+                        error = if (isGuestQuotaExceeded || isTemporaryRateLimit) null else userMessage,
                         messages = state.messages.filterNot { it.id == optimisticUserMessage.id },
                         inputText = trimmedText,
                         streamingMessage = null,
@@ -1172,10 +1174,11 @@ class ChatViewModel(
                     conversationId = _uiState.value.conversationId,
                     messages = _uiState.value.messages
                 )
+                val isTemporaryRateLimit = e is NetworkError.TooManyRequests && !isGuestQuotaExceeded
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = if (isGuestQuotaExceeded) null else failure.userMessage,
+                        error = if (isGuestQuotaExceeded || isTemporaryRateLimit) null else failure.userMessage,
                         streamingMessage = null,
                         thinkingMessages = emptyList()
                     )

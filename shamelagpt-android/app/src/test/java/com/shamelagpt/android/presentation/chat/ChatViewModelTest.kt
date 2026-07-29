@@ -382,8 +382,10 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun testGuestTemporaryRateLimitUnderQuotaStillShowsError() = runTest {
+    fun testGuestTemporaryRateLimitUnderQuotaShowsSnackbarOnly() = runTest {
         every { mockAuthRepository.isLoggedIn() } returns false
+        every { mockContext.getString(R.string.network_too_many_requests) } returns
+            "You're sending too quickly. Please wait a few seconds and try again."
 
         val underLimitMessages = (1..3).map { index ->
             TestData.createMessage(id = "u-$index", content = "Q $index", isUserMessage = true)
@@ -405,9 +407,12 @@ class ChatViewModelTest {
 
             val event = awaitItem()
             assertThat(event).isInstanceOf(ChatEvent.ShowError::class.java)
+            assertThat((event as ChatEvent.ShowError).message)
+                .isEqualTo("You're sending too quickly. Please wait a few seconds and try again.")
+            assertThat(event.message).doesNotContain("E-RATE-001")
         }
 
-        assertThat(viewModel.uiState.value.error).isNotNull()
+        assertThat(viewModel.uiState.value.error).isNull()
         assertThat(mockChatRepository.streamMessageCallCount).isEqualTo(1)
     }
 

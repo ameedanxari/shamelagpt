@@ -40,6 +40,11 @@ object ChatOperationError {
                 retryable = throwable.isRetryable,
                 requiresAuth = true
             )
+            is NetworkError.TooManyRequests -> ChatOperationFailure(
+                userMessage = throwable.getUserMessage(context),
+                debugCode = throwable.debugCode,
+                retryable = throwable.isRetryable
+            )
             is NetworkError -> ChatOperationFailure(
                 userMessage = throwable.getUserMessageWithCode(context),
                 debugCode = throwable.debugCode,
