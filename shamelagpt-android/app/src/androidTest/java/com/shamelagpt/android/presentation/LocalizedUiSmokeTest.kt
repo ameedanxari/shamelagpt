@@ -22,7 +22,6 @@ import com.shamelagpt.android.presentation.theme.ShamelaGPTTheme
 import com.shamelagpt.android.presentation.welcome.WelcomeScreen
 import io.mockk.Runs
 import io.mockk.every
-import io.mockk.firstArg
 import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -93,7 +92,7 @@ class LocalizedUiSmokeTest(private val localeTag: String) {
         every { mockViewModel.loadConversations() } just Runs
         every { mockViewModel.deleteConversation(any()) } just Runs
         every { mockViewModel.getFilteredConversations() } returns conversations
-        every { mockViewModel.displayTitle(any()) } answers { firstArg<Conversation>().title }
+        every { mockViewModel.displayTitle(any()) } answers { (it.invocation.args[0] as Conversation).title }
         every { mockViewModel.messagePreview(any()) } returns "Preview"
 
         composeRule.setContent {

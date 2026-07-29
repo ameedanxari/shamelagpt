@@ -12,7 +12,6 @@ import com.shamelagpt.android.domain.model.Conversation
 import com.shamelagpt.android.presentation.common.TestTags
 import io.mockk.Runs
 import io.mockk.every
-import io.mockk.firstArg
 import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +46,7 @@ class HistoryScreenTest {
         every { viewModel.loadConversations() } just Runs
         every { viewModel.deleteConversation(any()) } just Runs
         every { viewModel.getFilteredConversations() } returns conversations
-        every { viewModel.displayTitle(any()) } answers { firstArg<Conversation>().title }
+        every { viewModel.displayTitle(any()) } answers { (it.invocation.args[0] as Conversation).title }
         every { viewModel.messagePreview(any()) } returns "Preview"
 
         var selectedConversationId: String? = null
