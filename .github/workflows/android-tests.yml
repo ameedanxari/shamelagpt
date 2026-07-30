@@ -50,8 +50,9 @@ jobs:
 
   instrumented-tests:
     name: Android Instrumented Tests
-    # macOS runner needed for better emulator performance (hardware accel)
-    runs-on: macos-14
+    # Linux runner with KVM: macOS ARM runners (M1) cannot run the emulator
+    # (no nested virtualization)
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: unit-tests
     
@@ -66,15 +67,12 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: AVD Cache
-        uses: actions/cache@v4
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-api-30-x86_64
-          
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
       - name: Run Instrumented Tests via Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -83,6 +81,7 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           working-directory: shamelagpt-android
+          emulator-options: -no-window -no-snapshot -noaudio -gpu swiftshader_indirect -camera-back none
           # Run connected tests on debug build
           script: ./gradlew connectedDebugAndroidTest
           
