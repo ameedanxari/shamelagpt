@@ -23,6 +23,7 @@
     <string name="password">پاس ورڈ</string>
     <string name="display_name_optional">ظاہر ہونے والا نام (اختیاری)</string>
     <string name="continue_as_guest">بطور مہمان جاری رکھیں</string>
+    <string name="guest_limit_signup_prompt">آپ اپنے 10 مفت سوالات استعمال کر چکے ہیں۔ جاری رکھنے کے لیے مفت سائن اپ کریں۔</string>
     <string name="need_account">اکاؤنٹ نہیں ہے؟ نیا بنائیں</string>
     <string name="have_account">اکاؤنٹ ہے؟ سائن اِن کریں</string>
     <string name="auth_invalid_credentials">سائن اِن نہیں ہو سکا۔ اپنا ای میل اور پاس ورڈ چیک کریں اور دوبارہ کوشش کریں۔</string>
@@ -190,7 +191,7 @@
     <string name="network_auth_required">توثیق درکار ہے۔ براہ کرم سائن اِن کریں۔</string>
     <string name="network_access_forbidden">رسائی ممنوع ہے۔</string>
     <string name="network_not_found">وسیلہ نہیں ملا۔</string>
-    <string name="network_too_many_requests">درخواستیں بہت زیادہ ہیں۔ بعد میں کوشش کریں۔</string>
+    <string name="network_too_many_requests">آپ بہت تیزی سے پیغام بھیج رہے ہیں۔ چند سیکنڈ انتظار کر کے دوبارہ کوشش کریں۔</string>
     <string name="network_invalid_request">غلط درخواست۔ براہ کرم اپنے اندراج کی جانچ کریں۔</string>
     <string name="network_generic_error">کوئی خرابی پیش آئی۔ دوبارہ کوشش کریں۔</string>
     <string name="network_connection_error">سرور سے جڑنے میں مسئلہ۔ براہ کرم بعد میں کوشش کریں۔</string>

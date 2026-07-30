@@ -40,7 +40,7 @@ fun ShamelaGPTApp(
         destination.hasRoute<SettingsRoute>()
     } ?: false
 
-    val finalStartDest = startDestination ?: if (sessionManager.isLoggedIn()) ChatRoute() else AuthRoute
+    val finalStartDest = startDestination ?: if (sessionManager.isLoggedIn()) ChatRoute() else AuthRoute()
 
     Scaffold(
         bottomBar = {

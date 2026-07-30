@@ -323,6 +323,21 @@ class ChatViewModel(
                 threadId = currentState.threadId,
                 detail = "textLen=${trimmedText.length}"
             )
+
+            // Route guests to signup before hitting the API once free questions are used.
+            // Avoids temporary IP 429 (E-RATE-001) masking an already-exhausted guest quota.
+            if (shouldRequireGuestSignup(currentState.conversationId, currentState.messages)) {
+                ChatFlowDiagnostics.markPhase(
+                    phaseName = "chat.send.guestQuotaPreempt",
+                    conversationId = currentState.conversationId,
+                    threadId = currentState.threadId,
+                    detail = "userMessages=${guestUserMessageCount(currentState.messages)}"
+                )
+                _events.send(ChatEvent.RequireSignup(guestLimitSignupMessage()))
+                ChatFlowDiagnostics.clear(detail = "chat.send.guestQuotaPreempt")
+                return@launch
+            }
+
             val optimisticUserMessage = Message(
                 id = UUID.randomUUID().toString(),
                 content = trimmedText,
@@ -509,10 +524,18 @@ class ChatViewModel(
                 )
                 val failure = ChatOperationError.from(context, ChatOperation.SEND_MESSAGE, e)
                 val userMessage = failure.userMessage
+                val isGuestQuotaExceeded = isGuestQuotaFailure(
+                    error = e,
+                    conversationId = currentState.conversationId,
+                    messages = currentState.messages
+                )
+                val isTemporaryRateLimit = e is NetworkError.TooManyRequests && !isGuestQuotaExceeded
+                val signupPrompt = if (isGuestQuotaExceeded) guestLimitSignupMessage() else userMessage
                 _uiState.update { state ->
                     state.copy(
                         isLoading = false,
-                        error = userMessage,
+                        // Snackbar-only for temporary throttle; skip red inline banner.
+                        error = if (isGuestQuotaExceeded || isTemporaryRateLimit) null else userMessage,
                         messages = state.messages.filterNot { it.id == optimisticUserMessage.id },
                         inputText = trimmedText,
                         streamingMessage = null,
@@ -521,13 +544,19 @@ class ChatViewModel(
                 }
                 
                 val message = when {
+                    isGuestQuotaExceeded -> {
+                        _events.send(ChatEvent.RequireSignup(signupPrompt))
+                        null
+                    }
                     failure.requiresAuth || e is NetworkError.Unauthorized -> {
                         _events.send(ChatEvent.RequireAuth)
                         userMessage
                     }
                     else -> userMessage
                 }
-                _events.send(ChatEvent.ShowError(message))
+                if (message != null) {
+                    _events.send(ChatEvent.ShowError(message))
+                }
                 ChatFlowDiagnostics.clear(detail = "chat.send.error")
             }
         }
@@ -925,16 +954,23 @@ class ChatViewModel(
         }
 
         Logger.d("ChatVM", "Dismissing confirmation dialog and starting backend stream")
-        
-        // Clear image state and set loading
-        _uiState.update { it.copy(
-            imageInputState = ImageInputState(),
-            isLoading = true,
-            thinkingMessages = listOf(DEFAULT_THINKING_MESSAGE),
-            streamingMessage = null
-        )}
 
         viewModelScope.launch {
+            if (shouldRequireGuestSignup(currentState.conversationId, currentState.messages)) {
+                _uiState.update { it.copy(imageInputState = ImageInputState(), isLoading = false) }
+                _events.send(ChatEvent.RequireSignup(guestLimitSignupMessage()))
+                ChatFlowDiagnostics.clear(detail = "chat.factCheck.guestQuotaPreempt")
+                return@launch
+            }
+
+            // Clear image state and set loading
+            _uiState.update { it.copy(
+                imageInputState = ImageInputState(),
+                isLoading = true,
+                thinkingMessages = listOf(DEFAULT_THINKING_MESSAGE),
+                streamingMessage = null
+            )}
+
             try {
                 // 1. Save user message locally first
                 val userMessage = Message(
@@ -1133,18 +1169,28 @@ class ChatViewModel(
                     detail = e::class.java.simpleName
                 )
                 val failure = ChatOperationError.from(context, ChatOperation.FACT_CHECK, e)
+                val isGuestQuotaExceeded = isGuestQuotaFailure(
+                    error = e,
+                    conversationId = _uiState.value.conversationId,
+                    messages = _uiState.value.messages
+                )
+                val isTemporaryRateLimit = e is NetworkError.TooManyRequests && !isGuestQuotaExceeded
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = failure.userMessage,
+                        error = if (isGuestQuotaExceeded || isTemporaryRateLimit) null else failure.userMessage,
                         streamingMessage = null,
                         thinkingMessages = emptyList()
                     )
                 }
-                if (failure.requiresAuth) {
+                if (isGuestQuotaExceeded) {
+                    _events.send(ChatEvent.RequireSignup(guestLimitSignupMessage()))
+                } else if (failure.requiresAuth) {
                     _events.send(ChatEvent.RequireAuth)
+                    _events.send(ChatEvent.ShowError(failure.userMessage))
+                } else {
+                    _events.send(ChatEvent.ShowError(failure.userMessage))
                 }
-                _events.send(ChatEvent.ShowError(failure.userMessage))
                 ChatFlowDiagnostics.clear(detail = "chat.factCheck.error")
             }
         }
@@ -1290,10 +1336,49 @@ class ChatViewModel(
         }
     }
 
+    private fun guestUserMessageCount(messages: List<Message>): Int =
+        messages.count { it.isUserMessage }
+
+    private fun guestLimitSignupMessage(): String =
+        context.getString(R.string.guest_limit_signup_prompt)
+
+    private suspend fun isGuestConversation(conversationId: String?): Boolean {
+        if (conversationId != null) {
+            val conversation = conversationRepository.getConversationById(conversationId)
+            if (conversation != null) {
+                return conversation.isLocalOnly
+            }
+        }
+        return authRepository?.isLoggedIn() != true
+    }
+
+    private suspend fun shouldRequireGuestSignup(
+        conversationId: String?,
+        messages: List<Message>
+    ): Boolean {
+        return isGuestConversation(conversationId) &&
+            guestUserMessageCount(messages) >= GUEST_FREE_QUESTION_LIMIT
+    }
+
+    private suspend fun isGuestQuotaFailure(
+        error: Throwable,
+        conversationId: String?,
+        messages: List<Message>
+    ): Boolean {
+        if (error is NetworkError.GuestQuotaExceeded) {
+            return true
+        }
+        // IP burst throttle can fire before the guest-quota response; once local free
+        // questions are used, treat that 429 as signup instead of a rate-limit error.
+        return error is NetworkError.TooManyRequests &&
+            shouldRequireGuestSignup(conversationId, messages)
+    }
+
     private companion object {
         const val DEFAULT_THINKING_MESSAGE = "Thinking..."
         const val MODE_RESEARCH = 1
         const val MODE_FACT_CHECK = 2
+        const val GUEST_FREE_QUESTION_LIMIT = 10
         @Volatile
         var factCheckRequiresImageUrl: Boolean = false
     }

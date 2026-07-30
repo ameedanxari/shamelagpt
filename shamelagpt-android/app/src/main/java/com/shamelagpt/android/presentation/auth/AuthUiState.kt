@@ -9,5 +9,6 @@ data class AuthUiState(
     val displayName: String = "",
     val isLoginMode: Boolean = true,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isGuestLimitPrompt: Boolean = false
 )

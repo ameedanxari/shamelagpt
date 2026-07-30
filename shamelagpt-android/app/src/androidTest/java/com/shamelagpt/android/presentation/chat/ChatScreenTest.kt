@@ -76,7 +76,7 @@ class ChatScreenTest {
     @Test
     fun streamingState_showsTypingAndThinkingIndicators() {
         val mockViewModel = mockk<ChatViewModel>(relaxed = true, relaxUnitFun = true)
-        val stateFlow = MutableStateFlow(
+        val thinkingState = MutableStateFlow(
             ChatUiState(
                 messages = emptyList(),
                 isLoading = true,
@@ -84,7 +84,7 @@ class ChatScreenTest {
             )
         )
 
-        every { mockViewModel.uiState } returns stateFlow
+        every { mockViewModel.uiState } returns thinkingState
         every { mockViewModel.events } returns MutableSharedFlow()
         every { mockViewModel.loadConversation(any()) } just Runs
 
@@ -92,10 +92,22 @@ class ChatScreenTest {
             ChatScreen(viewModel = mockViewModel)
         }
 
+        // When thinking text is present, UI shows thinking bubble (not typing dots).
         composeTestRule.onNodeWithTag(TestTags.Chat.ThinkingBubble, useUnmergedTree = true)
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.Chat.TypingIndicator, useUnmergedTree = true)
+            .assertDoesNotExist()
+
+        // Without thinking text, loading shows the typing indicator instead.
+        thinkingState.value = ChatUiState(
+            messages = emptyList(),
+            isLoading = true,
+            thinkingMessages = emptyList()
+        )
+        composeTestRule.onNodeWithTag(TestTags.Chat.TypingIndicator, useUnmergedTree = true)
             .assertExists()
+        composeTestRule.onNodeWithTag(TestTags.Chat.ThinkingBubble, useUnmergedTree = true)
+            .assertDoesNotExist()
     }
 
     @Test

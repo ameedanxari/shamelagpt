@@ -112,6 +112,19 @@ sealed class NetworkError : Exception() {
             return context.getString(R.string.network_too_many_requests)
         }
     }
+
+    /**
+     * Guest session reached the free-question limit and should sign up.
+     */
+    object GuestQuotaExceeded : NetworkError() {
+        override val debugCode = "E-GUEST-001"
+        override val debugMessage = "[$debugCode] Guest free-question limit reached"
+        override val message = debugMessage
+
+        override fun getUserMessage(context: Context): String {
+            return context.getString(R.string.guest_limit_signup_prompt)
+        }
+    }
     
     /**
      * Network exception (connectivity issues, DNS, etc.).

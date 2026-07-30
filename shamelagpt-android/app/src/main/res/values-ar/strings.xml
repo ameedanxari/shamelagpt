@@ -23,6 +23,7 @@
     <string name="password">كلمة المرور</string>
     <string name="display_name_optional">الاسم المعروض (اختياري)</string>
     <string name="continue_as_guest">المتابعة كضيف</string>
+    <string name="guest_limit_signup_prompt">لقد وصلت إلى 10 أسئلة مجانية. أنشئ حسابًا مجانيًا للمتابعة.</string>
     <string name="need_account">ليس لديك حساب؟ إنشاء حساب</string>
     <string name="have_account">لديك حساب؟ تسجيل الدخول</string>
     <string name="auth_invalid_credentials">تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور ثم حاول مرة أخرى.</string>
@@ -217,7 +218,7 @@
     <string name="network_auth_required">المصادقة مطلوبة. يرجى تسجيل الدخول.</string>
     <string name="network_access_forbidden">الوصول محظور.</string>
     <string name="network_not_found">المورد غير موجود.</string>
-    <string name="network_too_many_requests">طلبات كثيرة جداً. يرجى المحاولة مرة أخرى لاحقاً.</string>
+    <string name="network_too_many_requests">ترسل بسرعة كبيرة. يرجى الانتظار بضع ثوانٍ ثم المحاولة مرة أخرى.</string>
     <string name="network_invalid_request">طلب غير صالح. يرجى التحقق من إدخالك والمحاولة مرة أخرى.</string>
     <string name="network_generic_error">حدث خطأ. يرجى المحاولة مرة أخرى.</string>
     <string name="network_connection_error">تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقاً.</string>

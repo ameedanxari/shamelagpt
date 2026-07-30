@@ -5,6 +5,8 @@ import android.content.Context
 import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.shamelagpt.android.R
+import com.shamelagpt.android.core.network.NetworkError
 import com.shamelagpt.android.core.util.OCRManager
 import com.shamelagpt.android.core.util.OCRResult
 import com.shamelagpt.android.core.util.VoiceInputManager
@@ -318,6 +320,100 @@ class ChatViewModelTest {
 
         assertThat(viewModel.uiState.value.isLoading).isFalse()
         assertThat(viewModel.uiState.value.error).isNotNull()
+    }
+
+    @Test
+    fun testGuestQuotaExceededRoutesToSignupWithoutInlineError() = runTest {
+        // Given
+        every { mockContext.getString(R.string.guest_limit_signup_prompt) } returns
+            "You reached your 10 free questions. Sign up for free to continue."
+        viewModel.updateInputText("Test guest limit")
+        mockChatRepository.sendMessageResult = Result.failure(NetworkError.GuestQuotaExceeded)
+
+        // When/Then
+        viewModel.events.test {
+            viewModel.sendMessage()
+            testScheduler.advanceUntilIdle()
+
+            val event = awaitItem()
+            assertThat(event).isInstanceOf(ChatEvent.RequireSignup::class.java)
+            assertThat((event as ChatEvent.RequireSignup).message).isNotEmpty()
+        }
+
+        assertThat(viewModel.uiState.value.isLoading).isFalse()
+        assertThat(viewModel.uiState.value.error).isNull()
+        assertThat(viewModel.uiState.value.inputText).isEqualTo("Test guest limit")
+    }
+
+    @Test
+    fun testGuestFreeQuestionLimitPreemptsApiAndRoutesToSignup() = runTest {
+        every { mockContext.getString(R.string.guest_limit_signup_prompt) } returns
+            "You reached your 10 free questions. Sign up for free to continue."
+        every { mockAuthRepository.isLoggedIn() } returns false
+
+        val userMessages = (1..10).map { index ->
+            TestData.createMessage(id = "user-$index", content = "Question $index", isUserMessage = true)
+        }
+        val conversation = TestData.createConversation(
+            id = "guest-limit-conv",
+            messages = userMessages
+        ).copy(isLocalOnly = true)
+        mockConversationRepository.addConversation(conversation)
+
+        viewModel.loadConversation(conversation.id)
+        testScheduler.advanceUntilIdle()
+        viewModel.updateInputText("One more question")
+
+        viewModel.events.test {
+            viewModel.sendMessage()
+            testScheduler.advanceUntilIdle()
+
+            val event = awaitItem()
+            assertThat(event).isInstanceOf(ChatEvent.RequireSignup::class.java)
+            assertThat((event as ChatEvent.RequireSignup).message)
+                .isEqualTo("You reached your 10 free questions. Sign up for free to continue.")
+            expectNoEvents()
+        }
+
+        assertThat(mockChatRepository.streamMessageCallCount).isEqualTo(0)
+        assertThat(viewModel.uiState.value.error).isNull()
+        assertThat(viewModel.uiState.value.isLoading).isFalse()
+        assertThat(viewModel.uiState.value.inputText).isEqualTo("One more question")
+    }
+
+    @Test
+    fun testGuestTemporaryRateLimitUnderQuotaShowsSnackbarOnly() = runTest {
+        every { mockAuthRepository.isLoggedIn() } returns false
+        every { mockContext.getString(R.string.network_too_many_requests) } returns
+            "You're sending too quickly. Please wait a few seconds and try again."
+
+        val underLimitMessages = (1..3).map { index ->
+            TestData.createMessage(id = "u-$index", content = "Q $index", isUserMessage = true)
+        }
+        val underLimitConversation = TestData.createConversation(
+            id = "guest-under-limit",
+            messages = underLimitMessages
+        ).copy(isLocalOnly = true)
+        mockConversationRepository.addConversation(underLimitConversation)
+        mockChatRepository.sendMessageResult = Result.failure(NetworkError.TooManyRequests)
+
+        viewModel.loadConversation(underLimitConversation.id)
+        testScheduler.advanceUntilIdle()
+        viewModel.updateInputText("Burst send")
+
+        viewModel.events.test {
+            viewModel.sendMessage()
+            testScheduler.advanceUntilIdle()
+
+            val event = awaitItem()
+            assertThat(event).isInstanceOf(ChatEvent.ShowError::class.java)
+            assertThat((event as ChatEvent.ShowError).message)
+                .isEqualTo("You're sending too quickly. Please wait a few seconds and try again.")
+            assertThat(event.message).doesNotContain("E-RATE-001")
+        }
+
+        assertThat(viewModel.uiState.value.error).isNull()
+        assertThat(mockChatRepository.streamMessageCallCount).isEqualTo(1)
     }
 
     @Test

@@ -28,6 +28,7 @@ suspend fun <T> safeApiCall(
     } catch (e: HttpException) {
         val errorBody = e.response()?.errorBody()?.string()
         val status = e.code()
+        val headers = e.response()?.headers()
         Logger.w(tag, "http error status=$status")
         if ((status == 401 || status == 403) && authRetry != null) {
             Logger.i(tag, "attempting auth retry for status=$status")
@@ -48,7 +49,19 @@ suspend fun <T> safeApiCall(
         }
         when (status) {
             401, 403 -> Result.failure(NetworkError.Unauthorized)
-            429 -> Result.failure(NetworkError.TooManyRequests)
+            429 -> {
+                val guestLimitReached = headers
+                    ?.get("X-Guest-Limit-Reached")
+                    ?.equals("true", ignoreCase = true) == true
+                val looksLikeGuestLimit = errorBody
+                    ?.contains("guest mode", ignoreCase = true) == true &&
+                    errorBody.contains("sign in to continue", ignoreCase = true)
+                if (guestLimitReached || looksLikeGuestLimit) {
+                    Result.failure(NetworkError.GuestQuotaExceeded)
+                } else {
+                    Result.failure(NetworkError.TooManyRequests)
+                }
+            }
             else -> Result.failure(NetworkError.HttpError(code = status, errorBody = errorBody))
         }
     } catch (e: SocketTimeoutException) {
