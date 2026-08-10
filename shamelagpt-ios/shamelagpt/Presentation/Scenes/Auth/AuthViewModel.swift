@@ -17,9 +17,17 @@ final class AuthViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let authRepository: AuthRepository
+    private let googleSignInService: GoogleSignInService
 
-    init(authRepository: AuthRepository) {
+    /// `googleSignInService` is built here rather than as a default argument: default
+    /// arguments are evaluated in a nonisolated context, and its initialiser is
+    /// `@MainActor`. This init already is, so constructing it inside is valid.
+    init(
+        authRepository: AuthRepository,
+        googleSignInService: GoogleSignInService? = nil
+    ) {
         self.authRepository = authRepository
+        self.googleSignInService = googleSignInService ?? GoogleSignInService()
     }
 
     func toggleMode() {
@@ -88,6 +96,32 @@ final class AuthViewModel: ObservableObject {
                 isLoading = false
                 AppLogger.auth.logWarning("forgot password request failed reason=\(type(of: error))")
                 AppLogger.auth.logError("forgot password error", error: error)
+                errorMessage = error.userFacingMessage
+            }
+        }
+    }
+
+    /// Runs the Google browser flow, then trades the resulting ID token for a session.
+    ///
+    /// The backend does the Firebase IdP exchange for us (`POST /api/auth/google` calls
+    /// `accounts:signInWithIdp`), so the app never needs the Firebase SDK — it only has to
+    /// obtain a Google ID token and hand it over.
+    func signInWithGoogle(onSuccess: @escaping () -> Void) {
+        Task {
+            isLoading = true
+            errorMessage = nil
+            do {
+                AppLogger.auth.logInfo("google browser flow started")
+                let idToken = try await googleSignInService.signIn()
+                isLoading = false
+                googleSignIn(idToken: idToken, onSuccess: onSuccess)
+            } catch GoogleSignInService.GoogleSignInError.cancelled {
+                // Dismissing the sheet is a normal outcome, not an error to shout about.
+                isLoading = false
+                AppLogger.auth.logInfo("google sign-in cancelled by user")
+            } catch {
+                isLoading = false
+                AppLogger.auth.logError("google browser flow failed", error: error)
                 errorMessage = error.userFacingMessage
             }
         }

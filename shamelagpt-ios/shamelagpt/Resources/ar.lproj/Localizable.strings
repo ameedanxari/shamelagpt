@@ -247,6 +247,8 @@
 "auth.needAccount" = "ليس لديك حساب؟ إنشاء حساب";
 "auth.haveAccount" = "لديك حساب؟ تسجيل الدخول";
 "auth.signInButton" = "تسجيل الدخول";
+"auth.continueWithGoogle" = "المتابعة باستخدام Google";
+"auth.orDivider" = "أو";
 
 "settings.pref.length.title" = "طول الإجابة";
 "settings.pref.length.short" = "قصيرة";

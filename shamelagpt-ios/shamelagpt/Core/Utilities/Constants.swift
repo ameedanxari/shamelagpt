@@ -26,6 +26,21 @@ enum Constants {
         static let version = "1.0.0"
     }
 
+    // MARK: - Google Sign-In
+    ///
+    /// The iOS OAuth client from the `shamela-fe4d3` Firebase project. This is a public
+    /// client identifier, not a secret — it ships in every copy of the binary by design,
+    /// and the flow is secured by PKCE instead (see `GoogleSignInService`).
+    ///
+    /// `reversedClientID` must stay in sync with the `CFBundleURLSchemes` entry in
+    /// Info.plist; it is the custom scheme Google redirects back to.
+    enum Google {
+        static let iosClientID =
+            "1056619207445-sh6qcja4ffj8hhjo2ohc3jsfev1h2pfo.apps.googleusercontent.com"
+        static let reversedClientID =
+            "com.googleusercontent.apps.1056619207445-sh6qcja4ffj8hhjo2ohc3jsfev1h2pfo"
+    }
+
     // MARK: - Storage Keys
     enum Storage {
         static let hasSeenWelcome = "hasSeenWelcome"

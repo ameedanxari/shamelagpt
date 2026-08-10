@@ -246,6 +246,8 @@
 "auth.needAccount" = "Need an account? Sign up";
 "auth.haveAccount" = "Have an account? Sign in";
 "auth.signInButton" = "Sign In";
+"auth.continueWithGoogle" = "Continue with Google";
+"auth.orDivider" = "OR";
 
 // MARK: - AI Preference Options
 

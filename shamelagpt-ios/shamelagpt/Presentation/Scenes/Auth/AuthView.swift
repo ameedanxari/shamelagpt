@@ -24,6 +24,30 @@ struct AuthView: View {
                 .font(DesignSystem.Typography.title2)
                 .foregroundColor(DesignSystem.Colors.textPrimary(colorScheme))
 
+            // Social sign-in sits above the credential form, matching the web app.
+            Button {
+                if !viewModel.isLoading {
+                    viewModel.signInWithGoogle(onSuccess: onAuthenticated)
+                }
+            } label: {
+                HStack(spacing: DesignSystem.Spacing.sm) {
+                    GoogleGlyph()
+                    Text(LocalizationKeys.authContinueWithGoogle.localizedKey)
+                }
+            }
+            .buttonStyle(.secondary)
+            .disabled(viewModel.isLoading)
+            .accessibilityIdentifier(AccessibilityID.Auth.googleSignInButton)
+
+            // "OR" divider
+            HStack(spacing: DesignSystem.Spacing.sm) {
+                dividerRule
+                Text(LocalizationKeys.authOrDivider.localizedKey)
+                    .font(DesignSystem.Typography.footnote)
+                    .foregroundColor(DesignSystem.Colors.textSecondary(colorScheme))
+                dividerRule
+            }
+
             // Email field
             TextField(LocalizationKeys.authEmail.localizedKey, text: $viewModel.email)
                 .keyboardType(.emailAddress)
@@ -93,6 +117,46 @@ struct AuthView: View {
             }
             .padding(DesignSystem.Spacing.lg)
         }
+    }
+
+    private var dividerRule: some View {
+        Rectangle()
+            .fill(DesignSystem.Colors.textSecondary(colorScheme).opacity(0.3))
+            .frame(height: 1)
+    }
+}
+
+/// The Google "G" drawn as vector shapes.
+///
+/// Google's brand terms require the official mark and forbid recolouring it, so it cannot
+/// be an SF Symbol or a tinted template image. Drawing it keeps the four brand colours
+/// exact without adding an asset that has to be exported at three scales.
+private struct GoogleGlyph: View {
+    var body: some View {
+        ZStack {
+            Circle()
+                .trim(from: 0.0, to: 0.25)
+                .stroke(Color(red: 0.918, green: 0.263, blue: 0.208), lineWidth: 4)   // red
+                .rotationEffect(.degrees(-135))
+            Circle()
+                .trim(from: 0.0, to: 0.25)
+                .stroke(Color(red: 0.984, green: 0.737, blue: 0.020), lineWidth: 4)   // yellow
+                .rotationEffect(.degrees(135))
+            Circle()
+                .trim(from: 0.0, to: 0.25)
+                .stroke(Color(red: 0.204, green: 0.659, blue: 0.325), lineWidth: 4)   // green
+                .rotationEffect(.degrees(45))
+            Circle()
+                .trim(from: 0.0, to: 0.25)
+                .stroke(Color(red: 0.259, green: 0.522, blue: 0.957), lineWidth: 4)   // blue
+                .rotationEffect(.degrees(-45))
+            Rectangle()
+                .fill(Color(red: 0.259, green: 0.522, blue: 0.957))
+                .frame(width: 8, height: 4)
+                .offset(x: 4, y: 0)
+        }
+        .frame(width: 18, height: 18)
+        .accessibilityHidden(true)
     }
 }
 
