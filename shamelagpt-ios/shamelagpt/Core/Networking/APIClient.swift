@@ -44,7 +44,7 @@ final class APIClient: APIClientProtocol {
     private let session: URLSession
     private let jsonEncoder: JSONEncoder
     private let jsonDecoder: JSONDecoder
-    private let authTokenProvider: (() -> String?)?
+    private let tokenProvider: AuthTokenProviding?
 
     /// Lightweight empty response placeholder
     private struct EmptyResponse: Decodable {}
@@ -53,7 +53,19 @@ final class APIClient: APIClientProtocol {
 
     private struct Configuration {
         static let baseURLString = "https://shamelagpt.com"
+        /// Idle timeout: how long a request may go without receiving *any* bytes.
         static let timeoutInterval: TimeInterval = 30.0
+        /// Idle timeout for SSE. The backend emits `: heartbeat` comments every 15s
+        /// specifically to keep this from firing during long retrieval/generation pauses.
+        static let streamIdleTimeout: TimeInterval = 60.0
+        /// Ceiling on total request duration.
+        ///
+        /// This was previously `timeoutInterval * 2` (60s) and applied to SSE too, so any
+        /// answer that took longer than a minute to finish streaming was killed mid-flight.
+        /// Deep research and fact-check answers (which retrieve up to 25 documents) routinely
+        /// exceed that. The idle timeout above is what actually detects a dead connection;
+        /// this only needs to be generous enough not to truncate a healthy long answer.
+        static let resourceTimeout: TimeInterval = 600.0
         static let defaultHeaders = [
             "Content-Type": "application/json",
             "Accept": "application/json"
@@ -62,10 +74,23 @@ final class APIClient: APIClientProtocol {
 
     // MARK: - Initialization
 
+    /// Legacy convenience: a synchronous token closure with no refresh capability.
+    convenience init(
+        baseURL: URL? = nil,
+        session: URLSession? = nil,
+        authTokenProvider: (@Sendable () -> String?)?
+    ) {
+        self.init(
+            baseURL: baseURL,
+            session: session,
+            tokenProvider: authTokenProvider.map { StaticTokenProvider($0) }
+        )
+    }
+
     init(
         baseURL: URL? = nil,
         session: URLSession? = nil,
-        authTokenProvider: (() -> String?)? = nil
+        tokenProvider: AuthTokenProviding? = nil
     ) {
         // Use provided base URL or default
         if let baseURL = baseURL {
@@ -83,7 +108,7 @@ final class APIClient: APIClientProtocol {
         } else if isUITesting {
             let configuration = URLSessionConfiguration.ephemeral
             configuration.timeoutIntervalForRequest = Configuration.timeoutInterval
-            configuration.timeoutIntervalForResource = Configuration.timeoutInterval * 2
+            configuration.timeoutIntervalForResource = Configuration.resourceTimeout
             configuration.httpAdditionalHeaders = Configuration.defaultHeaders
             configuration.waitsForConnectivity = true
             configuration.protocolClasses = [MockURLProtocol.self]
@@ -92,7 +117,7 @@ final class APIClient: APIClientProtocol {
         } else {
             let configuration = URLSessionConfiguration.default
             configuration.timeoutIntervalForRequest = Configuration.timeoutInterval
-            configuration.timeoutIntervalForResource = Configuration.timeoutInterval * 2
+            configuration.timeoutIntervalForResource = Configuration.resourceTimeout
             configuration.httpAdditionalHeaders = Configuration.defaultHeaders
             configuration.waitsForConnectivity = true
             self.session = URLSession(configuration: configuration)
@@ -105,7 +130,7 @@ final class APIClient: APIClientProtocol {
         self.jsonDecoder = JSONDecoder()
         self.jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
 
-        self.authTokenProvider = authTokenProvider
+        self.tokenProvider = tokenProvider
     }
 
     /// Detects UI test environment (arguments, env, or runner bundle path)
@@ -131,7 +156,7 @@ final class APIClient: APIClientProtocol {
     /// POST /api/chat
     func sendMessage(_ request: ChatRequest) async throws -> ChatResponse {
         // If an auth token is not available, route to the guest chat endpoint
-        let endpointPath = (authTokenProvider?() == nil) ? "api/guest/chat" : "api/chat"
+        let endpointPath = (await tokenProvider?.validToken() == nil) ? "api/guest/chat" : "api/chat"
         let endpoint = baseURL.appendingPathComponent(endpointPath)
         return try await performRequest(
             url: endpoint,
@@ -282,7 +307,8 @@ final class APIClient: APIClientProtocol {
         request.httpMethod = method
 
         AppLogger.network.logDebug("Making \(method) request to: \(url.absoluteString)")
-        if let token = authTokenProvider?() {
+        let token = await tokenProvider?.validToken()
+        if let token {
             request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
 
@@ -301,7 +327,18 @@ final class APIClient: APIClientProtocol {
         }
 
         // Perform request
-        let (data, response) = try await performDataTask(request: request)
+        var (data, response) = try await performDataTask(request: request)
+
+        // A 401 on a token we believed was valid means our local expiry was wrong (clock
+        // skew, or a server-side revocation). Renew once and replay before surfacing an
+        // error — otherwise the user is signed out for a recoverable condition.
+        if token != nil, statusCode(of: response) == 401 {
+            AppLogger.network.logWarning("401 on authenticated request - refreshing token and retrying once")
+            if let renewed = await tokenProvider?.forceRefresh() {
+                request.setValue("Bearer \(renewed)", forHTTPHeaderField: "Authorization")
+                (data, response) = try await performDataTask(request: request)
+            }
+        }
 
         // Log response details
         if let httpResponse = response as? HTTPURLResponse {
@@ -348,6 +385,26 @@ final class APIClient: APIClientProtocol {
         }
     }
 
+    /// Opens an SSE byte stream, mapping transport failures the same way `performDataTask`
+    /// does. Without this, `session.bytes(for:)` threw raw `URLError`s that no caller could
+    /// classify, and every connection problem was reported as an unknown app error.
+    private func performBytesTask(
+        request: URLRequest
+    ) async throws -> (URLSession.AsyncBytes, URLResponse) {
+        do {
+            return try await session.bytes(for: request)
+        } catch let urlError as URLError {
+            throw mapURLError(urlError)
+        } catch {
+            throw NetworkError.unknown(error)
+        }
+    }
+
+    /// Status code of a response, when it is an HTTP response.
+    private func statusCode(of response: URLResponse) -> Int? {
+        (response as? HTTPURLResponse)?.statusCode
+    }
+
     /// Validates the HTTP response
     private func validateResponse(_ response: URLResponse) throws {
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -382,7 +439,12 @@ final class APIClient: APIClientProtocol {
     ) async throws -> AsyncThrowingStream<String, Error> {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        if let token = authTokenProvider?() {
+        // SSE tolerates longer gaps than a normal request: the server may spend a while
+        // retrieving and generating before the first token. Heartbeat comments keep this
+        // from firing on a healthy connection.
+        request.timeoutInterval = Configuration.streamIdleTimeout
+        let token = await tokenProvider?.validToken()
+        if let token {
             request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
 
@@ -397,7 +459,18 @@ final class APIClient: APIClientProtocol {
             AppLogger.network.logDebug("SSE request body (first 2000 chars): \(bodyString.prefix(2000))")
         }
 
-        let (bytes, response) = try await session.bytes(for: request)
+        var (bytes, response) = try await performBytesTask(request: request)
+
+        // Same 401 recovery as the non-streaming path. Safe to replay here because we have
+        // not emitted anything to the caller yet — the status is checked before any bytes
+        // are consumed, so no partial answer can be duplicated.
+        if token != nil, statusCode(of: response) == 401 {
+            AppLogger.network.logWarning("401 on SSE request - refreshing token and retrying once")
+            if let renewed = await tokenProvider?.forceRefresh() {
+                request.setValue("Bearer \(renewed)", forHTTPHeaderField: "Authorization")
+                (bytes, response) = try await performBytesTask(request: request)
+            }
+        }
 
         if let httpResp = response as? HTTPURLResponse {
             AppLogger.network.logInfo("SSE response status: \(httpResp.statusCode)")
@@ -416,8 +489,15 @@ final class APIClient: APIClientProtocol {
                     }
                     continuation.finish()
                 } catch {
+                    // Map here too. A stream that dies mid-answer previously surfaced a raw
+                    // URLError, which `handleError` could not classify, so the user saw the
+                    // generic "E-APP-000" instead of "connection lost".
                     AppLogger.network.logError("SSE stream error", error: error)
-                    continuation.finish(throwing: error)
+                    if let urlError = error as? URLError {
+                        continuation.finish(throwing: self.mapURLError(urlError))
+                    } else {
+                        continuation.finish(throwing: error)
+                    }
                 }
             }
         }

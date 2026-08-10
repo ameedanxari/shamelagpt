@@ -587,6 +587,15 @@ final class ChatViewModel: ObservableObject {
 
     // MARK: - Error Handling
 
+    /// Clears the auth-required signal once the view has acted on it.
+    ///
+    /// `requiresAuth` was previously write-once: nothing ever set it back to `false`, so a
+    /// view model that had seen a single 401 stayed latched and `.onChange` would not fire
+    /// again on a later auth failure.
+    func acknowledgeAuthRequirement() {
+        requiresAuth = false
+    }
+
     private func handleError(_ error: Error) {
         AppLogger.chat.logError("handleError called with error: \(error)")
         self.error = error
@@ -596,6 +605,15 @@ final class ChatViewModel: ObservableObject {
                 requiresAuth = true
             }
             AppLogger.chat.logInfo("Set errorMessage from NetworkError with debugCode: \(networkError.debugCode)")
+        } else if let appError = error as? AppError {
+            // Parity with AppStartupViewModel.isUnauthorized: an auth failure wrapped as an
+            // AppError used to slip through here unflagged, so the user saw a generic error
+            // instead of being asked to sign in again.
+            errorMessage = appError.userFacingMessage
+            if case .api(let status, _) = appError, status == 401 || status == 403 {
+                requiresAuth = true
+            }
+            AppLogger.chat.logInfo("Set errorMessage from AppError: \(appError)")
         } else {
             errorMessage = error.userFacingMessage
             AppLogger.chat.logInfo("Set errorMessage from userFacingMessage for error type: \(type(of: error))")

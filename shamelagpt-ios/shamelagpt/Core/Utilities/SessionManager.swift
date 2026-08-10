@@ -55,6 +55,31 @@ final class SessionManager {
         return token
     }
 
+    /// The stored token regardless of local expiry.
+    ///
+    /// `token()` deliberately hides an expired token, which is right for "am I logged in?"
+    /// but wrong for the refresh path — the refresher needs to know a token exists before
+    /// deciding whether to renew it.
+    func rawToken() -> String? {
+        getItem(tokenKey)
+    }
+
+    /// Local expiry timestamp for the stored token, if one was recorded.
+    func expiresAt() -> Date? {
+        let value = defaults.double(forKey: expiresAtKey)
+        guard value != 0 else { return nil }
+        return Date(timeIntervalSince1970: value)
+    }
+
+    /// Whether the token is expired, or will expire within `skew`.
+    ///
+    /// Refreshing slightly early avoids the race where a token passes this check and then
+    /// expires in flight, which the server would reject with a 401.
+    func isExpiring(within skew: TimeInterval) -> Bool {
+        guard let expiry = expiresAt() else { return false }
+        return Date().addingTimeInterval(skew) >= expiry
+    }
+
     func refreshToken() -> String? {
         getItem(refreshTokenKey)
     }

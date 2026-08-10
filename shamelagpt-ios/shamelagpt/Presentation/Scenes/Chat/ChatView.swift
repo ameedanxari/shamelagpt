@@ -158,6 +158,7 @@ struct ChatView: View {
         .onChange(of: viewModel.requiresAuth) { requiresAuth in
             if requiresAuth {
                 onRequireAuth()
+                viewModel.acknowledgeAuthRequirement()
             }
         }
         .onChange(of: viewModel.voiceInputError) { voiceError in

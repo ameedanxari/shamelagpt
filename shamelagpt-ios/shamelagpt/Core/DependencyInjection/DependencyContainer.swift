@@ -102,6 +102,10 @@ class DependencyContainer {
         let isUITesting = Self.isUITestEnvironment()
         AppLogger.network.logInfo("DependencyContainer.registerNetworkLayer - isUITesting: \(isUITesting)")
 
+        // Base URL must match APIClient's own default so the refresh call lands on the
+        // same host as everything else.
+        let baseURL = URL(string: "https://shamelagpt.com")!
+
         if isUITesting {
             // Create a URLSession with mock protocol for testing
             let configuration = URLSessionConfiguration.ephemeral
@@ -110,14 +114,33 @@ class DependencyContainer {
             AppLogger.network.logInfo("Using MockURLProtocol for URLSession")
             apiClient = APIClient(
                 session: mockSession,
-                authTokenProvider: { self.resolve(SessionManager.self)?.token() }
+                tokenProvider: sessionManagerBackedTokenProvider(baseURL: baseURL, session: mockSession)
             )
         } else {
             apiClient = APIClient(
-                authTokenProvider: { self.resolve(SessionManager.self)?.token() }
+                tokenProvider: sessionManagerBackedTokenProvider(baseURL: baseURL, session: .shared)
             )
         }
         register(APIClientProtocol.self, instance: apiClient)
+    }
+
+    /// Builds the token provider backed by the registered `SessionManager`.
+    ///
+    /// Falls back to a non-refreshing provider if the session manager is somehow missing,
+    /// so a DI ordering mistake degrades to the old behaviour rather than crashing.
+    private func sessionManagerBackedTokenProvider(
+        baseURL: URL,
+        session: URLSession
+    ) -> AuthTokenProviding {
+        guard let sessionManager = resolve(SessionManager.self) else {
+            AppLogger.network.logWarning("SessionManager unavailable - token refresh disabled")
+            return StaticTokenProvider { nil }
+        }
+        return SessionTokenProvider(
+            sessionManager: sessionManager,
+            baseURL: baseURL,
+            session: session
+        )
     }
 
     /// Detects UI test environment (arguments, env, or runner bundle path)
