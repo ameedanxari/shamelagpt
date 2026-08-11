@@ -248,6 +248,7 @@
 "auth.haveAccount" = "لديك حساب؟ تسجيل الدخول";
 "auth.signInButton" = "تسجيل الدخول";
 "auth.continueWithGoogle" = "المتابعة باستخدام Google";
+"auth.continueWithApple" = "المتابعة باستخدام Apple";
 "auth.orDivider" = "أو";
 
 "settings.pref.length.title" = "طول الإجابة";

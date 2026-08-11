@@ -39,6 +39,20 @@ struct AuthView: View {
             .disabled(viewModel.isLoading)
             .accessibilityIdentifier(AccessibilityID.Auth.googleSignInButton)
 
+            Button {
+                if !viewModel.isLoading {
+                    viewModel.signInWithApple(onSuccess: onAuthenticated)
+                }
+            } label: {
+                HStack(spacing: DesignSystem.Spacing.sm) {
+                    Image(systemName: "apple.logo")
+                    Text(LocalizationKeys.authContinueWithApple.localizedKey)
+                }
+            }
+            .buttonStyle(.secondary)
+            .disabled(viewModel.isLoading)
+            .accessibilityIdentifier(AccessibilityID.Auth.appleSignInButton)
+
             // "OR" divider
             HStack(spacing: DesignSystem.Spacing.sm) {
                 dividerRule

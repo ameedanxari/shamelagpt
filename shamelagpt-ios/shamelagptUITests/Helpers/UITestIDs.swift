@@ -26,6 +26,7 @@ enum UITestID {
         static let continueAsGuestButton = "continueAsGuestButton"
         static let toggleModeButton = "toggleModeButton"
         static let googleSignInButton = "googleSignInButton"
+        static let appleSignInButton = "appleSignInButton"
     }
 
     enum Chat {

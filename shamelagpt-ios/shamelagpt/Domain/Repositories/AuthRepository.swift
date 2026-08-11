@@ -12,6 +12,7 @@ protocol AuthRepository {
     func login(request: LoginRequest) async throws -> AuthResponse
     func forgotPassword(email: String) async throws
     func googleSignIn(request: GoogleSignInRequest) async throws -> AuthResponse
+    func appleSignIn(request: AppleSignInRequest) async throws -> AuthResponse
     func refreshToken(request: RefreshTokenRequest) async throws -> AuthResponse
     func getCurrentUser() async throws -> UserResponse
     func updateCurrentUser(request: UpdateUserRequest) async throws -> UserResponse

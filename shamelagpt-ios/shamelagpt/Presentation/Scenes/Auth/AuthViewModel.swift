@@ -18,16 +18,19 @@ final class AuthViewModel: ObservableObject {
 
     private let authRepository: AuthRepository
     private let googleSignInService: GoogleSignInService
+    private let appleSignInService: AppleSignInService
 
     /// `googleSignInService` is built here rather than as a default argument: default
     /// arguments are evaluated in a nonisolated context, and its initialiser is
     /// `@MainActor`. This init already is, so constructing it inside is valid.
     init(
         authRepository: AuthRepository,
-        googleSignInService: GoogleSignInService? = nil
+        googleSignInService: GoogleSignInService? = nil,
+        appleSignInService: AppleSignInService? = nil
     ) {
         self.authRepository = authRepository
         self.googleSignInService = googleSignInService ?? GoogleSignInService()
+        self.appleSignInService = appleSignInService ?? AppleSignInService()
     }
 
     func toggleMode() {
@@ -122,6 +125,34 @@ final class AuthViewModel: ObservableObject {
             } catch {
                 isLoading = false
                 AppLogger.auth.logError("google browser flow failed", error: error)
+                errorMessage = error.userFacingMessage
+            }
+        }
+    }
+
+    /// Runs Sign in with Apple, then trades the identity token for a session.
+    ///
+    /// The token Apple returns is exactly what the backend forwards to Firebase, so as
+    /// with Google the app needs no Firebase SDK of its own.
+    func signInWithApple(onSuccess: @escaping () -> Void) {
+        Task {
+            isLoading = true
+            errorMessage = nil
+            do {
+                AppLogger.auth.logInfo("apple authorization started")
+                let credential = try await appleSignInService.signIn()
+                _ = try await authRepository.appleSignIn(
+                    request: AppleSignInRequest(idToken: credential.identityToken)
+                )
+                isLoading = false
+                AppLogger.auth.logInfo("apple sign-in success")
+                onSuccess()
+            } catch AppleSignInService.AppleSignInError.cancelled {
+                // Dismissing the system sheet is a normal outcome, not an error.
+                isLoading = false
+            } catch {
+                isLoading = false
+                AppLogger.auth.logError("apple sign-in error", error: error)
                 errorMessage = error.userFacingMessage
             }
         }

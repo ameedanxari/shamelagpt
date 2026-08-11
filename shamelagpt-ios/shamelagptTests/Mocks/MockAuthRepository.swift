@@ -11,6 +11,7 @@ class MockAuthRepository: AuthRepository {
     var loginCallCount = 0
     var forgotPasswordCallCount = 0
     var googleSignInCallCount = 0
+    var appleSignInCallCount = 0
     var logoutCallCount = 0
     var isLoggedInCallCount = 0
     var refreshTokenCallCount = 0
@@ -40,6 +41,12 @@ class MockAuthRepository: AuthRepository {
     
     func googleSignIn(request: GoogleSignInRequest) async throws -> AuthResponse {
         googleSignInCallCount += 1
+        if shouldFail { throw errorToThrow }
+        return mockAuthResponse
+    }
+
+    func appleSignIn(request: AppleSignInRequest) async throws -> AuthResponse {
+        appleSignInCallCount += 1
         if shouldFail { throw errorToThrow }
         return mockAuthResponse
     }

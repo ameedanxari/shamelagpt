@@ -272,6 +272,7 @@ enum LocalizationKeys {
     static let authHaveAccount = "auth.haveAccount"
     static let authSignInButton = "auth.signInButton"
     static let authContinueWithGoogle = "auth.continueWithGoogle"
+    static let authContinueWithApple = "auth.continueWithApple"
     static let authOrDivider = "auth.orDivider"
 
     // MARK: - Permission Messages

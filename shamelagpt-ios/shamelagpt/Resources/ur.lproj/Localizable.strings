@@ -246,6 +246,7 @@
 "auth.haveAccount" = "اکاؤنٹ ہے؟ سائن اِن کریں";
 "auth.signInButton" = "سائن اِن";
 "auth.continueWithGoogle" = "Google کے ساتھ جاری رکھیں";
+"auth.continueWithApple" = "Apple کے ساتھ جاری رکھیں";
 "auth.orDivider" = "یا";
 
 // MARK: - AI Preference Options
