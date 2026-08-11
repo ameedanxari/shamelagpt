@@ -16,7 +16,8 @@ Quick rules (1–3 lines each):
 - `.claude/quick_rules.md` — short grep patterns & commands
 
 Environment pointers (fast):
-- **iOS simulator runbook** (build/run/drive it without the Xcode UI, the signing workaround, and hard limitations): `docs/getting-started/IOS_SIMULATOR_RUNBOOK.md` — read before running or verifying any iOS change.
+- **Web ↔ iOS parity, known defects, and backend gotchas:** `docs/project/WEB_IOS_PARITY.md` — read before building anything the web already has. Records what is missing, what is already fixed, and the traps (conversation mode is endpoint-driven, not a preference; FastAPI returns 403 not 401 for a missing token).
+- **iOS simulator runbook** (build/run/drive it without the Xcode UI, the ad-hoc signing requirement, hard limitations): `docs/getting-started/IOS_SIMULATOR_RUNBOOK.md` — read before running or verifying any iOS change.
 - OpenAPI: `docs/api/openapi_latest.json`
 - Android entry points: `shamelagpt-android/app/src/main/java/.../presentation/chat/ChatViewModel.kt`
 - iOS entry points: `shamelagpt-ios/shamelagpt/Presentation/Scenes/Chat/ChatViewModel.swift`
