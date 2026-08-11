@@ -70,7 +70,7 @@
 		E2F0A1B12F00C00100A1B2C3 /* StoreScreenshots.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreScreenshots.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-	/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		E1F3A9013B5A9D0F00A1BEEF /* Exceptions for "shamelagpt" folder in "ShamelaGPT" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -672,8 +672,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SSTKXHNR6U;
 				ENABLE_PREVIEWS = YES;
-					GENERATE_INFOPLIST_FILE = NO;
-					INFOPLIST_FILE = shamelagpt/Info.plist;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = shamelagpt/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -698,8 +698,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SSTKXHNR6U;
 				ENABLE_PREVIEWS = YES;
-					GENERATE_INFOPLIST_FILE = NO;
-					INFOPLIST_FILE = shamelagpt/Info.plist;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = shamelagpt/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

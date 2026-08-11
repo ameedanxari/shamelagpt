@@ -329,11 +329,18 @@ final class APIClient: APIClientProtocol {
         // Perform request
         var (data, response) = try await performDataTask(request: request)
 
-        // A 401 on a token we believed was valid means our local expiry was wrong (clock
-        // skew, or a server-side revocation). Renew once and replay before surfacing an
-        // error — otherwise the user is signed out for a recoverable condition.
-        if token != nil, statusCode(of: response) == 401 {
-            AppLogger.network.logWarning("401 on authenticated request - refreshing token and retrying once")
+        // A 401/403 on a token we believed was valid means our local expiry was wrong
+        // (clock skew, or a server-side revocation). Renew once and replay before
+        // surfacing an error — otherwise the user is signed out for a recoverable
+        // condition.
+        //
+        // 403 matters as much as 401 here: the backend guards routes with FastAPI's
+        // `HTTPBearer(auto_error=True)`, which answers a *missing* Authorization header
+        // with 403 "Not authenticated" rather than the 401 you would expect. Production
+        // logs show exactly that shape — bursts of 403s on /api/conversations and
+        // /api/chat/stream that resolve themselves after a refresh.
+        if token != nil, isAuthFailure(statusCode(of: response)) {
+            AppLogger.network.logWarning("auth failure on authenticated request - refreshing token and retrying once")
             if let renewed = await tokenProvider?.forceRefresh() {
                 request.setValue("Bearer \(renewed)", forHTTPHeaderField: "Authorization")
                 (data, response) = try await performDataTask(request: request)
@@ -405,6 +412,15 @@ final class APIClient: APIClientProtocol {
         (response as? HTTPURLResponse)?.statusCode
     }
 
+    /// Whether a status indicates the request was rejected for authentication reasons.
+    ///
+    /// Includes 403 deliberately: FastAPI's `HTTPBearer(auto_error=True)` returns 403 for a
+    /// *missing* bearer token, not 401, so treating only 401 as recoverable would leave the
+    /// most common real-world case unhandled.
+    private func isAuthFailure(_ status: Int?) -> Bool {
+        status == 401 || status == 403
+    }
+
     /// Validates the HTTP response
     private func validateResponse(_ response: URLResponse) throws {
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -464,8 +480,8 @@ final class APIClient: APIClientProtocol {
         // Same 401 recovery as the non-streaming path. Safe to replay here because we have
         // not emitted anything to the caller yet — the status is checked before any bytes
         // are consumed, so no partial answer can be duplicated.
-        if token != nil, statusCode(of: response) == 401 {
-            AppLogger.network.logWarning("401 on SSE request - refreshing token and retrying once")
+        if token != nil, isAuthFailure(statusCode(of: response)) {
+            AppLogger.network.logWarning("auth failure on SSE request - refreshing token and retrying once")
             if let renewed = await tokenProvider?.forceRefresh() {
                 request.setValue("Bearer \(renewed)", forHTTPHeaderField: "Authorization")
                 (bytes, response) = try await performBytesTask(request: request)
