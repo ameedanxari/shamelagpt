@@ -100,4 +100,44 @@ class AuthScreenTest {
         stateFlow.value = AuthUiState(isLoginMode = false)
         composeTestRule.onNodeWithTag(TestTags.Auth.SignUpButton).assertIsDisplayed()
     }
+
+    @Test
+    fun forgotPassword_callsViewModel() {
+        val mockViewModel = mockk<AuthViewModel>(relaxed = true)
+        val stateFlow = MutableStateFlow(
+            AuthUiState(email = "test@example.com", isLoginMode = true)
+        )
+        every { mockViewModel.uiState } returns stateFlow
+
+        composeTestRule.setContent {
+            AuthScreen(
+                onAuthenticated = {},
+                onContinueAsGuest = {},
+                viewModel = mockViewModel
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TestTags.Auth.ForgotPasswordButton)
+            .assertIsDisplayed()
+            .performClick()
+
+        verify { mockViewModel.forgotPassword() }
+    }
+
+    @Test
+    fun forgotPassword_hiddenInSignupMode() {
+        val mockViewModel = mockk<AuthViewModel>(relaxed = true)
+        val stateFlow = MutableStateFlow(AuthUiState(isLoginMode = false))
+        every { mockViewModel.uiState } returns stateFlow
+
+        composeTestRule.setContent {
+            AuthScreen(
+                onAuthenticated = {},
+                onContinueAsGuest = {},
+                viewModel = mockViewModel
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TestTags.Auth.ForgotPasswordButton).assertDoesNotExist()
+    }
 }

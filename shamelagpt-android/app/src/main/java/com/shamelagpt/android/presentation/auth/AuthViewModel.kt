@@ -42,7 +42,7 @@ class AuthViewModel(
     }
 
     fun setError(message: String) {
-        _uiState.update { it.copy(error = message, isGuestLimitPrompt = false) }
+        _uiState.update { it.copy(error = message, isGuestLimitPrompt = false, isInfoMessage = false) }
     }
 
     fun prepareEntry(startInSignup: Boolean, initialMessage: String?) {
@@ -50,7 +50,8 @@ class AuthViewModel(
             it.copy(
                 isLoginMode = !startInSignup,
                 error = initialMessage,
-                isGuestLimitPrompt = !initialMessage.isNullOrBlank()
+                isGuestLimitPrompt = !initialMessage.isNullOrBlank(),
+                isInfoMessage = false
             )
         }
     }
@@ -60,7 +61,8 @@ class AuthViewModel(
             it.copy(
                 isLoginMode = !it.isLoginMode,
                 error = null,
-                isGuestLimitPrompt = false
+                isGuestLimitPrompt = false,
+                isInfoMessage = false
             )
         }
     }
@@ -75,14 +77,17 @@ class AuthViewModel(
             _uiState.update {
                 it.copy(
                     error = "Email and password are required",
-                    isGuestLimitPrompt = false
+                    isGuestLimitPrompt = false,
+                    isInfoMessage = false
                 )
             }
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null, isGuestLimitPrompt = false) }
+            _uiState.update {
+                it.copy(isLoading = true, error = null, isGuestLimitPrompt = false, isInfoMessage = false)
+            }
             
             val trimmedEmail = state.email.trim()
             val trimmedPassword = state.password.trim()
@@ -118,7 +123,8 @@ class AuthViewModel(
                         it.copy(
                             isLoading = false,
                             error = mappedError.message,
-                            isGuestLimitPrompt = false
+                            isGuestLimitPrompt = false,
+                            isInfoMessage = false
                         )
                     }
                 }
@@ -126,18 +132,38 @@ class AuthViewModel(
         }
     }
 
-    fun forgotPassword(email: String) {
+    fun forgotPassword() {
+        val email = _uiState.value.email.trim()
+        Logger.i(TAG, "forgot password requested")
         if (email.isBlank()) {
-            _uiState.update { it.copy(error = "Email is required", isGuestLimitPrompt = false) }
+            Logger.w(TAG, "forgot password validation failed: email missing")
+            _uiState.update {
+                it.copy(
+                    error = appContext.getString(R.string.forgot_password_email_required),
+                    isGuestLimitPrompt = false,
+                    isInfoMessage = false
+                )
+            }
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null, isGuestLimitPrompt = false) }
+            _uiState.update {
+                it.copy(isLoading = true, error = null, isGuestLimitPrompt = false, isInfoMessage = false)
+            }
+            Logger.d(TAG, "sending forgot password request")
             val result = authRepository.forgotPassword(email)
             result.fold(
                 onSuccess = {
-                    _uiState.update { it.copy(isLoading = false, error = "Password reset email sent (if account exists)", isGuestLimitPrompt = false) }
+                    Logger.i(TAG, "forgot password request succeeded")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = appContext.getString(R.string.forgot_password_email_sent),
+                            isGuestLimitPrompt = false,
+                            isInfoMessage = true
+                        )
+                    }
                 },
                 onFailure = { ex ->
                     Logger.w(TAG, "forgot password failed reason=${ex::class.simpleName}")
@@ -146,7 +172,8 @@ class AuthViewModel(
                         it.copy(
                             isLoading = false,
                             error = ex.toUserFacingMessage(),
-                            isGuestLimitPrompt = false
+                            isGuestLimitPrompt = false,
+                            isInfoMessage = false
                         )
                     }
                 }
@@ -158,7 +185,9 @@ class AuthViewModel(
         viewModelScope.launch {
             Logger.i(TAG, "google sign-in requested")
             Logger.d(TAG, "google sign-in id_token length=${idToken.length}")
-            _uiState.update { it.copy(isLoading = true, error = null, isGuestLimitPrompt = false) }
+            _uiState.update {
+                it.copy(isLoading = true, error = null, isGuestLimitPrompt = false, isInfoMessage = false)
+            }
             val result = authRepository.googleSignIn(idToken)
             result.fold(
                 onSuccess = {
@@ -176,7 +205,8 @@ class AuthViewModel(
                         it.copy(
                             isLoading = false,
                             error = ex.toUserFacingMessage(),
-                            isGuestLimitPrompt = false
+                            isGuestLimitPrompt = false,
+                            isInfoMessage = false
                         )
                     }
                 }

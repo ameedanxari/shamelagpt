@@ -30,6 +30,9 @@
     <string name="auth_email_exists_use_login">هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول.</string>
     <string name="sign_in_with_google">تسجيل الدخول بحساب جوجل</string>
     <string name="auth_or_divider">أو</string>
+    <string name="forgot_password">نسيت كلمة المرور؟</string>
+    <string name="forgot_password_email_required">أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور.</string>
+    <string name="forgot_password_email_sent">إذا كان هناك حساب بهذا البريد، فقد أُرسل رابط إعادة تعيين كلمة المرور.</string>
     <string name="google_sign_in_failed">فشل تسجيل الدخول بحساب جوجل. يرجى المحاولة مرة أخرى.</string>
 
     <!-- Chat Screen -->

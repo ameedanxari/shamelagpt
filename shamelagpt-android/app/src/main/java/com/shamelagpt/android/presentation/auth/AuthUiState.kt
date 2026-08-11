@@ -10,5 +10,7 @@ data class AuthUiState(
     val isLoginMode: Boolean = true,
     val isLoading: Boolean = false,
     val error: String? = null,
-    val isGuestLimitPrompt: Boolean = false
+    val isGuestLimitPrompt: Boolean = false,
+    /** True when [error] is an informational/success message (not a failure). */
+    val isInfoMessage: Boolean = false
 )

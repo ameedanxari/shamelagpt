@@ -144,6 +144,23 @@ fun AuthScreen(
             singleLine = true
         )
 
+        if (state.isLoginMode) {
+            TextButton(
+                onClick = {
+                    if (!state.isLoading) {
+                        focusManager.clearFocus(force = true)
+                        viewModel.forgotPassword()
+                    }
+                },
+                enabled = !state.isLoading,
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .testTag(TestTags.Auth.ForgotPasswordButton)
+            ) {
+                Text(stringResource(R.string.forgot_password))
+            }
+        }
+
         if (!state.isLoginMode) {
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
@@ -158,7 +175,7 @@ fun AuthScreen(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = state.error ?: "",
-                color = if (state.isGuestLimitPrompt) {
+                color = if (state.isGuestLimitPrompt || state.isInfoMessage) {
                     MaterialTheme.colorScheme.onSurface
                 } else {
                     MaterialTheme.colorScheme.error

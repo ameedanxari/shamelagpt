@@ -24,6 +24,7 @@ object TestTags {
         const val ContinueAsGuestButton = "continueAsGuestButton"
         const val ToggleModeButton = "toggleModeButton"
         const val GoogleSignInButton = "googleSignInButton"
+        const val ForgotPasswordButton = "forgotPasswordButton"
     }
 
     object Chat {
