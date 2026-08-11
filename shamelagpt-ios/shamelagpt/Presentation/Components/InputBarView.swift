@@ -20,6 +20,18 @@ struct InputBarView: View {
     let onMicrophoneTap: () -> Void
     let onCameraTap: () -> Void
 
+    // MARK: - Composer options
+    //
+    // Both live here rather than in Settings: they are per-conversation decisions the
+    // user makes while composing, not preferences they hunt for in a settings list.
+    let conversationMode: ConversationMode
+    let isThinkingEnabled: Bool
+    /// Guests have no server-side mode, so the chip is hidden rather than shown inert.
+    let showsModeChip: Bool
+    let isSwitchingMode: Bool
+    let onToggleMode: () -> Void
+    let onToggleThinking: () -> Void
+
     // MARK: - State
 
     @State private var textEditorHeight: CGFloat = 40
@@ -52,6 +64,8 @@ struct InputBarView: View {
                 ocrProcessingIndicator
             }
 
+            optionsChips
+
             HStack(alignment: .bottom, spacing: AppTheme.Spacing.xs) {
                 // Camera button
                 cameraButton
@@ -71,6 +85,77 @@ struct InputBarView: View {
     }
 
     // MARK: - Subviews
+
+    /// Mode + thinking chips, mirroring the web composer.
+    private var optionsChips: some View {
+        HStack(spacing: AppTheme.Spacing.xs) {
+            if showsModeChip {
+                chip(
+                    systemImage: conversationMode.symbolName,
+                    title: conversationMode.titleKey.localizedKey,
+                    isActive: conversationMode == .factCheck,
+                    isBusy: isSwitchingMode,
+                    action: onToggleMode
+                )
+                .accessibilityIdentifier(AccessibilityID.Chat.modeChip)
+            }
+
+            chip(
+                systemImage: isThinkingEnabled ? "lightbulb.fill" : "lightbulb",
+                title: isThinkingEnabled
+                    ? LocalizationKeys.chatThinkingOn.localizedKey
+                    : LocalizationKeys.chatThinkingOff.localizedKey,
+                isActive: isThinkingEnabled,
+                isBusy: false,
+                action: onToggleThinking
+            )
+            .accessibilityIdentifier(AccessibilityID.Chat.thinkingChip)
+
+            Spacer()
+        }
+        .padding(.horizontal, AppTheme.Spacing.sm)
+        .padding(.top, AppTheme.Spacing.xs)
+    }
+
+    private func chip(
+        systemImage: String,
+        title: LocalizedStringKey,
+        isActive: Bool,
+        isBusy: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                if isBusy {
+                    ProgressView().scaleEffect(0.6)
+                } else {
+                    Image(systemName: systemImage).font(.caption2)
+                }
+                Text(title).font(.caption2)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(
+                Capsule().fill(
+                    isActive ? DesignSystem.Colors.primary.opacity(0.15)
+                             : DesignSystem.Colors.textSecondary(colorScheme).opacity(0.10)
+                )
+            )
+            .overlay(
+                Capsule().stroke(
+                    isActive ? DesignSystem.Colors.primary
+                             : DesignSystem.Colors.textSecondary(colorScheme).opacity(0.25),
+                    lineWidth: 1
+                )
+            )
+            .foregroundColor(
+                isActive ? DesignSystem.Colors.primary
+                         : DesignSystem.Colors.textSecondary(colorScheme)
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(isBusy)
+    }
 
     private var textInputArea: some View {
         ZStack(alignment: .topLeading) {
@@ -308,7 +393,13 @@ struct InputBarView_Previews: PreviewProvider {
                 isProcessingOCR: isProcessingOCR,
                 onSend: {},
                 onMicrophoneTap: {},
-                onCameraTap: {}
+                onCameraTap: {},
+                conversationMode: .research,
+                isThinkingEnabled: true,
+                showsModeChip: true,
+                isSwitchingMode: false,
+                onToggleMode: {},
+                onToggleThinking: {}
             )
         }
     }

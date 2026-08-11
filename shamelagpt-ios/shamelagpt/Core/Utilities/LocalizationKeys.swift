@@ -279,6 +279,8 @@ enum LocalizationKeys {
     static let modeEnterButton = "mode.enterButton"
     static let modeSignInRequired = "mode.signInRequired"
     static let modeSettingsRow = "mode.settingsRow"
+    static let chatThinkingOn = "chat.thinking.on"
+    static let chatThinkingOff = "chat.thinking.off"
     static let modeResearchTitle = "mode.research.title"
     static let modeResearchTagline = "mode.research.tagline"
     static let modeResearchBullet1 = "mode.research.bullet1"

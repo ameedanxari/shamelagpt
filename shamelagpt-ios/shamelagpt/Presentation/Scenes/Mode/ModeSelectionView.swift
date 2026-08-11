@@ -20,21 +20,34 @@ struct ModeSelectionView: View {
         ZStack {
             DesignSystem.Colors.background(colorScheme).ignoresSafeArea()
 
+            // The cards scroll; the action bar is attached as a bottom safe-area inset.
+            //
+            // It must be an inset rather than a plain VStack row. When this screen is
+            // pushed from Settings there is a tab bar, and iOS 26 renders a floating tab
+            // bar whose `AdditionalDimmingOverlay` extends well above the bar itself. A
+            // button merely placed at the bottom lands underneath that overlay: it looks
+            // perfectly tappable and renders normally, but the overlay swallows the touch,
+            // so nothing happens and no error is produced. `safeAreaInset` makes SwiftUI
+            // account for the tab bar and keeps the primary action actually hittable.
             ScrollView {
-                VStack(spacing: DesignSystem.Spacing.lg) {
-                    header
+                    VStack(spacing: DesignSystem.Spacing.lg) {
+                        header
 
-                    ForEach(ConversationMode.selectable) { mode in
-                        ModeCard(
-                            mode: mode,
-                            isSelected: viewModel.selected == mode,
-                            isLocked: isGuest && mode.requiresAuthentication,
-                            colorScheme: colorScheme
-                        ) {
-                            viewModel.select(mode)
+                        ForEach(ConversationMode.selectable) { mode in
+                            ModeCard(
+                                mode: mode,
+                                isSelected: viewModel.selected == mode,
+                                isLocked: isGuest && mode.requiresAuthentication,
+                                colorScheme: colorScheme
+                            ) {
+                                viewModel.select(mode)
+                            }
                         }
-                    }
-
+                }
+                .padding(DesignSystem.Spacing.lg)
+            }
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: DesignSystem.Spacing.sm) {
                     if let error = viewModel.errorMessage {
                         Text(error)
                             .font(DesignSystem.Typography.subheadline)
@@ -66,7 +79,10 @@ struct ModeSelectionView: View {
                         .accessibilityIdentifier(AccessibilityID.Mode.cancelButton)
                     }
                 }
-                .padding(DesignSystem.Spacing.lg)
+                .padding(.horizontal, DesignSystem.Spacing.lg)
+                .padding(.bottom, DesignSystem.Spacing.md)
+                .padding(.top, DesignSystem.Spacing.sm)
+                .background(DesignSystem.Colors.background(colorScheme))
             }
         }
         .accessibilityIdentifier(AccessibilityID.Mode.screen)

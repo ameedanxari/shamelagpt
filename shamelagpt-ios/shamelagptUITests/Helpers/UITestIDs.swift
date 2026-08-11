@@ -42,6 +42,8 @@ enum UITestID {
         static let cameraButton = "cameraButton"
         static let micButton = "micButton"
         static let sendButton = "sendButton"
+        static let modeChip = "chatModeChip"
+        static let thinkingChip = "chatThinkingChip"
         static let typingIndicator = "TypingIndicator"
         static let thinkingBubble = "ThinkingBubble"
         static let messageBubble = "MessageBubble"

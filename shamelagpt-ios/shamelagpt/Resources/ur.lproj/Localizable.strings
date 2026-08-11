@@ -281,3 +281,5 @@
 "mode.factCheck.bullet2" = "جانچ سے پہلے متن کا جائزہ لیں";
 "mode.factCheck.bullet3" = "مستند حوالوں کے ساتھ فیصلہ حاصل کریں";
 "mode.factCheck.bullet4" = "وائرل دعووں اور غلط معلومات کے لیے";
+"chat.thinking.on" = "سوچ فعال";
+"chat.thinking.off" = "سوچ بند";

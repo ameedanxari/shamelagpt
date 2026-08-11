@@ -282,3 +282,5 @@
 "mode.factCheck.bullet2" = "Review the extracted text before checking";
 "mode.factCheck.bullet3" = "Get a verdict with authenticated sources";
 "mode.factCheck.bullet4" = "For viral claims and misinformation";
+"chat.thinking.on" = "Thinking ON";
+"chat.thinking.off" = "Thinking OFF";

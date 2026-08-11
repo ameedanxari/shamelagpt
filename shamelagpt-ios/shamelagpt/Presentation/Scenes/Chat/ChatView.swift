@@ -17,6 +17,8 @@ struct ChatView: View {
     @Environment(\.colorScheme) private var colorScheme
     var onRequireAuth: () -> Void = {}
 
+    private let authRepository: AuthRepository? = DependencyContainer.shared.resolve(AuthRepository.self)
+
     // MARK: - State
 
     @State private var scrollProxy: ScrollViewProxy?
@@ -185,6 +187,10 @@ struct ChatView: View {
             // Catch pending extension payloads even if deep-link notification fired before this view subscribed.
             viewModel.handleImportedFactCheckIfAvailable()
         }
+        .task {
+            // The chip must show the stored mode, not a default guess.
+            await viewModel.loadConversationMode(using: authRepository)
+        }
         .onReceive(NotificationCenter.default.publisher(for: .importFactCheckPayload)) { _ in
             viewModel.handleImportedFactCheckIfAvailable()
         }
@@ -217,7 +223,15 @@ struct ChatView: View {
                         isProcessingOCR: viewModel.isProcessingOCR,
                         onSend: { viewModel.sendMessage() },
                         onMicrophoneTap: viewModel.toggleVoiceInput,
-                        onCameraTap: viewModel.handleCameraButtonTap
+                        onCameraTap: viewModel.handleCameraButtonTap,
+                        conversationMode: viewModel.conversationMode,
+                        isThinkingEnabled: viewModel.enableThinking,
+                        showsModeChip: !viewModel.isGuest,
+                        isSwitchingMode: viewModel.isSwitchingMode,
+                        onToggleMode: {
+                            Task { await viewModel.toggleConversationMode(using: authRepository) }
+                        },
+                        onToggleThinking: viewModel.toggleThinking
                     )
                     .transition(.move(edge: .bottom))
                 }

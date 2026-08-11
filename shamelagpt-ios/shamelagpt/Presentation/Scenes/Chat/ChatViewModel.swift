@@ -40,6 +40,13 @@ final class ChatViewModel: ObservableObject {
     @Published var showPhotoLibraryPicker: Bool = false
     @Published var selectedImage: UIImage?
     @Published var requiresAuth: Bool = false
+
+    /// Whether the backend should stream chain-of-thought progress and use the thinking
+    /// model. Was hardcoded to `true`; now user-controllable from the composer.
+    @Published var enableThinking: Bool = ChatViewModel.loadThinkingPreference()
+    /// Current conversation mode, shown on the composer chip.
+    @Published var conversationMode: ConversationMode = .research
+    @Published var isSwitchingMode: Bool = false
     @Published var cameraPermission: CameraPermissionState = .unknown
     @Published var photoLibraryPermission: CameraPermissionState = .unknown
     @Published var showCameraPermissionDenied: Bool = false
@@ -56,7 +63,7 @@ final class ChatViewModel: ObservableObject {
     private let sendMessageUseCase: SendMessageUseCaseProtocol
     private let chatRepository: ChatRepository
     private let apiClient: APIClientProtocol?
-    private let isGuest: Bool
+    let isGuest: Bool
     private let onConversationIdChange: ((String?) -> Void)?
     private let voiceInputManager: any VoiceInputManagerProtocol
     private let ocrManager: any OCRManagerProtocol
@@ -244,7 +251,7 @@ final class ChatViewModel: ObservableObject {
                         threadId: threadId,
                         languagePreference: LanguageManager.shared.currentLanguage.rawValue,
                         sessionId: sessionIdToUse,
-                        enableThinking: true
+                        enableThinking: enableThinking
                     )
 
                     // Try to save user message locally if this conversation is local-only or authenticated (so history persists)
@@ -585,6 +592,59 @@ final class ChatViewModel: ObservableObject {
         voiceInputManager.clearError()
     }
 
+    // MARK: - Composer Options
+
+    private static let thinkingPreferenceKey = "chat_enable_thinking"
+
+    /// Defaults to on, matching the backend default, so behaviour is unchanged until the
+    /// user says otherwise.
+    static func loadThinkingPreference() -> Bool {
+        let defaults = UserDefaults.standard
+        guard defaults.object(forKey: thinkingPreferenceKey) != nil else { return true }
+        return defaults.bool(forKey: thinkingPreferenceKey)
+    }
+
+    func toggleThinking() {
+        enableThinking.toggle()
+        UserDefaults.standard.set(enableThinking, forKey: Self.thinkingPreferenceKey)
+        AppLogger.chat.logInfo("thinking toggled to \(enableThinking)")
+    }
+
+    /// Loads the stored mode so the chip shows the truth rather than a guess.
+    func loadConversationMode(using authRepository: AuthRepository?) async {
+        guard !isGuest, let authRepository else { return }
+        do {
+            let mode = try await authRepository.getModePreference()
+            conversationMode = (mode == .unset) ? .research : mode
+        } catch {
+            AppLogger.chat.logWarning("could not load conversation mode for composer chip")
+        }
+    }
+
+    /// Flips research <-> fact check and persists it.
+    ///
+    /// The mode only affects the backend via which endpoint a turn uses, so the chip is
+    /// really choosing which input the user is about to give: a question, or a claim to
+    /// verify. Selecting fact check therefore opens capture rather than silently waiting.
+    func toggleConversationMode(using authRepository: AuthRepository?) async {
+        guard !isGuest, let authRepository, !isSwitchingMode else { return }
+        let next: ConversationMode = (conversationMode == .factCheck) ? .research : .factCheck
+        isSwitchingMode = true
+        do {
+            try await authRepository.setModePreference(next)
+            conversationMode = next
+            isSwitchingMode = false
+            AppLogger.chat.logInfo("conversation mode switched to \(next.rawValue)")
+            if next == .factCheck {
+                handleCameraButtonTap()
+            }
+        } catch {
+            isSwitchingMode = false
+            AppLogger.chat.logError("failed to switch conversation mode", error: error)
+            errorMessage = error.userFacingMessage
+        }
+    }
+
     // MARK: - Error Handling
 
     /// Clears the auth-required signal once the view has acted on it.
@@ -891,7 +951,7 @@ final class ChatViewModel: ObservableObject {
                         imageBase64: nil,
                         threadId: threadId,
                         languagePreference: LanguageManager.shared.currentLanguage.rawValue,
-                        enableThinking: true
+                        enableThinking: enableThinking
                     )
 
                     let rawStream = try await chatRepository.confirmFactCheck(request)

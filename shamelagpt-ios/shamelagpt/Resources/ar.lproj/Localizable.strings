@@ -279,3 +279,5 @@
 "mode.factCheck.bullet2" = "راجع النص المستخرج قبل التحقق";
 "mode.factCheck.bullet3" = "احصل على حكم مع مصادر موثّقة";
 "mode.factCheck.bullet4" = "للادعاءات المنتشرة والمعلومات المضللة";
+"chat.thinking.on" = "التفكير مفعّل";
+"chat.thinking.off" = "التفكير متوقف";
