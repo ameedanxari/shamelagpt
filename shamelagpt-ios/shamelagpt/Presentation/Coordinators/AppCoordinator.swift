@@ -307,4 +307,10 @@ final class FactCheckImportManager {
 
 extension Notification.Name {
     static let importFactCheckPayload = Notification.Name("importFactCheckPayload")
+    /// Posted when the user picks Fact Check mode, to drop them straight into claim capture.
+    ///
+    /// Fact-check is endpoint-driven: only /api/chat/confirm-factcheck runs in fact-check
+    /// mode, and the only route there is the capture -> OCR -> confirm flow. Choosing the
+    /// mode therefore has to *start* that flow, otherwise the choice would change nothing.
+    static let startFactCheckCapture = Notification.Name("startFactCheckCapture")
 }

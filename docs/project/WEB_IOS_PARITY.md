@@ -16,7 +16,7 @@ Companion: `docs/getting-started/IOS_SIMULATOR_RUNBOOK.md` for how to build/run/
 | Guest mode | ✅ | ✅ | |
 | **Google sign-in** | ✅ | ✅ *(PR)* | Web uses Google Identity Services; iOS uses `ASWebAuthenticationSession` + PKCE |
 | **Apple sign-in** | ✅ | ✅ *(PR)* | Web uses Firebase `signInWithPopup`; iOS uses `ASAuthorizationAppleIDProvider` |
-| **Conversation modes** | ✅ | ✅ *(PR)* | Research / Fact Check |
+| **Conversation modes** | ✅ | ✅ *(PR)* | UI/preference layer only — mode is endpoint-driven server-side, see §2 |
 | **Mode onboarding gate** | ✅ | ✅ *(PR)* | Fires when `mode_preference == 0` |
 | Response language | ✅ | ✅ | |
 | Response style (length/style/focus) | ✅ | ✅ | |
@@ -30,32 +30,56 @@ Companion: `docs/getting-started/IOS_SIMULATOR_RUNBOOK.md` for how to build/run/
 
 ## 2. Things that are easy to get wrong
 
-### Mode is **not** a per-message field
+### Conversation mode is **endpoint-driven**, not preference-driven
 
-The single most important detail. The backend re-reads `mode_preference` from
-Postgres on every stream (`routes/chat.py`), so:
+The single most important detail, and the easiest thing to get wrong — an earlier
+version of this document had it wrong, which is why it is spelled out here.
 
-```
-PUT /api/auth/me/mode   { "mode_preference": 2 }   ← this is how you switch
-```
+`users.mode_preference` **does not decide how the backend answers.** Backend PR #91
+made mode a property of the *endpoint*:
 
-The web client *does* put `mode_preference` in the chat body
-(`useAuthenticatedMessaging.ts`), but `ChatRequest` has no such field server-side and
-Pydantic silently drops it. **That field does nothing.** Don't copy it.
+| Endpoint | conversation_mode |
+|---|---|
+| `POST /api/chat/stream` | **always `research`** (hardcoded, `routes/chat.py`) |
+| `POST /api/chat/confirm-factcheck` | **always `fact_check`** |
+| `POST /api/guest/chat/stream` | always research |
 
-Mapping: `0` unset → treated as research · `1` research · `2` fact check.
-A new account starts at `0`; that is the onboarding trigger, not an error.
+The rationale is in the source (`routes/chat.py`):
 
-Guests are **always** research server-side — the guest route never sets a mode. The
-web stores a guest mode preference in localStorage but it is cosmetic.
+> Mode is endpoint-driven: /chat/stream always runs in research mode. Fact-check runs
+> only via /chat/confirm-factcheck. The global users.mode_preference toggle is
+> intentionally NOT used for routing (#4 / backend #74) — a web-set fact-check toggle
+> must not hijack a new app chat, nor turn a bare "ok" follow-up into a fact-check turn.
 
-### What actually changes per mode
+`_is_fact_check_origin` likewise decides from conversation *history* (image input or
+fact-check metadata), never from the toggle.
+
+**Consequences for any client:**
+
+- Setting `mode_preference = 2` and then typing a question gets you a **research**
+  answer. Copy that promises otherwise is a lie to the user.
+- The only route into fact-check is the **capture flow**: image/screenshot → OCR →
+  review → `POST /api/chat/confirm-factcheck`.
+- `mode_preference` is still real and worth storing — it drives **client UI** (which
+  affordances to foreground, the onboarding gate) and is shared across web and mobile.
+  It just is not an answering-engine switch.
+
+Also note the web sends `mode_preference` in the chat request body
+(`useAuthenticatedMessaging.ts`). `ChatRequest` has no such field and Pydantic drops it.
+**That field does nothing.** Don't copy it.
+
+Mapping: `0` unset · `1` research · `2` fact check. New accounts start at `0`, which is
+the onboarding trigger. `PUT /api/auth/me/mode` rejects anything outside 0–2 with **400**.
+
+### What actually differs between the two backend modes
+
+Once `conversation_mode` is set by the endpoint:
 
 1. **System prompt** — `FACT_CHECK_PROMPT` (structured VERDICT / CONFIDENCE / CLAIMS)
    vs `RAG_PROMPT_OPTIMIZED` (scholarly markdown with citations)
 2. **Retrieval depth** — fact check forces `num_results = 25`; research uses the
    classifier's dynamic *k*
-3. **Extra SSE event** — fact check emits `fact_check_result` with verdict and claims
+3. **Extra SSE event** — fact check emits `fact_check_result`
 4. **Not** the model — that depends only on `enable_thinking`
 
 ### Social sign-in needs no Firebase SDK on the client

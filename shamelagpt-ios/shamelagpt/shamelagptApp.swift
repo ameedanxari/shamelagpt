@@ -492,8 +492,15 @@ struct ShamelaGPTApp: App {
                     ModeSelectionView(
                         viewModel: ModeSelectionViewModel(authRepository: authRepository),
                         isGuest: false,
-                        onComplete: { _ in
+                        onComplete: { mode in
                             needsModeSelection = false
+                            // Picking Fact Check has to *start* the capture flow — that is
+                            // the only path that reaches /api/chat/confirm-factcheck.
+                            if mode == .factCheck {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                                    NotificationCenter.default.post(name: .startFactCheckCapture, object: nil)
+                                }
+                            }
                         }
                     )
                     .transition(.opacity)

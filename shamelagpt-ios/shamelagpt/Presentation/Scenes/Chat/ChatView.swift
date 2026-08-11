@@ -188,6 +188,9 @@ struct ChatView: View {
         .onReceive(NotificationCenter.default.publisher(for: .importFactCheckPayload)) { _ in
             viewModel.handleImportedFactCheckIfAvailable()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .startFactCheckCapture)) { _ in
+            viewModel.handleCameraButtonTap()
+        }
     }
 
     // MARK: - Content View

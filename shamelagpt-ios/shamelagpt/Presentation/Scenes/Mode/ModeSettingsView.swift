@@ -24,7 +24,16 @@ struct ModeSettingsView: View {
                 ModeSelectionView(
                     viewModel: viewModel,
                     isGuest: false,
-                    onComplete: { _ in dismiss() }
+                    onComplete: { mode in
+                        dismiss()
+                        // Same reasoning as the onboarding gate: choosing Fact Check must
+                        // land the user in claim capture, not just store a number.
+                        if mode == .factCheck {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                                NotificationCenter.default.post(name: .startFactCheckCapture, object: nil)
+                            }
+                        }
+                    }
                 )
             } else if loadFailed {
                 VStack(spacing: 12) {

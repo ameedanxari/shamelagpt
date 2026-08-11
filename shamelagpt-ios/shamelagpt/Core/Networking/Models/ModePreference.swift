@@ -8,7 +8,7 @@ struct ModePreferenceResponse: Decodable {
 
 /// Body for `PUT /api/auth/me/mode`.
 ///
-/// The backend validates the value is in {0, 1, 2} and rejects anything else with 422.
+/// The backend validates the value is in {0, 1, 2} and rejects anything else with 400.
 struct UpdateModeRequest: Encodable {
     let modePreference: Int
 }
