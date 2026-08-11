@@ -27,6 +27,16 @@ enum AccessibilityID {
         static let toggleModeButton = "toggleModeButton"
     }
 
+    enum Mode {
+        static let screen = "modeSelectionScreen"
+        static let researchCard = "modeResearchCard"
+        static let factCheckCard = "modeFactCheckCard"
+        static let confirmButton = "modeConfirmButton"
+        static let cancelButton = "modeCancelButton"
+        static let errorLabel = "modeErrorLabel"
+        static let settingsRow = "modeSettingsRow"
+    }
+
     enum Chat {
         static let messageInputField = "messageInputField"
         static let cameraButton = "cameraButton"

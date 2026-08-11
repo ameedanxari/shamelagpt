@@ -272,6 +272,26 @@ enum LocalizationKeys {
     static let authHaveAccount = "auth.haveAccount"
     static let authSignInButton = "auth.signInButton"
 
+    // MARK: - Conversation Modes
+
+    static let modeSelectionTitle = "mode.selection.title"
+    static let modeSelectionSubtitle = "mode.selection.subtitle"
+    static let modeEnterButton = "mode.enterButton"
+    static let modeSignInRequired = "mode.signInRequired"
+    static let modeSettingsRow = "mode.settingsRow"
+    static let modeResearchTitle = "mode.research.title"
+    static let modeResearchTagline = "mode.research.tagline"
+    static let modeResearchBullet1 = "mode.research.bullet1"
+    static let modeResearchBullet2 = "mode.research.bullet2"
+    static let modeResearchBullet3 = "mode.research.bullet3"
+    static let modeResearchBullet4 = "mode.research.bullet4"
+    static let modeFactCheckTitle = "mode.factCheck.title"
+    static let modeFactCheckTagline = "mode.factCheck.tagline"
+    static let modeFactCheckBullet1 = "mode.factCheck.bullet1"
+    static let modeFactCheckBullet2 = "mode.factCheck.bullet2"
+    static let modeFactCheckBullet3 = "mode.factCheck.bullet3"
+    static let modeFactCheckBullet4 = "mode.factCheck.bullet4"
+
     // MARK: - Permission Messages
 
     static func permissionMessage(_ type: String) -> String {

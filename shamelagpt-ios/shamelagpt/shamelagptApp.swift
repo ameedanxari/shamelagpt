@@ -30,6 +30,10 @@ struct ShamelaGPTApp: App {
     @State private var showFeedbackPrompt = false
     @State private var hasStartedStartupGate = false
     @State private var hasMetMinimumStartupDuration = false
+    /// Whether the one-time mode picker still needs to run for this session.
+    @State private var needsModeSelection = false
+    /// Guards the mode lookup so it runs once per authenticated session, not per redraw.
+    @State private var hasCheckedModePreference = false
     
     private func presentAuth() {
         isAuthenticated = false
@@ -38,6 +42,33 @@ struct ShamelaGPTApp: App {
         chatSessionState.resetToNew()
         coordinator.shouldShowWelcome = false
         coordinator.resetTabSelectionToChat()
+        // The next sign-in may be a different account with a different mode.
+        hasCheckedModePreference = false
+        needsModeSelection = false
+    }
+
+    /// Decides whether the one-time mode picker should run.
+    ///
+    /// Only signed-in users have a stored preference — guests are always research mode
+    /// server-side, so asking them to choose would be theatre.
+    ///
+    /// A failure here deliberately does **not** show the picker. The server treats an
+    /// unset mode as research, so the cost of skipping is that the user keeps the default;
+    /// the cost of showing it on every network blip is a gate they cannot get past while
+    /// offline.
+    private func checkModePreferenceIfNeeded() async {
+        guard isAuthenticated, !isGuest, !hasCheckedModePreference else { return }
+        hasCheckedModePreference = true
+        do {
+            let mode = try await authRepository.getModePreference()
+            needsModeSelection = (mode == .unset)
+            AppLogger.app.logInfo(
+                "mode preference on launch: \(mode.rawValue), showPicker=\(needsModeSelection)"
+            )
+        } catch {
+            AppLogger.app.logWarning("could not read mode preference, skipping picker")
+            needsModeSelection = false
+        }
     }
 
     private var shouldShowStartupRestore: Bool {
@@ -454,6 +485,18 @@ struct ShamelaGPTApp: App {
                     )
                     .transition(.opacity)
                     .zIndex(1)
+                } else if isAuthenticated && needsModeSelection {
+                    // One-time mode picker. The backend starts every account at
+                    // mode_preference == 0 ("unset"), which is the signal that the user has
+                    // never chosen. Mirrors the web app's /mode-selection redirect.
+                    ModeSelectionView(
+                        viewModel: ModeSelectionViewModel(authRepository: authRepository),
+                        isGuest: false,
+                        onComplete: { _ in
+                            needsModeSelection = false
+                        }
+                    )
+                    .transition(.opacity)
                 } else if isAuthenticated || isGuest {
                     // Main tab view
                     MainTabView(
@@ -466,6 +509,8 @@ struct ShamelaGPTApp: App {
                             authRepository.logout()
                             isAuthenticated = false
                             isGuest = false
+                            hasCheckedModePreference = false
+                            needsModeSelection = false
                             self.sessionManager.setGuest(false)
                             chatSessionState.resetToNew()
                             coordinator.shouldShowWelcome = true
@@ -497,6 +542,12 @@ struct ShamelaGPTApp: App {
                         }
                     )
                 }
+            }
+            // Keyed on isAuthenticated so it re-runs when a user signs in, not just at
+            // launch — the picker has to appear right after signup, which is the only
+            // moment mode_preference is still 0.
+            .task(id: isAuthenticated) {
+                await checkModePreferenceIfNeeded()
             }
             .overlay(alignment: .topLeading) {
                 if Self.isUITestEnvironment() {

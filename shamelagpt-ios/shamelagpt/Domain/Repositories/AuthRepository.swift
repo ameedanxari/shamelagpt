@@ -18,6 +18,8 @@ protocol AuthRepository {
     func deleteCurrentUser() async throws
     func verifyToken() async throws
     func getPreferences() async throws -> UserPreferencesRequest
+    func getModePreference() async throws -> ConversationMode
+    func setModePreference(_ mode: ConversationMode) async throws
     func setPreferences(_ request: UserPreferencesRequest) async throws
     func logout()
     func token() -> String?

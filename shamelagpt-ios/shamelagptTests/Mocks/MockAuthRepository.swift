@@ -78,6 +78,20 @@ class MockAuthRepository: AuthRepository {
         if shouldFail { throw errorToThrow }
     }
     
+    var modePreferenceToReturn: ConversationMode = .research
+    var setModeCallCount = 0
+
+    func getModePreference() async throws -> ConversationMode {
+        if shouldFail { throw errorToThrow }
+        return modePreferenceToReturn
+    }
+
+    func setModePreference(_ mode: ConversationMode) async throws {
+        setModeCallCount += 1
+        if shouldFail { throw errorToThrow }
+        modePreferenceToReturn = mode
+    }
+
     func logout() {
         logoutCallCount += 1
         mockIsLoggedIn = false

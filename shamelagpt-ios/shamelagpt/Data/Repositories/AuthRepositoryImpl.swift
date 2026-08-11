@@ -129,6 +129,26 @@ final class AuthRepositoryImpl: AuthRepository {
         }
     }
 
+    func getModePreference() async throws -> ConversationMode {
+        do {
+            let response = try await apiClient.getModePreference()
+            // An unrecognised value means the server grew a mode this build predates.
+            // Treat it as unset so the picker runs rather than guessing wrong.
+            return ConversationMode(rawValue: response.modePreference) ?? .unset
+        } catch {
+            throw normalizeError(error)
+        }
+    }
+
+    func setModePreference(_ mode: ConversationMode) async throws {
+        do {
+            AppLogger.auth.logInfo("updating mode preference to \(mode.rawValue)")
+            try await apiClient.setModePreference(UpdateModeRequest(modePreference: mode.rawValue))
+        } catch {
+            throw normalizeError(error)
+        }
+    }
+
     func logout() {
         AppLogger.auth.logInfo("logout called")
         sessionManager.clearSession()

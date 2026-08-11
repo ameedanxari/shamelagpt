@@ -260,3 +260,22 @@
 "settings.pref.focus.practical" = "عملي";
 "settings.pref.focus.theoretical" = "نظري";
 "settings.pref.focus.historical" = "تاريخي";
+
+/* Conversation Modes */
+"mode.selection.title" = "اختر كيف تريد استخدام ShamelaGPT";
+"mode.selection.subtitle" = "معرفة إسلامية موثوقة، مصمّمة لغرضك.";
+"mode.enterButton" = "متابعة";
+"mode.signInRequired" = "سجّل الدخول لاستخدام وضع التحقق من الحقائق.";
+"mode.settingsRow" = "وضع المحادثة";
+"mode.research.title" = "وضع البحث";
+"mode.research.tagline" = "بحث إسلامي معمّق وموثّق وأسئلة وأجوبة شاملة";
+"mode.research.bullet1" = "التعلّم والدراسة";
+"mode.research.bullet2" = "مسائل الفقه والعقيدة";
+"mode.research.bullet3" = "البحث التاريخي والنصّي";
+"mode.research.bullet4" = "أسئلة إسلامية عامة";
+"mode.factCheck.title" = "وضع التحقق من الحقائق";
+"mode.factCheck.tagline" = "تحقّق من الادعاءات. اكشف المعلومات المضللة. ادفع عن الحق.";
+"mode.factCheck.bullet1" = "مكافحة المعلومات المضللة";
+"mode.factCheck.bullet2" = "الردّ على الإسلاموفوبيا";
+"mode.factCheck.bullet3" = "التحقق من الادعاءات المنتشرة";
+"mode.factCheck.bullet4" = "الاستخدام الأكاديمي والصحفي";

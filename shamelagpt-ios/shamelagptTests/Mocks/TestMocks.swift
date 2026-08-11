@@ -163,6 +163,20 @@ class MockAPIClient: APIClientProtocol {
         )
     }
 
+    var modePreferenceToReturn = 1
+    var setModePreferenceCallCount = 0
+
+    func getModePreference() async throws -> ModePreferenceResponse {
+        if shouldFail { throw errorToThrow }
+        return ModePreferenceResponse(modePreference: modePreferenceToReturn, modeName: nil)
+    }
+
+    func setModePreference(_ request: UpdateModeRequest) async throws {
+        setModePreferenceCallCount += 1
+        if shouldFail { throw errorToThrow }
+        modePreferenceToReturn = request.modePreference
+    }
+
     func refreshToken(_ request: RefreshTokenRequest) async throws -> AuthResponse {
         refreshTokenCallCount += 1
         if shouldFail { throw errorToThrow }

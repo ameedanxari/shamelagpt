@@ -56,6 +56,16 @@ struct SettingsView: View {
             // AI Preferences Section
             Section(header: Text(LocalizationKeys.aiPreferences.localizedKey)) {
                 if isAuthenticated {
+                    // Mode is stored server-side and re-read on every stream, so this row
+                    // is the only way to change how answers get produced.
+                    NavigationLink(destination: ModeSettingsView()) {
+                        Text(LocalizationKeys.modeSettingsRow.localizedKey)
+                            .font(AppTheme.Typography.heading)
+                            .foregroundColor(AppTheme.Colors.primaryText)
+                            .padding(.vertical, AppTheme.Spacing.xs)
+                    }
+                    .accessibilityIdentifier(AccessibilityID.Mode.settingsRow)
+
                     NavigationLink(
                         destination: CustomPromptEditView(
                             customPrompt: $customPrompt,

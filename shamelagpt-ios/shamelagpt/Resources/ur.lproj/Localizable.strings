@@ -262,3 +262,22 @@
 "settings.pref.focus.practical" = "عملی";
 "settings.pref.focus.theoretical" = "نظری";
 "settings.pref.focus.historical" = "تاریخی";
+
+/* Conversation Modes */
+"mode.selection.title" = "منتخب کریں کہ آپ ShamelaGPT کو کیسے استعمال کرنا چاہتے ہیں";
+"mode.selection.subtitle" = "مستند اسلامی علم، آپ کے مقصد کے مطابق۔";
+"mode.enterButton" = "جاری رکھیں";
+"mode.signInRequired" = "فیکٹ چیک موڈ استعمال کرنے کے لیے سائن اِن کریں۔";
+"mode.settingsRow" = "گفتگو کا موڈ";
+"mode.research.title" = "ریسرچ موڈ";
+"mode.research.tagline" = "گہری، باحوالہ اسلامی تحقیق اور جامع سوال و جواب";
+"mode.research.bullet1" = "سیکھنا اور مطالعہ";
+"mode.research.bullet2" = "فقہ اور عقیدہ کے سوالات";
+"mode.research.bullet3" = "تاریخی اور متنی تحقیق";
+"mode.research.bullet4" = "عمومی اسلامی سوال و جواب";
+"mode.factCheck.title" = "فیکٹ چیک موڈ";
+"mode.factCheck.tagline" = "دعووں کی تصدیق کریں۔ غلط معلومات بےنقاب کریں۔ سچ کا دفاع کریں۔";
+"mode.factCheck.bullet1" = "غلط معلومات کا مقابلہ";
+"mode.factCheck.bullet2" = "اسلاموفوبیا کا جواب";
+"mode.factCheck.bullet3" = "وائرل دعووں کی تصدیق";
+"mode.factCheck.bullet4" = "تعلیمی و صحافتی استعمال";

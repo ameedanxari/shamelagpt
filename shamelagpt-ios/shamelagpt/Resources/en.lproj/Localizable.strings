@@ -263,3 +263,22 @@
 "settings.pref.focus.practical" = "Practical";
 "settings.pref.focus.theoretical" = "Theoretical";
 "settings.pref.focus.historical" = "Historical";
+
+/* Conversation Modes */
+"mode.selection.title" = "Choose how you want to use ShamelaGPT";
+"mode.selection.subtitle" = "Authentic Islamic knowledge, tailored to your purpose.";
+"mode.enterButton" = "Continue";
+"mode.signInRequired" = "Sign in to use Fact Check mode.";
+"mode.settingsRow" = "Conversation Mode";
+"mode.research.title" = "Research Mode";
+"mode.research.tagline" = "Deep, sourced Islamic research and comprehensive Q&A";
+"mode.research.bullet1" = "Learning & study";
+"mode.research.bullet2" = "Fiqh & Aqeedah questions";
+"mode.research.bullet3" = "Historical and textual research";
+"mode.research.bullet4" = "General Islamic Q&A";
+"mode.factCheck.title" = "Fact Check Mode";
+"mode.factCheck.tagline" = "Verify claims. Expose misinformation. Defend the truth.";
+"mode.factCheck.bullet1" = "Fighting misinformation";
+"mode.factCheck.bullet2" = "Countering Islamophobia";
+"mode.factCheck.bullet3" = "Verifying viral claims";
+"mode.factCheck.bullet4" = "Academic & journalistic use";

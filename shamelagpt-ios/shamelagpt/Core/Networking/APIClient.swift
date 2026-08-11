@@ -24,6 +24,8 @@ protocol APIClientProtocol {
     func deleteCurrentUser() async throws
     func verifyToken() async throws
     func getPreferences() async throws -> UserPreferencesRequest
+    func getModePreference() async throws -> ModePreferenceResponse
+    func setModePreference(_ request: UpdateModeRequest) async throws
     func setPreferences(_ request: UserPreferencesRequest) async throws
     func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data
     func listConversations() async throws -> [ConversationResponse]
@@ -242,6 +244,17 @@ final class APIClient: APIClientProtocol {
 
     func setPreferences(_ request: UserPreferencesRequest) async throws {
         let endpoint = baseURL.appendingPathComponent("api/auth/me/preferences")
+        _ = try await performRequest(url: endpoint, method: "PUT", body: request) as EmptyResponse
+    }
+
+    /// Conversation mode
+    func getModePreference() async throws -> ModePreferenceResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me/mode")
+        return try await performRequest(url: endpoint, method: "GET")
+    }
+
+    func setModePreference(_ request: UpdateModeRequest) async throws {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me/mode")
         _ = try await performRequest(url: endpoint, method: "PUT", body: request) as EmptyResponse
     }
 
@@ -686,6 +699,14 @@ final class PreviewMockAPIClient: APIClientProtocol {
 
     func refreshToken(_ request: RefreshTokenRequest) async throws -> AuthResponse {
         return mockAuthResponse
+    }
+
+    func getModePreference() async throws -> ModePreferenceResponse {
+        return ModePreferenceResponse(modePreference: 1, modeName: "research")
+    }
+
+    func setModePreference(_ request: UpdateModeRequest) async throws {
+        return
     }
 
     func getMessages(conversationId: String) async throws -> ConversationMessagesResponse {
