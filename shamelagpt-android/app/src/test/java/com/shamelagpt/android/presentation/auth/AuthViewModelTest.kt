@@ -105,4 +105,50 @@ class AuthViewModelTest {
             viewModel.uiState.value.error
         )
     }
+
+    @Test
+    fun `forgot password with blank email shows required message`() = runTest {
+        every { appContext.getString(R.string.forgot_password_email_required) } returns
+            "Enter your email to reset your password."
+
+        viewModel.forgotPassword()
+
+        coVerify(exactly = 0) { authRepository.forgotPassword(any()) }
+        assertEquals(
+            "Enter your email to reset your password.",
+            viewModel.uiState.value.error
+        )
+        assertFalse(viewModel.uiState.value.isInfoMessage)
+    }
+
+    @Test
+    fun `forgot password with valid email calls repository and shows success`() = runTest {
+        every { appContext.getString(R.string.forgot_password_email_sent) } returns
+            "If an account exists for that email, a password reset link has been sent."
+        coEvery { authRepository.forgotPassword("user@example.com") } returns Result.success(Unit)
+
+        viewModel.updateEmail("  user@example.com  ")
+        viewModel.forgotPassword()
+
+        coVerify { authRepository.forgotPassword("user@example.com") }
+        assertFalse(viewModel.uiState.value.isLoading)
+        assertTrue(viewModel.uiState.value.isInfoMessage)
+        assertEquals(
+            "If an account exists for that email, a password reset link has been sent.",
+            viewModel.uiState.value.error
+        )
+    }
+
+    @Test
+    fun `forgot password failure shows error message`() = runTest {
+        coEvery { authRepository.forgotPassword(any()) } returns
+            Result.failure(NetworkError.HttpError(500, "server error"))
+
+        viewModel.updateEmail("user@example.com")
+        viewModel.forgotPassword()
+
+        assertFalse(viewModel.uiState.value.isLoading)
+        assertFalse(viewModel.uiState.value.isInfoMessage)
+        assertNotNull(viewModel.uiState.value.error)
+    }
 }

@@ -30,6 +30,9 @@
     <string name="auth_email_exists_use_login">یہ ای میل پہلے سے رجسٹرڈ ہے۔ براہ کرم سائن اِن کریں۔</string>
     <string name="sign_in_with_google">گوگل سے سائن اِن کریں</string>
     <string name="auth_or_divider">یا</string>
+    <string name="forgot_password">پاس ورڈ بھول گئے؟</string>
+    <string name="forgot_password_email_required">پاس ورڈ ری سیٹ کرنے کے لیے اپنا ای میل درج کریں۔</string>
+    <string name="forgot_password_email_sent">اگر اس ای میل پر اکاؤنٹ موجود ہے تو پاس ورڈ ری سیٹ کا لنک بھیج دیا گیا ہے۔</string>
     <string name="google_sign_in_failed">گوگل سائن اِن ناکام ہوا۔ براہ کرم دوبارہ کوشش کریں۔</string>
 
     <!-- Chat Screen -->
