@@ -290,3 +290,5 @@
 "composer.deepThinking" = "گہری سوچ";
 "composer.switchToFactCheck" = "فیکٹ چیک پر جائیں";
 "composer.switchToResearch" = "ریسرچ پر جائیں";
+"permission.camera" = "کیمرہ";
+"permission.photoLibrary" = "تصاویر کی لائبریری";

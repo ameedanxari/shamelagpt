@@ -52,8 +52,6 @@ struct InputBarView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Divider()
-
             // Recording indicator
             if isRecording {
                 recordingIndicator
@@ -66,18 +64,39 @@ struct InputBarView: View {
 
             activeStateChips
 
-            HStack(alignment: .bottom, spacing: AppTheme.Spacing.xs) {
+            // A single floating capsule rather than a full-width bar with a divider.
+            // The controls sit *inside* the capsule so the composer reads as one object.
+            HStack(alignment: .bottom, spacing: 0) {
                 // Everything that used to crowd the bar now lives behind one control.
                 attachmentMenu
 
                 // Text input
                 textInputArea
 
+                // Voice input stays on the bar: it is a mode of composing, not an
+                // attachment, and burying it behind the menu costs a tap every time.
+                microphoneButton
+
                 // Send button
                 sendButton
             }
-            .padding(AppTheme.Spacing.sm)
-            .background(DesignSystem.Colors.surface(colorScheme))
+            .padding(.horizontal, 6)
+            .padding(.vertical, 6)
+            .background(
+                Capsule(style: .continuous)
+                    .fill(DesignSystem.Colors.surface(colorScheme))
+                    .overlay(
+                        Capsule(style: .continuous)
+                            .stroke(
+                                DesignSystem.Colors.textSecondary(colorScheme).opacity(0.15),
+                                lineWidth: 1
+                            )
+                    )
+                    .shadow(color: Color.black.opacity(0.06), radius: 10, x: 0, y: 2)
+            )
+            .padding(.horizontal, 12)
+            .padding(.bottom, 8)
+            .padding(.top, 4)
         }
     }
 
@@ -126,13 +145,13 @@ struct InputBarView: View {
                 }
             }
         } label: {
+            // Bare glyph — the capsule already provides the affordance, and a filled
+            // circle here competes visually with the send button.
             Image(systemName: "plus")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(DesignSystem.Colors.primary)
-                .frame(width: 34, height: 34)
-                .background(
-                    Circle().fill(DesignSystem.Colors.primary.opacity(0.12))
-                )
+                .font(.system(size: 19, weight: .medium))
+                .foregroundColor(DesignSystem.Colors.textPrimary(colorScheme))
+                .frame(width: 38, height: 38)
+                .contentShape(Rectangle())
         }
         .disabled(isSwitchingMode)
         .accessibilityIdentifier(AccessibilityID.Chat.attachmentMenu)

@@ -288,3 +288,5 @@
 "composer.deepThinking" = "التفكير العميق";
 "composer.switchToFactCheck" = "التبديل إلى التحقق من الحقائق";
 "composer.switchToResearch" = "التبديل إلى البحث";
+"permission.camera" = "الكاميرا";
+"permission.photoLibrary" = "مكتبة الصور";

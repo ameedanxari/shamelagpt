@@ -9,6 +9,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 /// App-wide theme configuration
 /// Note: For new code, prefer using `DesignSystem` directly for full light/dark mode support.
@@ -27,8 +28,19 @@ struct AppTheme {
 
         // Backgrounds - These use system colors for automatic light/dark support
         // For explicit control, use DesignSystem.Colors.background(colorScheme)
-        static let background = Color(.systemBackground)
-        static let secondaryBackground = Color(.secondarySystemBackground)
+        // Adaptive rather than `systemBackground`, otherwise screens using this legacy
+        // API render plain white while the brand surfaces are warm cream, and the app
+        // looks like two different products stitched together.
+        static let background = Color(UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? UIColor(red: 0.071, green: 0.078, blue: 0.059, alpha: 1)   // #12140F
+                : UIColor(red: 0.980, green: 0.969, blue: 0.949, alpha: 1)   // #FAF7F2
+        })
+        static let secondaryBackground = Color(UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? UIColor(red: 0.102, green: 0.114, blue: 0.086, alpha: 1)   // #1A1D16
+                : UIColor(red: 0.953, green: 0.929, blue: 0.890, alpha: 1)   // #F3EDE3
+        })
 
         // Text
         static let primaryText = Color.primary

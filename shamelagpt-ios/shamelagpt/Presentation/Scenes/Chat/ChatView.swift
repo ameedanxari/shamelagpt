@@ -112,13 +112,13 @@ struct ChatView: View {
         }
         .sheet(isPresented: $viewModel.showCameraPermissionDenied) {
             PermissionDeniedView(
-                permissionType: LocalizationKeys.cameraAccessibilityLabel,
+                permissionType: LocalizationKeys.permissionCamera,
                 settingsAction: viewModel.openSettings
             )
         }
         .sheet(isPresented: $viewModel.showPhotoPermissionDenied) {
             PermissionDeniedView(
-                permissionType: LocalizationKeys.imagePickerChooseFromLibrary,
+                permissionType: LocalizationKeys.permissionPhotoLibrary,
                 settingsAction: viewModel.openSettings
             )
         }

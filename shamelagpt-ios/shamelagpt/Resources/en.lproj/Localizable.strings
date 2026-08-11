@@ -291,3 +291,5 @@
 "composer.deepThinking" = "Deep Thinking";
 "composer.switchToFactCheck" = "Switch to Fact Check";
 "composer.switchToResearch" = "Switch to Research";
+"permission.camera" = "Camera";
+"permission.photoLibrary" = "Photo Library";

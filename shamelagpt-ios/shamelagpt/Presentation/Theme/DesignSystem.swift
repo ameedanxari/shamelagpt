@@ -18,21 +18,21 @@ enum DesignSystem {
     
     enum Brand {
         /// Primary emerald color - #10B981
-        static let emerald = Color(hex: "#10B981")
+        static let emerald = Color(hex: "#4E7541")
         /// Light emerald variant - #5CDBB3
-        static let emeraldLight = Color(hex: "#5CDBB3")
+        static let emeraldLight = Color(hex: "#6D9B5E")
         /// Dark emerald variant - #059669
-        static let emeraldDark = Color(hex: "#059669")
+        static let emeraldDark = Color(hex: "#3C5D30")
         
         /// Teal for gradients - #2DD4BF
-        static let teal = Color(hex: "#2DD4BF")
+        static let teal = Color(hex: "#95BF87")
         /// Cyan for gradients - #22D3EE
-        static let cyan = Color(hex: "#22D3EE")
+        static let cyan = Color(hex: "#BBDDB0")
         
         /// Amber accent - #F59E0B
-        static let amber = Color(hex: "#F59E0B")
+        static let amber = Color(hex: "#BD8200")
         /// Light amber variant - #FACC15
-        static let amberLight = Color(hex: "#FACC15")
+        static let amberLight = Color(hex: "#F8D193")
     }
     
     // MARK: - Semantic Colors
@@ -54,51 +54,51 @@ enum DesignSystem {
         
         /// Main background - dark mode: #0f0f0f, light mode: system
         static func background(_ colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? Color(hex: "#0f0f0f") : Color(hex: "#FAFAFA")
+            colorScheme == .dark ? Color(hex: "#12140F") : Color(hex: "#FAF7F2")
         }
         
         /// Secondary/surface background - dark mode: #171717, light mode: system secondary
         static func surface(_ colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? Color(hex: "#171717") : Color(hex: "#F1F3F6")
+            colorScheme == .dark ? Color(hex: "#1A1D16") : Color(hex: "#F3EDE3")
         }
         
         /// Card/elevated surface - dark mode: #1F2937, light mode: white
         static func card(_ colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? Color(hex: "#1F2937") : Color.white
+            colorScheme == .dark ? Color(hex: "#22261D") : Color(hex: "#FFFDFA")
         }
         
         /// Input field background
         static func inputBackground(_ colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? Color(hex: "#1F2937") : Color(hex: "#E8ECF2")
+            colorScheme == .dark ? Color(hex: "#22261D") : Color(hex: "#F0EBE0")
         }
         
         // MARK: Text
         
         /// Primary text color
         static func textPrimary(_ colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? Color.white : Color(hex: "#111827")
+            colorScheme == .dark ? Color(hex: "#F5F2EC") : Color(hex: "#223028")
         }
         
         /// Secondary/muted text color
         static func textSecondary(_ colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? Color(hex: "#9CA3AF") : Color(hex: "#6B7280")
+            colorScheme == .dark ? Color(hex: "#A8B0A2") : Color(hex: "#5C6659")
         }
         
         /// Tertiary/placeholder text color
         static func textTertiary(_ colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? Color(hex: "#6B7280") : Color(hex: "#9CA3AF")
+            colorScheme == .dark ? Color(hex: "#7C8577") : Color(hex: "#8D9488")
         }
         
         // MARK: Messages (Minimal styling per website design)
         
         /// User message text color (right-aligned, on background)
         static func userMessageText(_ colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? Color.white : Color(hex: "#111827")
+            colorScheme == .dark ? Color(hex: "#F5F2EC") : Color(hex: "#223028")
         }
         
         /// AI message text color (left-aligned, on background)
         static func aiMessageText(_ colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? Color.white : Color(hex: "#111827")
+            colorScheme == .dark ? Color(hex: "#F5F2EC") : Color(hex: "#223028")
         }
         
         /// Source link color (amber)
@@ -108,7 +108,7 @@ enum DesignSystem {
         
         /// Default border color
         static func border(_ colorScheme: ColorScheme) -> Color {
-            colorScheme == .dark ? Color(hex: "#374151") : Color(hex: "#CBD5E1")
+            colorScheme == .dark ? Color(hex: "#3A4034") : Color(hex: "#DDD5C7")
         }
         
         /// Focus ring color

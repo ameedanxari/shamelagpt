@@ -288,6 +288,8 @@ enum LocalizationKeys {
     static let composerDeepThinking = "composer.deepThinking"
     static let composerSwitchToFactCheck = "composer.switchToFactCheck"
     static let composerSwitchToResearch = "composer.switchToResearch"
+    static let permissionCamera = "permission.camera"
+    static let permissionPhotoLibrary = "permission.photoLibrary"
     static let modeResearchTitle = "mode.research.title"
     static let modeResearchTagline = "mode.research.tagline"
     static let modeResearchBullet1 = "mode.research.bullet1"
@@ -304,7 +306,11 @@ enum LocalizationKeys {
     // MARK: - Permission Messages
 
     static func permissionMessage(_ type: String) -> String {
-        return String(format: LanguageManager.shared.localizedString(forKey: "permission.message"), type)
+        // Callers pass a localization *key*. Interpolating it raw put
+        // "imagePicker.chooseFromLibrary" in front of users. Resolve it first; a plain
+        // display string passed by a preview resolves to itself, so both cases work.
+        let localizedType = LanguageManager.shared.localizedString(forKey: type)
+        return String(format: LanguageManager.shared.localizedString(forKey: "permission.message"), localizedType)
     }
 }
 
