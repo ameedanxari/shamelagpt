@@ -281,3 +281,10 @@
 "mode.factCheck.bullet4" = "للادعاءات المنتشرة والمعلومات المضللة";
 "chat.thinking.on" = "التفكير مفعّل";
 "chat.thinking.off" = "التفكير متوقف";
+"composer.addOptions" = "خيارات إضافية";
+"composer.addPhoto" = "صورة أو لقطة شاشة";
+"composer.voiceInput" = "الإدخال الصوتي";
+"composer.stopVoice" = "إيقاف التسجيل";
+"composer.deepThinking" = "التفكير العميق";
+"composer.switchToFactCheck" = "التبديل إلى التحقق من الحقائق";
+"composer.switchToResearch" = "التبديل إلى البحث";

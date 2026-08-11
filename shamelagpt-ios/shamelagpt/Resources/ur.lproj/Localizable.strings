@@ -283,3 +283,10 @@
 "mode.factCheck.bullet4" = "وائرل دعووں اور غلط معلومات کے لیے";
 "chat.thinking.on" = "سوچ فعال";
 "chat.thinking.off" = "سوچ بند";
+"composer.addOptions" = "مزید اختیارات";
+"composer.addPhoto" = "تصویر یا اسکرین شاٹ";
+"composer.voiceInput" = "صوتی ان پٹ";
+"composer.stopVoice" = "ریکارڈنگ روکیں";
+"composer.deepThinking" = "گہری سوچ";
+"composer.switchToFactCheck" = "فیکٹ چیک پر جائیں";
+"composer.switchToResearch" = "ریسرچ پر جائیں";

@@ -64,14 +64,11 @@ struct InputBarView: View {
                 ocrProcessingIndicator
             }
 
-            optionsChips
+            activeStateChips
 
             HStack(alignment: .bottom, spacing: AppTheme.Spacing.xs) {
-                // Camera button
-                cameraButton
-
-                // Microphone button
-                microphoneButton
+                // Everything that used to crowd the bar now lives behind one control.
+                attachmentMenu
 
                 // Text input
                 textInputArea
@@ -86,30 +83,91 @@ struct InputBarView: View {
 
     // MARK: - Subviews
 
-    /// Mode + thinking chips, mirroring the web composer.
-    private var optionsChips: some View {
-        HStack(spacing: AppTheme.Spacing.xs) {
+    /// The "+" menu: capture, voice, and the two per-conversation switches.
+    ///
+    /// A single entry point keeps the bar uncluttered and makes the options discoverable —
+    /// the camera used to be a bare icon that most users never associated with fact-check.
+    private var attachmentMenu: some View {
+        Menu {
+            Button(action: onCameraTap) {
+                Label(LocalizationKeys.composerAddPhoto.localizedKey, systemImage: "camera.fill")
+            }
+
+            Button(action: onMicrophoneTap) {
+                Label(
+                    isRecording
+                        ? LocalizationKeys.composerStopVoice.localizedKey
+                        : LocalizationKeys.composerVoiceInput.localizedKey,
+                    systemImage: isRecording ? "stop.circle.fill" : "mic.fill"
+                )
+            }
+
+            Divider()
+
+            // Checkmarks rather than switches: a Menu row cannot host a live toggle, and a
+            // state-revealing label is clearer than a control that closes the menu anyway.
+            Button(action: onToggleThinking) {
+                Label(
+                    LocalizationKeys.composerDeepThinking.localizedKey,
+                    systemImage: isThinkingEnabled ? "checkmark.circle.fill" : "circle"
+                )
+            }
+
             if showsModeChip {
+                Button(action: onToggleMode) {
+                    Label(
+                        conversationMode == .factCheck
+                            ? LocalizationKeys.composerSwitchToResearch.localizedKey
+                            : LocalizationKeys.composerSwitchToFactCheck.localizedKey,
+                        systemImage: conversationMode == .factCheck
+                            ? "graduationcap.fill"
+                            : "checkmark.shield.fill"
+                    )
+                }
+            }
+        } label: {
+            Image(systemName: "plus")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(DesignSystem.Colors.primary)
+                .frame(width: 34, height: 34)
+                .background(
+                    Circle().fill(DesignSystem.Colors.primary.opacity(0.12))
+                )
+        }
+        .disabled(isSwitchingMode)
+        .accessibilityIdentifier(AccessibilityID.Chat.attachmentMenu)
+        .accessibilityLabel(LocalizationKeys.composerAddOptions.localizedKey)
+    }
+
+    /// Shows only what differs from the defaults.
+    ///
+    /// Research + thinking-on is the normal state and needs no badge; surfacing chips for
+    /// it would just add noise to every screen. A user who has switched to fact check, or
+    /// turned thinking off, does need to see that at a glance — otherwise the next answer
+    /// arrives in a shape they did not expect.
+    private var activeStateChips: some View {
+        HStack(spacing: AppTheme.Spacing.xs) {
+            if showsModeChip && conversationMode == .factCheck {
                 chip(
                     systemImage: conversationMode.symbolName,
                     title: conversationMode.titleKey.localizedKey,
-                    isActive: conversationMode == .factCheck,
+                    isActive: true,
                     isBusy: isSwitchingMode,
                     action: onToggleMode
                 )
                 .accessibilityIdentifier(AccessibilityID.Chat.modeChip)
             }
 
-            chip(
-                systemImage: isThinkingEnabled ? "lightbulb.fill" : "lightbulb",
-                title: isThinkingEnabled
-                    ? LocalizationKeys.chatThinkingOn.localizedKey
-                    : LocalizationKeys.chatThinkingOff.localizedKey,
-                isActive: isThinkingEnabled,
-                isBusy: false,
-                action: onToggleThinking
-            )
-            .accessibilityIdentifier(AccessibilityID.Chat.thinkingChip)
+            if !isThinkingEnabled {
+                chip(
+                    systemImage: "lightbulb",
+                    title: LocalizationKeys.chatThinkingOff.localizedKey,
+                    isActive: false,
+                    isBusy: false,
+                    action: onToggleThinking
+                )
+                .accessibilityIdentifier(AccessibilityID.Chat.thinkingChip)
+            }
 
             Spacer()
         }

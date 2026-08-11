@@ -284,3 +284,10 @@
 "mode.factCheck.bullet4" = "For viral claims and misinformation";
 "chat.thinking.on" = "Thinking ON";
 "chat.thinking.off" = "Thinking OFF";
+"composer.addOptions" = "More options";
+"composer.addPhoto" = "Photo or Screenshot";
+"composer.voiceInput" = "Voice Input";
+"composer.stopVoice" = "Stop Recording";
+"composer.deepThinking" = "Deep Thinking";
+"composer.switchToFactCheck" = "Switch to Fact Check";
+"composer.switchToResearch" = "Switch to Research";
