@@ -39,7 +39,11 @@ jobs:
             -scheme ShamelaGPT \
             -destination 'platform=iOS Simulator,name=iPhone 16' \
             -only-testing:ShamelaGPTTests \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=YES \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
             -resultBundlePath "$IOS_ARTIFACTS_DIR/TestResults.xcresult"
 
       - name: Generate Unit Coverage Summary
@@ -85,7 +89,11 @@ jobs:
             -scheme ShamelaGPT \
             -destination 'platform=iOS Simulator,name=iPhone 16' \
             -only-testing:ShamelaGPTUITests \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=YES \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
             -resultBundlePath "$IOS_ARTIFACTS_DIR/UITestResults.xcresult"
 
       - name: Upload UI Test Results
