@@ -7,9 +7,8 @@ import com.shamelagpt.android.core.util.LanguageManager
 import com.shamelagpt.android.domain.model.ResponsePreferences
 import com.shamelagpt.android.domain.model.UserPreferences
 import com.shamelagpt.android.domain.repository.AuthRepository
+import com.shamelagpt.android.domain.repository.ConversationRepository
 import com.shamelagpt.android.domain.repository.PreferencesRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +23,8 @@ private const val TAG = "SettingsViewModel"
 class SettingsViewModel(
     private val languageManager: LanguageManager,
     private val authRepository: AuthRepository,
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val conversationRepository: ConversationRepository
 ) : ViewModel() {
 
     private val _selectedLanguage = MutableStateFlow(normalizeLanguageCode(languageManager.getLanguage()))
@@ -38,6 +38,12 @@ class SettingsViewModel(
 
     private val _isAuthenticated = MutableStateFlow(false)
     val isAuthenticated: StateFlow<Boolean> = _isAuthenticated.asStateFlow()
+
+    private val _isDeletingAccount = MutableStateFlow(false)
+    val isDeletingAccount: StateFlow<Boolean> = _isDeletingAccount.asStateFlow()
+
+    private val _deleteAccountError = MutableStateFlow(false)
+    val deleteAccountError: StateFlow<Boolean> = _deleteAccountError.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -129,6 +135,43 @@ class SettingsViewModel(
             } catch (e: Exception) {
                 onError(e.message ?: "Failed to logout")
             }
+        }
+    }
+
+    fun clearDeleteAccountError() {
+        _deleteAccountError.value = false
+    }
+
+    fun deleteAccount(onSuccess: () -> Unit) {
+        if (_isDeletingAccount.value) return
+
+        viewModelScope.launch {
+            _isDeletingAccount.value = true
+            _deleteAccountError.value = false
+            Log.d(TAG, "deleteAccount() started")
+
+            // Wipe chats while still authenticated (server best-effort + local Room).
+            try {
+                conversationRepository.deleteAllConversations()
+                Log.d(TAG, "deleteAccount() conversation wipe completed")
+            } catch (error: Exception) {
+                Log.e(TAG, "deleteAccount() conversation wipe failed; continuing with account delete", error)
+            }
+
+            val result = authRepository.deleteCurrentUser()
+            result.fold(
+                onSuccess = {
+                    Log.d(TAG, "deleteAccount() succeeded")
+                    _isAuthenticated.value = false
+                    _isDeletingAccount.value = false
+                    onSuccess()
+                },
+                onFailure = { error ->
+                    Log.e(TAG, "deleteAccount() failed", error)
+                    _isDeletingAccount.value = false
+                    _deleteAccountError.value = true
+                }
+            )
         }
     }
 }

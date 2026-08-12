@@ -107,6 +107,26 @@ class AuthViewModelTest {
     }
 
     @Test
+    fun `when login fails with Unauthorized, shows friendlier credentials message`() = runTest {
+        coEvery {
+            authRepository.login(any())
+        } returns Result.failure(NetworkError.Unauthorized)
+
+        viewModel.updateEmail("deleted@example.com")
+        viewModel.updatePassword("any-password")
+
+        viewModel.authenticate { fail("success callback should not be called") }
+
+        assertEquals(
+            "Unable to sign in. Check your email and password and try again.",
+            viewModel.uiState.value.error
+        )
+        assertFalse(
+            viewModel.uiState.value.error.orEmpty().contains("E-AUTH-001")
+        )
+    }
+
+    @Test
     fun `forgot password with blank email shows required message`() = runTest {
         every { appContext.getString(R.string.forgot_password_email_required) } returns
             "Enter your email to reset your password."

@@ -32,6 +32,8 @@ class SettingsScreenTest {
         every { mockViewModel.isAuthenticated } returns MutableStateFlow(true)
         every { mockViewModel.customPrompt } returns MutableStateFlow("")
         every { mockViewModel.responsePreferences } returns MutableStateFlow(ResponsePreferences())
+        every { mockViewModel.isDeletingAccount } returns MutableStateFlow(false)
+        every { mockViewModel.deleteAccountError } returns MutableStateFlow(false)
 
         composeTestRule.setContent {
             SettingsScreen(
@@ -67,6 +69,8 @@ class SettingsScreenTest {
         composeTestRule.onNodeWithTag(TestTags.Settings.SupportItem, useUnmergedTree = true).assertIsDisplayed()
         scrollToTag(TestTags.Settings.AboutItem)
         composeTestRule.onNodeWithTag(TestTags.Settings.AboutItem, useUnmergedTree = true).assertIsDisplayed()
+        scrollToTag(TestTags.Settings.DeleteAccountItem)
+        composeTestRule.onNodeWithTag(TestTags.Settings.DeleteAccountItem, useUnmergedTree = true).assertIsDisplayed()
         scrollToTag(TestTags.Settings.LogoutItem)
         composeTestRule.onNodeWithTag(TestTags.Settings.LogoutItem, useUnmergedTree = true).assertIsDisplayed()
     }
@@ -78,6 +82,8 @@ class SettingsScreenTest {
         every { mockViewModel.isAuthenticated } returns MutableStateFlow(false) // Not authenticated
         every { mockViewModel.customPrompt } returns MutableStateFlow("")
         every { mockViewModel.responsePreferences } returns MutableStateFlow(ResponsePreferences())
+        every { mockViewModel.isDeletingAccount } returns MutableStateFlow(false)
+        every { mockViewModel.deleteAccountError } returns MutableStateFlow(false)
         
         composeTestRule.setContent {
             SettingsScreen(
@@ -92,6 +98,7 @@ class SettingsScreenTest {
         
         // Custom Prompt should NOT be displayed
         composeTestRule.onNodeWithTag(TestTags.Settings.CustomPromptItem, useUnmergedTree = true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TestTags.Settings.DeleteAccountItem, useUnmergedTree = true).assertDoesNotExist()
         
         // Sign In button should be displayed
         composeTestRule.onNodeWithTag(TestTags.Settings.SignInButton, useUnmergedTree = true).assertIsDisplayed()
@@ -104,6 +111,8 @@ class SettingsScreenTest {
         every { mockViewModel.isAuthenticated } returns MutableStateFlow(true)
         every { mockViewModel.customPrompt } returns MutableStateFlow("")
         every { mockViewModel.responsePreferences } returns MutableStateFlow(ResponsePreferences())
+        every { mockViewModel.isDeletingAccount } returns MutableStateFlow(false)
+        every { mockViewModel.deleteAccountError } returns MutableStateFlow(false)
 
         var navigateCalled = false
         composeTestRule.setContent {
@@ -119,5 +128,37 @@ class SettingsScreenTest {
 
         composeTestRule.onNodeWithTag(TestTags.Settings.LanguageItem, useUnmergedTree = true).performClick()
         assertTrue("Language navigation callback should be invoked", navigateCalled)
+    }
+
+    @Test
+    fun deleteAccount_showsConfirmationAndCallsViewModel() {
+        val mockViewModel = mockk<SettingsViewModel>(relaxed = true)
+        every { mockViewModel.selectedLanguage } returns MutableStateFlow("en")
+        every { mockViewModel.isAuthenticated } returns MutableStateFlow(true)
+        every { mockViewModel.customPrompt } returns MutableStateFlow("")
+        every { mockViewModel.responsePreferences } returns MutableStateFlow(ResponsePreferences())
+        every { mockViewModel.isDeletingAccount } returns MutableStateFlow(false)
+        every { mockViewModel.deleteAccountError } returns MutableStateFlow(false)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                isAuthenticated = true,
+                onNavigateToLanguage = {},
+                onNavigateToAbout = {},
+                onNavigateToAuth = {},
+                onLogout = {},
+                viewModel = mockViewModel
+            )
+        }
+
+        scrollToTag(TestTags.Settings.DeleteAccountItem)
+        composeTestRule.onNodeWithTag(TestTags.Settings.DeleteAccountItem, useUnmergedTree = true)
+            .performClick()
+
+        composeTestRule.onNodeWithTag(TestTags.Settings.DeleteAccountConfirmButton)
+            .assertIsDisplayed()
+            .performClick()
+
+        verify { mockViewModel.deleteAccount(any()) }
     }
 }

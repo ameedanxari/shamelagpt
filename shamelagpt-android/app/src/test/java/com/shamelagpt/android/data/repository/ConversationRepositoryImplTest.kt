@@ -20,6 +20,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.slot
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -234,12 +235,14 @@ class ConversationRepositoryImplTest {
         coEvery {
             mockConversationDao.deleteAllConversations()
         } just runs
+        every { mockSyncMetadataStore.clear() } just runs
 
         // When
         conversationRepository.deleteAllConversations()
 
         // Then
         coVerify { mockConversationDao.deleteAllConversations() }
+        verify { mockSyncMetadataStore.clear() }
     }
 
     // MARK: - Message CRUD Tests
