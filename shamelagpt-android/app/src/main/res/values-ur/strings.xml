@@ -99,6 +99,9 @@
     <string name="settings_sign_out">سائن آؤٹ</string>
     <string name="sign_out_confirmation_title">سائن آؤٹ؟</string>
     <string name="sign_out_confirmation_message">کیا آپ واقعی سائن آؤٹ کرنا چاہتے ہیں؟</string>
+    <string name="settings_delete_account">اکاؤنٹ حذف کریں</string>
+    <string name="settings_delete_account_message">اس سے آپ کا اکاؤنٹ مستقل طور پر حذف ہو جائے گا اور آپ کی گفتگوئیں سرور سے ہٹا دی جائیں گی۔ یہ عمل واپس نہیں ہو سکتا۔</string>
+    <string name="settings_delete_account_error">اکاؤنٹ حذف کرنے میں ناکام۔ دوبارہ کوشش کریں۔</string>
     <string name="settings_support_subtitle">اس منصوبے کو جاری رکھنے میں ہماری مدد کریں</string>
     <string name="settings_style_formal">رسمی</string>
     <string name="settings_pref_length_title">جواب کی لمبائی</string>

@@ -126,6 +126,9 @@
     <string name="settings_sign_out">تسجيل الخروج</string>
     <string name="sign_out_confirmation_title">تسجيل الخروج؟</string>
     <string name="sign_out_confirmation_message">هل أنت متأكد أنك تريد تسجيل الخروج؟</string>
+    <string name="settings_delete_account">حذف الحساب</string>
+    <string name="settings_delete_account_message">سيتم حذف حسابك نهائياً وإزالة محادثاتك من الخادم. لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="settings_delete_account_error">فشل حذف الحساب. يرجى المحاولة مرة أخرى.</string>
     <string name="settings_support_subtitle">ساعدنا في الحفاظ على هذا المشروع</string>
     <string name="settings_style_formal">رسمي</string>
     <string name="settings_pref_length_title">طول الرد</string>
