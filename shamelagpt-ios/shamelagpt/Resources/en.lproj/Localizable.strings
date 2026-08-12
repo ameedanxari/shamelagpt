@@ -35,10 +35,16 @@
 "chat.viewHistory" = "View History";
 "chat.mode.research" = "Research";
 "chat.mode.factCheck" = "Fact Check";
+"chat.share.description" = "When enabled, others can view this conversation. Your account details remain private.";
+"chat.share.copyLink" = "Copy shareable link";
+"chat.share.copied" = "Copied";
+"chat.share.conversationAccessibility" = "Share conversation";
+"chat.share.toggleAccessibility" = "Toggle chat sharing";
 "chat.error.sendFailed" = "We could not send your message. Please try again.";
 "chat.error.conversationUnavailable" = "This conversation is unavailable. Please reopen it from History and try again.";
 "chat.error.factCheckFailed" = "We could not complete the fact-check. Please try again.";
 "chat.error.shareImportFailed" = "We could not import the shared content. Please try sharing it again.";
+"chat.error.shareStatusFailed" = "We could not update sharing for this conversation. Please try again.";
 "chat.error.requestCancelled" = "The request was cancelled. Please try again.";
 "chat.warning.showingSavedMessages" = "Could not refresh from the server. Showing saved messages.";
 "chat.warning.continuityNotSaved" = "Conversation context may not have been saved. Future replies may lose context.";

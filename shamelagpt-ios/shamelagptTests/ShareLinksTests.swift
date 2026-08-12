@@ -16,11 +16,20 @@ final class ShareLinksTests: XCTestCase {
     var mockGetConversationsUseCase: MockGetConversationsUseCase!
     var mockDeleteConversationUseCase: MockDeleteConversationUseCase!
     var mockChatRepository: MockChatRepository!
+    var mockSendMessageUseCase: MockSendMessageUseCase!
+    var mockAuthRepository: MockAuthRepository!
+    var mockVoiceInputManager: MockVoiceInputManager!
+    var mockOCRManager: MockOCRManager!
 
     override func setUpWithError() throws {
         mockGetConversationsUseCase = MockGetConversationsUseCase()
         mockDeleteConversationUseCase = MockDeleteConversationUseCase()
         mockChatRepository = MockChatRepository()
+        mockSendMessageUseCase = MockSendMessageUseCase()
+        mockAuthRepository = MockAuthRepository()
+        mockAuthRepository.mockIsLoggedIn = true
+        mockVoiceInputManager = MockVoiceInputManager()
+        mockOCRManager = MockOCRManager()
 
         viewModel = HistoryViewModel(
             getConversationsUseCase: mockGetConversationsUseCase,
@@ -34,12 +43,35 @@ final class ShareLinksTests: XCTestCase {
         mockGetConversationsUseCase = nil
         mockDeleteConversationUseCase = nil
         mockChatRepository = nil
+        mockSendMessageUseCase = nil
+        mockAuthRepository = nil
+        mockVoiceInputManager = nil
+        mockOCRManager = nil
     }
 
     // MARK: - Helpers
 
     private func makeConversation(id: String = "conv-1") -> Conversation {
         Conversation(id: id, title: "Shareable", messages: [Message.preview])
+    }
+
+    /// Builds an authenticated chat view model bound to a persisted conversation,
+    /// which is the only configuration in which the share control is offered.
+    private func makeChatViewModel(
+        conversationId: String? = "chat-conv-1",
+        isGuest: Bool = false
+    ) -> ChatViewModel {
+        ChatViewModel(
+            conversationId: conversationId,
+            sendMessageUseCase: mockSendMessageUseCase,
+            chatRepository: mockChatRepository,
+            apiClient: nil,
+            authRepository: mockAuthRepository,
+            isGuest: isGuest,
+            guestSessionId: nil,
+            voiceInputManager: mockVoiceInputManager,
+            ocrManager: mockOCRManager
+        )
     }
 
     // MARK: - enableSharing
@@ -166,5 +198,160 @@ final class ShareLinksTests: XCTestCase {
     func testNormalizeFallsBackWhenPathIsUnrelated() {
         let result = ShareLink.normalize("https://shamelagpt.com/pricing", conversationId: "abc-123")
         XCTAssertEqual(result, "https://shamelagpt.com/shared?chatid=abc-123")
+    }
+
+    // MARK: - ChatViewModel visibility
+
+    func testChatCanShareWhenAuthenticatedWithPersistedConversation() {
+        XCTAssertTrue(makeChatViewModel().canShareConversation)
+    }
+
+    func testChatCannotShareBrandNewConversationWithoutId() {
+        XCTAssertFalse(makeChatViewModel(conversationId: nil).canShareConversation)
+        XCTAssertFalse(makeChatViewModel(conversationId: "   ").canShareConversation)
+    }
+
+    func testChatCannotShareAsGuest() {
+        XCTAssertFalse(makeChatViewModel(isGuest: true).canShareConversation)
+    }
+
+    func testChatCannotShareWhenSignedOut() {
+        mockAuthRepository.mockIsLoggedIn = false
+        XCTAssertFalse(makeChatViewModel().canShareConversation)
+    }
+
+    // MARK: - ChatViewModel toggling
+
+    func testChatSetSharingOnCallsRepositoryAndExposesNormalizedURL() async {
+        // Given - an older backend that still returns the legacy path form
+        let chatViewModel = makeChatViewModel(conversationId: "chat-conv-1")
+        mockChatRepository.shareURLToReturn = "https://shamelagpt.com/shared/chat-conv-1"
+
+        // When
+        await chatViewModel.setSharing(true)
+
+        // Then
+        XCTAssertTrue(mockChatRepository.setConversationSharedCalled)
+        XCTAssertEqual(mockChatRepository.lastSetConversationSharedId, "chat-conv-1")
+        XCTAssertEqual(mockChatRepository.lastSetConversationSharedValue, true)
+        XCTAssertTrue(chatViewModel.isShared)
+        XCTAssertEqual(chatViewModel.shareURL, "https://shamelagpt.com/shared?chatid=chat-conv-1")
+        XCTAssertFalse(chatViewModel.isSharePopoverLoading)
+    }
+
+    func testChatSetSharingOffCallsRepositoryAndClearsURL() async {
+        // Given - already shared
+        let chatViewModel = makeChatViewModel(conversationId: "chat-conv-1")
+        await chatViewModel.setSharing(true)
+        XCTAssertNotNil(chatViewModel.shareURL)
+
+        // When
+        await chatViewModel.setSharing(false)
+
+        // Then
+        XCTAssertEqual(mockChatRepository.setConversationSharedCallCount, 2)
+        XCTAssertEqual(mockChatRepository.lastSetConversationSharedValue, false)
+        XCTAssertFalse(chatViewModel.isShared)
+        XCTAssertNil(chatViewModel.shareURL)
+    }
+
+    func testChatSetSharingRevertsToggleWhenRepositoryFails() async {
+        // Given
+        let chatViewModel = makeChatViewModel(conversationId: "chat-conv-1")
+        mockChatRepository.setConversationSharedError = NSError(
+            domain: "test",
+            code: 500,
+            userInfo: [NSLocalizedDescriptionKey: "Share failed"]
+        )
+
+        // When
+        await chatViewModel.setSharing(true)
+
+        // Then - never leave the switch implying a private chat is public
+        XCTAssertTrue(mockChatRepository.setConversationSharedCalled)
+        XCTAssertFalse(chatViewModel.isShared)
+        XCTAssertNil(chatViewModel.shareURL)
+        XCTAssertFalse(chatViewModel.isSharePopoverLoading)
+        XCTAssertNotNil(chatViewModel.errorMessage)
+    }
+
+    func testChatSetSharingOffRevertsToOnWhenRepositoryFails() async {
+        // Given - shared, then the un-share PUT is rejected
+        let chatViewModel = makeChatViewModel(conversationId: "chat-conv-1")
+        await chatViewModel.setSharing(true)
+        let sharedURL = chatViewModel.shareURL
+        mockChatRepository.setConversationSharedError = NSError(domain: "test", code: 500, userInfo: nil)
+
+        // When
+        await chatViewModel.setSharing(false)
+
+        // Then
+        XCTAssertTrue(chatViewModel.isShared)
+        XCTAssertEqual(chatViewModel.shareURL, sharedURL)
+    }
+
+    // MARK: - ChatViewModel status seeding
+
+    func testChatLoadShareStatusSeedsIsSharedFromServer() async {
+        // Given - the conversation was already published elsewhere
+        let chatViewModel = makeChatViewModel(conversationId: "chat-conv-1")
+        mockChatRepository.mockShareStatus = ShareStatusResponse(
+            conversationId: "chat-conv-1",
+            isShared: true,
+            shareUrl: "https://shamelagpt.com/shared/chat-conv-1"
+        )
+
+        // When
+        await chatViewModel.loadShareStatus()
+
+        // Then
+        XCTAssertEqual(mockChatRepository.conversationShareStatusCallCount, 1)
+        XCTAssertEqual(mockChatRepository.lastConversationShareStatusId, "chat-conv-1")
+        XCTAssertTrue(chatViewModel.isShared)
+        XCTAssertEqual(chatViewModel.shareURL, "https://shamelagpt.com/shared?chatid=chat-conv-1")
+        XCTAssertFalse(chatViewModel.isSharePopoverLoading)
+    }
+
+    func testChatLoadShareStatusSeedsUnsharedAndLeavesNoLink() async {
+        // Given
+        let chatViewModel = makeChatViewModel(conversationId: "chat-conv-1")
+        mockChatRepository.mockShareStatus = ShareStatusResponse(
+            conversationId: "chat-conv-1",
+            isShared: false,
+            shareUrl: nil
+        )
+
+        // When
+        await chatViewModel.loadShareStatus()
+
+        // Then
+        XCTAssertFalse(chatViewModel.isShared)
+        XCTAssertNil(chatViewModel.shareURL)
+    }
+
+    func testChatLoadShareStatusSkippedForGuest() async {
+        // Given
+        let chatViewModel = makeChatViewModel(isGuest: true)
+
+        // When
+        await chatViewModel.loadShareStatus()
+
+        // Then - the endpoint is auth-protected; never call it as a guest
+        XCTAssertEqual(mockChatRepository.conversationShareStatusCallCount, 0)
+        XCTAssertFalse(chatViewModel.isShared)
+    }
+
+    func testChatLoadShareStatusSurfacesErrorAndLeavesToggleOff() async {
+        // Given
+        let chatViewModel = makeChatViewModel(conversationId: "chat-conv-1")
+        mockChatRepository.conversationShareStatusError = NSError(domain: "test", code: 503, userInfo: nil)
+
+        // When
+        await chatViewModel.loadShareStatus()
+
+        // Then
+        XCTAssertFalse(chatViewModel.isShared)
+        XCTAssertNil(chatViewModel.shareURL)
+        XCTAssertNotNil(chatViewModel.errorMessage)
     }
 }

@@ -471,6 +471,10 @@ class MockChatRepository: ChatRepository {
     /// When set, `setConversationShared` throws this instead of returning.
     var setConversationSharedError: Error?
     var mockShareStatus: ShareStatusResponse?
+    var conversationShareStatusCallCount = 0
+    var lastConversationShareStatusId: String?
+    /// When set, `conversationShareStatus` throws this instead of returning.
+    var conversationShareStatusError: Error?
 
     func fetchMostRecentEmptyConversation(includeLocalOnly: Bool = false) async throws -> Conversation? {
         if shouldThrowError { throw errorToThrow }
@@ -523,6 +527,9 @@ class MockChatRepository: ChatRepository {
     }
 
     func conversationShareStatus(id: String) async throws -> ShareStatusResponse {
+        conversationShareStatusCallCount += 1
+        lastConversationShareStatusId = id
+        if let conversationShareStatusError { throw conversationShareStatusError }
         if shouldThrowError { throw errorToThrow }
         return mockShareStatus ?? ShareStatusResponse(
             conversationId: id,
@@ -685,6 +692,9 @@ class MockChatRepository: ChatRepository {
         lastSetConversationSharedValue = nil
         setConversationSharedError = nil
         mockShareStatus = nil
+        conversationShareStatusCallCount = 0
+        lastConversationShareStatusId = nil
+        conversationShareStatusError = nil
     }
 }
 

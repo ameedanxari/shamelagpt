@@ -35,10 +35,16 @@
 "chat.viewHistory" = "عرض السجل";
 "chat.mode.research" = "بحث";
 "chat.mode.factCheck" = "تحقق من الحقائق";
+"chat.share.description" = "عند التفعيل، يمكن للآخرين عرض هذه المحادثة. تفاصيل حسابك تبقى خاصة.";
+"chat.share.copyLink" = "نسخ رابط المشاركة";
+"chat.share.copied" = "تم النسخ";
+"chat.share.conversationAccessibility" = "مشاركة المحادثة";
+"chat.share.toggleAccessibility" = "تبديل مشاركة المحادثة";
 "chat.error.sendFailed" = "تعذر إرسال رسالتك. يرجى المحاولة مرة أخرى.";
 "chat.error.conversationUnavailable" = "هذه المحادثة غير متاحة. يرجى فتحها من السجل والمحاولة مرة أخرى.";
 "chat.error.factCheckFailed" = "تعذر إكمال التحقق. يرجى المحاولة مرة أخرى.";
 "chat.error.shareImportFailed" = "تعذر استيراد المحتوى المُشارَك. يرجى مشاركته مرة أخرى.";
+"chat.error.shareStatusFailed" = "تعذر تحديث مشاركة هذه المحادثة. يرجى المحاولة مرة أخرى.";
 "chat.error.requestCancelled" = "تم إلغاء الطلب. يرجى المحاولة مرة أخرى.";
 "chat.warning.showingSavedMessages" = "تعذر التحديث من الخادم. يتم عرض الرسائل المحفوظة.";
 "chat.warning.continuityNotSaved" = "قد لا يكون سياق المحادثة قد حُفظ. قد تفقد الردود القادمة السياق.";

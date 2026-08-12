@@ -63,6 +63,21 @@ final class ChatViewModel: ObservableObject {
     @Published private(set) var modePreference: Int = ModePreference.research
     @Published private(set) var isModePreferenceLoading: Bool = false
 
+    // MARK: - Sharing
+
+    /// Whether this conversation is publicly viewable. Mirrors `is_shared` on the
+    /// server; never optimistic beyond the in-flight request (see `setSharing`).
+    @Published private(set) var isShared: Bool = false
+
+    /// True while a GET/PUT of the share status is in flight. Drives the spinner
+    /// and disables the toggle so a double tap cannot race two PUTs.
+    @Published private(set) var isSharePopoverLoading: Bool = false
+
+    /// Canonical public link, already run through `ShareLink.normalize`.
+    /// `nil` whenever the conversation is not shared, so the copy button has
+    /// nothing to hand out.
+    @Published private(set) var shareURL: String?
+
     // MARK: - Private Properties
 
     private let sendMessageUseCase: SendMessageUseCaseProtocol
@@ -282,6 +297,76 @@ final class ChatViewModel: ObservableObject {
         } catch {
             AppLogger.chat.logWarning("Failed to update mode preference reason=\(type(of: error))")
             errorMessage = ChatOperationError.warningMessage(for: .modePreference)
+        }
+    }
+
+    // MARK: - Sharing
+
+    /// Whether the share control should be offered at all.
+    ///
+    /// Sharing publishes a *persisted, owned* conversation: `PUT /api/conversations/{id}/share`
+    /// is auth-protected, and a brand-new chat has no id to publish yet. Guests fail
+    /// both tests, so they never see the control.
+    var canShareConversation: Bool {
+        guard !isGuest, let authRepository, authRepository.isLoggedIn() else { return false }
+        guard let conversationId, !conversationId.trimmed.isEmpty else { return false }
+        return true
+    }
+
+    /// Seeds the toggle from the server when the popover opens.
+    ///
+    /// WHY: the conversation may already be shared from the web app or a previous
+    /// session. Assuming `false` would show a private-looking switch for a chat that
+    /// is in fact public — the most dangerous direction for this control to lie in.
+    func loadShareStatus() async {
+        guard canShareConversation, let conversationId else { return }
+
+        isSharePopoverLoading = true
+        defer { isSharePopoverLoading = false }
+
+        do {
+            let status = try await chatRepository.conversationShareStatus(id: conversationId)
+            isShared = status.isShared
+            shareURL = status.isShared
+                ? ShareLink.normalize(status.shareUrl, conversationId: conversationId)
+                : nil
+        } catch {
+            AppLogger.chat.logWarning("Failed to load share status reason=\(type(of: error))")
+            errorMessage = ChatOperationError.warningMessage(for: .shareStatus)
+        }
+    }
+
+    /// Publishes or unpublishes the conversation.
+    ///
+    /// The toggle moves optimistically so the switch feels instant, then snaps back
+    /// if the PUT is rejected. Leaving it "on" after a failure would tell the user a
+    /// private conversation is public.
+    func setSharing(_ enabled: Bool) async {
+        guard canShareConversation, let conversationId else { return }
+        guard !isSharePopoverLoading else { return }
+
+        let previousIsShared = isShared
+        let previousShareURL = shareURL
+        guard previousIsShared != enabled else { return }
+
+        isShared = enabled
+        isSharePopoverLoading = true
+        defer { isSharePopoverLoading = false }
+
+        do {
+            let serverURL = try await chatRepository.setConversationShared(id: conversationId, isShared: enabled)
+            isShared = enabled
+            // The server URL is preferred but not trusted verbatim: an older backend
+            // still emits the legacy `/shared/<id>` path form. See `ShareLink.normalize`.
+            shareURL = enabled ? ShareLink.normalize(serverURL, conversationId: conversationId) : nil
+        } catch {
+            isShared = previousIsShared
+            shareURL = previousShareURL
+            AppLogger.chat.logError(
+                "Failed to update share status for conversation \(conversationId) requested=\(enabled)",
+                error: error
+            )
+            errorMessage = ChatOperationError.warningMessage(for: .shareStatus)
         }
     }
 
