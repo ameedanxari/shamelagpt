@@ -225,7 +225,8 @@ struct ChatView: View {
                         onMicrophoneTap: viewModel.toggleVoiceInput,
                         onCameraTap: viewModel.handleCameraButtonTap,
                         isThinkingEnabled: viewModel.enableThinking,
-                        onToggleThinking: viewModel.toggleThinking
+                        onToggleThinking: viewModel.toggleThinking,
+                        allowsImageInput: !viewModel.isGuest
                     )
                     .transition(.move(edge: .bottom))
                 }
