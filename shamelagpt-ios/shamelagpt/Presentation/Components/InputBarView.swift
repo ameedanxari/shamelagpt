@@ -24,6 +24,9 @@ struct InputBarView: View {
     /// they belong here rather than buried in Settings.
     let isThinkingEnabled: Bool
     let onToggleThinking: () -> Void
+    /// Guests have no OCR path — `/api/chat/ocr` requires auth and the option is not
+    /// offered to them by product decision. Hidden rather than shown-and-failing.
+    let allowsImageInput: Bool
 
     // MARK: - State
 
@@ -45,7 +48,6 @@ struct InputBarView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Divider()
 
             // Recording indicator
             if isRecording {
@@ -59,7 +61,9 @@ struct InputBarView: View {
 
             thinkingStatusChip
 
-            HStack(alignment: .bottom, spacing: AppTheme.Spacing.xs) {
+            // One floating capsule rather than a full-width bar with a divider, so the
+            // composer reads as a single object with its controls inside it.
+            HStack(alignment: .bottom, spacing: 0) {
                 // Capture, voice and the thinking switch behind one control, so the bar
                 // stays uncluttered and the options are discoverable — the camera used to
                 // be a bare icon nothing associated with fact-check.
@@ -71,8 +75,20 @@ struct InputBarView: View {
                 // Send button
                 sendButton
             }
-            .padding(AppTheme.Spacing.sm)
-            .background(DesignSystem.Colors.surface(colorScheme))
+            .padding(.horizontal, 6)
+            .padding(.vertical, 6)
+            .background(
+                Capsule(style: .continuous)
+                    .fill(DesignSystem.Colors.card(colorScheme))
+                    .overlay(
+                        Capsule(style: .continuous)
+                            .stroke(DesignSystem.Colors.border(colorScheme).opacity(0.6), lineWidth: 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.06), radius: 10, x: 0, y: 2)
+            )
+            .padding(.horizontal, 12)
+            .padding(.bottom, 8)
+            .padding(.top, 4)
         }
     }
 
@@ -125,8 +141,10 @@ struct InputBarView: View {
 
     private var attachmentMenu: some View {
         Menu {
-            Button(action: onCameraTap) {
-                Label(LocalizationKeys.composerAddPhoto.localizedKey, systemImage: "camera.fill")
+            if allowsImageInput {
+                Button(action: onCameraTap) {
+                    Label(LocalizationKeys.composerAddPhoto.localizedKey, systemImage: "camera.fill")
+                }
             }
             Button(action: onMicrophoneTap) {
                 Label(
@@ -375,7 +393,8 @@ struct InputBarView_Previews: PreviewProvider {
                 onMicrophoneTap: {},
                 onCameraTap: {},
                 isThinkingEnabled: true,
-                onToggleThinking: {}
+                onToggleThinking: {},
+                allowsImageInput: true
             )
         }
     }

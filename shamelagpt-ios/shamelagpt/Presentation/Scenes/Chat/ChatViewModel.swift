@@ -69,7 +69,7 @@ final class ChatViewModel: ObservableObject {
     private let chatRepository: ChatRepository
     private let apiClient: APIClientProtocol?
     private let authRepository: AuthRepository?
-    private let isGuest: Bool
+    let isGuest: Bool
     private let onConversationIdChange: ((String?) -> Void)?
     private let voiceInputManager: any VoiceInputManagerProtocol
     private let ocrManager: any OCRManagerProtocol
