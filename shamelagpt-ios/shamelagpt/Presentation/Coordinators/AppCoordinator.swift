@@ -246,6 +246,25 @@ class AppCoordinator: ObservableObject {
                 return true
             }
 
+            // Share links produced by the app itself: HistoryViewModel builds
+            // "https://shamelagpt.com/shared?chatid=<id>". Without this branch every link
+            // the app shares failed to open its conversation — it fell through to the
+            // final `return false` and the deep link was simply ignored.
+            //
+            // `chatid` is accepted alongside `id` because that is the parameter the share
+            // link actually uses; the web's /shared route reads the same name.
+            if path.hasPrefix("/shared") {
+                let conversationId = components.queryItems?.first(where: {
+                    $0.name == "chatid" || $0.name == "id"
+                })?.value
+                if let conversationId, !conversationId.isEmpty {
+                    openConversation(conversationId)
+                } else {
+                    startNewConversation()
+                }
+                return true
+            }
+
             if path.hasPrefix("/history") {
                 navigate(to: .history)
                 return true
