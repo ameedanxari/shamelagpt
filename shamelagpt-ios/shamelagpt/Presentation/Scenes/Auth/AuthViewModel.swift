@@ -15,6 +15,9 @@ final class AuthViewModel: ObservableObject {
     @Published var isLoginMode: Bool = true
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    /// Confirmation shown after a reset email is requested. Separate from `errorMessage`
+    /// so a success is not styled as a failure.
+    @Published var infoMessage: String?
 
     private let authRepository: AuthRepository
 
@@ -29,6 +32,7 @@ final class AuthViewModel: ObservableObject {
     func toggleMode() {
         isLoginMode.toggle()
         errorMessage = nil
+        infoMessage = nil
     }
 
     func setError(_ message: String) {
@@ -125,23 +129,31 @@ final class AuthViewModel: ObservableObject {
             message.contains("email or password")
     }
 
+    /// Requests a password reset email.
+    ///
+    /// The confirmation deliberately says "if an account exists" rather than confirming
+    /// one does. Saying otherwise turns this screen into an account-enumeration oracle:
+    /// anyone could test addresses and learn which are registered. Matches the Android
+    /// wording so both clients behave the same.
     func forgotPassword() {
-        guard !email.isEmpty else {
+        let trimmed = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
             AppLogger.auth.logWarning("forgot password validation failed: email missing")
-            errorMessage = "Email is required to reset password"
+            infoMessage = nil
+            errorMessage = LanguageManager.shared.localizedString(forKey: LocalizationKeys.authForgotPasswordEmailRequired)
             return
         }
 
         Task {
             isLoading = true
             errorMessage = nil
+            infoMessage = nil
             do {
                 AppLogger.auth.logInfo("forgot password request started")
-                try await authRepository.forgotPassword(email: email)
+                try await authRepository.forgotPassword(email: trimmed)
                 isLoading = false
                 AppLogger.auth.logInfo("forgot password request completed")
-                // On success, we might want to show a success message or alert
-                // For now, clear error and stop loading
+                infoMessage = LanguageManager.shared.localizedString(forKey: LocalizationKeys.authForgotPasswordSent)
             } catch {
                 isLoading = false
                 AppLogger.auth.logWarning("forgot password request failed reason=\(type(of: error))")

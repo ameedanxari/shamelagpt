@@ -77,6 +77,45 @@ struct AuthView: View {
                     .accessibilityIdentifier(AccessibilityID.Auth.errorLabel)
                 }
 
+                // Success is rendered in the primary colour, not the error style — a reset
+                // email being sent is a good outcome and should not look like a failure.
+                if let info = viewModel.infoMessage {
+                    HStack(alignment: .top, spacing: DesignSystem.Spacing.xs) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(DesignSystem.Colors.primary)
+                        Text(info)
+                            .foregroundColor(DesignSystem.Colors.textPrimary(colorScheme))
+                            .font(DesignSystem.Typography.subheadline)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(DesignSystem.Spacing.sm)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(DesignSystem.Colors.primary.opacity(0.08))
+                    .cornerRadius(AppTheme.Layout.cornerRadius)
+                    .accessibilityIdentifier(AccessibilityID.Auth.infoLabel)
+                }
+
+                // Sign-in only: there is no password to recover while creating an account.
+                if viewModel.isLoginMode {
+                    HStack {
+                        Spacer()
+                        Button {
+                            if !viewModel.isLoading {
+                                dismissKeyboard()
+                                viewModel.forgotPassword()
+                            }
+                        } label: {
+                            Text(LocalizationKeys.authForgotPassword.localizedKey)
+                                .font(DesignSystem.Typography.footnote)
+                                .foregroundColor(DesignSystem.Colors.primary)
+                        }
+                        .disabled(viewModel.isLoading)
+                        .accessibilityIdentifier(AccessibilityID.Auth.forgotPasswordButton)
+                    }
+                }
+
                 Button {
                     dismissKeyboard()
                     if !viewModel.isLoading {
@@ -118,6 +157,11 @@ struct AuthView: View {
                     guard !viewModel.isLoading else { return }
                     handleGoogleSignIn()
                 }
+                // Matches the Apple button and the rest of the stack. Without an explicit
+                // frame the SDK button renders at its own intrinsic size, so it sat at a
+                // different height and width from every other control on the screen.
+                .frame(maxWidth: .infinity)
+                .frame(height: 44)
                 .accessibilityIdentifier(AccessibilityID.Auth.googleSignInButton)
 
                 SignInWithAppleButton(viewModel.isLoginMode ? .signIn : .signUp) { request in

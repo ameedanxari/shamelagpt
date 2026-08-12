@@ -311,3 +311,6 @@
 "composer.deepThinking" = "التفكير العميق";
 "permission.camera" = "الكاميرا";
 "permission.photoLibrary" = "مكتبة الصور";
+"auth.forgotPassword" = "هل نسيت كلمة المرور؟";
+"auth.forgotPassword.emailRequired" = "أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور.";
+"auth.forgotPassword.sent" = "إذا كان هناك حساب بهذا البريد الإلكتروني، فقد تم إرسال رابط إعادة تعيين كلمة المرور.";

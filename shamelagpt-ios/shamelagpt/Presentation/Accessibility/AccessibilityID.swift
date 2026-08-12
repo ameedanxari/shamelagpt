@@ -25,6 +25,8 @@ enum AccessibilityID {
         static let signUpButton = "signUpButton"
         static let continueAsGuestButton = "continueAsGuestButton"
         static let toggleModeButton = "toggleModeButton"
+        static let forgotPasswordButton = "forgotPasswordButton"
+        static let infoLabel = "authInfoLabel"
         static let googleSignInButton = "googleSignInButton"
         static let appleSignInButton = "appleSignInButton"
     }

@@ -313,3 +313,6 @@
 "composer.deepThinking" = "گہری سوچ";
 "permission.camera" = "کیمرہ";
 "permission.photoLibrary" = "تصاویر کی لائبریری";
+"auth.forgotPassword" = "پاس ورڈ بھول گئے؟";
+"auth.forgotPassword.emailRequired" = "پاس ورڈ ری سیٹ کرنے کے لیے اپنا ای میل درج کریں۔";
+"auth.forgotPassword.sent" = "اگر اس ای میل کے لیے اکاؤنٹ موجود ہے تو پاس ورڈ ری سیٹ لنک بھیج دیا گیا ہے۔";
