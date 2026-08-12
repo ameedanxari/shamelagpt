@@ -22,6 +22,17 @@ final class LanguageManagerTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
+        // LanguageManager is a singleton, so its in-memory `currentLanguage`
+        // outlives this test class. `resetUserDefaults()` only clears the
+        // persisted key — it does not undo `setLanguage(.arabic/.urdu)` above.
+        //
+        // Without this reset the global stayed on whichever language the last
+        // test set, and every later test class that asserted on English copy
+        // (HistoryViewModelTests' export tests, SettingsViewModelTests'
+        // error-message test) failed against Arabic/Urdu strings. That is what
+        // made the suite order-dependent: the failures moved whenever tests
+        // were added or reordered.
+        LanguageManager.shared.setLanguage(.english)
         resetUserDefaults()
         languageManager = nil
     }
