@@ -105,7 +105,8 @@ val presentationModule = module {
         SettingsViewModel(
             languageManager = get(),
             authRepository = get(),
-            preferencesRepository = get()
+            preferencesRepository = get(),
+            conversationRepository = get()
         )
     }
 

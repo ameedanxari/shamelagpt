@@ -141,6 +141,9 @@
     <string name="settings_sign_out">Sign out</string>
     <string name="sign_out_confirmation_title">Sign Out?</string>
     <string name="sign_out_confirmation_message">Are you sure you want to sign out?</string>
+    <string name="settings_delete_account">Delete Account</string>
+    <string name="settings_delete_account_message">This will permanently delete your account and remove your conversations from the server. This action cannot be undone.</string>
+    <string name="settings_delete_account_error">Failed to delete account. Please try again.</string>
     <string name="settings_support_subtitle">Help us keep this project running</string>
     <string name="settings_style_formal">Formal</string>
     <string name="send_feedback">Send Feedback</string>

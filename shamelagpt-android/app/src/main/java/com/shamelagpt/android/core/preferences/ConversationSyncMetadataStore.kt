@@ -35,6 +35,11 @@ class ConversationSyncMetadataStore(context: Context) {
         prefs.edit().putLong(key, nowMs).apply()
     }
 
+    /** Clears all sync freshness markers (logout / account delete). */
+    fun clear() {
+        prefs.edit().clear().apply()
+    }
+
     private fun isStale(lastSyncedAt: Long, ttlMs: Long, nowMs: Long): Boolean {
         if (lastSyncedAt <= 0L) return true
         return nowMs - lastSyncedAt >= ttlMs

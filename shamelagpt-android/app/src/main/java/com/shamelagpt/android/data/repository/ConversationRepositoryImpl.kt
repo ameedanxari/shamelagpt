@@ -97,9 +97,11 @@ class ConversationRepositoryImpl(
 
     override suspend fun deleteAllConversations() {
         if (sessionManager?.isLoggedIn() == true && conversationRemoteDataSource != null) {
+            // Best-effort remote wipe; local cache must clear either way.
             conversationRemoteDataSource.deleteAllConversations()
         }
         conversationDao.deleteAllConversations()
+        syncMetadataStore.clear()
         // Messages will be cascade deleted due to foreign key constraint
     }
 

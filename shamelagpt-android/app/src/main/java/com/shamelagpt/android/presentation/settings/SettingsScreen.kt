@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -47,9 +48,18 @@ fun SettingsScreen(
     val context = LocalContext.current
     val selectedLanguage by viewModel.selectedLanguage.collectAsState()
     val isAuthenticatedState by viewModel.isAuthenticated.collectAsState()
+    val isDeletingAccount by viewModel.isDeletingAccount.collectAsState()
+    val deleteAccountError by viewModel.deleteAccountError.collectAsState()
     val donationUiState by donationViewModel.uiState.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showDeleteAccountDialog by remember { mutableStateOf(false) }
     var showDonationSheet by remember { mutableStateOf(false) }
+
+    LaunchedEffect(deleteAccountError) {
+        if (deleteAccountError) {
+            showDeleteAccountDialog = false
+        }
+    }
 
 
     Scaffold(
@@ -268,37 +278,7 @@ fun SettingsScreen(
                             )
                         }
 
-                        // Logout Confirmation Dialog
-                        if (showLogoutDialog) {
-                            AlertDialog(
-                                onDismissRequest = { showLogoutDialog = false },
-                                title = { Text(stringResource(R.string.sign_out_confirmation_title)) },
-                                text = { Text(stringResource(R.string.sign_out_confirmation_message)) },
-                                confirmButton = {
-                                    Button(
-                                        onClick = {
-                                            showLogoutDialog = false
-                                            viewModel.logout(
-                                                onLoggedOut = {
-                                                    // Do not navigate away, just refresh UI
-                                                },
-                                                onError = { /* Ignore for now */ }
-                                            )
-                                        },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.error
-                                        )
-                                    ) {
-                                        Text(stringResource(R.string.settings_sign_out))
-                                    }
-                                },
-                                dismissButton = {
-                                    TextButton(onClick = { showLogoutDialog = false }) {
-                                        Text(stringResource(R.string.common_cancel))
-                                    }
-                                }
-                            )
-                        }
+                        // Preference dialogs only — logout/delete confirmations live at Scaffold level
                     }
                 }
             } else {
@@ -441,6 +421,35 @@ fun SettingsScreen(
             if (isAuthenticatedState) {
 
                 item {
+                    if (deleteAccountError) {
+                        Text(
+                            text = stringResource(R.string.settings_delete_account_error),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+
+                item {
+                    SettingsItem(
+                        title = stringResource(R.string.settings_delete_account),
+                        icon = Icons.Default.DeleteForever,
+                        iconTint = MaterialTheme.colorScheme.error,
+                        textColor = MaterialTheme.colorScheme.error,
+                        onClick = {
+                            if (!isDeletingAccount) {
+                                viewModel.clearDeleteAccountError()
+                                showDeleteAccountDialog = true
+                            }
+                        },
+                        modifier = Modifier.testTag(TestTags.Settings.DeleteAccountItem)
+                    )
+                }
+
+                item {
                     SettingsItem(
                         title = stringResource(R.string.settings_sign_out),
                         icon = Icons.AutoMirrored.Filled.ExitToApp,
@@ -454,6 +463,84 @@ fun SettingsScreen(
 
                 }
             }
+        }
+
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogoutDialog = false },
+                title = { Text(stringResource(R.string.sign_out_confirmation_title)) },
+                text = { Text(stringResource(R.string.sign_out_confirmation_message)) },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showLogoutDialog = false
+                            viewModel.logout(
+                                onLoggedOut = {
+                                    // Stay on Settings in guest mode
+                                },
+                                onError = { /* Ignore for now */ }
+                            )
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text(stringResource(R.string.settings_sign_out))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showLogoutDialog = false }) {
+                        Text(stringResource(R.string.common_cancel))
+                    }
+                }
+            )
+        }
+
+        if (showDeleteAccountDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    if (!isDeletingAccount) {
+                        showDeleteAccountDialog = false
+                    }
+                },
+                title = { Text(stringResource(R.string.settings_delete_account)) },
+                text = { Text(stringResource(R.string.settings_delete_account_message)) },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.deleteAccount(
+                                onSuccess = {
+                                    showDeleteAccountDialog = false
+                                    onLogout()
+                                }
+                            )
+                        },
+                        enabled = !isDeletingAccount,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error
+                        ),
+                        modifier = Modifier.testTag(TestTags.Settings.DeleteAccountConfirmButton)
+                    ) {
+                        if (isDeletingAccount) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onError
+                            )
+                        } else {
+                            Text(stringResource(R.string.common_delete))
+                        }
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showDeleteAccountDialog = false },
+                        enabled = !isDeletingAccount
+                    ) {
+                        Text(stringResource(R.string.common_cancel))
+                    }
+                }
+            )
         }
 
         if (showDonationSheet) {
