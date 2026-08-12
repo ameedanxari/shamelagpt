@@ -306,3 +306,11 @@
 "settings.donate.paymentsDisabled" = "In-app purchases are disabled on this device.";
 "settings.donate.current" = "Current";
 "settings.donate.currentStatus" = "Current donation: %@";
+"chat.thinking.off" = "Thinking OFF";
+"composer.addOptions" = "More options";
+"composer.addPhoto" = "Photo or Screenshot";
+"composer.voiceInput" = "Voice Input";
+"composer.stopVoice" = "Stop Recording";
+"composer.deepThinking" = "Deep Thinking";
+"permission.camera" = "Camera";
+"permission.photoLibrary" = "Photo Library";

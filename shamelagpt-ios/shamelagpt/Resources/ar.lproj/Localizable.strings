@@ -303,3 +303,11 @@
 "settings.donate.paymentsDisabled" = "المشتريات داخل التطبيق معطّلة على هذا الجهاز.";
 "settings.donate.current" = "الحالي";
 "settings.donate.currentStatus" = "التبرع الحالي: %@";
+"chat.thinking.off" = "التفكير متوقف";
+"composer.addOptions" = "خيارات إضافية";
+"composer.addPhoto" = "صورة أو لقطة شاشة";
+"composer.voiceInput" = "الإدخال الصوتي";
+"composer.stopVoice" = "إيقاف التسجيل";
+"composer.deepThinking" = "التفكير العميق";
+"permission.camera" = "الكاميرا";
+"permission.photoLibrary" = "مكتبة الصور";

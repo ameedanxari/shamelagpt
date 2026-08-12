@@ -298,6 +298,14 @@ enum LocalizationKeys {
     static let authNeedAccount = "auth.needAccount"
     static let authHaveAccount = "auth.haveAccount"
     static let authSignInButton = "auth.signInButton"
+    static let chatThinkingOff = "chat.thinking.off"
+    static let composerAddOptions = "composer.addOptions"
+    static let composerAddPhoto = "composer.addPhoto"
+    static let composerVoiceInput = "composer.voiceInput"
+    static let composerStopVoice = "composer.stopVoice"
+    static let composerDeepThinking = "composer.deepThinking"
+    static let permissionCamera = "permission.camera"
+    static let permissionPhotoLibrary = "permission.photoLibrary"
     static let authInvalidCredentials = "auth.invalidCredentials"
     static let authEmailExistsUseLogin = "auth.emailExistsUseLogin"
     static let authSignInWithGoogle = "auth.signInWithGoogle"
@@ -309,7 +317,10 @@ enum LocalizationKeys {
     // MARK: - Permission Messages
 
     static func permissionMessage(_ type: String) -> String {
-        return String(format: LanguageManager.shared.localizedString(forKey: "permission.message"), type)
+        // Callers pass a localization *key*. Interpolating it raw put
+        // "imagePicker.chooseFromLibrary" in front of users.
+        let localizedType = LanguageManager.shared.localizedString(forKey: type)
+        return String(format: LanguageManager.shared.localizedString(forKey: "permission.message"), localizedType)
     }
 }
 

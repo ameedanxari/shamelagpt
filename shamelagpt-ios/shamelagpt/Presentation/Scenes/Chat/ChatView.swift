@@ -110,13 +110,13 @@ struct ChatView: View {
         }
         .sheet(isPresented: $viewModel.showCameraPermissionDenied) {
             PermissionDeniedView(
-                permissionType: LocalizationKeys.cameraAccessibilityLabel,
+                permissionType: LocalizationKeys.permissionCamera,
                 settingsAction: viewModel.openSettings
             )
         }
         .sheet(isPresented: $viewModel.showPhotoPermissionDenied) {
             PermissionDeniedView(
-                permissionType: LocalizationKeys.imagePickerChooseFromLibrary,
+                permissionType: LocalizationKeys.permissionPhotoLibrary,
                 settingsAction: viewModel.openSettings
             )
         }
@@ -223,7 +223,9 @@ struct ChatView: View {
                         isProcessingOCR: viewModel.isProcessingOCR,
                         onSend: { viewModel.sendMessage() },
                         onMicrophoneTap: viewModel.toggleVoiceInput,
-                        onCameraTap: viewModel.handleCameraButtonTap
+                        onCameraTap: viewModel.handleCameraButtonTap,
+                        isThinkingEnabled: viewModel.enableThinking,
+                        onToggleThinking: viewModel.toggleThinking
                     )
                     .transition(.move(edge: .bottom))
                 }
