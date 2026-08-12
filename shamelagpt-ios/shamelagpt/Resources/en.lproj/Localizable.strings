@@ -314,3 +314,6 @@
 "composer.deepThinking" = "Deep Thinking";
 "permission.camera" = "Camera";
 "permission.photoLibrary" = "Photo Library";
+"auth.forgotPassword" = "Forgot password?";
+"auth.forgotPassword.emailRequired" = "Enter your email to reset your password.";
+"auth.forgotPassword.sent" = "If an account exists for that email, a password reset link has been sent.";
