@@ -282,18 +282,39 @@ struct HistoryView: View {
     }
 
     private func shareConversation(_ conversation: Conversation) {
-        let text = viewModel.exportConversation(conversation)
+        // Publishing must succeed before the share sheet opens. Sharing local
+        // text alone leaves `is_shared` false server-side, so the link would
+        // 404 for whoever receives it.
+        Task { @MainActor in
+            let shareURL: String
+            do {
+                shareURL = try await viewModel.enableSharing(for: conversation)
+            } catch {
+                AppLogger.app.logError("Failed to enable sharing for conversation \(conversation.id)", error: error)
+                viewModel.error = LanguageManager.shared.localizedString(forKey: LocalizationKeys.historyShareFailed)
+                return
+            }
 
-        let activityController = UIActivityViewController(
-            activityItems: [text],
-            applicationActivities: nil
-        )
+            let text = viewModel.exportConversation(conversation)
 
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first,
-           let rootViewController = window.rootViewController {
-            activityController.popoverPresentationController?.sourceView = window
-            rootViewController.present(activityController, animated: true)
+            // The URL is passed as a real `URL` (not just inside the text) so
+            // iOS can fetch its metadata and render a rich link preview.
+            var activityItems: [Any] = [text]
+            if let url = URL(string: shareURL) {
+                activityItems.append(url)
+            }
+
+            let activityController = UIActivityViewController(
+                activityItems: activityItems,
+                applicationActivities: nil
+            )
+
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first,
+               let rootViewController = window.rootViewController {
+                activityController.popoverPresentationController?.sourceView = window
+                rootViewController.present(activityController, animated: true)
+            }
         }
     }
 

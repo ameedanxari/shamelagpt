@@ -58,6 +58,7 @@
 "history.loadFailed" = "Failed to load conversations.";
 "history.deleteFailed" = "Failed to delete conversation.";
 "history.deleteAllFailed" = "Failed to delete all conversations.";
+"history.shareFailed" = "Couldn't share this conversation. Please try again.";
 "history.loadingConversations" = "Loading conversations...";
 "common.share" = "Share";
 "share.conversationTitle" = "ShamelaGPT Conversation";

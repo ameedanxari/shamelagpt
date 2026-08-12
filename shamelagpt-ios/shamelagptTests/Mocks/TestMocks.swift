@@ -57,6 +57,9 @@ class MockAPIClient: APIClientProtocol {
     var deleteAllConversationsCallCount = 0
     var deleteConversationCallCount = 0
     var getMessagesCallCount = 0
+    var getShareStatusCallCount = 0
+    var setShareStatusCallCount = 0
+    var lastSetShareStatusIsShared: Bool?
     var lastSendMessageRequest: ChatRequest?
     var lastSetPreferencesRequest: UserPreferencesRequest?
     var lastSetModePreferenceRequest: ModePreferenceRequest?
@@ -357,6 +360,33 @@ class MockAPIClient: APIClientProtocol {
         )
     }
 
+    func getShareStatus(conversationId: String) async throws -> ShareStatusResponse {
+        getShareStatusCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return ShareStatusResponse(
+            conversationId: conversationId,
+            isShared: false,
+            shareUrl: nil
+        )
+    }
+
+    func setShareStatus(conversationId: String, isShared: Bool) async throws -> ShareStatusResponse {
+        setShareStatusCallCount += 1
+        lastSetShareStatusIsShared = isShared
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return ShareStatusResponse(
+            conversationId: conversationId,
+            isShared: isShared,
+            shareUrl: isShared ? "https://shamelagpt.com/shared?chatid=\(conversationId)" : nil
+        )
+    }
+
     func ocr(_ request: OCRRequest) async throws -> OCRResponse {
         if shouldFail { throw errorToThrow }
         return OCRResponse(
@@ -401,6 +431,9 @@ class MockAPIClient: APIClientProtocol {
         deleteAllConversationsCallCount = 0
         deleteConversationCallCount = 0
         getMessagesCallCount = 0
+        getShareStatusCallCount = 0
+        setShareStatusCallCount = 0
+        lastSetShareStatusIsShared = nil
         mockCreateConversationResponse = nil
         streamMessageLines = []
         streamGuestMessageLines = []
@@ -426,6 +459,18 @@ class MockChatRepository: ChatRepository {
     var createConversationCallCount = 0
     var addMessageCallCount = 0
     var fetchMessagesCallCount = 0
+
+    // Sharing
+    /// Value handed back by `setConversationShared`; nil simulates a server
+    /// that flipped the flag but returned no `share_url`.
+    var shareURLToReturn: String? = "https://shamelagpt.com/shared?chatid=mock-id"
+    var setConversationSharedCalled = false
+    var setConversationSharedCallCount = 0
+    var lastSetConversationSharedId: String?
+    var lastSetConversationSharedValue: Bool?
+    /// When set, `setConversationShared` throws this instead of returning.
+    var setConversationSharedError: Error?
+    var mockShareStatus: ShareStatusResponse?
 
     func fetchMostRecentEmptyConversation(includeLocalOnly: Bool = false) async throws -> Conversation? {
         if shouldThrowError { throw errorToThrow }
@@ -465,6 +510,29 @@ class MockChatRepository: ChatRepository {
 
     func syncRemoteConversations(forceRefresh: Bool) async throws {
         // no-op for mock
+    }
+
+    func setConversationShared(id: String, isShared: Bool) async throws -> String? {
+        setConversationSharedCalled = true
+        setConversationSharedCallCount += 1
+        lastSetConversationSharedId = id
+        lastSetConversationSharedValue = isShared
+        if let setConversationSharedError { throw setConversationSharedError }
+        if shouldThrowError { throw errorToThrow }
+        return isShared ? shareURLToReturn : nil
+    }
+
+    func conversationShareStatus(id: String) async throws -> ShareStatusResponse {
+        if shouldThrowError { throw errorToThrow }
+        return mockShareStatus ?? ShareStatusResponse(
+            conversationId: id,
+            isShared: setConversationSharedValueOrDefault,
+            shareUrl: shareURLToReturn
+        )
+    }
+
+    private var setConversationSharedValueOrDefault: Bool {
+        lastSetConversationSharedValue ?? false
     }
 
     func fetchConversation(byId id: String) async throws -> Conversation? {
@@ -610,6 +678,13 @@ class MockChatRepository: ChatRepository {
         createConversationCallCount = 0
         addMessageCallCount = 0
         fetchMessagesCallCount = 0
+        shareURLToReturn = "https://shamelagpt.com/shared?chatid=mock-id"
+        setConversationSharedCalled = false
+        setConversationSharedCallCount = 0
+        lastSetConversationSharedId = nil
+        lastSetConversationSharedValue = nil
+        setConversationSharedError = nil
+        mockShareStatus = nil
     }
 }
 

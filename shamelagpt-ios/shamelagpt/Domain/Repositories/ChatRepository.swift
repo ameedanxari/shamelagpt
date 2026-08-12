@@ -59,6 +59,20 @@ protocol ChatRepository {
     /// When `forceRefresh` is false, implementation may skip network if cache is still fresh.
     func syncRemoteConversations(forceRefresh: Bool) async throws
 
+    // MARK: - Sharing Operations
+
+    /// Enables or disables public sharing for a conversation server-side
+    /// - Parameters:
+    ///   - id: The conversation ID
+    ///   - isShared: Whether the conversation should be publicly readable
+    /// - Returns: The public share URL, or nil when sharing was disabled
+    func setConversationShared(id: String, isShared: Bool) async throws -> String?
+
+    /// Fetches the current sharing state of a conversation
+    /// - Parameter id: The conversation ID
+    /// - Returns: The server's share status for that conversation
+    func conversationShareStatus(id: String) async throws -> ShareStatusResponse
+
     // MARK: - Message Operations
 
     /// Adds a message to a conversation

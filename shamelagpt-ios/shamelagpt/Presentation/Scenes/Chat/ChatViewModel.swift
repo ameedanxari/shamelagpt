@@ -1538,6 +1538,14 @@ class MockChatRepository: ChatRepository {
 
     func syncRemoteConversations(forceRefresh: Bool) async throws {}
 
+    func setConversationShared(id: String, isShared: Bool) async throws -> String? {
+        return isShared ? "https://shamelagpt.com/shared?chatid=\(id)" : nil
+    }
+
+    func conversationShareStatus(id: String) async throws -> ShareStatusResponse {
+        return ShareStatusResponse(conversationId: id, isShared: false, shareUrl: nil)
+    }
+
     func updateConversationTitle(id: String, title: String) async throws {}
 
     func updateConversationThreadId(id: String, threadId: String) async throws {}

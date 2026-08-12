@@ -58,6 +58,7 @@
 "history.loadFailed" = "تعذر تحميل المحادثات.";
 "history.deleteFailed" = "تعذر حذف المحادثة.";
 "history.deleteAllFailed" = "تعذر حذف جميع المحادثات.";
+"history.shareFailed" = "تعذرت مشاركة هذه المحادثة. يرجى المحاولة مرة أخرى.";
 "history.loadingConversations" = "جاري تحميل المحادثات...";
 "common.share" = "مشاركة";
 "share.conversationTitle" = "محادثة شاملة GPT";

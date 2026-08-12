@@ -56,6 +56,7 @@
 "history.loadFailed" = "مکالمات لوڈ نہیں ہو سکے۔";
 "history.deleteFailed" = "مکالمہ حذف نہیں ہو سکا۔";
 "history.deleteAllFailed" = "تمام مکالمات حذف نہیں ہو سکے۔";
+"history.shareFailed" = "یہ مکالمہ شیئر نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔";
 "history.loadingConversations" = "گفتگوئیں لوڈ ہو رہی ہیں...";
 "common.share" = "شیئر کریں";
 "share.conversationTitle" = "شاملہ جی پی ٹی گفتگو";

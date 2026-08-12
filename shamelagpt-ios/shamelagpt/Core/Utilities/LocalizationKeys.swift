@@ -67,6 +67,7 @@ enum LocalizationKeys {
     static let historyLoadFailed = "history.loadFailed"
     static let historyDeleteFailed = "history.deleteFailed"
     static let historyDeleteAllFailed = "history.deleteAllFailed"
+    static let historyShareFailed = "history.shareFailed"
 
     // MARK: - Settings Screen
 
