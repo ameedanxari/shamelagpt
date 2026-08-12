@@ -33,10 +33,16 @@
 "chat.viewHistory" = "تاریخچہ دیکھیں";
 "chat.mode.research" = "تحقیق";
 "chat.mode.factCheck" = "فیکٹ چیک";
+"chat.share.description" = "فعال ہونے پر دوسرے یہ گفتگو دیکھ سکتے ہیں۔ آپ کے اکاؤنٹ کی تفصیلات نجی رہیں گی۔";
+"chat.share.copyLink" = "شیئر ایبل لنک کاپی کریں";
+"chat.share.copied" = "کاپی ہو گیا";
+"chat.share.conversationAccessibility" = "گفتگو شیئر کریں";
+"chat.share.toggleAccessibility" = "چیٹ شیئرنگ ٹوگل کریں";
 "chat.error.sendFailed" = "آپ کا پیغام نہیں بھیجا جا سکا۔ براہ کرم دوبارہ کوشش کریں۔";
 "chat.error.conversationUnavailable" = "یہ گفتگو دستیاب نہیں ہے۔ براہ کرم اسے ہسٹری سے دوبارہ کھول کر کوشش کریں۔";
 "chat.error.factCheckFailed" = "فیکٹ چیک مکمل نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔";
 "chat.error.shareImportFailed" = "شیئر کیا گیا مواد درآمد نہیں ہو سکا۔ براہ کرم دوبارہ شیئر کریں۔";
+"chat.error.shareStatusFailed" = "اس گفتگو کی شیئرنگ اپ ڈیٹ نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔";
 "chat.error.requestCancelled" = "درخواست منسوخ ہو گئی۔ براہ کرم دوبارہ کوشش کریں۔";
 "chat.warning.showingSavedMessages" = "سرور سے تازہ کاری نہیں ہو سکی۔ محفوظ پیغامات دکھائے جا رہے ہیں۔";
 "chat.warning.continuityNotSaved" = "گفتگو کا سیاق محفوظ نہیں ہو سکا۔ آئندہ جوابات میں سیاق ضائع ہو سکتا ہے۔";
@@ -56,6 +62,7 @@
 "history.loadFailed" = "مکالمات لوڈ نہیں ہو سکے۔";
 "history.deleteFailed" = "مکالمہ حذف نہیں ہو سکا۔";
 "history.deleteAllFailed" = "تمام مکالمات حذف نہیں ہو سکے۔";
+"history.shareFailed" = "یہ مکالمہ شیئر نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔";
 "history.loadingConversations" = "گفتگوئیں لوڈ ہو رہی ہیں...";
 "common.share" = "شیئر کریں";
 "share.conversationTitle" = "شاملہ جی پی ٹی گفتگو";

@@ -7,6 +7,7 @@ enum ChatOperation {
     case factCheck
     case ocr
     case shareImport
+    case shareStatus
     case modePreference
     case continuity
 }
@@ -88,6 +89,8 @@ enum ChatOperationError {
             return LocalizationKeys.ocrRecognitionFailed
         case .shareImport:
             return LocalizationKeys.chatErrorShareImportFailed
+        case .shareStatus:
+            return LocalizationKeys.chatErrorShareStatusFailed
         case .modePreference:
             return LocalizationKeys.chatWarningModePreferenceNotSaved
         case .continuity:
@@ -109,6 +112,8 @@ enum ChatOperationError {
             return "E-CHAT-OCR"
         case .shareImport:
             return "E-CHAT-SHARE"
+        case .shareStatus:
+            return "E-CHAT-SHARE-STATUS"
         case .modePreference:
             return "E-CHAT-MODE"
         case .continuity:

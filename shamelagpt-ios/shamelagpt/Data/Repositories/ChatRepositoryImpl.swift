@@ -548,6 +548,23 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         return try await apiClient.confirmFactCheck(request)
     }
 
+    // MARK: - Sharing
+
+    func setConversationShared(id: String, isShared: Bool) async throws -> String? {
+        guard let apiClient = apiClient else {
+            throw ChatRepositoryError.apiClientNotConfigured
+        }
+        let response = try await apiClient.setShareStatus(conversationId: id, isShared: isShared)
+        return response.shareUrl
+    }
+
+    func conversationShareStatus(id: String) async throws -> ShareStatusResponse {
+        guard let apiClient = apiClient else {
+            throw ChatRepositoryError.apiClientNotConfigured
+        }
+        return try await apiClient.getShareStatus(conversationId: id)
+    }
+
     // MARK: - Combine Publishers
 
     var conversationsPublisher: AnyPublisher<[Conversation], Never> {

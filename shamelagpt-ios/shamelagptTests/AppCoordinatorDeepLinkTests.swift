@@ -57,15 +57,74 @@ final class AppCoordinatorDeepLinkTests: XCTestCase {
         XCTAssertEqual(coordinator.navigationRoutes.last, .chat(conversationId: id))
     }
 
-    func testHandleUniversalLinkSharedPath_opensConversation() {
+    /// Swaps the shared container's ChatRepository for the duration of a test.
+    /// `/shared` routing asks the repository whether the conversation is owned
+    /// locally, so the test has to control that answer.
+    private func withStubbedChatRepository(
+        owning conversations: [Conversation],
+        _ body: (MockChatRepository) async throws -> Void
+    ) async rethrows {
+        let previous = DependencyContainer.shared.resolve(ChatRepository.self)
+        let mock = MockChatRepository()
+        mock.mockConversations = conversations
+        DependencyContainer.shared.register(ChatRepository.self, instance: mock as ChatRepository)
+        defer {
+            if let previous {
+                DependencyContainer.shared.register(ChatRepository.self, instance: previous)
+            }
+        }
+        try await body(mock)
+    }
+
+    func testHandleUniversalLinkSharedPath_opensConversationWhenOwned() async throws {
         let (coordinator, sessionState) = makeCoordinator()
         let id = "f1e2d3c4-5678-90ab-cdef-1234567890ab"
         let url = URL(string: "https://shamelagpt.com/shared?chatid=\(id)")!
+        let owned = Conversation(id: id, title: "Owned", messages: [])
 
-        let handled = coordinator.handleDeepLink(url)
+        try await withStubbedChatRepository(owning: [owned]) { _ in
+            let handled = coordinator.handleDeepLink(url)
+            XCTAssertTrue(handled, "The link is handled even though routing resolves asynchronously")
 
-        XCTAssertTrue(handled)
-        XCTAssertEqual(sessionState.conversationId, id)
-        XCTAssertEqual(coordinator.navigationRoutes.last, .chat(conversationId: id))
+            // Ownership is resolved in a Task; give it a turn to finish.
+            try await Task.sleep(nanoseconds: 200_000_000)
+
+            XCTAssertEqual(sessionState.conversationId, id)
+            XCTAssertEqual(coordinator.navigationRoutes.last, .chat(conversationId: id))
+        }
+    }
+
+    func testHandleUniversalLinkSharedPath_doesNotOpenInAppWhenNotOwned() async throws {
+        let (coordinator, sessionState) = makeCoordinator()
+        let id = "not-mine-1234"
+        let url = URL(string: "https://shamelagpt.com/shared?chatid=\(id)")!
+
+        try await withStubbedChatRepository(owning: []) { _ in
+            let handled = coordinator.handleDeepLink(url)
+            XCTAssertTrue(handled)
+
+            try await Task.sleep(nanoseconds: 200_000_000)
+
+            // Non-owners are handed to Safari instead of the authenticated ChatView.
+            XCTAssertNil(sessionState.conversationId)
+            XCTAssertTrue(coordinator.navigationRoutes.isEmpty)
+        }
+    }
+
+    func testHandleUniversalLinkLegacySharedPathSegment_isHandled() async throws {
+        let (coordinator, sessionState) = makeCoordinator()
+        let id = "legacy-1234-5678"
+        // The shape the backend used to emit; those links are already in the wild.
+        let url = URL(string: "https://shamelagpt.com/shared/\(id)")!
+        let owned = Conversation(id: id, title: "Owned", messages: [])
+
+        try await withStubbedChatRepository(owning: [owned]) { _ in
+            let handled = coordinator.handleDeepLink(url)
+            XCTAssertTrue(handled)
+
+            try await Task.sleep(nanoseconds: 200_000_000)
+
+            XCTAssertEqual(sessionState.conversationId, id)
+        }
     }
 }

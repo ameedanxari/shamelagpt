@@ -509,6 +509,14 @@ class MockURLProtocol: URLProtocol {
             return mockMessagesResponse(conversationId: conversationId, delay: delay)
         }
 
+        // GET/PUT /api/conversations/{id}/share
+        if let conversationsIndex = pathComponents.firstIndex(of: "conversations"),
+           pathComponents.last == "share",
+           pathComponents.count > conversationsIndex + 1 {
+            let conversationId = pathComponents[conversationsIndex + 1]
+            return mockShareStatusResponse(conversationId: conversationId, method: method, delay: delay)
+        }
+
         if method == "DELETE" {
             return MockURLProtocol.successResponse(json: [:], statusCode: 200, delay: delay)
         }
@@ -521,6 +529,23 @@ class MockURLProtocol: URLProtocol {
         let data = try? JSONSerialization.data(withJSONObject: conversations)
         let response = MockURLProtocol.httpResponse(statusCode: 200)
         return MockResponse(data: data, response: response, delay: delay)
+    }
+
+    /// Mocks the conversation sharing endpoints. A PUT is treated as "share it",
+    /// which is the only thing the app currently asks for.
+    private func mockShareStatusResponse(conversationId: String, method: String, delay: TimeInterval) -> MockResponse? {
+        guard method == "GET" || method == "PUT" else { return nil }
+
+        let isShared = method == "PUT"
+        var payload: [String: Any] = [
+            "status": "success",
+            "conversation_id": conversationId,
+            "is_shared": isShared
+        ]
+        if isShared {
+            payload["share_url"] = "https://shamelagpt.com/shared?chatid=\(conversationId)"
+        }
+        return MockURLProtocol.successResponse(json: payload, statusCode: 200, delay: delay)
     }
 
     private func mockMessagesResponse(conversationId: String, delay: TimeInterval) -> MockResponse? {

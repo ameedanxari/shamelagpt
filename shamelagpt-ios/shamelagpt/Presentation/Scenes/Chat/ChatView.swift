@@ -23,6 +23,7 @@ struct ChatView: View {
     @State private var showingErrorAlert = false
     @State private var isBottomBarVisible = true
     @State private var isHydrating = false
+    @State private var isSharePopoverPresented = false
     @State private var activeTransientAlert: ActiveTransientAlert?
 
     private enum ActiveTransientAlert {
@@ -201,10 +202,18 @@ struct ChatView: View {
                 }
 
             VStack(spacing: 0) {
-                if viewModel.canToggleModePreference {
-                    HStack {
+                // The row is gated on "is there anything to show", not on the mode
+                // flag alone — otherwise the share button would vanish for users who
+                // cannot switch modes.
+                if showsHeaderControls {
+                    HStack(spacing: AppTheme.Spacing.xs) {
                         Spacer()
-                        modeToggleControl
+                        if viewModel.canToggleModePreference {
+                            modeToggleControl
+                        }
+                        if viewModel.canShareConversation {
+                            shareControl
+                        }
                     }
                     .padding(.horizontal, AppTheme.Spacing.md)
                     .padding(.top, AppTheme.Spacing.sm)
@@ -277,6 +286,38 @@ struct ChatView: View {
     }
 
     // MARK: - Subviews
+
+    /// Whether the trailing header row has any content worth laying out.
+    private var showsHeaderControls: Bool {
+        viewModel.canToggleModePreference || viewModel.canShareConversation
+    }
+
+    private var shareControl: some View {
+        Button {
+            isSharePopoverPresented = true
+        } label: {
+            Image(systemName: "square.and.arrow.up")
+                .font(.caption.weight(.semibold))
+                .padding(.horizontal, AppTheme.Spacing.sm)
+                .padding(.vertical, AppTheme.Spacing.xs)
+        }
+        .buttonStyle(.bordered)
+        .tint(AppTheme.Colors.primary)
+        .accessibilityIdentifier(AccessibilityID.Chat.shareButton)
+        .accessibilityLabel(Text(LocalizationKeys.chatShareConversationAccessibility.localizedKey))
+        .popover(isPresented: $isSharePopoverPresented) {
+            ConversationSharePopover(viewModel: viewModel)
+                .compactPopoverAdaptation()
+        }
+        .onChange(of: isSharePopoverPresented) { isPresented in
+            // Seed from the server every time it opens: the conversation may have
+            // been shared from the web or another device since we last looked.
+            guard isPresented else { return }
+            Task {
+                await viewModel.loadShareStatus()
+            }
+        }
+    }
 
     private var modeToggleControl: some View {
         Group {

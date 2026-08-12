@@ -34,6 +34,8 @@ protocol APIClientProtocol {
     func deleteAllConversations() async throws
     func deleteConversation(id: String) async throws
     func getMessages(conversationId: String) async throws -> ConversationMessagesResponse
+    func getShareStatus(conversationId: String) async throws -> ShareStatusResponse
+    func setShareStatus(conversationId: String, isShared: Bool) async throws -> ShareStatusResponse
     func ocr(_ request: OCRRequest) async throws -> OCRResponse
     func confirmFactCheck(_ request: ConfirmFactCheckRequest) async throws -> AsyncThrowingStream<String, Error>
 }
@@ -313,6 +315,28 @@ final class APIClient: APIClientProtocol {
             .appendingPathComponent("messages")
         AppLogger.network.logInfo("Fetching messages for conversation \(conversationId) from API")
         return try await performRequest(url: endpoint, method: "GET")
+    }
+
+    /// Sharing
+    func getShareStatus(conversationId: String) async throws -> ShareStatusResponse {
+        let endpoint = baseURL
+            .appendingPathComponent("api/conversations")
+            .appendingPathComponent(conversationId)
+            .appendingPathComponent("share")
+        return try await performRequest(url: endpoint, method: "GET")
+    }
+
+    func setShareStatus(conversationId: String, isShared: Bool) async throws -> ShareStatusResponse {
+        let endpoint = baseURL
+            .appendingPathComponent("api/conversations")
+            .appendingPathComponent(conversationId)
+            .appendingPathComponent("share")
+        AppLogger.network.logInfo("Setting share status for conversation \(conversationId) to \(isShared)")
+        return try await performRequest(
+            url: endpoint,
+            method: "PUT",
+            body: ShareConversationRequest(isShared: isShared)
+        )
     }
 
     /// OCR
@@ -738,6 +762,22 @@ final class PreviewMockAPIClient: APIClientProtocol {
 
     func getMessages(conversationId: String) async throws -> ConversationMessagesResponse {
         return ConversationMessagesResponse(conversationId: conversationId, messages: [])
+    }
+
+    func getShareStatus(conversationId: String) async throws -> ShareStatusResponse {
+        return ShareStatusResponse(
+            conversationId: conversationId,
+            isShared: false,
+            shareUrl: nil
+        )
+    }
+
+    func setShareStatus(conversationId: String, isShared: Bool) async throws -> ShareStatusResponse {
+        return ShareStatusResponse(
+            conversationId: conversationId,
+            isShared: isShared,
+            shareUrl: isShared ? "https://shamelagpt.com/shared?chatid=\(conversationId)" : nil
+        )
     }
 
     func ocr(_ request: OCRRequest) async throws -> OCRResponse {

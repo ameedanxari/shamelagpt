@@ -40,10 +40,16 @@ enum LocalizationKeys {
     static let viewHistory = "chat.viewHistory"
     static let chatModeResearch = "chat.mode.research"
     static let chatModeFactCheck = "chat.mode.factCheck"
+    static let chatShareDescription = "chat.share.description"
+    static let chatShareCopyLink = "chat.share.copyLink"
+    static let chatShareCopied = "chat.share.copied"
+    static let chatShareConversationAccessibility = "chat.share.conversationAccessibility"
+    static let chatShareToggleAccessibility = "chat.share.toggleAccessibility"
     static let chatErrorSendFailed = "chat.error.sendFailed"
     static let chatErrorConversationUnavailable = "chat.error.conversationUnavailable"
     static let chatErrorFactCheckFailed = "chat.error.factCheckFailed"
     static let chatErrorShareImportFailed = "chat.error.shareImportFailed"
+    static let chatErrorShareStatusFailed = "chat.error.shareStatusFailed"
     static let chatErrorRequestCancelled = "chat.error.requestCancelled"
     static let chatWarningShowingSavedMessages = "chat.warning.showingSavedMessages"
     static let chatWarningContinuityNotSaved = "chat.warning.continuityNotSaved"
@@ -67,6 +73,7 @@ enum LocalizationKeys {
     static let historyLoadFailed = "history.loadFailed"
     static let historyDeleteFailed = "history.deleteFailed"
     static let historyDeleteAllFailed = "history.deleteAllFailed"
+    static let historyShareFailed = "history.shareFailed"
 
     // MARK: - Settings Screen
 

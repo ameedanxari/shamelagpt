@@ -230,6 +230,24 @@ final class HistoryViewModel: ObservableObject {
         return title
     }
 
+    // MARK: - Sharing
+
+    /// Enables sharing server-side and returns the canonical public link.
+    /// The PUT must happen before the share sheet: without it `is_shared` stays
+    /// false and the recipient's GET /api/shared/{id} returns 404.
+    /// - Parameter conversation: The conversation to publish
+    /// - Returns: The public link to hand to the share sheet
+    func enableSharing(for conversation: Conversation) async throws -> String {
+        let serverURL = try await chatRepository.setConversationShared(
+            id: conversation.id,
+            isShared: true
+        )
+        // The server URL is preferred but not trusted verbatim: an older
+        // backend still emits the legacy `/shared/<id>` path form, which the
+        // web SPA does not route. See `ShareLink.normalize`.
+        return ShareLink.normalize(serverURL, conversationId: conversation.id)
+    }
+
     /// Exports conversation as text
     /// - Parameter conversation: The conversation to export
     /// - Returns: Formatted text of the conversation

@@ -253,12 +253,27 @@ class AppCoordinator: ObservableObject {
             //
             // `chatid` is accepted alongside `id` because that is the parameter the share
             // link actually uses; the web's /shared route reads the same name.
+            //
+            // The path-segment form "/shared/<id>" is handled too: that is the shape the
+            // backend used to emit, and those links are already out in the wild.
             if path.hasPrefix("/shared") {
-                let conversationId = components.queryItems?.first(where: {
+                let queryId = components.queryItems?.first(where: {
                     $0.name == "chatid" || $0.name == "id"
                 })?.value
+
+                let conversationId: String?
+                if let queryId, !queryId.isEmpty {
+                    conversationId = queryId
+                } else {
+                    // "/shared/<id>" -> last path component, ignoring "/shared" itself.
+                    let segments = components.path
+                        .split(separator: "/")
+                        .map(String.init)
+                    conversationId = segments.count > 1 ? segments[segments.count - 1] : nil
+                }
+
                 if let conversationId, !conversationId.isEmpty {
-                    openConversation(conversationId)
+                    routeSharedConversation(conversationId, originalURL: url)
                 } else {
                     startNewConversation()
                 }
@@ -279,6 +294,42 @@ class AppCoordinator: ObservableObject {
         }
 
         return false
+    }
+
+    /// Routes a `/shared` universal link to whichever surface can actually display it.
+    ///
+    /// WHY: iOS gives the app first refusal on `shamelagpt.com` universal links, so the
+    /// app intercepts share links even when the person tapping them is *not* the owner
+    /// of that conversation. Only the owner can load it in-app — `/api/conversations/{id}`
+    /// is authenticated and scoped to the caller — so routing everyone to ChatView shows
+    /// non-owners an empty or failing screen. Everyone else needs the public web view at
+    /// `/api/shared/{id}`, which is exactly what the browser will get.
+    ///
+    /// Ownership is decided by asking the local repository for the conversation: a hit
+    /// means it is ours, a miss means hand the link to Safari.
+    @MainActor private func routeSharedConversation(_ conversationId: String, originalURL: URL) {
+        // Resolved lazily rather than injected: adding a repository to `init` would
+        // ripple through the DI container and every test that builds a coordinator.
+        guard let repository = DependencyContainer.shared.resolve(ChatRepository.self) else {
+            // Never drop the link — fall back to the previous in-app behaviour.
+            AppLogger.app.logWarning("ChatRepository unavailable; opening shared link in-app")
+            openConversation(conversationId)
+            return
+        }
+
+        Task { @MainActor in
+            if (try? await repository.fetchConversation(byId: conversationId)) != nil {
+                AppLogger.app.logInfo("Shared link owned locally -> opening in-app: \(conversationId)")
+                openConversation(conversationId)
+            } else {
+                AppLogger.app.logInfo("Shared link not owned locally -> opening in browser: \(conversationId)")
+                // `open(_:)` resolves to its async overload inside this Task.
+                // Opening a universal link the app itself claims is the
+                // documented way to hand it to the browser instead of looping
+                // straight back into this handler.
+                await UIApplication.shared.open(originalURL)
+            }
+        }
     }
 }
 
