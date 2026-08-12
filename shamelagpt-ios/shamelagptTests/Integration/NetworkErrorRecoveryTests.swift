@@ -282,6 +282,25 @@ final class NetworkErrorRecoveryTests: XCTestCase {
         mockNetworkMonitor.mockIsConnected = true
 
         for (scenario, expectedError) in matrix {
+            // Clear the previous iteration's failure before touching the API
+            // again. `apply` does reset `shouldFail`, but it runs AFTER the
+            // createConversation below — so from the second iteration onward
+            // that call inherited the prior scenario's error and threw outside
+            // the do/catch, failing the test on an unrelated line.
+            MockScenarioMatrix.apply(.success, to: mockAPIClient)
+
+            // Give every scenario its own conversation. MockAPIClient's default
+            // createConversation response hardcodes id "conv-created", so all
+            // iterations shared one conversation and the user messages piled up
+            // — the persistence assertion below saw 2, 3, 4... instead of 1.
+            mockAPIClient.mockCreateConversationResponse = ConversationResponse(
+                id: "conv-matrix-\(scenario.rawValue)",
+                threadId: nil,
+                title: "Matrix \(scenario.rawValue)",
+                createdAt: "2025-01-01T00:00:00Z",
+                updatedAt: "2025-01-01T00:00:00Z"
+            )
+
             let conversation = try await chatRepository.createConversation(title: "Matrix \(scenario.rawValue)")
             MockScenarioMatrix.apply(scenario, to: mockAPIClient)
 

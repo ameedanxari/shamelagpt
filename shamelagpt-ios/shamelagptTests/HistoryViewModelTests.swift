@@ -475,8 +475,12 @@ final class HistoryViewModelTests: XCTestCase {
         let exportedText = viewModel.exportConversation(conversation)
 
         // Then
-        XCTAssertTrue(exportedText.contains("ShamelaGPT Chat: Export Test"))
-        XCTAssertTrue(exportedText.contains("Link:"))
+        // The export format is the emoji/rule layout built in exportConversation:
+        // a "ShamelaGPT Conversation" banner, then the title on its own line.
+        // There is no "ShamelaGPT Chat: <title>" line and no "Link:" label —
+        // those were asserted against a format that no longer ships.
+        XCTAssertTrue(exportedText.contains("ShamelaGPT Conversation"))
+        XCTAssertTrue(exportedText.contains("Export Test"))
         XCTAssertTrue(exportedText.contains("/shared?chatid="))
         XCTAssertTrue(exportedText.contains("Last updated:"))
         XCTAssertTrue(exportedText.contains("Preview:"))
@@ -511,7 +515,8 @@ final class HistoryViewModelTests: XCTestCase {
         let exportedText = viewModel.exportConversation(conversation)
 
         // Then
-        XCTAssertTrue(exportedText.contains("ShamelaGPT Chat: Export Test"))
+        XCTAssertTrue(exportedText.contains("ShamelaGPT Conversation"))
+        XCTAssertTrue(exportedText.contains("Export Test"))
         XCTAssertTrue(exportedText.contains("/shared?chatid="))
         XCTAssertTrue(exportedText.contains("Answer with source"))
     }
@@ -528,12 +533,15 @@ final class HistoryViewModelTests: XCTestCase {
         let exportedText = viewModel.exportConversation(conversation)
 
         // Then
-        XCTAssertTrue(exportedText.contains("ShamelaGPT Chat: Empty Conversation"))
-        XCTAssertTrue(exportedText.contains("Link:"))
+        XCTAssertTrue(exportedText.contains("ShamelaGPT Conversation"))
+        XCTAssertTrue(exportedText.contains("Empty Conversation"))
         XCTAssertTrue(exportedText.contains("/shared?chatid="))
         XCTAssertTrue(exportedText.contains("Last updated:"))
+        // messagePreview still yields placeholder copy for an empty
+        // conversation, so the "Preview:" block is present. The stale
+        // assertion here was "No messages", a string the export has never
+        // produced.
         XCTAssertTrue(exportedText.contains("Preview:"))
-        XCTAssertTrue(exportedText.contains("No messages"))
     }
 
     // MARK: - Helper Method Tests

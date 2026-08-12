@@ -75,6 +75,22 @@ class LanguageManager: ObservableObject {
             return
         }
         
+        // Unit tests must not inherit a language from persisted state. This is
+        // a lazily-created singleton, so whichever test first touches it runs
+        // this init — and it would otherwise pick up `selectedLanguage` left in
+        // the simulator's UserDefaults by an EARLIER RUN, or the host's system
+        // locale on CI. The whole suite then ran in Arabic/Urdu and every test
+        // asserting English copy failed, with the failures moving around as
+        // tests were added or reordered.
+        //
+        // `isRunningUnitTests` was already declared for this purpose but never
+        // wired up. Tests that genuinely exercise switching still call
+        // setLanguage() explicitly, which is unaffected.
+        if Self.isRunningUnitTests {
+            currentLanguage = .english
+            return
+        }
+
         // Load saved language, check system language, or default to English
         if let savedLanguage = UserDefaults.standard.string(forKey: Self.selectedLanguageKey),
            let language = Language(rawValue: savedLanguage) {
