@@ -67,6 +67,8 @@ object TestTags {
         fun donationProduct(productId: String): String = "donationProduct_$productId"
         const val AboutItem = "settingsAboutItem"
         const val LogoutItem = "settingsLogoutItem"
+        const val DeleteAccountItem = "settingsDeleteAccountItem"
+        const val DeleteAccountConfirmButton = "settingsDeleteAccountConfirmButton"
         fun languageOption(code: String): String = "LanguageOption_$code"
         fun languageSelectedCheckmark(code: String): String = "LanguageSelectedCheckmark_$code"
     }

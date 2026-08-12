@@ -238,8 +238,11 @@ class AuthViewModel(
 
     private fun isInvalidLoginCredentials(isLoginMode: Boolean, throwable: Throwable): Boolean {
         if (!isLoginMode) return false
+        // Login 401/403 are mapped to Unauthorized by SafeApiCall — treat as bad credentials,
+        // not "session expired / please sign in" (that copy is for authenticated API calls).
+        if (throwable is NetworkError.Unauthorized) return true
         val httpError = throwable as? NetworkError.HttpError ?: return false
-        if (httpError.code == 401) return true
+        if (httpError.code == 401 || httpError.code == 403) return true
         if (httpError.code != 400) return false
 
         val body = httpError.errorBody.orEmpty()

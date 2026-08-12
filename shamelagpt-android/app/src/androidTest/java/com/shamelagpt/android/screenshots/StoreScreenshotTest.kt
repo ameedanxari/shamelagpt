@@ -201,6 +201,8 @@ class StoreScreenshotTest {
         every { vm.isAuthenticated } returns authFlow
         every { vm.customPrompt } returns promptFlow
         every { vm.responsePreferences } returns prefsFlow
+        every { vm.isDeletingAccount } returns MutableStateFlow(false)
+        every { vm.deleteAccountError } returns MutableStateFlow(false)
         return vm
     }
 

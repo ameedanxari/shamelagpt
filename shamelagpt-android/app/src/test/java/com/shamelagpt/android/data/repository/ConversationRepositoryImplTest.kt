@@ -234,12 +234,14 @@ class ConversationRepositoryImplTest {
         coEvery {
             mockConversationDao.deleteAllConversations()
         } just runs
+        every { mockSyncMetadataStore.clear() } just Runs
 
         // When
         conversationRepository.deleteAllConversations()
 
         // Then
         coVerify { mockConversationDao.deleteAllConversations() }
+        verify { mockSyncMetadataStore.clear() }
     }
 
     // MARK: - Message CRUD Tests
