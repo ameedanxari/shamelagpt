@@ -40,6 +40,9 @@ final class ChatViewModel: ObservableObject {
     @Published var showPhotoLibraryPicker: Bool = false
     @Published var selectedImage: UIImage?
     @Published var requiresAuth: Bool = false
+    /// `image_url` returned by /api/chat/ocr, reused by the confirm turn so the image is
+    /// uploaded once rather than twice.
+    private var resolvedFactCheckImageUrl: String?
     @Published var cameraPermission: CameraPermissionState = .unknown
     @Published var photoLibraryPermission: CameraPermissionState = .unknown
     @Published var showCameraPermissionDenied: Bool = false
@@ -868,6 +871,47 @@ final class ChatViewModel: ObservableObject {
     private func processImageWithOCR(_ image: UIImage) async {
         AppLogger.ocr.logInfo("Starting OCR processing for image with size: \(image.size)")
 
+        // Extraction runs server-side via POST /api/chat/ocr, which uses a vision model
+        // and reads Arabic, Urdu and mixed scripts. Apple Vision — used below, and the
+        // only path before this change — supports only the languages listed in
+        // `VNRecognizeTextRequest.recognitionLanguages` ("en-US", "ar-SA") and has **no
+        // Urdu support at all**, so an Urdu screenshot always failed with "No text found
+        // in image" while the identical image worked on the web.
+        //
+        // This is not an extra round trip: the fact-check turn already needs an image_url
+        // from this same endpoint, and `resolveFactCheckImageUrl` was calling it purely
+        // for that while discarding `extracted_text`. One call now serves both, and the
+        // URL is cached so the image uploads once instead of twice.
+        //
+        // Vision remains as an offline fallback so a network failure degrades rather than
+        // dead-ends.
+        let compressed = compressImage(image, maxSizeKB: 200)
+        if let compressed, !isGuest {
+            do {
+                let response = try await chatRepository.ocr(
+                    OCRRequest(
+                        imageBase64: compressed.base64EncodedString(),
+                        threadId: conversationId,
+                        languageHint: nil
+                    )
+                )
+                let text = response.extractedText.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !text.isEmpty {
+                    AppLogger.ocr.logInfo("Server OCR extracted \(text.count) chars, language: \(response.metadata.detectedLanguage ?? "unknown")")
+                    ocrExtractedText = text
+                    ocrDetectedLanguage = response.metadata.detectedLanguage
+                    ocrImageData = compressed
+                    resolvedFactCheckImageUrl = response.imageUrl
+                    showOCRConfirmation = true
+                    selectedImage = nil
+                    return
+                }
+                AppLogger.ocr.logWarning("Server OCR returned no text; falling back to on-device Vision")
+            } catch {
+                AppLogger.ocr.logWarning("Server OCR failed (\(type(of: error))); falling back to on-device Vision")
+            }
+        }
+
         do {
             let ocrResult = try await ocrManager.recognizeTextWithLanguage(from: image)
 
@@ -1113,6 +1157,13 @@ final class ChatViewModel: ObservableObject {
             throw NetworkError.invalidResponse
         }
 
+        // The OCR step already uploaded this image and returned a URL; re-uploading costs
+        // a second round trip and leaves a duplicate object in S3.
+        if let cached = resolvedFactCheckImageUrl, !cached.isEmpty {
+            AppLogger.chat.logInfo("Reusing image_url from the OCR step")
+            return cached
+        }
+
         AppLogger.chat.logInfo("Uploading fact-check image to resolve image_url")
         let ocrRequest = OCRRequest(
             imageBase64: imageData.base64EncodedString(),
@@ -1170,6 +1221,7 @@ final class ChatViewModel: ObservableObject {
     /// Dismisses OCR confirmation dialog
     func dismissOCRConfirmation() {
         showOCRConfirmation = false
+        resolvedFactCheckImageUrl = nil
         ocrExtractedText = ""
         ocrDetectedLanguage = nil
         ocrImageData = nil
