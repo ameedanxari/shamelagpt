@@ -34,6 +34,8 @@ enum AccessibilityID {
         static let cameraButton = "cameraButton"
         static let micButton = "micButton"
         static let sendButton = "sendButton"
+        static let attachmentMenu = "chatAttachmentMenu"
+        static let thinkingChip = "chatThinkingChip"
         static let modeToggleButton = "chatModeToggleButton"
         static let modeToggleProgress = "chatModeToggleProgress"
         static let typingIndicator = "TypingIndicator"

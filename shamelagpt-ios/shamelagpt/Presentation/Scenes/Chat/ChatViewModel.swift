@@ -40,6 +40,16 @@ final class ChatViewModel: ObservableObject {
     @Published var showPhotoLibraryPicker: Bool = false
     @Published var selectedImage: UIImage?
     @Published var requiresAuth: Bool = false
+
+    /// Whether the backend should stream chain-of-thought progress and use the thinking
+    /// model. Was hardcoded `true` in every request and unreachable by users; it is a real
+    /// switch — it controls both the `{"type":"thinking"}` events and which model runs
+    /// (`thinking_llm` vs `generation_llm`, services/graph_interface.py).
+    @Published var enableThinking: Bool = ChatViewModel.loadThinkingPreference()
+
+    /// `image_url` returned by /api/chat/ocr, reused by the confirm turn so the image is
+    /// uploaded once rather than twice.
+    private var resolvedFactCheckImageUrl: String?
     @Published var cameraPermission: CameraPermissionState = .unknown
     @Published var photoLibraryPermission: CameraPermissionState = .unknown
     @Published var showCameraPermissionDenied: Bool = false
@@ -329,7 +339,7 @@ final class ChatViewModel: ObservableObject {
                         threadId: threadId,
                         languagePreference: LanguageManager.shared.currentLanguage.rawValue,
                         sessionId: sessionIdToUse,
-                        enableThinking: true
+                        enableThinking: enableThinking
                     )
 
                     // Try to save user message locally if this conversation is local-only or authenticated (so history persists)
@@ -701,6 +711,24 @@ final class ChatViewModel: ObservableObject {
         voiceInputManager.clearError()
     }
 
+    // MARK: - Composer Options
+
+    private static let thinkingPreferenceKey = "chat_enable_thinking"
+
+    /// Defaults to on, matching the backend default, so behaviour is unchanged until the
+    /// user opts out.
+    static func loadThinkingPreference() -> Bool {
+        let defaults = UserDefaults.standard
+        guard defaults.object(forKey: thinkingPreferenceKey) != nil else { return true }
+        return defaults.bool(forKey: thinkingPreferenceKey)
+    }
+
+    func toggleThinking() {
+        enableThinking.toggle()
+        UserDefaults.standard.set(enableThinking, forKey: Self.thinkingPreferenceKey)
+        AppLogger.chat.logInfo("thinking toggled to \(enableThinking)")
+    }
+
     // MARK: - Error Handling
 
     private func handleError(_ error: Error, operation: ChatOperation = .sendMessage) {
@@ -865,32 +893,60 @@ final class ChatViewModel: ObservableObject {
     }
 
     /// Processes image with OCR and shows confirmation dialog
+    /// Extracts text from an image using the backend's OCR, then shows the review sheet.
+    ///
+    /// Apple Vision is deliberately **not** used. It only supports the languages in
+    /// `VNRecognizeTextRequest.recognitionLanguages` and has **no Urdu support at all** —
+    /// the supported set is fixed by the OS, so Urdu cannot be added. Every Urdu
+    /// screenshot failed with "No text found in image" while the same image worked on the
+    /// web, which uses the backend's vision model (`services/image_service.py`).
+    ///
+    /// This costs no extra round trip: the fact-check turn already needs an `image_url`
+    /// from this endpoint, and the app was previously calling it purely for that while
+    /// discarding `extracted_text`. One call now serves both, and the URL is cached so the
+    /// image uploads once rather than twice.
     private func processImageWithOCR(_ image: UIImage) async {
         AppLogger.ocr.logInfo("Starting OCR processing for image with size: \(image.size)")
 
+        guard let compressed = compressImage(image, maxSizeKB: 200) else {
+            AppLogger.ocr.logError("Could not compress the selected image")
+            ocrError = .invalidImage
+            selectedImage = nil
+            return
+        }
+
+        isProcessingOCR = true
+        defer { isProcessingOCR = false }
+
         do {
-            let ocrResult = try await ocrManager.recognizeTextWithLanguage(from: image)
+            let response = try await chatRepository.ocr(
+                OCRRequest(
+                    imageBase64: compressed.base64EncodedString(),
+                    threadId: conversationId,
+                    languageHint: nil
+                )
+            )
+            let text = response.extractedText.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !text.isEmpty else {
+                AppLogger.ocr.logWarning("Server OCR returned no text for this image")
+                ocrError = .noTextFound
+                selectedImage = nil
+                return
+            }
 
-            AppLogger.ocr.logInfo("OCR completed successfully, extracted \(ocrResult.text.count) characters, language: \(ocrResult.detectedLanguage ?? "unknown")")
-
-            // Compress image for storage (max 200KB)
-            let imageData = compressImage(image, maxSizeKB: 200)
-
-            // Store OCR result and show confirmation dialog
-            ocrExtractedText = ocrResult.text
-            ocrDetectedLanguage = ocrResult.detectedLanguage
-            ocrImageData = imageData
+            AppLogger.ocr.logInfo("Server OCR extracted \(text.count) chars, language: \(response.metadata.detectedLanguage ?? "unknown")")
+            ocrExtractedText = text
+            ocrDetectedLanguage = response.metadata.detectedLanguage
+            ocrImageData = compressed
+            resolvedFactCheckImageUrl = response.imageUrl
             showOCRConfirmation = true
-
-            // Clear the selected image
             selectedImage = nil
         } catch {
-            AppLogger.ocr.logError("OCR processing failed", error: error)
-            if let ocrError = error as? OCRError {
-                self.ocrError = ocrError
-            } else {
-                self.ocrError = .recognitionFailed(error.localizedDescription)
-            }
+            // Surface the real failure rather than silently degrading to an engine that
+            // cannot read the user's language.
+            AppLogger.ocr.logError("Server OCR failed", error: error)
+            ocrError = .recognitionFailed(error.localizedDescription)
+            selectedImage = nil
         }
     }
 
@@ -996,7 +1052,7 @@ final class ChatViewModel: ObservableObject {
                         imageBase64: nil,
                         threadId: threadId,
                         languagePreference: LanguageManager.shared.currentLanguage.rawValue,
-                        enableThinking: true
+                        enableThinking: enableThinking
                     )
 
                     let rawStream = try await chatRepository.confirmFactCheck(request)
@@ -1113,6 +1169,13 @@ final class ChatViewModel: ObservableObject {
             throw NetworkError.invalidResponse
         }
 
+        // The OCR step already uploaded this image and returned a URL; re-uploading costs
+        // a second round trip and leaves a duplicate object in S3.
+        if let cached = resolvedFactCheckImageUrl, !cached.isEmpty {
+            AppLogger.chat.logInfo("Reusing image_url from the OCR step")
+            return cached
+        }
+
         AppLogger.chat.logInfo("Uploading fact-check image to resolve image_url")
         let ocrRequest = OCRRequest(
             imageBase64: imageData.base64EncodedString(),
@@ -1170,6 +1233,7 @@ final class ChatViewModel: ObservableObject {
     /// Dismisses OCR confirmation dialog
     func dismissOCRConfirmation() {
         showOCRConfirmation = false
+        resolvedFactCheckImageUrl = nil
         ocrExtractedText = ""
         ocrDetectedLanguage = nil
         ocrImageData = nil
@@ -1200,11 +1264,9 @@ final class ChatViewModel: ObservableObject {
             // 2) If only text exists -> prefill input (do not auto-send).
             if let data = payload.imageData, let image = UIImage(data: data) {
                 do {
-                    let ocrResult = try await ocrManager.recognizeTextWithLanguage(from: image)
-                    ocrExtractedText = ocrResult.text
-                    ocrDetectedLanguage = ocrResult.detectedLanguage
-                    ocrImageData = compressImage(image, maxSizeKB: 200)
-                    showOCRConfirmation = true
+                    // Same reasoning as processImageWithOCR: server OCR, never Vision.
+                    await processImageWithOCR(image)
+                    guard showOCRConfirmation else { return }
                     AppLogger.chat.logInfo("Imported image payload prepared for OCR confirmation")
                     return
                 } catch {

@@ -20,6 +20,11 @@ struct InputBarView: View {
     let onMicrophoneTap: () -> Void
     let onCameraTap: () -> Void
 
+    /// Composer options. These are per-conversation decisions made while composing, so
+    /// they belong here rather than buried in Settings.
+    let isThinkingEnabled: Bool
+    let onToggleThinking: () -> Void
+
     // MARK: - State
 
     @State private var textEditorHeight: CGFloat = 40
@@ -52,12 +57,13 @@ struct InputBarView: View {
                 ocrProcessingIndicator
             }
 
-            HStack(alignment: .bottom, spacing: AppTheme.Spacing.xs) {
-                // Camera button
-                cameraButton
+            thinkingStatusChip
 
-                // Microphone button
-                microphoneButton
+            HStack(alignment: .bottom, spacing: AppTheme.Spacing.xs) {
+                // Capture, voice and the thinking switch behind one control, so the bar
+                // stays uncluttered and the options are discoverable — the camera used to
+                // be a bare icon nothing associated with fact-check.
+                attachmentMenu
 
                 // Text input
                 textInputArea
@@ -115,6 +121,65 @@ struct InputBarView: View {
             RoundedRectangle(cornerRadius: AppTheme.Layout.cornerRadius)
                 .stroke(DesignSystem.Colors.border(colorScheme), lineWidth: 1)
         )
+    }
+
+    private var attachmentMenu: some View {
+        Menu {
+            Button(action: onCameraTap) {
+                Label(LocalizationKeys.composerAddPhoto.localizedKey, systemImage: "camera.fill")
+            }
+            Button(action: onMicrophoneTap) {
+                Label(
+                    isRecording
+                        ? LocalizationKeys.composerStopVoice.localizedKey
+                        : LocalizationKeys.composerVoiceInput.localizedKey,
+                    systemImage: isRecording ? "stop.circle.fill" : "mic.fill"
+                )
+            }
+            Divider()
+            // A checkmark rather than a Toggle: a Menu row cannot host a live switch, and
+            // a state-revealing label is clearer than a control that dismisses the menu.
+            Button(action: onToggleThinking) {
+                Label(
+                    LocalizationKeys.composerDeepThinking.localizedKey,
+                    systemImage: isThinkingEnabled ? "checkmark.circle.fill" : "circle"
+                )
+            }
+        } label: {
+            Image(systemName: "plus")
+                .font(.system(size: 19, weight: .medium))
+                .foregroundColor(DesignSystem.Colors.textPrimary(colorScheme))
+                .frame(width: 38, height: 38)
+                .contentShape(Rectangle())
+        }
+        .accessibilityIdentifier(AccessibilityID.Chat.attachmentMenu)
+        .accessibilityLabel(LocalizationKeys.composerAddOptions.localizedKey)
+    }
+
+    /// Shown only when thinking is OFF. On (the default) needs no badge; off does, or the
+    /// next answer arrives in a shape the user did not expect.
+    @ViewBuilder
+    private var thinkingStatusChip: some View {
+        if !isThinkingEnabled {
+            HStack(spacing: AppTheme.Spacing.xs) {
+                Button(action: onToggleThinking) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "lightbulb").font(.caption2)
+                        Text(LocalizationKeys.chatThinkingOff.localizedKey).font(.caption2)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Capsule().fill(DesignSystem.Colors.textSecondary(colorScheme).opacity(0.10)))
+                    .overlay(Capsule().stroke(DesignSystem.Colors.textSecondary(colorScheme).opacity(0.25), lineWidth: 1))
+                    .foregroundColor(DesignSystem.Colors.textSecondary(colorScheme))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier(AccessibilityID.Chat.thinkingChip)
+                Spacer()
+            }
+            .padding(.horizontal, AppTheme.Spacing.sm)
+            .padding(.top, AppTheme.Spacing.xs)
+        }
     }
 
     private var cameraButton: some View {
@@ -308,7 +373,9 @@ struct InputBarView_Previews: PreviewProvider {
                 isProcessingOCR: isProcessingOCR,
                 onSend: {},
                 onMicrophoneTap: {},
-                onCameraTap: {}
+                onCameraTap: {},
+                isThinkingEnabled: true,
+                onToggleThinking: {}
             )
         }
     }

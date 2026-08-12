@@ -305,3 +305,11 @@
 "settings.donate.paymentsDisabled" = "اس ڈیوائس پر ایپ کے اندر خریداری غیر فعال ہے۔";
 "settings.donate.current" = "موجودہ";
 "settings.donate.currentStatus" = "موجودہ عطیہ: %@";
+"chat.thinking.off" = "سوچ بند";
+"composer.addOptions" = "مزید اختیارات";
+"composer.addPhoto" = "تصویر یا اسکرین شاٹ";
+"composer.voiceInput" = "صوتی ان پٹ";
+"composer.stopVoice" = "ریکارڈنگ روکیں";
+"composer.deepThinking" = "گہری سوچ";
+"permission.camera" = "کیمرہ";
+"permission.photoLibrary" = "تصاویر کی لائبریری";
