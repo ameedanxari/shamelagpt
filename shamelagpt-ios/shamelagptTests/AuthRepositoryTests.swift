@@ -173,7 +173,11 @@ final class AuthRepositoryTests: XCTestCase {
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.url?.path, "/api/auth/me/mode")
             XCTAssertEqual(request.httpMethod, "PUT")
-            capturedBody = request.httpBody
+            // URLSession hands a URLProtocol the body as `httpBodyStream`, not
+            // `httpBody` — reading only `httpBody` here always yielded nil, so
+            // this test could never have passed. APIClientTests already drains
+            // the stream the same way.
+            capturedBody = Self.requestBody(from: request)
             return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, responseData)
         }
 
@@ -183,8 +187,36 @@ final class AuthRepositoryTests: XCTestCase {
         // Then
         XCTAssertEqual(result.modePreference, 1)
         XCTAssertEqual(result.modeName, "research")
-        XCTAssertNotNil(capturedBody)
-        let json = try XCTUnwrap(try JSONSerialization.jsonObject(with: capturedBody!) as? [String: Any])
+        // XCTUnwrap, not `capturedBody!`. XCTAssertNotNil records a failure but
+        // does NOT stop execution, so the force-unwrap on the next line ran
+        // anyway when the body was nil and took the whole test PROCESS down
+        // with a fatal error — which XCTest reports as "unexpected exit", losing
+        // the results of every test that had not run yet. Unwrapping this way
+        // fails just this test instead.
+        let body = try XCTUnwrap(capturedBody)
+        let json = try XCTUnwrap(try JSONSerialization.jsonObject(with: body) as? [String: Any])
         XCTAssertEqual(json["mode_preference"] as? Int, 1)
+    }
+
+    /// Reads a request body regardless of whether URLSession delivered it as
+    /// `httpBody` or (as it does for a URLProtocol) an `httpBodyStream`.
+    private static func requestBody(from request: URLRequest) -> Data? {
+        if let body = request.httpBody {
+            return body
+        }
+        guard let stream = request.httpBodyStream else {
+            return nil
+        }
+        stream.open()
+        defer { stream.close() }
+        let bufferSize = 1024
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+        defer { buffer.deallocate() }
+        var data = Data()
+        while true {
+            let read = stream.read(buffer, maxLength: bufferSize)
+            if read > 0 { data.append(buffer, count: read) } else { break }
+        }
+        return data
     }
 }
