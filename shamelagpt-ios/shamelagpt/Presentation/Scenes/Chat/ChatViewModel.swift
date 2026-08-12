@@ -868,73 +868,60 @@ final class ChatViewModel: ObservableObject {
     }
 
     /// Processes image with OCR and shows confirmation dialog
+    /// Extracts text from an image using the backend's OCR, then shows the review sheet.
+    ///
+    /// Apple Vision is deliberately **not** used. It only supports the languages in
+    /// `VNRecognizeTextRequest.recognitionLanguages` and has **no Urdu support at all** —
+    /// the supported set is fixed by the OS, so Urdu cannot be added. Every Urdu
+    /// screenshot failed with "No text found in image" while the same image worked on the
+    /// web, which uses the backend's vision model (`services/image_service.py`).
+    ///
+    /// This costs no extra round trip: the fact-check turn already needs an `image_url`
+    /// from this endpoint, and the app was previously calling it purely for that while
+    /// discarding `extracted_text`. One call now serves both, and the URL is cached so the
+    /// image uploads once rather than twice.
     private func processImageWithOCR(_ image: UIImage) async {
         AppLogger.ocr.logInfo("Starting OCR processing for image with size: \(image.size)")
 
-        // Extraction runs server-side via POST /api/chat/ocr, which uses a vision model
-        // and reads Arabic, Urdu and mixed scripts. Apple Vision — used below, and the
-        // only path before this change — supports only the languages listed in
-        // `VNRecognizeTextRequest.recognitionLanguages` ("en-US", "ar-SA") and has **no
-        // Urdu support at all**, so an Urdu screenshot always failed with "No text found
-        // in image" while the identical image worked on the web.
-        //
-        // This is not an extra round trip: the fact-check turn already needs an image_url
-        // from this same endpoint, and `resolveFactCheckImageUrl` was calling it purely
-        // for that while discarding `extracted_text`. One call now serves both, and the
-        // URL is cached so the image uploads once instead of twice.
-        //
-        // Vision remains as an offline fallback so a network failure degrades rather than
-        // dead-ends.
-        let compressed = compressImage(image, maxSizeKB: 200)
-        if let compressed, !isGuest {
-            do {
-                let response = try await chatRepository.ocr(
-                    OCRRequest(
-                        imageBase64: compressed.base64EncodedString(),
-                        threadId: conversationId,
-                        languageHint: nil
-                    )
-                )
-                let text = response.extractedText.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !text.isEmpty {
-                    AppLogger.ocr.logInfo("Server OCR extracted \(text.count) chars, language: \(response.metadata.detectedLanguage ?? "unknown")")
-                    ocrExtractedText = text
-                    ocrDetectedLanguage = response.metadata.detectedLanguage
-                    ocrImageData = compressed
-                    resolvedFactCheckImageUrl = response.imageUrl
-                    showOCRConfirmation = true
-                    selectedImage = nil
-                    return
-                }
-                AppLogger.ocr.logWarning("Server OCR returned no text; falling back to on-device Vision")
-            } catch {
-                AppLogger.ocr.logWarning("Server OCR failed (\(type(of: error))); falling back to on-device Vision")
-            }
+        guard let compressed = compressImage(image, maxSizeKB: 200) else {
+            AppLogger.ocr.logError("Could not compress the selected image")
+            ocrError = .invalidImage
+            selectedImage = nil
+            return
         }
 
+        isProcessingOCR = true
+        defer { isProcessingOCR = false }
+
         do {
-            let ocrResult = try await ocrManager.recognizeTextWithLanguage(from: image)
+            let response = try await chatRepository.ocr(
+                OCRRequest(
+                    imageBase64: compressed.base64EncodedString(),
+                    threadId: conversationId,
+                    languageHint: nil
+                )
+            )
+            let text = response.extractedText.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !text.isEmpty else {
+                AppLogger.ocr.logWarning("Server OCR returned no text for this image")
+                ocrError = .noTextFound
+                selectedImage = nil
+                return
+            }
 
-            AppLogger.ocr.logInfo("OCR completed successfully, extracted \(ocrResult.text.count) characters, language: \(ocrResult.detectedLanguage ?? "unknown")")
-
-            // Compress image for storage (max 200KB)
-            let imageData = compressImage(image, maxSizeKB: 200)
-
-            // Store OCR result and show confirmation dialog
-            ocrExtractedText = ocrResult.text
-            ocrDetectedLanguage = ocrResult.detectedLanguage
-            ocrImageData = imageData
+            AppLogger.ocr.logInfo("Server OCR extracted \(text.count) chars, language: \(response.metadata.detectedLanguage ?? "unknown")")
+            ocrExtractedText = text
+            ocrDetectedLanguage = response.metadata.detectedLanguage
+            ocrImageData = compressed
+            resolvedFactCheckImageUrl = response.imageUrl
             showOCRConfirmation = true
-
-            // Clear the selected image
             selectedImage = nil
         } catch {
-            AppLogger.ocr.logError("OCR processing failed", error: error)
-            if let ocrError = error as? OCRError {
-                self.ocrError = ocrError
-            } else {
-                self.ocrError = .recognitionFailed(error.localizedDescription)
-            }
+            // Surface the real failure rather than silently degrading to an engine that
+            // cannot read the user's language.
+            AppLogger.ocr.logError("Server OCR failed", error: error)
+            ocrError = .recognitionFailed(error.localizedDescription)
+            selectedImage = nil
         }
     }
 
@@ -1252,11 +1239,9 @@ final class ChatViewModel: ObservableObject {
             // 2) If only text exists -> prefill input (do not auto-send).
             if let data = payload.imageData, let image = UIImage(data: data) {
                 do {
-                    let ocrResult = try await ocrManager.recognizeTextWithLanguage(from: image)
-                    ocrExtractedText = ocrResult.text
-                    ocrDetectedLanguage = ocrResult.detectedLanguage
-                    ocrImageData = compressImage(image, maxSizeKB: 200)
-                    showOCRConfirmation = true
+                    // Same reasoning as processImageWithOCR: server OCR, never Vision.
+                    await processImageWithOCR(image)
+                    guard showOCRConfirmation else { return }
                     AppLogger.chat.logInfo("Imported image payload prepared for OCR confirmation")
                     return
                 } catch {
