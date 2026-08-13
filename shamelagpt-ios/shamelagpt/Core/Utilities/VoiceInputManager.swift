@@ -20,6 +20,10 @@ final class VoiceInputManager: NSObject, ObservableObject {
     @Published private(set) var isRecording: Bool = false
     @Published private(set) var authorizationStatus: SFSpeechRecognizerAuthorizationStatus = .notDetermined
     @Published private(set) var error: VoiceInputError?
+    /// True when on-device recognition died and the live preview stopped updating.
+    /// Recording continues regardless — the backend still produces the final text —
+    /// so this is for UI hinting only, never an error condition.
+    @Published private(set) var isPreviewUnavailable: Bool = false
 
     // MARK: - Recording Artefact
 
@@ -207,15 +211,22 @@ final class VoiceInputManager: NSObject, ObservableObject {
         // Update recognizer with specified locale
         speechRecognizer = SFSpeechRecognizer(locale: locale)
 
-        guard let speechRecognizer = speechRecognizer, speechRecognizer.isAvailable else {
-            AppLogger.voiceInput.logError("Speech recognizer not available locale=\(locale.identifier) diagnostics=\(runtimeDiagnostics(for: locale))")
-            throw VoiceInputError.recognizerNotAvailable
+        // An unavailable recognizer is no longer fatal. It only costs the live preview;
+        // the backend still produces the final text from the recorded file. Throwing
+        // here would block recording entirely on exactly the devices this migration is
+        // meant to help — unsupported locale, speech assets not downloaded, offline.
+        let previewRecognizer = speechRecognizer.flatMap { $0.isAvailable ? $0 : nil }
+        if previewRecognizer == nil {
+            AppLogger.voiceInput.logWarning(
+                "Speech recognizer unavailable; recording for backend transcription without a live preview. locale=\(locale.identifier) diagnostics=\(runtimeDiagnostics(for: locale))"
+            )
         }
 
-        let supportsOnDevice = speechRecognizer.supportsOnDeviceRecognition
-        AppLogger.voiceInput.logDebug(
-            "Speech recognizer initialized available=true locale=\(speechRecognizer.locale.identifier) supportsOnDevice=\(supportsOnDevice)"
-        )
+        if let previewRecognizer {
+            AppLogger.voiceInput.logDebug(
+                "Speech recognizer initialized available=true locale=\(previewRecognizer.locale.identifier) supportsOnDevice=\(previewRecognizer.supportsOnDeviceRecognition)"
+            )
+        }
 
         // Configure audio session
         let audioSession = AVAudioSession.sharedInstance()
@@ -240,8 +251,12 @@ final class VoiceInputManager: NSObject, ObservableObject {
         // Get the audio input node
         let inputNode = audioEngine.inputNode
 
-        // Start recognition task
-        recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { [weak self] result, error in
+        // Start recognition task — only when a recognizer is actually usable. Without
+        // one there is simply no live preview; recording and upload are unaffected.
+        if previewRecognizer == nil {
+            isPreviewUnavailable = true
+        }
+        recognitionTask = previewRecognizer?.recognitionTask(with: recognitionRequest) { [weak self] result, error in
             guard let self = self else { return }
 
             Task { @MainActor in
@@ -257,12 +272,26 @@ final class VoiceInputManager: NSObject, ObservableObject {
 
                 if let error = error {
                     let nsError = error as NSError
-                    AppLogger.voiceInput.logError(
-                        "Recognition task failed domain=\(nsError.domain) code=\(nsError.code) message=\(nsError.localizedDescription)",
-                        error: error
+                    // On-device recognition is ONLY the live preview now; the backend
+                    // is the source of truth. So a recognizer failure must not end the
+                    // recording and must not reach the user — the audio file is still
+                    // being written and will still be uploaded when they tap stop.
+                    //
+                    // Previously this called stopRecording() and surfaced
+                    // .recognitionFailed, which killed the recording within a second of
+                    // starting and left nothing worth uploading. That fires whenever
+                    // the recognizer cannot initialise: no downloaded speech assets, an
+                    // unsupported locale, offline, or the Simulator (kLSRErrorDomain
+                    // 300, which is exactly how this was found).
+                    //
+                    // If the upload then fails, ChatViewModel surfaces that error — so
+                    // a genuinely broken run still tells the user something.
+                    AppLogger.voiceInput.logWarning(
+                        "Live preview unavailable; continuing to record for backend transcription. domain=\(nsError.domain) code=\(nsError.code) message=\(nsError.localizedDescription)"
                     )
-                    self.error = .recognitionFailed(error.localizedDescription)
-                    self.stopRecording()
+                    self.isPreviewUnavailable = true
+                    self.recognitionTask?.cancel()
+                    self.recognitionTask = nil
                 } else if result?.isFinal == true {
                     AppLogger.voiceInput.logInfo("Recognition task completed with final result")
                     self.stopRecording()
@@ -303,6 +332,7 @@ final class VoiceInputManager: NSObject, ObservableObject {
         isRecording = true
         transcribedText = ""
         error = nil
+        isPreviewUnavailable = false
 
         startMaxDurationTimer()
     }
