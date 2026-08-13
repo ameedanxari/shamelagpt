@@ -12,6 +12,11 @@ enum NetworkError: LocalizedError, Equatable {
     case invalidURL
     case invalidResponse
     case httpError(statusCode: Int)
+    /// HTTP 429. Carried separately from `httpError` because the `Retry-After` header is
+    /// the only thing that lets the UI say *when* to try again, and `httpError` has
+    /// nowhere to put it. `retryAfter` is in seconds, `nil` when the header was absent or
+    /// not an integer (the spec also allows an HTTP-date, which we do not parse).
+    case rateLimited(retryAfter: Int?)
     case badRequest
     case serverError(Int)
     case decodingError(Error)
@@ -36,6 +41,8 @@ enum NetworkError: LocalizedError, Equatable {
             return "E-REQ-001"
         case .httpError(let code):
             return "E-HTTP-\(code)"
+        case .rateLimited:
+            return "E-HTTP-429"
         case .serverError(let code):
             return "E-SRV-\(code)"
         case .decodingError:
@@ -54,6 +61,8 @@ enum NetworkError: LocalizedError, Equatable {
             return "[\(debugCode)] Server returned invalid response format"
         case .httpError(let statusCode):
             return "[\(debugCode)] HTTP error with status code \(statusCode)"
+        case .rateLimited(let retryAfter):
+            return "[\(debugCode)] Rate limited, retryAfter=\(retryAfter.map(String.init) ?? "nil")"
         case .badRequest:
             return "[\(debugCode)] Bad request - invalid parameters"
         case .serverError(let code):
@@ -99,6 +108,8 @@ enum NetworkError: LocalizedError, Equatable {
             default:
                 return LocalizationKeys.networkGenericError
             }
+        case .rateLimited:
+            return LocalizationKeys.networkTooManyRequests
         case .badRequest:
             return LocalizationKeys.networkInvalidRequest
         case .serverError:
@@ -124,7 +135,7 @@ enum NetworkError: LocalizedError, Equatable {
     /// Whether the error is retryable
     var isRetryable: Bool {
         switch self {
-        case .noConnection, .timeout:
+        case .noConnection, .timeout, .rateLimited:
             return true
         case .httpError(let code):
             // Retry on 5xx server errors and 429 rate limiting
@@ -150,6 +161,8 @@ enum NetworkError: LocalizedError, Equatable {
             return l == r
         case (.httpError(let lhsCode), .httpError(let rhsCode)):
             return lhsCode == rhsCode
+        case (.rateLimited(let lhsRetry), .rateLimited(let rhsRetry)):
+            return lhsRetry == rhsRetry
         case (.decodingError(let lhsError), .decodingError(let rhsError)):
             return lhsError.localizedDescription == rhsError.localizedDescription
         case (.unknown(let lhsError), .unknown(let rhsError)):

@@ -64,6 +64,14 @@ class MockAPIClient: APIClientProtocol {
     var lastSetPreferencesRequest: UserPreferencesRequest?
     var lastSetModePreferenceRequest: ModePreferenceRequest?
 
+    // Transcription (`POST /api/transcribe`). Controlled independently of `shouldFail` so a
+    // test can fail transcription without failing every other endpoint.
+    var transcribeResult = TranscriptionResponse(text: "Mock transcription", language: "en")
+    var transcribeError: Error?
+    var transcribeCallCount = 0
+    var lastTranscribeLanguage: String?
+    var lastTranscribeFileURL: URL?
+
     func healthCheck() async throws -> HealthResponse {
         healthCheckCallCount += 1
 
@@ -404,6 +412,22 @@ class MockAPIClient: APIClientProtocol {
         }
     }
 
+    func transcribe(audioFileURL: URL, language: String?) async throws -> TranscriptionResponse {
+        transcribeCallCount += 1
+        lastTranscribeFileURL = audioFileURL
+        lastTranscribeLanguage = language
+
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+
+        if let transcribeError {
+            throw transcribeError
+        }
+        if shouldFail { throw errorToThrow }
+        return transcribeResult
+    }
+
     func reset() {
         healthCheckCallCount = 0
         sendMessageCallCount = 0
@@ -443,6 +467,11 @@ class MockAPIClient: APIClientProtocol {
         lastSetPreferencesRequest = nil
         mockModePreferenceResponse = ModePreferenceResponse(modePreference: 1, modeName: "research")
         lastSetModePreferenceRequest = nil
+        transcribeResult = TranscriptionResponse(text: "Mock transcription", language: "en")
+        transcribeError = nil
+        transcribeCallCount = 0
+        lastTranscribeLanguage = nil
+        lastTranscribeFileURL = nil
     }
 }
 
@@ -841,30 +870,44 @@ class MockVoiceInputManager: VoiceInputManagerProtocol {
     @Published var isRecording: Bool = false
     @Published var authorizationStatus: SFSpeechRecognizerAuthorizationStatus = .authorized
     @Published var error: VoiceInputError?
-    
+
+    /// Set by tests to simulate audio having been captured. `nil` (the default) means "no
+    /// upload", which is how the simulation and unit-test paths behave in production.
+    var recordedFileURL: URL?
+    var discardRecordingCallCount = 0
+    var startRecordingCallCount = 0
+    var lastStartRecordingLocale: Locale?
+
     var transcribedTextPublisher: Published<String>.Publisher { $transcribedText }
     var isRecordingPublisher: Published<Bool>.Publisher { $isRecording }
     var authorizationStatusPublisher: Published<SFSpeechRecognizerAuthorizationStatus>.Publisher { $authorizationStatus }
     var errorPublisher: Published<VoiceInputError?>.Publisher { $error }
-    
+
     func requestPermission() async -> Bool {
         return authorizationStatus == .authorized
     }
-    
+
     func startRecording(locale: Locale) async throws {
+        startRecordingCallCount += 1
+        lastStartRecordingLocale = locale
         isRecording = true
     }
-    
+
     func stopRecording() {
         isRecording = false
     }
-    
+
     func clearTranscription() {
         transcribedText = ""
     }
-    
+
     func clearError() {
         error = nil
+    }
+
+    func discardRecording() {
+        discardRecordingCallCount += 1
+        recordedFileURL = nil
     }
 }
 

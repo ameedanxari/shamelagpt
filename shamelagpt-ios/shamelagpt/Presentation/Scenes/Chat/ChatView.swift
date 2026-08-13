@@ -70,7 +70,10 @@ struct ChatView: View {
                 if activeTransientAlert == .voice {
                     return Alert(
                         title: Text(LocalizationKeys.error.localizedKey),
-                        message: viewModel.voiceInputError.map { Text($0.localizedDescription) },
+                        // userMessageWithCode, not localizedDescription: the latter is the
+                        // hardcoded English developer string, so Arabic/Urdu users were
+                        // shown English and the voice.* localizations were unreachable.
+                        message: viewModel.voiceInputError.map { Text($0.userMessageWithCode) },
                         dismissButton: .default(Text(LocalizationKeys.ok.localizedKey)) {
                             viewModel.clearVoiceInputError()
                             activeTransientAlert = nil
@@ -230,6 +233,8 @@ struct ChatView: View {
                         isEnabled: viewModel.canSendMessage,
                         isRecording: viewModel.isRecording,
                         isProcessingOCR: viewModel.isProcessingOCR,
+                        isTranscribing: viewModel.isTranscribing,
+                        isVoiceInputAvailable: !viewModel.isVoiceInputUnavailable,
                         onSend: { viewModel.sendMessage() },
                         onMicrophoneTap: viewModel.toggleVoiceInput,
                         onCameraTap: viewModel.handleCameraButtonTap,

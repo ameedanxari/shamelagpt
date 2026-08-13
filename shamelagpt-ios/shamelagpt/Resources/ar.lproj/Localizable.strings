@@ -23,6 +23,7 @@
 "chat.imageTextRecognition" = "التعرف على النص من الصورة";
 "chat.recording" = "جاري التسجيل...";
 "chat.extractingText" = "جاري استخراج النص...";
+"chat.transcribing" = "جاري تحويل الصوت إلى نص...";
 "chat.thinking" = "جاري التفكير...";
 "chat.loadingMessages" = "جاري تحميل الرسائل...";
 "chat.startConversation" = "ابدأ محادثة";
@@ -197,6 +198,19 @@
 "ocr.imageDataMissing" = "بيانات الصورة مفقودة. يرجى اختيار الصورة مرة أخرى.";
 "ocr.sendForFactCheck" = "إرسال للتحقق من الحقائق";
 "history.factCheckBadge" = "تحقق من الحقائق";
+
+// MARK: - Voice Input
+"voice.permissionDenied" = "تم رفض إذن التعرف على الكلام. يرجى تفعيله من الإعدادات.";
+"voice.microphonePermissionDenied" = "تم رفض إذن الميكروفون. يرجى تفعيله من الإعدادات.";
+"voice.recognizerNotAvailable" = "الإدخال الصوتي غير متاح لهذه اللغة.";
+"voice.unableToCreateRequest" = "تعذر بدء الإدخال الصوتي. يرجى المحاولة مرة أخرى.";
+"voice.recognitionFailed" = "فشل الإدخال الصوتي. يرجى المحاولة مرة أخرى.";
+"voice.recordingTooLong" = "التسجيل طويل جداً. يرجى تسجيل رسالة أقصر.";
+"voice.transcriptionRateLimited" = "طلبات صوتية كثيرة جداً. يرجى المحاولة بعد قليل.";
+"voice.transcriptionRateLimitedRetry" = "طلبات صوتية كثيرة جداً. يرجى المحاولة بعد %@ ثانية.";
+"voice.transcriptionFailed" = "تعذر تحويل تسجيلك إلى نص. يرجى المحاولة مرة أخرى.";
+"voice.transcriptionServiceUnavailable" = "الإدخال الصوتي غير متاح حالياً. يرجى كتابة سؤالك بدلاً من ذلك.";
+"voice.transcriptionNetworkUnavailable" = "لا يوجد اتصال بالإنترنت. يحتاج الإدخال الصوتي إلى اتصال لتحويل الصوت إلى نص.";
 
 // MARK: - About Screen
 

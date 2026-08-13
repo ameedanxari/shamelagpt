@@ -38,6 +38,7 @@ protocol APIClientProtocol {
     func setShareStatus(conversationId: String, isShared: Bool) async throws -> ShareStatusResponse
     func ocr(_ request: OCRRequest) async throws -> OCRResponse
     func confirmFactCheck(_ request: ConfirmFactCheckRequest) async throws -> AsyncThrowingStream<String, Error>
+    func transcribe(audioFileURL: URL, language: String?) async throws -> TranscriptionResponse
 }
 
 /// Main API client for communicating with the ShamelaGPT backend
@@ -349,6 +350,146 @@ final class APIClient: APIClientProtocol {
     func confirmFactCheck(_ request: ConfirmFactCheckRequest) async throws -> AsyncThrowingStream<String, Error> {
         let endpoint = baseURL.appendingPathComponent("api/chat/confirm-factcheck")
         return try await streamRequest(url: endpoint, body: request)
+    }
+
+    /// Speech-to-text
+    /// POST /api/transcribe (multipart/form-data)
+    ///
+    /// This endpoint is PUBLIC — it takes no `Authorization` header, and a 401/403 from it
+    /// must not trigger the token-refresh-and-retry path, which is why it does not route
+    /// through `performRequest`.
+    ///
+    /// - Parameters:
+    ///   - audioFileURL: local file containing AAC/M4A audio.
+    ///   - language: ISO-639-1 hint (`ar`, `ur`, `en`). Always send it when known — the
+    ///     same Urdu clip comes back garbled without one and clean with `language=ur`.
+    func transcribe(audioFileURL: URL, language: String?) async throws -> TranscriptionResponse {
+        let endpoint = baseURL.appendingPathComponent("api/transcribe")
+
+        let audioData: Data
+        do {
+            audioData = try Data(contentsOf: audioFileURL)
+        } catch {
+            AppLogger.network.logError("Failed to read audio file for transcription", error: error)
+            throw NetworkError.unknown(error)
+        }
+
+        guard !audioData.isEmpty else {
+            AppLogger.network.logWarning("Transcription aborted: recorded audio file is empty")
+            throw NetworkError.badRequest
+        }
+
+        let boundary = "Boundary-\(UUID().uuidString)"
+        let body = Self.multipartBody(
+            boundary: boundary,
+            fileFieldName: Self.transcribeFileFieldName,
+            fileName: Self.transcribeFileName,
+            fileMimeType: Self.transcribeMimeType,
+            fileData: audioData,
+            textFields: language.map { [Self.transcribeLanguageFieldName: $0] } ?? [:]
+        )
+
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        // Overrides the session-wide `Content-Type: application/json` default header.
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpBody = body
+
+        AppLogger.network.logInfo(
+            "Uploading transcription audioBytes=\(audioData.count) bodyBytes=\(body.count) language=\(language ?? "nil") url=\(endpoint.absoluteString)"
+        )
+
+        let (data, response) = try await performDataTask(request: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            AppLogger.network.logWarning("Transcription response was not an HTTPURLResponse")
+            throw NetworkError.invalidResponse
+        }
+
+        AppLogger.network.logInfo("Transcription response status=\(httpResponse.statusCode) bytes=\(data.count)")
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            let bodyPreview = String(data: data, encoding: .utf8).map { String($0.prefix(500)) } ?? "<non-UTF8>"
+            AppLogger.network.logWarning(
+                "Transcription HTTP error status=\(httpResponse.statusCode) body=\(bodyPreview)"
+            )
+            if httpResponse.statusCode == 429 {
+                let retryAfter = Self.retryAfterSeconds(from: httpResponse)
+                AppLogger.network.logWarning("Transcription rate limited retryAfter=\(retryAfter.map(String.init) ?? "nil")")
+                throw NetworkError.rateLimited(retryAfter: retryAfter)
+            }
+            throw NetworkError.httpError(statusCode: httpResponse.statusCode)
+        }
+
+        do {
+            let decoded = try jsonDecoder.decode(TranscriptionResponse.self, from: data)
+            // `language` is diagnostic only — see TranscriptionResponse.
+            AppLogger.network.logInfo(
+                "Transcription decoded textLength=\(decoded.text.count) reportedLanguage=\(decoded.language ?? "nil")"
+            )
+            return decoded
+        } catch {
+            AppLogger.network.logError("Failed to decode transcription response", error: error)
+            throw NetworkError.decodingError(error)
+        }
+    }
+
+    // MARK: - Multipart
+
+    private static let transcribeFileFieldName = "file"
+    private static let transcribeLanguageFieldName = "language"
+    private static let transcribeFileName = "recording.m4a"
+    private static let transcribeMimeType = "audio/m4a"
+
+    /// Builds an RFC 7578 multipart/form-data body: one binary part plus zero or more
+    /// text parts, each preceded by `--boundary` and the whole thing closed by
+    /// `--boundary--`. CRLF line endings are required by the spec; LF-only bodies are
+    /// rejected by some servers.
+    static func multipartBody(
+        boundary: String,
+        fileFieldName: String,
+        fileName: String,
+        fileMimeType: String,
+        fileData: Data,
+        textFields: [String: String]
+    ) -> Data {
+        var body = Data()
+        let crlf = "\r\n"
+
+        func append(_ string: String) {
+            if let data = string.data(using: .utf8) {
+                body.append(data)
+            }
+        }
+
+        // Sorted so the body is deterministic and testable.
+        for key in textFields.keys.sorted() {
+            guard let value = textFields[key] else { continue }
+            append("--\(boundary)\(crlf)")
+            append("Content-Disposition: form-data; name=\"\(key)\"\(crlf)\(crlf)")
+            append("\(value)\(crlf)")
+        }
+
+        append("--\(boundary)\(crlf)")
+        append("Content-Disposition: form-data; name=\"\(fileFieldName)\"; filename=\"\(fileName)\"\(crlf)")
+        append("Content-Type: \(fileMimeType)\(crlf)\(crlf)")
+        body.append(fileData)
+        append(crlf)
+
+        append("--\(boundary)--\(crlf)")
+
+        return body
+    }
+
+    /// `Retry-After` may be a delta in seconds or an HTTP-date. Only the integer form is
+    /// parsed; a date yields `nil` and the UI falls back to a generic "try again shortly".
+    private static func retryAfterSeconds(from response: HTTPURLResponse) -> Int? {
+        guard let raw = response.value(forHTTPHeaderField: "Retry-After")?
+            .trimmingCharacters(in: .whitespacesAndNewlines) else {
+            return nil
+        }
+        return Int(raw)
     }
 
     // MARK: - Private Methods
@@ -793,6 +934,13 @@ final class PreviewMockAPIClient: APIClientProtocol {
             continuation.yield("data: This is a facts check response.")
             continuation.finish()
         }
+    }
+
+    func transcribe(audioFileURL: URL, language: String?) async throws -> TranscriptionResponse {
+        if shouldFail {
+            throw NetworkError.httpError(statusCode: 500)
+        }
+        return TranscriptionResponse(text: "Mock transcription", language: language)
     }
 }
 #endif

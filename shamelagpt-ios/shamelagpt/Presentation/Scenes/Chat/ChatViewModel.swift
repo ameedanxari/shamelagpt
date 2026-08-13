@@ -32,6 +32,15 @@ final class ChatViewModel: ObservableObject {
     @Published var isRecording: Bool = false
     @Published var voiceInputError: VoiceInputError?
 
+    /// True while the recorded audio is being uploaded to `/api/transcribe`. The on-device
+    /// preview has already landed in `inputText` by this point; this covers the window
+    /// where the server's authoritative text is still in flight.
+    @Published private(set) var isTranscribing: Bool = false
+
+    /// Latched on HTTP 503 (transcription not configured server-side). Hides the mic for
+    /// the rest of the session rather than letting the user fail over and over.
+    @Published private(set) var isVoiceInputUnavailable: Bool = false
+
     // OCR properties
     @Published var isProcessingOCR: Bool = false
     @Published var ocrError: OCRError?
@@ -90,6 +99,16 @@ final class ChatViewModel: ObservableObject {
     private let ocrManager: any OCRManagerProtocol
     private let streamingHandler: StreamingMessageHandlerProtocol
     private var cancellables = Set<AnyCancellable>()
+
+    /// Whatever the user had typed when recording STARTED. The live preview overwrites
+    /// `inputText` while recording, so this is the only copy left to restore if the
+    /// upload fails — a failed transcription must never destroy typed text.
+    private var voiceDraftBeforeRecording: String = ""
+
+    /// Exposed (internal, not private) purely so tests can await the upload deterministically
+    /// instead of polling.
+    private(set) var voiceTranscriptionTask: Task<Void, Never>?
+
     private let isUITesting: Bool
     private let isUIAutomationTesting: Bool
     private let isRunningTests: Bool
@@ -168,10 +187,17 @@ final class ChatViewModel: ObservableObject {
             }
             .store(in: &cancellables)
 
-        // Observe voice input recording state
+        // Observe voice input recording state. The true -> false edge is the trigger for
+        // uploading the captured audio, so the previous value has to be read before the
+        // new one is stored.
         voiceInputManager.isRecordingPublisher
             .sink { [weak self] isRecording in
-                self?.isRecording = isRecording
+                guard let self = self else { return }
+                let wasRecording = self.isRecording
+                self.isRecording = isRecording
+                if wasRecording && !isRecording {
+                    self.handleRecordingFinished()
+                }
             }
             .store(in: &cancellables)
 
@@ -718,7 +744,10 @@ final class ChatViewModel: ObservableObject {
 
     /// Returns whether the send button should be enabled
     var canSendMessage: Bool {
-        !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isRecording && !isProcessingOCR
+        // `isTranscribing` blocks sending too: the server transcript is about to overwrite
+        // inputText, so a send now would post text the user is not looking at.
+        !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !isLoading && !isRecording && !isProcessingOCR && !isTranscribing
     }
 
     /// Quickly seed the chat with a suggested question from the empty state.
@@ -753,6 +782,16 @@ final class ChatViewModel: ObservableObject {
         AppLogger.voiceInput.logInfo(
             "Starting voice input deviceLocale=\(Locale.current.identifier) preferredLanguages=\(Locale.preferredLanguages.joined(separator: ",")) inputLen=\(inputText.count)"
         )
+
+        guard !isVoiceInputUnavailable else {
+            AppLogger.voiceInput.logWarning("Voice input suppressed: service reported unavailable earlier this session")
+            return
+        }
+
+        // Snapshot the draft BEFORE anything can overwrite it. The interim preview starts
+        // replacing inputText as soon as the recognizer produces partial results, so by the
+        // time an upload fails this is the only copy of what the user actually typed.
+        voiceDraftBeforeRecording = inputText
 
         // Request permission if needed
         let hasPermission = await voiceInputManager.requestPermission()
@@ -794,6 +833,111 @@ final class ChatViewModel: ObservableObject {
     func clearVoiceInputError() {
         voiceInputError = nil
         voiceInputManager.clearError()
+    }
+
+    // MARK: - Backend Transcription
+
+    /// Called on the recording-stopped edge. The on-device text already sits in `inputText`
+    /// as a preview; this replaces it with the server's authoritative transcript.
+    private func handleRecordingFinished() {
+        guard let fileURL = voiceInputManager.recordedFileURL else {
+            // Nothing captured (simulation/unit-test modes, or a failed write). Keep the
+            // on-device preview — degrading to preview-only beats showing an error.
+            AppLogger.voiceInput.logDebug("Recording finished with no uploadable file; keeping on-device preview")
+            return
+        }
+
+        let draft = voiceDraftBeforeRecording
+        let languageHint = Self.transcriptionLanguageHint()
+        isTranscribing = true
+
+        voiceTranscriptionTask = Task { [weak self] in
+            await self?.uploadRecording(fileURL: fileURL, draft: draft, languageHint: languageHint)
+        }
+    }
+
+    private func uploadRecording(fileURL: URL, draft: String, languageHint: String) async {
+        defer {
+            isTranscribing = false
+            // Runs on success AND every failure path, so tmp never accumulates recordings.
+            voiceInputManager.discardRecording()
+        }
+
+        guard let apiClient = apiClient else {
+            AppLogger.voiceInput.logWarning("No API client configured; keeping on-device transcription")
+            return
+        }
+
+        do {
+            let response = try await apiClient.transcribe(audioFileURL: fileURL, language: languageHint)
+            // `response.language` is diagnostic only — it is NOT a stable ISO code.
+            AppLogger.voiceInput.logInfo(
+                "Transcription succeeded textLength=\(response.text.count) reportedLanguage=\(response.language ?? "nil") hint=\(languageHint)"
+            )
+            let text = response.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            // An empty transcript means the server heard nothing; restoring the draft is
+            // better than blanking the composer.
+            inputText = text.isEmpty ? draft : text
+        } catch {
+            let voiceError = Self.transcriptionError(from: error)
+            AppLogger.voiceInput.logError(
+                "Transcription upload failed mappedTo=\(voiceError) restoringDraftLen=\(draft.count)",
+                error: error
+            )
+            inputText = draft
+            if voiceError == .transcriptionServiceUnavailable {
+                isVoiceInputUnavailable = true
+            }
+            voiceInputError = voiceError
+        }
+    }
+
+    /// The backend needs an explicit ISO-639-1 hint: the same Urdu clip comes back garbled
+    /// without one and clean with `language=ur`.
+    private static func transcriptionLanguageHint() -> String {
+        transcriptionLanguageHint(for: LanguageManager.shared.currentLanguage)
+    }
+
+    /// Kept pure so tests can cover every locale WITHOUT calling
+    /// `LanguageManager.shared.setLanguage`. Test classes run in parallel
+    /// (`parallelizable = "YES"` in the scheme), so mutating that singleton races
+    /// against unrelated classes asserting on English copy and fails them at random —
+    /// which is exactly how this surfaced, as timeouts in AuthViewModelTests.
+    static func transcriptionLanguageHint(for language: Language) -> String {
+        switch language {
+        case .arabic:
+            return "ar"
+        case .urdu:
+            return "ur"
+        case .english:
+            return "en"
+        }
+    }
+
+    static func transcriptionError(from error: Error) -> VoiceInputError {
+        guard let networkError = error as? NetworkError else {
+            return .transcriptionFailed
+        }
+
+        switch networkError {
+        case .rateLimited(let retryAfter):
+            return .transcriptionRateLimited(retryAfter: retryAfter)
+        case .noConnection, .timeout:
+            return .transcriptionNetworkUnavailable
+        case .httpError(let statusCode):
+            switch statusCode {
+            case 413:
+                return .recordingTooLong
+            case 429:
+                return .transcriptionRateLimited(retryAfter: nil)
+            case 503:
+                return .transcriptionServiceUnavailable
+            default:
+                return .transcriptionFailed
+            }
+        default:
+            return .transcriptionFailed
+        }
     }
 
     // MARK: - Composer Options
