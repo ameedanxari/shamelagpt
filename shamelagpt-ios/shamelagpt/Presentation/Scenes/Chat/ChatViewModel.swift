@@ -895,7 +895,16 @@ final class ChatViewModel: ObservableObject {
     /// The backend needs an explicit ISO-639-1 hint: the same Urdu clip comes back garbled
     /// without one and clean with `language=ur`.
     private static func transcriptionLanguageHint() -> String {
-        switch LanguageManager.shared.currentLanguage {
+        transcriptionLanguageHint(for: LanguageManager.shared.currentLanguage)
+    }
+
+    /// Kept pure so tests can cover every locale WITHOUT calling
+    /// `LanguageManager.shared.setLanguage`. Test classes run in parallel
+    /// (`parallelizable = "YES"` in the scheme), so mutating that singleton races
+    /// against unrelated classes asserting on English copy and fails them at random —
+    /// which is exactly how this surfaced, as timeouts in AuthViewModelTests.
+    static func transcriptionLanguageHint(for language: Language) -> String {
+        switch language {
         case .arabic:
             return "ar"
         case .urdu:

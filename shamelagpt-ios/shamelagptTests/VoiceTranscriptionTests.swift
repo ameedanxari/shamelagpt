@@ -39,8 +39,10 @@ final class VoiceTranscriptionTests: XCTestCase {
             .appendingPathExtension("m4a")
         try Data("fake-audio-bytes".utf8).write(to: recordingURL)
 
-        LanguageManager.shared.setLanguage(.english)
-
+        // Deliberately does NOT touch LanguageManager.shared. Test classes run in
+        // parallel, so mutating that singleton races against classes asserting on
+        // English copy. Locale coverage is done against the pure
+        // ChatViewModel.transcriptionLanguageHint(for:) instead.
         viewModel = ChatViewModel(
             conversationId: nil,
             sendMessageUseCase: mockSendMessageUseCase,
@@ -66,9 +68,6 @@ final class VoiceTranscriptionTests: XCTestCase {
         mockAuthRepository = nil
         mockVoiceInputManager = nil
         mockOCRManager = nil
-        // The singleton outlives this test case; leave it where the rest of the suite
-        // expects it.
-        LanguageManager.shared.setLanguage(.english)
     }
 
     // MARK: - Helpers
@@ -90,26 +89,24 @@ final class VoiceTranscriptionTests: XCTestCase {
 
     // MARK: - Language Hint
 
-    func testUploadSendsLanguageHintDerivedFromAppLocale() async throws {
-        let cases: [(Language, String)] = [
-            (.english, "en"),
-            (.arabic, "ar"),
-            (.urdu, "ur")
-        ]
+    /// Covers every locale against the pure mapping rather than by driving the app's
+    /// language singleton — see the note in setUp. The hint is not cosmetic: the same
+    /// clip returns garbled Urdu without it and clean Urdu with `language=ur`.
+    func testLanguageHintMapsEveryAppLocaleToAnISOCode() {
+        XCTAssertEqual(ChatViewModel.transcriptionLanguageHint(for: .english), "en")
+        XCTAssertEqual(ChatViewModel.transcriptionLanguageHint(for: .arabic), "ar")
+        XCTAssertEqual(ChatViewModel.transcriptionLanguageHint(for: .urdu), "ur")
+    }
 
-        for (language, expectedHint) in cases {
-            LanguageManager.shared.setLanguage(language)
-            mockAPIClient.reset()
+    /// And that whatever the mapping returns is actually the value put on the wire.
+    func testUploadSendsTheLanguageHint() async throws {
+        await recordAndStop(draft: "", interimPreview: "preview")
 
-            await recordAndStop(draft: "", interimPreview: "preview")
-
-            XCTAssertEqual(mockAPIClient.transcribeCallCount, 1, "Expected one upload for \(language)")
-            XCTAssertEqual(
-                mockAPIClient.lastTranscribeLanguage,
-                expectedHint,
-                "Language hint should follow the app locale for \(language)"
-            )
-        }
+        XCTAssertEqual(mockAPIClient.transcribeCallCount, 1)
+        XCTAssertEqual(
+            mockAPIClient.lastTranscribeLanguage,
+            ChatViewModel.transcriptionLanguageHint(for: LanguageManager.shared.currentLanguage)
+        )
     }
 
     func testUploadReceivesTheRecordedFileURL() async throws {
