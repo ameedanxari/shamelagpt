@@ -199,6 +199,14 @@ enum LocalizationKeys {
     static let voiceRecognizerNotAvailable = "voice.recognizerNotAvailable"
     static let voiceUnableToCreateRequest = "voice.unableToCreateRequest"
     static let voiceRecognitionFailed = "voice.recognitionFailed"
+    static let voiceRecordingTooLong = "voice.recordingTooLong"
+    static let voiceTranscriptionRateLimited = "voice.transcriptionRateLimited"
+    /// Takes the `Retry-After` seconds as a single `%@` placeholder.
+    static let voiceTranscriptionRateLimitedRetry = "voice.transcriptionRateLimitedRetry"
+    static let voiceTranscriptionFailed = "voice.transcriptionFailed"
+    static let voiceTranscriptionServiceUnavailable = "voice.transcriptionServiceUnavailable"
+    static let voiceTranscriptionNetworkUnavailable = "voice.transcriptionNetworkUnavailable"
+    static let chatTranscribing = "chat.transcribing"
 
     // MARK: - Network Errors
 

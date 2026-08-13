@@ -16,6 +16,12 @@ struct InputBarView: View {
     let isEnabled: Bool
     let isRecording: Bool
     let isProcessingOCR: Bool
+    /// Recorded audio is uploading to the backend for the authoritative transcript.
+    /// `var` with a default so previews and older call sites keep compiling.
+    var isTranscribing: Bool = false
+    /// False once the backend reports transcription is not configured (HTTP 503); the mic
+    /// is hidden for the rest of the session instead of failing on every tap.
+    var isVoiceInputAvailable: Bool = true
     let onSend: () -> Void
     let onMicrophoneTap: () -> Void
     let onCameraTap: () -> Void
@@ -57,6 +63,11 @@ struct InputBarView: View {
             // OCR processing indicator
             if isProcessingOCR {
                 ocrProcessingIndicator
+            }
+
+            // Backend transcription in flight
+            if isTranscribing {
+                transcribingIndicator
             }
 
             thinkingStatusChip
@@ -146,13 +157,16 @@ struct InputBarView: View {
                     Label(LocalizationKeys.composerAddPhoto.localizedKey, systemImage: "camera.fill")
                 }
             }
-            Button(action: onMicrophoneTap) {
-                Label(
-                    isRecording
-                        ? LocalizationKeys.composerStopVoice.localizedKey
-                        : LocalizationKeys.composerVoiceInput.localizedKey,
-                    systemImage: isRecording ? "stop.circle.fill" : "mic.fill"
-                )
+            if isVoiceInputAvailable {
+                Button(action: onMicrophoneTap) {
+                    Label(
+                        isRecording
+                            ? LocalizationKeys.composerStopVoice.localizedKey
+                            : LocalizationKeys.composerVoiceInput.localizedKey,
+                        systemImage: isRecording ? "stop.circle.fill" : "mic.fill"
+                    )
+                }
+                .disabled(isTranscribing)
             }
             Divider()
             // A checkmark rather than a Toggle: a Menu row cannot host a live switch, and
@@ -293,6 +307,23 @@ struct InputBarView: View {
         .padding(.horizontal, AppTheme.Spacing.sm)
         .padding(.vertical, AppTheme.Spacing.xs)
         .background(DesignSystem.Colors.surface(colorScheme))
+    }
+
+    private var transcribingIndicator: some View {
+        HStack(spacing: AppTheme.Spacing.xs) {
+            ProgressView()
+                .scaleEffect(0.8)
+
+            Text(LocalizationKeys.chatTranscribing.localizedKey)
+                .font(AppTheme.Typography.caption)
+                .foregroundColor(AppTheme.Colors.secondaryText)
+
+            Spacer()
+        }
+        .padding(.horizontal, AppTheme.Spacing.sm)
+        .padding(.vertical, AppTheme.Spacing.xs)
+        .background(DesignSystem.Colors.surface(colorScheme))
+        .accessibilityIdentifier(AccessibilityID.Chat.transcribingIndicator)
     }
 
     private var ocrProcessingIndicator: some View {

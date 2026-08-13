@@ -21,6 +21,7 @@
 "chat.imageTextRecognition" = "تصویر سے متن شناخت";
 "chat.recording" = "ریکارڈنگ جاری ہے...";
 "chat.extractingText" = "متن نکالا جا رہا ہے...";
+"chat.transcribing" = "آواز کو متن میں تبدیل کیا جا رہا ہے...";
 "chat.thinking" = "سوچا جا رہا ہے...";
 "chat.loadingMessages" = "پیغامات لوڈ ہو رہے ہیں...";
 "chat.startConversation" = "گفتگو شروع کریں";
@@ -195,6 +196,19 @@
 "ocr.imageDataMissing" = "تصویری ڈیٹا دستیاب نہیں۔ براہ کرم تصویر دوبارہ منتخب کریں۔";
 "ocr.sendForFactCheck" = "حقائق کی جانچ کے لیے بھیجیں";
 "history.factCheckBadge" = "فیکٹ چیک";
+
+// MARK: - Voice Input
+"voice.permissionDenied" = "تقریر کی شناخت کی اجازت مسترد کر دی گئی۔ براہ کرم اسے سیٹنگز میں فعال کریں۔";
+"voice.microphonePermissionDenied" = "مائیکروفون کی اجازت مسترد کر دی گئی۔ براہ کرم اسے سیٹنگز میں فعال کریں۔";
+"voice.recognizerNotAvailable" = "اس زبان کے لیے آواز کا اندراج دستیاب نہیں ہے۔";
+"voice.unableToCreateRequest" = "آواز کا اندراج شروع نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔";
+"voice.recognitionFailed" = "آواز کا اندراج ناکام ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔";
+"voice.recordingTooLong" = "ریکارڈنگ بہت طویل ہے۔ براہ کرم مختصر پیغام ریکارڈ کریں۔";
+"voice.transcriptionRateLimited" = "آواز کی درخواستیں بہت زیادہ ہیں۔ براہ کرم تھوڑی دیر بعد کوشش کریں۔";
+"voice.transcriptionRateLimitedRetry" = "آواز کی درخواستیں بہت زیادہ ہیں۔ براہ کرم %@ سیکنڈ بعد دوبارہ کوشش کریں۔";
+"voice.transcriptionFailed" = "آپ کی ریکارڈنگ کو متن میں تبدیل نہیں کیا جا سکا۔ براہ کرم دوبارہ کوشش کریں۔";
+"voice.transcriptionServiceUnavailable" = "آواز کا اندراج فی الحال دستیاب نہیں ہے۔ براہ کرم اپنا سوال ٹائپ کریں۔";
+"voice.transcriptionNetworkUnavailable" = "انٹرنیٹ کنکشن نہیں۔ آواز کو متن میں تبدیل کرنے کے لیے کنکشن درکار ہے۔";
 
 // MARK: - About Screen
 

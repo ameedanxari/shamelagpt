@@ -23,6 +23,7 @@
 "chat.imageTextRecognition" = "Image text recognition";
 "chat.recording" = "Recording...";
 "chat.extractingText" = "Extracting text...";
+"chat.transcribing" = "Transcribing...";
 "chat.thinking" = "Thinking...";
 "chat.loadingMessages" = "Loading messages...";
 "chat.startConversation" = "Start a conversation";
@@ -196,6 +197,21 @@
 "ocr.imageDataMissing" = "Image data is missing. Please select the image again.";
 "ocr.sendForFactCheck" = "Send for Fact Check";
 "history.factCheckBadge" = "Fact-check";
+
+// MARK: - Voice Input
+"voice.permissionDenied" = "Speech recognition permission denied. Please enable it in Settings.";
+"voice.microphonePermissionDenied" = "Microphone permission denied. Please enable it in Settings.";
+// Wording deliberately mirrors VoiceInputError.errorDescription: existing UI tests match
+// on "recognizer" / "recognition failed" in the alert body.
+"voice.recognizerNotAvailable" = "Speech recognizer is not available for this language.";
+"voice.unableToCreateRequest" = "Unable to create speech recognition request.";
+"voice.recognitionFailed" = "Recognition failed. Please try again.";
+"voice.recordingTooLong" = "Recording too long. Please record a shorter message.";
+"voice.transcriptionRateLimited" = "Too many voice requests. Please try again in a moment.";
+"voice.transcriptionRateLimitedRetry" = "Too many voice requests. Please try again in %@ seconds.";
+"voice.transcriptionFailed" = "Could not transcribe your recording. Please try again.";
+"voice.transcriptionServiceUnavailable" = "Voice input is unavailable right now. Please type your question instead.";
+"voice.transcriptionNetworkUnavailable" = "No internet connection. Voice input needs a connection to transcribe.";
 
 // MARK: - About Screen
 

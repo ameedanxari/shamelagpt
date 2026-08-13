@@ -16,7 +16,12 @@ protocol VoiceInputManagerProtocol: AnyObject, ObservableObject {
     var isRecording: Bool { get }
     var authorizationStatus: SFSpeechRecognizerAuthorizationStatus { get }
     var error: VoiceInputError? { get }
-    
+
+    /// Audio captured during the last recording, ready to upload. `nil` when nothing
+    /// usable was captured — callers must treat that as "no upload", not as a failure.
+    /// The caller owns the file and must call `discardRecording()` when finished with it.
+    var recordedFileURL: URL? { get }
+
     var transcribedTextPublisher: Published<String>.Publisher { get }
     var isRecordingPublisher: Published<Bool>.Publisher { get }
     var authorizationStatusPublisher: Published<SFSpeechRecognizerAuthorizationStatus>.Publisher { get }
@@ -27,6 +32,8 @@ protocol VoiceInputManagerProtocol: AnyObject, ObservableObject {
     func stopRecording()
     func clearTranscription()
     func clearError()
+    /// Deletes the recorded temp file and clears `recordedFileURL`. Safe to call repeatedly.
+    func discardRecording()
 }
 
 /// Extension to make VoiceInputManager conform to the protocol
