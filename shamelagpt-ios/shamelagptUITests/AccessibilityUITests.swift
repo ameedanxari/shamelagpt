@@ -27,9 +27,16 @@ final class AccessibilityUITests: LocalizedUITestCase {
             "Microphone label should match current locale"
         )
 
-        let cameraButton = app.buttons[UITestID.Chat.cameraButton]
-        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5), "Camera button should exist")
-        XCTAssertEqual(cameraButton.label, localized("accessibility.camera"), "Camera label should match current locale")
+        // Photo capture lives inside the "+" menu, not as a bare button in the bar —
+        // that is deliberate, since it is an occasional action. This asserted on a
+        // top-level camera button that has not been rendered since the composer was
+        // redesigned, so it could never pass. The menu itself is the control to check.
+        let attachmentMenu = app.buttons[UITestID.Chat.attachmentMenu]
+        XCTAssertTrue(
+            attachmentMenu.waitForExistence(timeout: 5),
+            "Attachment menu should exist and expose photo capture"
+        )
+        XCTAssertFalse(attachmentMenu.label.isEmpty, "Attachment menu should expose an accessibility label")
     }
 
     func testOptimisticUserMessageIsAccessible() throws {

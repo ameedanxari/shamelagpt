@@ -75,13 +75,21 @@ struct InputBarView: View {
             // One floating capsule rather than a full-width bar with a divider, so the
             // composer reads as a single object with its controls inside it.
             HStack(alignment: .bottom, spacing: 0) {
-                // Capture, voice and the thinking switch behind one control, so the bar
-                // stays uncluttered and the options are discoverable — the camera used to
-                // be a bare icon nothing associated with fact-check.
+                // Capture and the thinking switch behind one control, so the bar stays
+                // uncluttered — the camera used to be a bare icon nothing associated
+                // with fact-check.
                 attachmentMenu
 
                 // Text input
                 textInputArea
+
+                // Voice sits in the capsule, not inside the "+" menu. It is a primary
+                // way to compose a message rather than an attachment, and burying it a
+                // tap deep cost discoverability. It also restores the element
+                // AccessibilityUITests and VoiceInputUITests have always looked for.
+                if isVoiceInputAvailable {
+                    microphoneButton
+                }
 
                 // Send button
                 sendButton
@@ -157,17 +165,9 @@ struct InputBarView: View {
                     Label(LocalizationKeys.composerAddPhoto.localizedKey, systemImage: "camera.fill")
                 }
             }
-            if isVoiceInputAvailable {
-                Button(action: onMicrophoneTap) {
-                    Label(
-                        isRecording
-                            ? LocalizationKeys.composerStopVoice.localizedKey
-                            : LocalizationKeys.composerVoiceInput.localizedKey,
-                        systemImage: isRecording ? "stop.circle.fill" : "mic.fill"
-                    )
-                }
-                .disabled(isTranscribing)
-            }
+            // Voice deliberately absent here — it lives in the capsule as a first-class
+            // control. Two entry points for the same action would be worse than either
+            // one alone.
             Divider()
             // A checkmark rather than a Toggle: a Menu row cannot host a live switch, and
             // a state-revealing label is clearer than a control that dismisses the menu.
@@ -255,9 +255,12 @@ struct InputBarView: View {
                 }
             }
         }
-        .disabled(isProcessingOCR)  // Only disable during OCR, allow when empty or recording
-        .scaleEffect(!isProcessingOCR ? 1.0 : 0.9)
+        // Disabled during OCR and while a recording is being transcribed; still enabled
+        // when the field is empty or while recording, since that is how you stop.
+        .disabled(isProcessingOCR || isTranscribing)
+        .scaleEffect(!(isProcessingOCR || isTranscribing) ? 1.0 : 0.9)
         .animation(AppTheme.Animation.quick, value: isProcessingOCR)
+        .animation(AppTheme.Animation.quick, value: isTranscribing)
         .accessibilityLabel(Text(isRecording ? LocalizationKeys.microphoneStopAccessibilityLabel.localizedKey : LocalizationKeys.microphoneStartAccessibilityLabel.localizedKey))
         .accessibilityIdentifier(AccessibilityID.Chat.micButton)
         .accessibilityHint(Text(isRecording ? LocalizationKeys.microphoneStopAccessibilityHint.localizedKey : LocalizationKeys.microphoneStartAccessibilityHint.localizedKey))
