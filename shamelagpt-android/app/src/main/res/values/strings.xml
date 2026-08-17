@@ -185,6 +185,13 @@
     <string name="voice_help_step_2">Find \"Voice input\", \"Speech\", or \"Language &amp; input\" settings.</string>
     <string name="voice_help_step_3">Enable/install a speech recognition service, then return and try again.</string>
     <string name="voice_setup_no_settings_fallback">This device may not include a speech service out of the box. Install one (if available for your device) and set it as default.</string>
+    <string name="voice_record_failed">Could not start recording. Please try again.</string>
+    <string name="voice_transcribe_empty">No speech was recognized. Please try again.</string>
+    <string name="voice_transcribe_invalid">Could not process the recording. Please try again.</string>
+    <string name="voice_transcribe_too_large">That recording is too long. Please record a shorter clip.</string>
+    <string name="voice_transcribe_failed">Could not convert speech to text. Please try again.</string>
+    <string name="voice_transcribe_unavailable">Voice transcription is temporarily unavailable.</string>
+    <string name="voice_transcribe_timeout">Voice transcription timed out. Please try again.</string>
 
     <!-- Image Input -->
     <string name="image_input">Image Input</string>

@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.testTag
  * @param onSendClick Callback when send button is clicked
  * @param isLoading Whether the app is currently loading (disables input)
  * @param isRecording Whether voice recording is active
+ * @param isTranscribing Whether recorded audio is being transcribed
  * @param isProcessingImage Whether image OCR is processing
  * @param onVoiceClick Callback when microphone button is clicked
  * @param onImageClick Callback when image/camera button is clicked with URI
@@ -50,6 +51,7 @@ fun InputBar(
     onSendClick: () -> Unit,
     isLoading: Boolean,
     isRecording: Boolean = false,
+    isTranscribing: Boolean = false,
     isProcessingImage: Boolean = false,
     requiresMicPermission: Boolean = true,
     onVoiceClick: () -> Unit = {},
@@ -102,7 +104,7 @@ fun InputBar(
             // Image/Camera button
             IconButton(
                 onClick = { showImagePicker = true },
-                enabled = !isLoading && !isRecording && !isProcessingImage,
+                enabled = !isLoading && !isRecording && !isTranscribing && !isProcessingImage,
                 modifier = Modifier.testTag(TestTags.Chat.CameraButton)
             ) {
                 if (isProcessingImage) {
@@ -114,7 +116,7 @@ fun InputBar(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add image",
-                        tint = if (isLoading || isRecording) {
+                        tint = if (isLoading || isRecording || isTranscribing) {
                             MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
@@ -123,7 +125,7 @@ fun InputBar(
                 }
             }
 
-            // Mic button with recording indicator
+            // Mic button with recording / transcribing indicator
             IconButton(
                 onClick = {
                     if (!requiresMicPermission) {
@@ -134,21 +136,28 @@ fun InputBar(
                         micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                     }
                 },
-                enabled = !isLoading && !isProcessingImage,
+                enabled = !isLoading && !isProcessingImage && !isTranscribing,
                 modifier = Modifier.testTag(TestTags.Chat.MicButton)
             ) {
-                if (isRecording) {
-                    RecordingIndicator()
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardVoice,
-                        contentDescription = "Voice input",
-                        tint = if (isLoading || isProcessingImage) {
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        }
-                    )
+                when {
+                    isTranscribing -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                    }
+                    isRecording -> RecordingIndicator()
+                    else -> {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardVoice,
+                            contentDescription = stringResource(R.string.voice_input_button),
+                            tint = if (isLoading || isProcessingImage) {
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    }
                 }
             }
 
@@ -170,14 +179,14 @@ fun InputBar(
                     disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.38f)
                 ),
                 maxLines = 5,
-                enabled = !isLoading && !isRecording,
+                enabled = !isLoading && !isRecording && !isTranscribing,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Send
                 ),
                 keyboardActions = KeyboardActions(
                     onSend = {
-                        if (text.isNotBlank() && !isLoading && !isRecording) {
+                        if (text.isNotBlank() && !isLoading && !isRecording && !isTranscribing) {
                             onSendClick()
                         }
                     }
@@ -188,13 +197,13 @@ fun InputBar(
             // Send button
             IconButton(
                 onClick = onSendClick,
-                enabled = text.isNotBlank() && !isLoading && !isRecording && !isProcessingImage,
+                enabled = text.isNotBlank() && !isLoading && !isRecording && !isTranscribing && !isProcessingImage,
                 modifier = Modifier.testTag(TestTags.Chat.SendButton)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send message",
-                    tint = if (text.isNotBlank() && !isLoading && !isRecording && !isProcessingImage) {
+                    tint = if (text.isNotBlank() && !isLoading && !isRecording && !isTranscribing && !isProcessingImage) {
                         MaterialTheme.colorScheme.primary
                     } else {
                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)

@@ -21,10 +21,15 @@ import com.shamelagpt.android.data.remote.dto.OCRResponse
 import com.shamelagpt.android.data.remote.dto.ConfirmFactCheckRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
+import com.shamelagpt.android.data.remote.dto.TranscribeResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
+import retrofit2.http.Part
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -150,6 +155,17 @@ interface ApiService {
      */
     @POST("api/chat/ocr")
     suspend fun ocr(@Body request: OCRRequest): OCRResponse
+
+    /**
+     * Transcribe recorded audio via Groq Whisper.
+     * Public endpoint — login is not required.
+     */
+    @Multipart
+    @POST("api/transcribe")
+    suspend fun transcribe(
+        @Part file: MultipartBody.Part,
+        @Part("language") language: RequestBody? = null
+    ): TranscribeResponse
 
     /**
      * Confirm and fact-check endpoint (SSE).

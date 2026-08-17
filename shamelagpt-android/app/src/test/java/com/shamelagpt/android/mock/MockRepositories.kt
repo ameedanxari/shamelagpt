@@ -7,6 +7,7 @@ import com.shamelagpt.android.data.remote.dto.OCRRequest
 import com.shamelagpt.android.data.remote.dto.OCRResponse
 import com.shamelagpt.android.data.remote.dto.OCRMetadata
 import com.shamelagpt.android.data.remote.dto.ConfirmFactCheckRequest
+import com.shamelagpt.android.data.remote.dto.TranscribeResponse
 import com.shamelagpt.android.domain.model.Conversation
 import com.shamelagpt.android.domain.model.Message
 import com.shamelagpt.android.domain.repository.ChatRepository
@@ -39,6 +40,11 @@ class MockChatRepository(
     var lastLanguagePreference: String? = null
     var lastEnableThinking: Boolean? = null
     var lastConfirmFactCheckRequest: ConfirmFactCheckRequest? = null
+    var transcribeResult: Result<TranscribeResponse> = Result.success(
+        TranscribeResponse(text = "Mock transcript", language = "en")
+    )
+    var transcribeCallCount = 0
+    var lastTranscribeLanguage: String? = null
     var delayMs: Long = 0
 
     override suspend fun sendMessage(
@@ -148,6 +154,20 @@ class MockChatRepository(
         ))
     }
 
+    override suspend fun transcribe(
+        audioBytes: ByteArray,
+        mimeType: String,
+        fileName: String,
+        language: String?
+    ): Result<TranscribeResponse> {
+        transcribeCallCount++
+        lastTranscribeLanguage = language
+        if (delayMs > 0) {
+            kotlinx.coroutines.delay(delayMs)
+        }
+        return transcribeResult
+    }
+
     override fun confirmFactCheck(request: ConfirmFactCheckRequest): Flow<StreamEvent> = flow {
         confirmFactCheckCallCount++
         lastConfirmFactCheckRequest = request
@@ -169,6 +189,9 @@ class MockChatRepository(
         lastLanguagePreference = null
         lastEnableThinking = null
         lastConfirmFactCheckRequest = null
+        transcribeResult = Result.success(TranscribeResponse(text = "Mock transcript", language = "en"))
+        transcribeCallCount = 0
+        lastTranscribeLanguage = null
         streamMessageCallCount = 0
         confirmFactCheckCallCount = 0
         delayMs = 0

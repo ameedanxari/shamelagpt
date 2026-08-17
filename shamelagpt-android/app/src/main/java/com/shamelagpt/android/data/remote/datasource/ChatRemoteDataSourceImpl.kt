@@ -19,6 +19,10 @@ import kotlinx.coroutines.flow.flowOn
 import com.shamelagpt.android.data.remote.dto.OCRRequest
 import com.shamelagpt.android.data.remote.dto.OCRResponse
 import com.shamelagpt.android.data.remote.dto.ConfirmFactCheckRequest
+import com.shamelagpt.android.data.remote.dto.TranscribeResponse
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
 
 /**
@@ -232,6 +236,27 @@ class ChatRemoteDataSourceImpl(
     override suspend fun ocr(request: OCRRequest): Result<OCRResponse> {
         return callWithAuth {
             apiService.ocr(request)
+        }
+    }
+
+    override suspend fun transcribe(
+        audioBytes: ByteArray,
+        mimeType: String,
+        fileName: String,
+        language: String?
+    ): Result<TranscribeResponse> {
+        // Public endpoint — do not attach auth-retry; a 401 should not force login.
+        return safeApiCall {
+            val filePart = MultipartBody.Part.createFormData(
+                "file",
+                fileName,
+                audioBytes.toRequestBody(mimeType.toMediaType())
+            )
+            val languagePart = language
+                ?.trim()
+                ?.takeIf { it.isNotEmpty() }
+                ?.toRequestBody("text/plain".toMediaType())
+            apiService.transcribe(filePart, languagePart)
         }
     }
 

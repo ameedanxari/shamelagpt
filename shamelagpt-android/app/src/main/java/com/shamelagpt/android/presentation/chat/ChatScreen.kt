@@ -316,13 +316,14 @@ fun ChatScreen(
                     onSendClick = { viewModel.sendMessage(uiState.inputText) },
                     isLoading = uiState.isLoading,
                     isRecording = uiState.voiceInputState.isRecording,
+                    isTranscribing = uiState.voiceInputState.isTranscribing,
                     isProcessingImage = uiState.imageInputState.isProcessing,
                     requiresMicPermission = uiState.voiceInputState.requiresMicPermission,
                     onVoiceClick = {
-                        if (uiState.voiceInputState.isRecording) {
-                            viewModel.stopVoiceInput()
-                        } else {
-                            viewModel.startVoiceInput()
+                        when {
+                            uiState.voiceInputState.isTranscribing -> Unit
+                            uiState.voiceInputState.isRecording -> viewModel.stopVoiceInput()
+                            else -> viewModel.startVoiceInput()
                         }
                     },
                     onImageClick = { uri ->

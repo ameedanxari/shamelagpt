@@ -1,6 +1,5 @@
 package com.shamelagpt.android.presentation.chat
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -10,8 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.shamelagpt.android.core.util.ChatFlowDiagnostics
 import com.shamelagpt.android.core.util.Logger
 import com.shamelagpt.android.core.util.OCRManager
-import com.shamelagpt.android.core.util.VoiceInputCapability
+import com.shamelagpt.android.core.util.VoiceAudioRecorder
 import com.shamelagpt.android.core.util.VoiceInputManager
+import com.shamelagpt.android.domain.usecase.TranscribeUseCase
 import com.shamelagpt.android.domain.model.Message
 import com.shamelagpt.android.domain.repository.ConversationRepository
 import android.util.Base64
@@ -51,6 +51,8 @@ class ChatViewModel(
     private val confirmFactCheckUseCase: ConfirmFactCheckUseCase,
     private val conversationRepository: ConversationRepository,
     private val voiceInputManager: VoiceInputManager,
+    private val voiceAudioRecorder: VoiceAudioRecorder,
+    private val transcribeUseCase: TranscribeUseCase,
     private val ocrManager: OCRManager,
     private val context: Context,
     private val preferencesManager: PreferencesManager? = null,
@@ -311,7 +313,11 @@ class ChatViewModel(
     fun sendMessage(text: String) {
         val trimmedText = text.trim()
         val currentState = _uiState.value
-        if (trimmedText.isEmpty() || currentState.isLoading) {
+        if (trimmedText.isEmpty() ||
+            currentState.isLoading ||
+            currentState.voiceInputState.isRecording ||
+            currentState.voiceInputState.isTranscribing
+        ) {
             return
         }
 
@@ -608,6 +614,7 @@ class ChatViewModel(
         if (trimmed.isEmpty() ||
             state.isLoading ||
             state.voiceInputState.isRecording ||
+            state.voiceInputState.isTranscribing ||
             state.imageInputState.isProcessing
         ) {
             return
@@ -626,156 +633,44 @@ class ChatViewModel(
         }
     }
 
-    // Voice Input Methods
+    // Voice Input Methods — record locally, then POST /api/transcribe (Whisper is final).
 
     /**
-     * Starts voice input recording.
+     * Starts microphone recording for Whisper transcription.
      *
-     * @param locale Locale for speech recognition
+     * @param locale Unused; kept for call-site compatibility. Whisper auto-detects
+     * the spoken language per recording, matching the web implementation.
      */
+    @Suppress("UNUSED_PARAMETER")
     fun startVoiceInput(locale: Locale = Locale.getDefault()) {
-        if (_uiState.value.voiceInputState.isRecording) {
-            Logger.d(TAG, "startVoiceInput ignored: already recording")
+        val voiceState = _uiState.value.voiceInputState
+        if (voiceState.isRecording || voiceState.isTranscribing) {
+            Logger.d(TAG, "startVoiceInput ignored: recording=${voiceState.isRecording} transcribing=${voiceState.isTranscribing}")
             return
         }
 
-        val capability = voiceInputManager.getCapability()
         Logger.i(
             TAG,
-            "startVoiceInput requested locale=${locale.toLanguageTag()} capability=$capability currentInputLen=${_uiState.value.inputText.length}"
+            "startVoiceInput currentInputLen=${_uiState.value.inputText.length} languageHint=auto"
         )
 
-        when (capability) {
-            VoiceInputCapability.DIRECT -> {
-                _uiState.update { state ->
-                    state.copy(
-                        voiceInputState = state.voiceInputState.copy(
-                            isAvailable = true,
-                            requiresMicPermission = true,
-                            unavailableReason = null,
-                            isRecording = true,
-                            transcribedText = "",
-                            error = null
-                        )
-                    )
-                }
-
-                voiceInputManager.startListening(
-                    locale = locale,
-                    onResult = { text ->
-                        Logger.i(TAG, "voice onResult received textLen=${text.length}")
-                        onVoiceResult(text)
-                    },
-                    onPartialResult = { partialText ->
-                        Logger.d(TAG, "voice onPartialResult received textLen=${partialText.length}")
-                        _uiState.update { state ->
-                            state.copy(
-                                voiceInputState = state.voiceInputState.copy(
-                                    transcribedText = partialText
-                                )
-                            )
-                        }
-                    },
-                    onError = { error ->
-                        Logger.w(TAG, "voice onError callback: $error")
-                        onVoiceError(error)
-                    }
-                )
-            }
-            VoiceInputCapability.INTENT_FALLBACK -> {
-                _uiState.update { state ->
-                    state.copy(
-                        voiceInputState = state.voiceInputState.copy(
-                            isAvailable = true,
-                            requiresMicPermission = false,
-                            unavailableReason = null,
-                            isRecording = false,
-                            error = null
-                        )
-                    )
-                }
-
-                viewModelScope.launch {
-                    Logger.i(TAG, "launching voice intent fallback locale=${locale.toLanguageTag()}")
-                    _events.send(ChatEvent.LaunchVoiceRecognition(voiceInputManager.createFallbackIntent(locale)))
-                }
-            }
-            VoiceInputCapability.UNAVAILABLE -> {
-                val message = context.getString(R.string.voice_setup_required_message)
-                Logger.w(TAG, "voice unavailable: $message")
-                _uiState.update { state ->
-                    state.copy(
-                        voiceInputState = state.voiceInputState.copy(
-                            isAvailable = false,
-                            requiresMicPermission = false,
-                            unavailableReason = message,
-                            isRecording = false,
-                            error = message
-                        )
-                    )
-                }
-                viewModelScope.launch {
-                    val setupIntent = voiceInputManager.createSetupIntent()
-                    _events.send(ChatEvent.ShowVoiceSetupHelp(intent = setupIntent))
-                }
-            }
-        }
-    }
-
-    /**
-     * Stops voice input recording.
-     */
-    fun stopVoiceInput() {
-        Logger.i(TAG, "stopVoiceInput requested")
-        voiceInputManager.stopListening()
-        _uiState.update { state ->
-            state.copy(
-                voiceInputState = state.voiceInputState.copy(
-                    isRecording = false
-                )
-            )
-        }
-    }
-
-    fun onVoiceRecognitionActivityResult(resultCode: Int, data: Intent?) {
-        Logger.i(TAG, "voice fallback activity resultCode=$resultCode hasData=${data != null}")
-        if (resultCode != Activity.RESULT_OK) {
-            Logger.w(TAG, "voice fallback activity canceled/non-ok resultCode=$resultCode")
-            _uiState.update { state ->
-                state.copy(
-                    voiceInputState = state.voiceInputState.copy(isRecording = false)
-                )
-            }
+        voiceAudioRecorder.onMaxDurationReached = { stopVoiceInput() }
+        val startResult = voiceAudioRecorder.start()
+        if (startResult.isFailure) {
+            Logger.w(TAG, "voice recording failed to start: ${startResult.exceptionOrNull()?.message}")
+            onVoiceError(context.getString(R.string.voice_record_failed))
             return
         }
 
-        val recognizedText = voiceInputManager.extractBestResult(data)
-        if (recognizedText != null) {
-            Logger.i(TAG, "voice fallback produced textLen=${recognizedText.length}")
-            onVoiceResult(recognizedText)
-            return
-        }
-
-        Logger.w(TAG, "voice fallback completed without recognized text")
-        onVoiceError("No speech recognized")
-    }
-
-    /**
-     * Handles successful voice recognition result.
-     *
-     * @param text Transcribed text
-     */
-    fun onVoiceResult(text: String) {
-        Logger.i(TAG, "onVoiceResult applying textLen=${text.length}")
         _uiState.update { state ->
             state.copy(
-                inputText = text,
                 voiceInputState = state.voiceInputState.copy(
                     isAvailable = true,
-                    requiresMicPermission = voiceInputManager.getCapability() == VoiceInputCapability.DIRECT,
+                    requiresMicPermission = true,
                     unavailableReason = null,
-                    isRecording = false,
-                    transcribedText = text,
+                    isRecording = true,
+                    isTranscribing = false,
+                    transcribedText = "",
                     error = null
                 )
             )
@@ -783,30 +678,136 @@ class ChatViewModel(
     }
 
     /**
-     * Handles voice recognition error.
-     *
-     * @param error Error message
+     * Stops recording and uploads audio to `/api/transcribe`.
      */
-    fun onVoiceError(error: String) {
-        val capability = voiceInputManager.getCapability()
-        Logger.w(TAG, "onVoiceError error=$error capability=$capability")
+    fun stopVoiceInput() {
+        val voiceState = _uiState.value.voiceInputState
+        if (!voiceState.isRecording || voiceState.isTranscribing) {
+            Logger.d(TAG, "stopVoiceInput ignored: recording=${voiceState.isRecording} transcribing=${voiceState.isTranscribing}")
+            return
+        }
+
+        Logger.i(TAG, "stopVoiceInput requested")
+        val recordingResult = voiceAudioRecorder.stop()
         _uiState.update { state ->
             state.copy(
                 voiceInputState = state.voiceInputState.copy(
-                    isAvailable = capability != VoiceInputCapability.UNAVAILABLE,
-                    requiresMicPermission = capability == VoiceInputCapability.DIRECT,
-                    unavailableReason = if (capability == VoiceInputCapability.UNAVAILABLE) {
-                        voiceInputManager.getUnavailableMessage()
-                    } else {
-                        null
-                    },
                     isRecording = false,
+                    isTranscribing = true,
+                    error = null
+                )
+            )
+        }
+
+        val recording = recordingResult.getOrNull()
+        if (recording == null || recording.bytes.isEmpty()) {
+            Logger.w(TAG, "voice recording empty or stop failed: ${recordingResult.exceptionOrNull()?.message}")
+            onVoiceError(context.getString(R.string.voice_transcribe_empty))
+            return
+        }
+        if (recording.bytes.size > VoiceAudioRecorder.MAX_UPLOAD_BYTES) {
+            onVoiceError(context.getString(R.string.voice_transcribe_too_large))
+            return
+        }
+
+        viewModelScope.launch {
+            Logger.i(
+                TAG,
+                "voice transcribe upload bytes=${recording.bytes.size} mime=${recording.mimeType} language=auto"
+            )
+            val result = transcribeUseCase(
+                audioBytes = recording.bytes,
+                mimeType = recording.mimeType,
+                fileName = recording.fileName,
+                language = null
+            )
+            result.fold(
+                onSuccess = { response ->
+                    val text = response.text.trim()
+                    if (text.isEmpty()) {
+                        Logger.w(TAG, "voice transcribe returned empty text language=${response.language}")
+                        onVoiceError(context.getString(R.string.voice_transcribe_empty))
+                    } else {
+                        Logger.i(TAG, "voice transcribe success textLen=${text.length} language=${response.language}")
+                        onVoiceResult(text)
+                    }
+                },
+                onFailure = { error ->
+                    Logger.w(TAG, "voice transcribe failed: ${error.message}")
+                    onVoiceError(transcribeErrorMessage(error))
+                }
+            )
+        }
+    }
+
+    fun onVoiceRecognitionActivityResult(resultCode: Int, data: Intent?) {
+        Logger.i(TAG, "voice fallback activity ignored resultCode=$resultCode hasData=${data != null}")
+    }
+
+    /**
+     * Appends the authoritative Whisper transcript to the chat input.
+     */
+    fun onVoiceResult(text: String) {
+        Logger.i(TAG, "onVoiceResult applying textLen=${text.length}")
+        _uiState.update { state ->
+            val addition = text.trim()
+            val existing = state.inputText.trimEnd()
+            val combined = when {
+                addition.isEmpty() -> existing
+                existing.isEmpty() -> addition
+                else -> "$existing $addition"
+            }
+            state.copy(
+                inputText = combined,
+                voiceInputState = state.voiceInputState.copy(
+                    isAvailable = true,
+                    requiresMicPermission = true,
+                    unavailableReason = null,
+                    isRecording = false,
+                    isTranscribing = false,
+                    transcribedText = addition,
+                    error = null
+                )
+            )
+        }
+    }
+
+    /**
+     * Handles voice recording / transcription error.
+     */
+    fun onVoiceError(error: String) {
+        Logger.w(TAG, "onVoiceError error=$error")
+        _uiState.update { state ->
+            state.copy(
+                voiceInputState = state.voiceInputState.copy(
+                    isAvailable = true,
+                    requiresMicPermission = true,
+                    unavailableReason = null,
+                    isRecording = false,
+                    isTranscribing = false,
                     error = error
                 )
             )
         }
         viewModelScope.launch {
-            _events.send(ChatEvent.ShowError("Voice recognition error: $error"))
+            _events.send(ChatEvent.ShowError(error))
+        }
+    }
+
+    private fun transcribeErrorMessage(error: Throwable): String {
+        return when (error) {
+            is NetworkError.HttpError -> when (error.code) {
+                400 -> context.getString(R.string.voice_transcribe_invalid)
+                413 -> context.getString(R.string.voice_transcribe_too_large)
+                429 -> context.getString(R.string.network_too_many_requests)
+                503 -> context.getString(R.string.voice_transcribe_unavailable)
+                504 -> context.getString(R.string.voice_transcribe_timeout)
+                else -> context.getString(R.string.voice_transcribe_failed)
+            }
+            is NetworkError.Timeout -> context.getString(R.string.voice_transcribe_timeout)
+            is NetworkError.TooManyRequests -> context.getString(R.string.network_too_many_requests)
+            is NetworkError -> error.getUserMessage(context)
+            else -> context.getString(R.string.voice_transcribe_failed)
         }
     }
 
@@ -1283,23 +1284,16 @@ class ChatViewModel(
     override fun onCleared() {
         super.onCleared()
         ChatFlowDiagnostics.clear(detail = "chat.vmCleared")
+        voiceAudioRecorder.destroy()
         voiceInputManager.destroy()
         ocrManager.close()
     }
 
     private fun createFreshUiState(): ChatUiState {
-        val capability = voiceInputManager.getCapability()
-        val unavailableReason = if (capability == VoiceInputCapability.UNAVAILABLE) {
-            voiceInputManager.getUnavailableMessage()
-        } else {
-            null
-        }
-
         return ChatUiState(
             voiceInputState = VoiceInputState(
-                isAvailable = capability != VoiceInputCapability.UNAVAILABLE,
-                requiresMicPermission = capability == VoiceInputCapability.DIRECT,
-                unavailableReason = unavailableReason
+                isAvailable = true,
+                requiresMicPermission = true
             )
         )
     }

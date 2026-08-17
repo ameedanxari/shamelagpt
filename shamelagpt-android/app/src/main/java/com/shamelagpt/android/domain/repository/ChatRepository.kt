@@ -6,6 +6,7 @@ import com.shamelagpt.android.data.remote.dto.OCRRequest
 import com.shamelagpt.android.data.remote.dto.OCRResponse
 import com.shamelagpt.android.data.remote.dto.ConfirmFactCheckRequest
 import com.shamelagpt.android.data.remote.dto.StreamEvent
+import com.shamelagpt.android.data.remote.dto.TranscribeResponse
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -55,6 +56,16 @@ interface ChatRepository {
      * Extracts text from an image via OCR.
      */
     suspend fun ocr(request: OCRRequest): Result<OCRResponse>
+
+    /**
+     * Transcribes recorded audio via Groq Whisper.
+     */
+    suspend fun transcribe(
+        audioBytes: ByteArray,
+        mimeType: String,
+        fileName: String,
+        language: String?
+    ): Result<TranscribeResponse>
 
     /**
      * Confirms the OCR result and starts a fact-check stream.

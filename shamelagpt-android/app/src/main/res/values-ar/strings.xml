@@ -182,6 +182,13 @@
     <string name="voice_help_step_2">ابحث عن إعدادات \"الإدخال الصوتي\" أو \"الكلام\" أو \"اللغة والإدخال\".</string>
     <string name="voice_help_step_3">فعِّل أو ثبّت خدمة التعرف على الكلام، ثم عُد وجرب مرة أخرى.</string>
     <string name="voice_setup_no_settings_fallback">قد لا يتضمن هذا الجهاز خدمة تعرف على الكلام بشكل افتراضي. ثبّت خدمة مناسبة (إن كانت متاحة لجهازك) واجعلها الافتراضية.</string>
+    <string name="voice_record_failed">تعذر بدء التسجيل. يرجى المحاولة مرة أخرى.</string>
+    <string name="voice_transcribe_empty">لم يتم التعرف على كلام. يرجى المحاولة مرة أخرى.</string>
+    <string name="voice_transcribe_invalid">تعذر معالجة التسجيل. يرجى المحاولة مرة أخرى.</string>
+    <string name="voice_transcribe_too_large">التسجيل طويل جداً. يرجى تسجيل مقطع أقصر.</string>
+    <string name="voice_transcribe_failed">تعذر تحويل الصوت إلى نص. يرجى المحاولة مرة أخرى.</string>
+    <string name="voice_transcribe_unavailable">خدمة التحويل الصوتي غير متاحة حالياً.</string>
+    <string name="voice_transcribe_timeout">انتهت مهلة التحويل الصوتي. يرجى المحاولة مرة أخرى.</string>
 
     <!-- Image Input -->
     <string name="image_input">إدخال صورة</string>
