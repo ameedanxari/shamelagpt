@@ -155,6 +155,13 @@
     <string name="voice_help_step_2">\"Voice input\"، \"Speech\" یا \"Language &amp; input\" کی سیٹنگز تلاش کریں۔</string>
     <string name="voice_help_step_3">اسپیچ ریکگنیشن سروس کو فعال یا انسٹال کریں، پھر واپس آکر دوبارہ کوشش کریں۔</string>
     <string name="voice_setup_no_settings_fallback">ممکن ہے اس ڈیوائس میں اسپیچ سروس پہلے سے موجود نہ ہو۔ اگر دستیاب ہو تو مناسب سروس انسٹال کریں اور اسے ڈیفالٹ بنائیں۔</string>
+    <string name="voice_record_failed">ریکارڈنگ شروع نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="voice_transcribe_empty">کوئی کلام پہچانا نہیں گیا۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="voice_transcribe_invalid">ریکارڈنگ پروسیس نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="voice_transcribe_too_large">ریکارڈنگ بہت لمبی ہے۔ براہ کرم چھوٹا کلپ ریکارڈ کریں۔</string>
+    <string name="voice_transcribe_failed">آواز کو متن میں تبدیل نہیں کیا جا سکا۔ براہ کرم دوبارہ کوشش کریں۔</string>
+    <string name="voice_transcribe_unavailable">آواز کی تحریر فی الحال دستیاب نہیں۔</string>
+    <string name="voice_transcribe_timeout">آواز کی تحریر کا وقت ختم ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔</string>
 
     <!-- Image Input -->
     <string name="image_input">تصویری اندراج</string>

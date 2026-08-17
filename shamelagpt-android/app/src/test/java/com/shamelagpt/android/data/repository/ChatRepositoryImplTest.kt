@@ -410,4 +410,21 @@ class ChatRepositoryImplTest {
         assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isEqualTo(error)
     }
+
+    @Test
+    fun testTranscribeDelegatesToRemoteDataSource() = runTest {
+        val audio = byteArrayOf(1, 2, 3)
+        val response = com.shamelagpt.android.data.remote.dto.TranscribeResponse(
+            text = "مرحبا",
+            language = "ar"
+        )
+        coEvery {
+            mockRemoteDataSource.transcribe(audio, "audio/mp4", "voice.m4a", "ar")
+        } returns Result.success(response)
+
+        val result = chatRepository.transcribe(audio, "audio/mp4", "voice.m4a", "ar")
+
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()).isEqualTo(response)
+    }
 }

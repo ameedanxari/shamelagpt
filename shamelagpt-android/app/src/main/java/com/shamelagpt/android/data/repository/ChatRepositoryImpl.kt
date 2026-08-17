@@ -10,6 +10,7 @@ import com.shamelagpt.android.data.remote.dto.HealthResponse
 import com.shamelagpt.android.data.remote.dto.OCRRequest
 import com.shamelagpt.android.data.remote.dto.OCRResponse
 import com.shamelagpt.android.data.remote.dto.ConfirmFactCheckRequest
+import com.shamelagpt.android.data.remote.dto.TranscribeResponse
 import com.shamelagpt.android.domain.model.Message
 import com.shamelagpt.android.domain.repository.ChatRepository
 import com.shamelagpt.android.domain.repository.ConversationRepository
@@ -182,6 +183,21 @@ class ChatRepositoryImpl(
     override suspend fun ocr(request: OCRRequest): Result<OCRResponse> {
         Log.d(TAG, "ocr() called")
         return chatRemoteDataSource.ocr(request)
+    }
+
+    override suspend fun transcribe(
+        audioBytes: ByteArray,
+        mimeType: String,
+        fileName: String,
+        language: String?
+    ): Result<TranscribeResponse> {
+        Log.d(TAG, "transcribe() called bytes=${audioBytes.size} mime=$mimeType language=$language")
+        return chatRemoteDataSource.transcribe(
+            audioBytes = audioBytes,
+            mimeType = mimeType,
+            fileName = fileName,
+            language = language
+        )
     }
 
     override fun confirmFactCheck(request: ConfirmFactCheckRequest): Flow<StreamEvent> = flow {

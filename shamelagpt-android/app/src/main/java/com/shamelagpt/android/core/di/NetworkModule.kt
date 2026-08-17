@@ -20,6 +20,7 @@ import com.shamelagpt.android.domain.repository.AuthRepository
 import com.shamelagpt.android.domain.repository.ChatRepository
 import com.shamelagpt.android.domain.usecase.OCRUseCase
 import com.shamelagpt.android.domain.usecase.ConfirmFactCheckUseCase
+import com.shamelagpt.android.domain.usecase.TranscribeUseCase
 import com.shamelagpt.android.domain.repository.PreferencesRepository
 import com.shamelagpt.android.domain.usecase.SendMessageUseCase
 import com.shamelagpt.android.domain.usecase.StreamMessageUseCase
@@ -159,6 +160,10 @@ val networkModule = module {
     // Provide OCRUseCase
     factory {
         OCRUseCase(chatRepository = get())
+    }
+
+    factory {
+        TranscribeUseCase(chatRepository = get())
     }
 
     // Provide ConfirmFactCheckUseCase

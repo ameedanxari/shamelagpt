@@ -3,6 +3,7 @@ package com.shamelagpt.android.core.di
 import com.shamelagpt.android.core.preferences.PreferencesManager
 import com.shamelagpt.android.core.util.LanguageManager
 import com.shamelagpt.android.core.util.OCRManager
+import com.shamelagpt.android.core.util.VoiceAudioRecorder
 import com.shamelagpt.android.core.util.VoiceInputManager
 import com.shamelagpt.android.data.billing.GooglePlayDonationBillingService
 import com.shamelagpt.android.domain.billing.DonationBillingService
@@ -51,9 +52,13 @@ val presentationModule = module {
         )
     }
 
-    // Voice Input Manager
+    // Voice Input Manager (legacy SpeechRecognizer helpers; recording uses VoiceAudioRecorder)
     single {
         VoiceInputManager(androidContext())
+    }
+
+    factory {
+        VoiceAudioRecorder(androidContext())
     }
 
     // OCR Manager (factory-scoped so closed recognizer is never reused across ChatViewModel instances)
@@ -84,6 +89,8 @@ val presentationModule = module {
             confirmFactCheckUseCase = get(),
             conversationRepository = get(),
             voiceInputManager = get(),
+            voiceAudioRecorder = get(),
+            transcribeUseCase = get(),
             ocrManager = get(),
             context = androidContext(),
             preferencesManager = get(),

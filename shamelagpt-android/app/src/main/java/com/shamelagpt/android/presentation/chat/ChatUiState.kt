@@ -34,11 +34,13 @@ data class ChatUiState(
  * State for voice input functionality.
  *
  * @property isRecording Whether voice recording is currently active
+ * @property isTranscribing Whether recorded audio is being uploaded/transcribed
  * @property transcribedText Text transcribed from voice input
  * @property error Error message for voice input, null if no error
  */
 data class VoiceInputState(
     val isRecording: Boolean = false,
+    val isTranscribing: Boolean = false,
     val transcribedText: String = "",
     val error: String? = null,
     val isAvailable: Boolean = true,

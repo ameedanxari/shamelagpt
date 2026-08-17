@@ -9,14 +9,17 @@ import com.shamelagpt.android.R
 import com.shamelagpt.android.core.network.NetworkError
 import com.shamelagpt.android.core.util.OCRManager
 import com.shamelagpt.android.core.util.OCRResult
+import com.shamelagpt.android.core.util.VoiceAudioRecorder
 import com.shamelagpt.android.core.util.VoiceInputManager
 import com.shamelagpt.android.core.preferences.PreferencesManager
 import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
+import com.shamelagpt.android.data.remote.dto.TranscribeResponse
 import com.shamelagpt.android.domain.repository.AuthRepository
 import com.shamelagpt.android.domain.usecase.SendMessageUseCase
 import com.shamelagpt.android.domain.usecase.StreamMessageUseCase
 import com.shamelagpt.android.domain.usecase.OCRUseCase
 import com.shamelagpt.android.domain.usecase.ConfirmFactCheckUseCase
+import com.shamelagpt.android.domain.usecase.TranscribeUseCase
 import com.shamelagpt.android.mock.MockChatRepository
 import com.shamelagpt.android.mock.MockConversationRepository
 import com.shamelagpt.android.mock.MockScenarioId
@@ -56,6 +59,8 @@ class ChatViewModelTest {
     private lateinit var mockChatRepository: MockChatRepository
     private lateinit var mockConversationRepository: MockConversationRepository
     private lateinit var mockVoiceInputManager: VoiceInputManager
+    private lateinit var mockVoiceAudioRecorder: VoiceAudioRecorder
+    private lateinit var mockTranscribeUseCase: TranscribeUseCase
     private lateinit var mockOCRManager: OCRManager
     private lateinit var mockPreferencesManager: PreferencesManager
     private lateinit var mockAuthRepository: AuthRepository
@@ -74,10 +79,23 @@ class ChatViewModelTest {
         mockConversationRepository = MockConversationRepository()
         mockChatRepository = MockChatRepository(mockConversationRepository)
         mockVoiceInputManager = mockk(relaxed = true)
+        mockVoiceAudioRecorder = mockk(relaxed = true)
+        mockTranscribeUseCase = mockk(relaxed = true)
         mockOCRManager = mockk(relaxed = true)
         mockPreferencesManager = mockk(relaxed = true)
         mockAuthRepository = mockk(relaxed = true)
         every { mockPreferencesManager.getSelectedLanguage() } returns "en"
+        every { mockVoiceAudioRecorder.start() } returns Result.success(Unit)
+        every { mockVoiceAudioRecorder.stop() } returns Result.success(
+            VoiceAudioRecorder.Recording(
+                bytes = byteArrayOf(0x00, 0x01, 0x02),
+                mimeType = "audio/mp4",
+                fileName = "voice.m4a"
+            )
+        )
+        coEvery {
+            mockTranscribeUseCase.invoke(any(), any(), any(), any())
+        } returns Result.success(TranscribeResponse(text = "whisper text", language = "en"))
         coEvery { mockAuthRepository.getModePreference() } returns Result.success(
             ModePreferenceResponse(modePreference = 1, modeName = "research")
         )
@@ -110,6 +128,8 @@ class ChatViewModelTest {
             confirmFactCheckUseCase = confirmFactCheckUseCase,
             conversationRepository = mockConversationRepository,
             voiceInputManager = mockVoiceInputManager,
+            voiceAudioRecorder = mockVoiceAudioRecorder,
+            transcribeUseCase = mockTranscribeUseCase,
             ocrManager = mockOCRManager,
             context = mockContext,
             preferencesManager = mockPreferencesManager,
@@ -591,9 +611,11 @@ class ChatViewModelTest {
 
         // When
         viewModel.stopVoiceInput()
+        testScheduler.advanceUntilIdle()
 
         // Then
         assertThat(viewModel.uiState.value.voiceInputState.isRecording).isFalse()
+        assertThat(viewModel.uiState.value.voiceInputState.isTranscribing).isFalse()
     }
 
     @Test
@@ -607,7 +629,17 @@ class ChatViewModelTest {
         // Then
         assertThat(viewModel.uiState.value.inputText).isEqualTo(transcribedText)
         assertThat(viewModel.uiState.value.voiceInputState.isRecording).isFalse()
+        assertThat(viewModel.uiState.value.voiceInputState.isTranscribing).isFalse()
         assertThat(viewModel.uiState.value.voiceInputState.transcribedText).isEqualTo(transcribedText)
+    }
+
+    @Test
+    fun testOnVoiceResultAppendsToExistingInput() = runTest {
+        viewModel.updateInputText("Hello")
+
+        viewModel.onVoiceResult("world")
+
+        assertThat(viewModel.uiState.value.inputText).isEqualTo("Hello world")
     }
 
     @Test
@@ -662,6 +694,7 @@ class ChatViewModelTest {
         onCleared.invoke(viewModel)
 
         // Then
+        verify(exactly = 1) { mockVoiceAudioRecorder.destroy() }
         verify(exactly = 1) { mockVoiceInputManager.destroy() }
         verify(exactly = 1) { mockOCRManager.close() }
     }
@@ -806,6 +839,57 @@ class ChatViewModelTest {
 
         // Then - Recording state should be maintained
         assertThat(viewModel.uiState.value.voiceInputState.isRecording).isTrue()
+    }
+
+    @Test
+    fun testStopVoiceInputUploadsWhisperTranscriptAndAppends() = runTest {
+        viewModel.updateInputText("Typed")
+        viewModel.startVoiceInput()
+        testScheduler.advanceUntilIdle()
+
+        viewModel.stopVoiceInput()
+        testScheduler.advanceUntilIdle()
+
+        assertThat(viewModel.uiState.value.inputText).isEqualTo("Typed whisper text")
+        assertThat(viewModel.uiState.value.voiceInputState.isRecording).isFalse()
+        assertThat(viewModel.uiState.value.voiceInputState.isTranscribing).isFalse()
+        coVerify {
+            mockTranscribeUseCase.invoke(any(), "audio/mp4", "voice.m4a", null)
+        }
+    }
+
+    @Test
+    fun testStopVoiceInputUsesAutoDetectInsteadOfAppLanguageHint() = runTest {
+        every { mockPreferencesManager.getSelectedLanguage() } returns "ur"
+        viewModel.startVoiceInput()
+        testScheduler.advanceUntilIdle()
+
+        viewModel.stopVoiceInput()
+        testScheduler.advanceUntilIdle()
+
+        coVerify {
+            mockTranscribeUseCase.invoke(any(), any(), any(), null)
+        }
+    }
+
+    @Test
+    fun testStopVoiceInputMapsHttp413() = runTest {
+        every { mockContext.getString(R.string.voice_transcribe_too_large) } returns "too large"
+        coEvery { mockTranscribeUseCase.invoke(any(), any(), any(), any()) } returns
+            Result.failure(NetworkError.HttpError(413))
+
+        viewModel.startVoiceInput()
+        testScheduler.advanceUntilIdle()
+
+        viewModel.events.test {
+            viewModel.stopVoiceInput()
+            testScheduler.advanceUntilIdle()
+
+            val event = awaitItem()
+            assertThat(event).isInstanceOf(ChatEvent.ShowError::class.java)
+            assertThat((event as ChatEvent.ShowError).message).isEqualTo("too large")
+            assertThat(viewModel.uiState.value.voiceInputState.isTranscribing).isFalse()
+        }
     }
 
     // MARK: - OCR Tests
