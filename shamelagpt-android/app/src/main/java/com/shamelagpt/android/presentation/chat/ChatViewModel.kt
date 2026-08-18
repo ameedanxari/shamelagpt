@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.Locale
 import java.util.UUID
+import kotlin.coroutines.coroutineContext
 
 /**
  * ViewModel for the chat screen.
@@ -85,7 +86,7 @@ class ChatViewModel(
     private fun loadModePreference() {
         if (authRepository == null) return
         _isModeLoading.value = true
-        viewModelScope.launch {
+        activeGenerationJob = viewModelScope.launch {
             authRepository.getModePreference().onSuccess { response ->
                 _modePreference.value = response.modePreference
             }.onFailure {
@@ -114,6 +115,8 @@ class ChatViewModel(
     // Job for collecting messages from Room Flow
     private var messageCollectionJob: Job? = null
     private var activeConversationLoadId: String? = null
+    private var activeGenerationJob: Job? = null
+    private var stopRequestedByUser: Boolean = false
 
     // Track if streaming was interrupted by app backgrounding
     private var streamInterrupted = false
@@ -321,7 +324,7 @@ class ChatViewModel(
             return
         }
 
-        viewModelScope.launch {
+        activeGenerationJob = viewModelScope.launch {
             val sendStartedAt = SystemClock.elapsedRealtime()
             ChatFlowDiagnostics.markPhase(
                 phaseName = "chat.send.start",
@@ -465,30 +468,42 @@ class ChatViewModel(
                                 phaseName = "chat.send.persistFinal",
                                 conversationId = actualConversationId,
                                 threadId = _uiState.value.threadId,
-                                detail = "finalLen=${finalContent.length}"
+                                detail = "finalLen=${finalContent.length} isComplete=${event.isComplete}"
+                            )
+                            persistAssistantResponse(
+                                conversationId = actualConversationId,
+                                content = finalContent,
+                                isComplete = event.isComplete ?: true,
+                                preferredId = event.aiMessageId ?: assistantMessageId
                             )
                             _uiState.update { state ->
                                 state.copy(
                                     isLoading = false,
                                     thinkingMessages = emptyList(),
-                                    streamingMessage = null // Clear streaming message as we'll save it to Room
+                                    streamingMessage = null
                                 )
                             }
                             
-                            // Persist the final assistant message
-                            val finalAssistantId = assistantMessageId ?: UUID.randomUUID().toString()
-                            conversationRepository.saveMessage(
-                                Message(
-                                    id = finalAssistantId,
-                                    content = finalContent,
-                                    isUserMessage = false,
-                                    timestamp = System.currentTimeMillis()
-                                ),
-                                actualConversationId
-                            )
-                            
                             _events.send(ChatEvent.MessageSent)
                             _events.send(ChatEvent.ScrollToBottom)
+                        }
+                        "cancelled" -> {
+                            sawDone = true
+                            val partial = event.fullAnswer ?: event.content ?: assembledContent
+                            if (partial.isNotBlank()) {
+                                persistIncompleteAssistant(
+                                    conversationId = actualConversationId,
+                                    content = partial,
+                                    localId = assistantMessageId
+                                )
+                            }
+                            _uiState.update { state ->
+                                state.copy(
+                                    isLoading = false,
+                                    thinkingMessages = emptyList(),
+                                    streamingMessage = null
+                                )
+                            }
                         }
                         "error" -> {
                             throw ChatOperationException(
@@ -508,11 +523,28 @@ class ChatViewModel(
                     }
                 }
                 if (!sawDone) {
-                    throw ChatOperationException(
-                        operation = ChatOperation.SEND_MESSAGE,
-                        code = "E-CHAT-STREAM-INCOMPLETE",
-                        message = "Stream ended before completion"
-                    )
+                    if (assembledContent.isNotBlank()) {
+                        persistIncompleteAssistant(
+                            conversationId = actualConversationId,
+                            content = assembledContent,
+                            localId = assistantMessageId
+                        )
+                        _uiState.update { state ->
+                            state.copy(
+                                isLoading = false,
+                                thinkingMessages = emptyList(),
+                                streamingMessage = null
+                            )
+                        }
+                        _events.send(ChatEvent.MessageSent)
+                        _events.send(ChatEvent.ScrollToBottom)
+                    } else {
+                        throw ChatOperationException(
+                            operation = ChatOperation.SEND_MESSAGE,
+                            code = "E-CHAT-STREAM-INCOMPLETE",
+                            message = "Stream ended before completion"
+                        )
+                    }
                 }
                 val totalMs = SystemClock.elapsedRealtime() - sendStartedAt
                 Logger.i(
@@ -520,7 +552,16 @@ class ChatViewModel(
                     "sendMessage completed conversationId=${Logger.redactedId(_uiState.value.conversationId)} elapsedMs=$totalMs"
                 )
                 ChatFlowDiagnostics.clear(detail = "chat.send.complete elapsedMs=$totalMs")
+            } catch (e: CancellationException) {
+                if (!stopRequestedByUser) throw e
+                Logger.i(TAG, "sendMessage cancelled by user")
+                ChatFlowDiagnostics.clear(detail = "chat.send.cancelledByUser")
             } catch (e: Exception) {
+                if (stopRequestedByUser) {
+                    Logger.i(TAG, "Ignoring sendMessage failure caused by user stop: ${e.message}")
+                    ChatFlowDiagnostics.clear(detail = "chat.send.stopIgnoredError")
+                    return@launch
+                }
                 Logger.e(TAG, "Failed to send message", e)
                 ChatFlowDiagnostics.markPhase(
                     phaseName = "chat.send.failed",
@@ -564,8 +605,74 @@ class ChatViewModel(
                     _events.send(ChatEvent.ShowError(message))
                 }
                 ChatFlowDiagnostics.clear(detail = "chat.send.error")
+            } finally {
+                if (activeGenerationJob === coroutineContext[Job]) {
+                    activeGenerationJob = null
+                    stopRequestedByUser = false
+                }
             }
         }
+    }
+
+    fun stopGenerating() {
+        val runningJob = activeGenerationJob ?: return
+        if (!runningJob.isActive) return
+
+        stopRequestedByUser = true
+        val state = _uiState.value
+        val partial = state.streamingMessage
+        val conversationId = state.conversationId
+
+        runningJob.cancel(CancellationException("User requested stop"))
+
+        viewModelScope.launch {
+            if (conversationId != null && partial != null && partial.content.isNotBlank()) {
+                runCatching {
+                    persistIncompleteAssistant(
+                        conversationId = conversationId,
+                        content = partial.content,
+                        localId = partial.id,
+                        isFactCheck = partial.isFactCheckMessage
+                    )
+                }.onFailure {
+                    Logger.w(TAG, "Failed to persist stopped partial answer: ${it.message}")
+                }
+            }
+
+            _uiState.update { current ->
+                current.copy(
+                    isLoading = false,
+                    streamingMessage = null,
+                    thinkingMessages = emptyList()
+                )
+            }
+
+            if (conversationId != null && authRepository?.isLoggedIn() == true) {
+                loadConversation(conversationId, showHydrationUi = false)
+                viewModelScope.launch {
+                    kotlinx.coroutines.delay(1200)
+                    loadConversation(conversationId, showHydrationUi = false)
+                }
+            }
+        }
+    }
+
+    fun regenerateAnswer(messageId: String) {
+        val state = _uiState.value
+        if (state.isLoading) return
+
+        val assistantIndex = state.messages.indexOfFirst { it.id == messageId && !it.isUserMessage }
+        if (assistantIndex <= 0) return
+
+        val prompt = state.messages
+            .subList(0, assistantIndex)
+            .lastOrNull { it.isUserMessage }
+            ?.content
+            ?.trim()
+            ?: return
+
+        if (prompt.isBlank()) return
+        sendMessage(prompt)
     }
 
     /**
@@ -1090,7 +1197,14 @@ class ChatViewModel(
                                         phaseName = "chat.factCheck.persistFinal",
                                         conversationId = actualConversationId,
                                         threadId = _uiState.value.threadId,
-                                        detail = "finalLen=${finalContent.length}"
+                                        detail = "finalLen=${finalContent.length} isComplete=${event.isComplete}"
+                                    )
+                                    persistAssistantResponse(
+                                        conversationId = actualConversationId,
+                                        content = finalContent,
+                                        isComplete = event.isComplete ?: true,
+                                        preferredId = event.aiMessageId ?: assistantMessageId,
+                                        isFactCheck = true
                                     )
                                     _uiState.update { it.copy(
                                         isLoading = false,
@@ -1098,20 +1212,25 @@ class ChatViewModel(
                                         streamingMessage = null
                                     )}
 
-                                    val finalId = assistantMessageId ?: UUID.randomUUID().toString()
-                                    conversationRepository.saveMessage(
-                                        Message(
-                                            id = finalId,
-                                            content = finalContent,
-                                            isUserMessage = false,
-                                            timestamp = System.currentTimeMillis(),
-                                            isFactCheckMessage = true
-                                        ),
-                                        actualConversationId
-                                    )
-
                                     _events.send(ChatEvent.MessageSent)
                                     _events.send(ChatEvent.ScrollToBottom)
+                                }
+                                "cancelled" -> {
+                                    sawDone = true
+                                    val partial = event.fullAnswer ?: event.content ?: assembledContent
+                                    if (partial.isNotBlank()) {
+                                        persistIncompleteAssistant(
+                                            conversationId = actualConversationId,
+                                            content = partial,
+                                            localId = assistantMessageId,
+                                            isFactCheck = true
+                                        )
+                                    }
+                                    _uiState.update { it.copy(
+                                        isLoading = false,
+                                        thinkingMessages = emptyList(),
+                                        streamingMessage = null
+                                    )}
                                 }
                                 "error" -> {
                                     throw ChatOperationException(
@@ -1130,11 +1249,27 @@ class ChatViewModel(
                             }
                         }
                         if (!sawDone) {
-                            throw ChatOperationException(
-                                operation = ChatOperation.FACT_CHECK,
-                                code = "E-CHAT-FACT-INCOMPLETE",
-                                message = "Fact-check stream ended before completion"
-                            )
+                            if (assembledContent.isNotBlank()) {
+                                persistIncompleteAssistant(
+                                    conversationId = actualConversationId,
+                                    content = assembledContent,
+                                    localId = assistantMessageId,
+                                    isFactCheck = true
+                                )
+                                _uiState.update { it.copy(
+                                    isLoading = false,
+                                    thinkingMessages = emptyList(),
+                                    streamingMessage = null
+                                )}
+                                _events.send(ChatEvent.MessageSent)
+                                _events.send(ChatEvent.ScrollToBottom)
+                            } else {
+                                throw ChatOperationException(
+                                    operation = ChatOperation.FACT_CHECK,
+                                    code = "E-CHAT-FACT-INCOMPLETE",
+                                    message = "Fact-check stream ended before completion"
+                                )
+                            }
                         }
 
                         if (resolvedImageUrl == null) {
@@ -1161,6 +1296,10 @@ class ChatViewModel(
                         throw error
                     }
                 }
+            } catch (e: CancellationException) {
+                if (!stopRequestedByUser) throw e
+                Logger.i("ChatVM", "Fact-check stream cancelled by user")
+                ChatFlowDiagnostics.clear(detail = "chat.factCheck.cancelledByUser")
             } catch (e: Exception) {
                 Logger.e("ChatVM", "Fact-check stream failed", e)
                 ChatFlowDiagnostics.markPhase(
@@ -1193,6 +1332,11 @@ class ChatViewModel(
                     _events.send(ChatEvent.ShowError(failure.userMessage))
                 }
                 ChatFlowDiagnostics.clear(detail = "chat.factCheck.error")
+            } finally {
+                if (activeGenerationJob === coroutineContext[Job]) {
+                    activeGenerationJob = null
+                    stopRequestedByUser = false
+                }
             }
         }
     }
@@ -1315,6 +1459,59 @@ class ChatViewModel(
         }
 
         return Locale.getDefault().language.ifBlank { "en" }
+    }
+
+    private suspend fun persistAssistantResponse(
+        conversationId: String,
+        content: String,
+        isComplete: Boolean,
+        preferredId: String?,
+        isFactCheck: Boolean = false
+    ) {
+        val id = preferredId?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString()
+        conversationRepository.saveMessage(
+            Message(
+                id = id,
+                content = content,
+                isUserMessage = false,
+                timestamp = System.currentTimeMillis(),
+                isFactCheckMessage = isFactCheck,
+                isComplete = isComplete
+            ),
+            conversationId
+        )
+    }
+
+    /**
+     * Saves a cut-off AI answer. Prefers the server message UUID from a refetch so Continue
+     * can call POST /api/chat/continue with a real message_id.
+     */
+    private suspend fun persistIncompleteAssistant(
+        conversationId: String,
+        content: String,
+        localId: String?,
+        isFactCheck: Boolean = false
+    ) {
+        var idToUse = localId
+        if (authRepository?.isLoggedIn() == true) {
+            conversationRepository.fetchMessages(conversationId, forceRefresh = true)
+            val messages = conversationRepository.getMessagesByConversationId(conversationId).first()
+            val lastAi = messages.lastOrNull { !it.isUserMessage && it.content.isNotBlank() }
+            if (lastAi != null && (
+                    content.startsWith(lastAi.content) ||
+                    lastAi.content.startsWith(content)
+                )
+            ) {
+                idToUse = lastAi.id
+            }
+        }
+        persistAssistantResponse(
+            conversationId = conversationId,
+            content = content,
+            isComplete = false,
+            preferredId = idToUse,
+            isFactCheck = isFactCheck
+        )
     }
 
     private suspend fun persistConversationThreadIdIfNeeded(conversationId: String, threadId: String) {

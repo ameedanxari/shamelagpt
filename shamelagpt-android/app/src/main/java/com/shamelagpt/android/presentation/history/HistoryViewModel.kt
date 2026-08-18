@@ -5,7 +5,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shamelagpt.android.R
+import com.shamelagpt.android.core.util.ShareLink
 import com.shamelagpt.android.domain.model.Conversation
+import com.shamelagpt.android.domain.repository.ConversationRepository
 import com.shamelagpt.android.domain.usecase.DeleteConversationUseCase
 import com.shamelagpt.android.domain.usecase.GetConversationsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +32,7 @@ private const val TAG = "HistoryViewModel"
 class HistoryViewModel(
     private val getConversationsUseCase: GetConversationsUseCase,
     private val deleteConversationUseCase: DeleteConversationUseCase,
+    private val conversationRepository: ConversationRepository,
     private val appContext: Context? = null
 ) : ViewModel() {
 
@@ -171,9 +174,38 @@ class HistoryViewModel(
         return "New Conversation"
     }
 
-    fun exportConversation(conversation: Conversation): String {
+    /**
+     * Enables sharing server-side and returns the canonical public link.
+     * The PUT must happen before the share sheet: without it `is_shared` stays
+     * false and the recipient's GET /api/shared/{id} returns 404.
+     */
+    suspend fun enableSharing(conversation: Conversation): Result<String> {
+        val result = conversationRepository.setConversationShared(
+            id = conversation.id,
+            isShared = true
+        )
+        return result.fold(
+            onSuccess = { serverUrl ->
+                Result.success(ShareLink.normalize(serverUrl, conversation.id))
+            },
+            onFailure = { error ->
+                Log.e(TAG, "Failed to enable sharing for conversation ${conversation.id}", error)
+                _uiState.update {
+                    it.copy(
+                        error = localizedString(
+                            R.string.history_share_failed,
+                            "Couldn't share this conversation. Please try again."
+                        )
+                    )
+                }
+                Result.failure(error)
+            }
+        )
+    }
+
+    fun exportConversation(conversation: Conversation, shareUrl: String? = null): String {
         val title = displayTitle(conversation)
-        val link = "https://shamelagpt.com/shared?chatid=${conversation.id}"
+        val link = ShareLink.normalize(shareUrl, conversation.id)
         val preview = messagePreview(conversation)
         val updated = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
             .format(Date(conversation.updatedAt))

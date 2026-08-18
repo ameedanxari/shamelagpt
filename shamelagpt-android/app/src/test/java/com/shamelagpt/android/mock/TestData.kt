@@ -183,7 +183,8 @@ fun example() {
         sources: List<Source>? = null,
         imageData: ByteArray? = null,
         detectedLanguage: String? = null,
-        isFactCheckMessage: Boolean = false
+        isFactCheckMessage: Boolean = false,
+        isComplete: Boolean = true
     ) = Message(
         id = id,
         content = content,
@@ -192,7 +193,8 @@ fun example() {
         sources = sources,
         imageData = imageData,
         detectedLanguage = detectedLanguage,
-        isFactCheckMessage = isFactCheckMessage
+        isFactCheckMessage = isFactCheckMessage,
+        isComplete = isComplete
     )
 
     /**

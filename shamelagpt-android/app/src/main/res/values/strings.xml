@@ -72,6 +72,7 @@
     <string name="just_now">Just now</string>
     <string name="history_locked_title">Save Your Conversations</string>
     <string name="history_locked_message">Sign in to keep track of your chat history, export conversations, and access them across devices.</string>
+    <string name="history_share_failed">Couldn\'t share this conversation. Please try again.</string>
 
     <!-- Settings Screen -->
     <string name="settings_general">General</string>
@@ -226,6 +227,8 @@
     <string name="chat_warning_showing_saved_messages">Could not refresh from the server. Showing saved messages.</string>
     <string name="chat_warning_continuity_not_saved">Conversation context may not have been saved. Future replies may lose context.</string>
     <string name="chat_warning_mode_preference_not_saved">Could not sync chat mode. Your last saved mode is still being used.</string>
+    <string name="chat_stop_answer">Stop</string>
+    <string name="chat_regenerate_answer">Regenerate</string>
     
     <!-- Network Error Messages (user-friendly) -->
     <string name="network_no_connection">No internet connection. Please check your network settings.</string>

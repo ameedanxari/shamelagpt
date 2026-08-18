@@ -49,6 +49,7 @@ fun InputBar(
     text: String,
     onTextChange: (String) -> Unit,
     onSendClick: () -> Unit,
+    onStopClick: () -> Unit = {},
     isLoading: Boolean,
     isRecording: Boolean = false,
     isTranscribing: Boolean = false,
@@ -194,16 +195,16 @@ fun InputBar(
                 textStyle = MaterialTheme.typography.bodyMedium
             )
 
-            // Send button
+            // Send / Stop button
             IconButton(
-                onClick = onSendClick,
-                enabled = text.isNotBlank() && !isLoading && !isRecording && !isTranscribing && !isProcessingImage,
-                modifier = Modifier.testTag(TestTags.Chat.SendButton)
+                onClick = if (isLoading) onStopClick else onSendClick,
+                enabled = if (isLoading) true else text.isNotBlank() && !isRecording && !isTranscribing && !isProcessingImage,
+                modifier = Modifier.testTag(if (isLoading) TestTags.Chat.StopButton else TestTags.Chat.SendButton)
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Send message",
-                    tint = if (text.isNotBlank() && !isLoading && !isRecording && !isTranscribing && !isProcessingImage) {
+                    imageVector = if (isLoading) Icons.Default.Stop else Icons.AutoMirrored.Filled.Send,
+                    contentDescription = if (isLoading) stringResource(R.string.chat_stop_answer) else "Send message",
+                    tint = if (isLoading || (text.isNotBlank() && !isRecording && !isTranscribing && !isProcessingImage)) {
                         MaterialTheme.colorScheme.primary
                     } else {
                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)

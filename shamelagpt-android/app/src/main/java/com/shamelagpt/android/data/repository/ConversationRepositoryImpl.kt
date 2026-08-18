@@ -164,7 +164,19 @@ class ConversationRepositoryImpl(
 
         Log.d(TAG, "fetchMessages() called for conversationId: $conversationId")
         val localMessageCountBeforeSync = messageDao.countMessagesByConversationId(conversationId)
-        val result = conversationRemoteDataSource.getMessages(conversationId)
+        val localConversation = conversationDao.getConversationById(conversationId)
+        val remoteConversationId = localConversation
+            ?.takeIf { !it.isLocalOnly }
+            ?.threadId
+            ?.takeIf { it.isNotBlank() }
+            ?: conversationId
+        if (remoteConversationId != conversationId) {
+            Log.d(
+                TAG,
+                "Fetching remote messages using threadId=$remoteConversationId for localConversationId=$conversationId"
+            )
+        }
+        val result = conversationRemoteDataSource.getMessages(remoteConversationId)
         result.onSuccess { response ->
             Log.d(TAG, "Fetched ${response.messages.size} messages from remote")
 
@@ -209,6 +221,13 @@ class ConversationRepositoryImpl(
             syncMetadataStore.markConversationsSynced()
         }
         return result.map { }
+    }
+
+    override suspend fun setConversationShared(id: String, isShared: Boolean): Result<String?> {
+        if (sessionManager?.isLoggedIn() != true || conversationRemoteDataSource == null) {
+            return Result.failure(IllegalStateException("Sign in to share a conversation"))
+        }
+        return conversationRemoteDataSource.setShareStatus(id, isShared).map { it.shareUrl }
     }
 
     private suspend fun upsertConversation(remote: ConversationResponse) {

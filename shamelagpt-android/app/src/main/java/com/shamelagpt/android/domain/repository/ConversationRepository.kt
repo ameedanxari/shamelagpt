@@ -80,4 +80,11 @@ interface ConversationRepository {
      * @return Result indicating success or failure
      */
     suspend fun fetchMessages(conversationId: String, forceRefresh: Boolean = false): Result<Unit>
+
+    /**
+     * Publishes or unpublishes a conversation so the public share link works.
+     *
+     * @return the server `share_url` when published, or null when unpublished
+     */
+    suspend fun setConversationShared(id: String, isShared: Boolean): Result<String?>
 }

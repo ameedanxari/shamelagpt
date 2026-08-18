@@ -37,7 +37,10 @@ object RetrofitClient {
         // Add logging interceptor for debug builds
         if (isDebug) {
             val loggingInterceptor = HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
+                // BODY logging can buffer SSE responses and make streaming appear
+                // to arrive all at once in debug builds. BASIC preserves request
+                // visibility without consuming streamed chat bodies.
+                level = HttpLoggingInterceptor.Level.BASIC
             }
             builder.addInterceptor(loggingInterceptor)
         }

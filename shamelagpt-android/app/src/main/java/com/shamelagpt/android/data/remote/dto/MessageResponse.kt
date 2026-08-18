@@ -10,5 +10,7 @@ data class MessageResponse(
     val role: String?,
     val content: String?,
     @SerializedName("created_at")
-    val createdAt: String?
+    val createdAt: String?,
+    @SerializedName("is_complete")
+    val isComplete: Boolean? = null
 )

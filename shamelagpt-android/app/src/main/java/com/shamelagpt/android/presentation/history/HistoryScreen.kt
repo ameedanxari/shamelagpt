@@ -62,6 +62,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,6 +79,7 @@ import com.shamelagpt.android.presentation.components.DeleteConfirmationDialog
 import com.shamelagpt.android.presentation.components.EmptyState
 import com.shamelagpt.android.presentation.components.SearchBar
 import org.koin.androidx.compose.koinViewModel
+import kotlinx.coroutines.launch
 
 /**
  * History screen showing list of past conversations.
@@ -105,6 +107,7 @@ fun HistoryScreen(
     val layoutDirection = LocalLayoutDirection.current
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -279,7 +282,13 @@ fun HistoryScreen(
                         title = viewModel.displayTitle(conversation),
                         preview = viewModel.messagePreview(conversation),
                         onOpen = { onNavigateToChat(conversation.id) },
-                        onShare = { shareConversation(context, viewModel, conversation) },
+                        onShare = {
+                            coroutineScope.launch {
+                                viewModel.enableSharing(conversation).onSuccess { shareUrl ->
+                                    shareConversation(context, viewModel, conversation, shareUrl)
+                                }
+                            }
+                        },
                         onDelete = { conversationToDelete = conversation },
                         modifier = Modifier
                             .testTag(TestTags.History.conversationCard(conversation.id))
@@ -489,11 +498,12 @@ private enum class SwipeAction {
 private fun shareConversation(
     context: android.content.Context,
     viewModel: HistoryViewModel,
-    conversation: Conversation
+    conversation: Conversation,
+    shareUrl: String
 ) {
     val sendIntent = Intent().apply {
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, viewModel.exportConversation(conversation))
+        putExtra(Intent.EXTRA_TEXT, viewModel.exportConversation(conversation, shareUrl))
         type = "text/plain"
     }
     val shareIntent = Intent.createChooser(sendIntent, null)

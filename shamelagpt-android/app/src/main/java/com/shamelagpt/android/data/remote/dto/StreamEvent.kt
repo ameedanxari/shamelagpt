@@ -15,5 +15,9 @@ data class StreamEvent(
     @SerializedName("thread_id")
     val threadId: String? = null,
     @SerializedName("full_answer")
-    val fullAnswer: String? = null
+    val fullAnswer: String? = null,
+    @SerializedName("is_complete")
+    val isComplete: Boolean? = null,
+    @SerializedName("ai_message_id")
+    val aiMessageId: String? = null
 )

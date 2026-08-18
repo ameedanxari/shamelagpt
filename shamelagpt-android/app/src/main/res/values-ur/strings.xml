@@ -71,6 +71,7 @@
     <string name="just_now">ابھی</string>
     <string name="history_locked_title">اپنی گفتگوئیں محفوظ کریں</string>
     <string name="history_locked_message">سائن ان کریں تاکہ اپنی گفتگوئیں محفوظ رکھ سکیں، برآمد کر سکیں، اور انہیں مختلف ڈیوائسز پر استعمال کر سکیں.</string>
+    <string name="history_share_failed">یہ مکالمہ شیئر نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔</string>
 
     <!-- Settings Screen -->
     <string name="settings_general">عمومی</string>
@@ -196,6 +197,8 @@
     <string name="chat_warning_showing_saved_messages">سرور سے تازہ کاری نہیں ہو سکی۔ محفوظ پیغامات دکھائے جا رہے ہیں۔</string>
     <string name="chat_warning_continuity_not_saved">گفتگو کا سیاق محفوظ نہیں ہو سکا۔ آئندہ جوابات میں سیاق ضائع ہو سکتا ہے۔</string>
     <string name="chat_warning_mode_preference_not_saved">چیٹ موڈ ہم آہنگ نہیں ہو سکا۔ آخری محفوظ موڈ استعمال ہو گا۔</string>
+    <string name="chat_stop_answer">روکیں</string>
+    <string name="chat_regenerate_answer">دوبارہ بنائیں</string>
 
     <!-- Network Error Messages (user-friendly) -->
     <string name="network_no_connection">انٹرنیٹ کنکشن نہیں۔ براہ کرم نیٹ ورک سیٹنگز چیک کریں.</string>

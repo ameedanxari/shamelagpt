@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.*
 import androidx.compose.material3.Typography
@@ -67,7 +69,9 @@ import java.util.*
 @Composable
 fun MessageBubble(
     message: Message,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showRegenerate: Boolean = false,
+    onRegenerate: () -> Unit = {}
 ) {
     val context = LocalContext.current
     var showContextMenu by remember { mutableStateOf(false) }
@@ -195,13 +199,43 @@ fun MessageBubble(
                 }
             }
 
-            // Timestamp
-            Text(
-                text = timeText,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp)
-            )
+            Row(
+                modifier = Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = timeText,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                if (!message.isUserMessage) {
+                    Spacer(modifier = Modifier.width(2.dp))
+                    MessageActionIconButton(
+                        imageVector = Icons.Default.ContentCopy,
+                        contentDescription = stringResource(R.string.copy),
+                        onClick = {
+                            copyToClipboard(context, shareContent(displayContent, displayedSources))
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.copied),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        modifier = Modifier.testTag(TestTags.Chat.CopyButton)
+                    )
+
+                    if (showRegenerate) {
+                        MessageActionIconButton(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = stringResource(R.string.chat_regenerate_answer),
+                            onClick = onRegenerate,
+                            modifier = Modifier.testTag(TestTags.Chat.RegenerateButton)
+                        )
+                    }
+                }
+            }
 
             // Sources (only for AI messages)
             if (!message.isUserMessage && !displayedSources.isNullOrEmpty()) {
@@ -315,6 +349,26 @@ private fun copyToClipboard(context: Context, text: String) {
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clip = ClipData.newPlainText("Message", text)
     clipboard.setPrimaryClip(clip)
+}
+
+@Composable
+private fun MessageActionIconButton(
+    imageVector: androidx.compose.ui.graphics.vector.ImageVector,
+    contentDescription: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier.size(24.dp)
+    ) {
+        Icon(
+            imageVector = imageVector,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(16.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 }
 
 /**
