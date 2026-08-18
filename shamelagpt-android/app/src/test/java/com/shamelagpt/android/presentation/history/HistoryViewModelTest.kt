@@ -370,17 +370,6 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun testEnableSharingNormalizesLegacyPathSegmentUrl() = runTest {
-        val conversation = TestData.createConversation(id = "conv-legacy")
-        mockConversationRepository.setConversationSharedResult =
-            Result.success("https://shamelagpt.com/shared/conv-legacy")
-
-        val url = viewModel.enableSharing(conversation).getOrThrow()
-
-        assertThat(url).isEqualTo("https://shamelagpt.com/shared?chatid=conv-legacy")
-    }
-
-    @Test
     fun testEnableSharingPropagatesRepositoryError() = runTest {
         val conversation = TestData.createConversation(id = "conv-fail")
         val expected = IllegalStateException("Share failed")

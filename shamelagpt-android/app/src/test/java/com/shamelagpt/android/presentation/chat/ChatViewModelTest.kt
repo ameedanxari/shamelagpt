@@ -1140,4 +1140,42 @@ class ChatViewModelTest {
         assertThat(mockChatRepository.streamMessageCallCount).isEqualTo(1)
         assertThat(mockChatRepository.lastQuestion).isEqualTo("What is zakat?")
     }
+
+    @Test
+    fun testRegenerateFactCheckAnswerUsesFactCheckStream() = runTest {
+        every { mockPreferencesManager.getSelectedLanguage() } returns "en"
+        val conversationId = "conv-fact-regen"
+        val assistantId = "ai-fact"
+        val imageData = byteArrayOf(9, 8, 7)
+        mockConversationRepository.addConversation(
+            TestData.createConversation(
+                id = conversationId,
+                messages = listOf(
+                    TestData.createMessage(
+                        id = "user-fact",
+                        content = "Check this claim",
+                        isUserMessage = true,
+                        imageData = imageData,
+                        detectedLanguage = "en",
+                        isFactCheckMessage = true
+                    ),
+                    TestData.createMessage(
+                        id = assistantId,
+                        content = "Initial fact-check",
+                        isUserMessage = false,
+                        isFactCheckMessage = true
+                    )
+                )
+            )
+        )
+        viewModel.loadConversation(conversationId)
+        testScheduler.advanceUntilIdle()
+
+        viewModel.regenerateAnswer(assistantId)
+        testScheduler.advanceUntilIdle()
+
+        assertThat(mockChatRepository.streamMessageCallCount).isEqualTo(0)
+        assertThat(mockChatRepository.confirmFactCheckCallCount).isEqualTo(1)
+        assertThat(mockChatRepository.lastConfirmFactCheckRequest?.reviewedText).isEqualTo("Check this claim")
+    }
 }
