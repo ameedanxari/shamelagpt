@@ -149,11 +149,12 @@ class ChatRemoteDataSourceImpl(
 
                         try {
                             val event = gson.fromJson(data, StreamEvent::class.java)
-                            validateStreamEvent(event, data)
-                            emit(event)
-                            emittedCount++
-                            if (emittedCount <= 3 || emittedCount % 25 == 0) {
-                                Log.d(TAG, "SSE event emitted type=${event.type} count=$emittedCount")
+                            if (shouldEmitStreamEvent(event, data)) {
+                                emit(event)
+                                emittedCount++
+                                if (emittedCount <= 3 || emittedCount % 25 == 0) {
+                                    Log.d(TAG, "SSE event emitted type=${event.type} count=$emittedCount")
+                                }
                             }
                         } catch (e: Exception) {
                             if (e is ChatOperationException) throw e
@@ -169,11 +170,12 @@ class ChatRemoteDataSourceImpl(
                         // Some guest streams might send raw JSON objects without "data:" prefix
                         try {
                             val event = gson.fromJson(trimmed, StreamEvent::class.java)
-                            validateStreamEvent(event, trimmed)
-                            emit(event)
-                            emittedCount++
-                            if (emittedCount <= 3 || emittedCount % 25 == 0) {
-                                Log.d(TAG, "raw JSON event emitted type=${event.type} count=$emittedCount")
+                            if (shouldEmitStreamEvent(event, trimmed)) {
+                                emit(event)
+                                emittedCount++
+                                if (emittedCount <= 3 || emittedCount % 25 == 0) {
+                                    Log.d(TAG, "raw JSON event emitted type=${event.type} count=$emittedCount")
+                                }
                             }
                         } catch (e: Exception) {
                             if (e is ChatOperationException) throw e
@@ -206,7 +208,7 @@ class ChatRemoteDataSourceImpl(
         }
     }
 
-    private fun validateStreamEvent(event: StreamEvent?, raw: String) {
+    private fun shouldEmitStreamEvent(event: StreamEvent?, raw: String): Boolean {
         if (event == null) {
             throw ChatOperationException(
                 operation = ChatOperation.SEND_MESSAGE,
@@ -214,21 +216,16 @@ class ChatRemoteDataSourceImpl(
                 message = "Stream event was empty"
             )
         }
-        when (event.type) {
-            "metadata", "thinking", "chunk", "done", "cancelled" -> Unit
+        return when (event.type) {
+            "metadata", "thinking", "chunk", "done", "cancelled" -> true
             "error" -> throw ChatOperationException(
                 operation = ChatOperation.SEND_MESSAGE,
                 code = "E-CHAT-STREAM-BACKEND",
                 message = event.message ?: event.error ?: event.content ?: "Backend stream error"
             )
             else -> {
-                // Forward-compatible: silently ignore unknown event types.
-                // Backend adds new SSE event types over time (e.g. "title" in
-                // shamela-qa-rag#72, "fact_check_result" in fact-check mode);
-                // throwing here surfaced them as E-CHAT-STREAM-UNKNOWN and broke
-                // every new-conversation send. iOS does the same in
-                // StreamingMessageHandler.swift. Log so we notice new types.
                 Log.d(TAG, "Ignoring unknown stream event type '${event.type}' (raw='${raw.take(120)}')")
+                false
             }
         }
     }

@@ -41,6 +41,19 @@ class MockChatRepository(
     var lastEnableThinking: Boolean? = null
     var lastConfirmFactCheckRequest: ConfirmFactCheckRequest? = null
     var streamEvents: List<StreamEvent>? = null
+    var ocrResult: Result<OCRResponse> = Result.success(
+        OCRResponse(
+            extractedText = "Mock OCR text",
+            imageUrl = "https://mock-s3-url.com/image.jpg",
+            metadata = OCRMetadata(
+                success = true,
+                detectedLanguage = "en",
+                confidence = "0.95",
+                textLength = 13
+            )
+        )
+    )
+    var lastOcrRequest: OCRRequest? = null
     var transcribeResult: Result<TranscribeResponse> = Result.success(
         TranscribeResponse(text = "Mock transcript", language = "en")
     )
@@ -149,16 +162,8 @@ class MockChatRepository(
     }
 
     override suspend fun ocr(request: OCRRequest): Result<OCRResponse> {
-        return Result.success(OCRResponse(
-            extractedText = "Mock OCR text",
-            imageUrl = "https://mock-s3-url.com/image.jpg",
-            metadata = OCRMetadata(
-                success = true,
-                detectedLanguage = "en",
-                confidence = "0.95",
-                textLength = 13
-            )
-        ))
+        lastOcrRequest = request
+        return ocrResult
     }
 
     override suspend fun transcribe(
@@ -181,6 +186,8 @@ class MockChatRepository(
         if (delayMs > 0) {
             kotlinx.coroutines.delay(delayMs)
         }
+        emit(StreamEvent(type = "title"))
+        emit(StreamEvent(type = "fact_check_result"))
         emit(StreamEvent(type = "chunk", content = "Mock fact-check response"))
         emit(StreamEvent(type = "done", content = "Mock fact-check complete"))
     }
@@ -196,6 +203,19 @@ class MockChatRepository(
         lastLanguagePreference = null
         lastEnableThinking = null
         lastConfirmFactCheckRequest = null
+        lastOcrRequest = null
+        ocrResult = Result.success(
+            OCRResponse(
+                extractedText = "Mock OCR text",
+                imageUrl = "https://mock-s3-url.com/image.jpg",
+                metadata = OCRMetadata(
+                    success = true,
+                    detectedLanguage = "en",
+                    confidence = "0.95",
+                    textLength = 13
+                )
+            )
+        )
         transcribeResult = Result.success(TranscribeResponse(text = "Mock transcript", language = "en"))
         transcribeCallCount = 0
         lastTranscribeLanguage = null

@@ -91,10 +91,10 @@ fun OCRConfirmationDialog(
 
                 // Subtitle with language info
                 if (detectedLanguage != null) {
-                    val languageName = when (detectedLanguage) {
-                        "ar" -> "Arabic"
-                        "en" -> "English"
-                        else -> detectedLanguage.uppercase()
+                    val languageName = when (detectedLanguage.lowercase()) {
+                        "ar", "arabic" -> "Arabic"
+                        "en", "english" -> "English"
+                        else -> detectedLanguage
                     }
                     Text(
                         text = "Detected language: $languageName",

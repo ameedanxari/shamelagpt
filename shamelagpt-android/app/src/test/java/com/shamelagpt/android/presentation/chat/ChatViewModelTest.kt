@@ -7,13 +7,13 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.shamelagpt.android.R
 import com.shamelagpt.android.core.network.NetworkError
-import com.shamelagpt.android.core.util.OCRManager
-import com.shamelagpt.android.core.util.OCRResult
 import com.shamelagpt.android.core.util.VoiceAudioRecorder
 import com.shamelagpt.android.core.util.VoiceInputManager
 import com.shamelagpt.android.core.preferences.PreferencesManager
 import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
 import com.shamelagpt.android.data.remote.dto.StreamEvent
+import com.shamelagpt.android.data.remote.dto.OCRMetadata
+import com.shamelagpt.android.data.remote.dto.OCRResponse
 import com.shamelagpt.android.data.remote.dto.TranscribeResponse
 import com.shamelagpt.android.domain.repository.AuthRepository
 import com.shamelagpt.android.domain.usecase.SendMessageUseCase
@@ -62,7 +62,6 @@ class ChatViewModelTest {
     private lateinit var mockVoiceInputManager: VoiceInputManager
     private lateinit var mockVoiceAudioRecorder: VoiceAudioRecorder
     private lateinit var mockTranscribeUseCase: TranscribeUseCase
-    private lateinit var mockOCRManager: OCRManager
     private lateinit var mockPreferencesManager: PreferencesManager
     private lateinit var mockAuthRepository: AuthRepository
     private lateinit var mockContext: Context
@@ -82,7 +81,6 @@ class ChatViewModelTest {
         mockVoiceInputManager = mockk(relaxed = true)
         mockVoiceAudioRecorder = mockk(relaxed = true)
         mockTranscribeUseCase = mockk(relaxed = true)
-        mockOCRManager = mockk(relaxed = true)
         mockPreferencesManager = mockk(relaxed = true)
         mockAuthRepository = mockk(relaxed = true)
         every { mockPreferencesManager.getSelectedLanguage() } returns "en"
@@ -131,7 +129,6 @@ class ChatViewModelTest {
             voiceInputManager = mockVoiceInputManager,
             voiceAudioRecorder = mockVoiceAudioRecorder,
             transcribeUseCase = mockTranscribeUseCase,
-            ocrManager = mockOCRManager,
             context = mockContext,
             preferencesManager = mockPreferencesManager,
             authRepository = mockAuthRepository
@@ -687,17 +684,14 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun testOnClearedReleasesVoiceAndOcrResources() {
-        // When
+    fun testOnClearedReleasesVoiceResources() {
         val onCleared = viewModel::class.java.getDeclaredMethod("onCleared").apply {
             isAccessible = true
         }
         onCleared.invoke(viewModel)
 
-        // Then
         verify(exactly = 1) { mockVoiceAudioRecorder.destroy() }
         verify(exactly = 1) { mockVoiceInputManager.destroy() }
-        verify(exactly = 1) { mockOCRManager.close() }
     }
 
     @Test
@@ -897,45 +891,49 @@ class ChatViewModelTest {
 
     @Test
     fun testProcessImageSuccessShowsConfirmation() = runTest {
-        // Given
         val imageUri = Uri.parse("content://test/image")
         val imageBytes = byteArrayOf(1, 2, 3)
         every { mockContentResolver.openInputStream(imageUri) } returns ByteArrayInputStream(imageBytes)
-        coEvery { mockOCRManager.recognizeTextWithLanguage(imageUri) } returns Result.success(
-            OCRResult(text = "Extracted text", detectedLanguage = "en")
+        mockChatRepository.ocrResult = Result.success(
+            OCRResponse(
+                extractedText = "Extracted text",
+                imageUrl = "https://s3.example/image.jpg",
+                metadata = OCRMetadata(
+                    success = true,
+                    detectedLanguage = "English",
+                    confidence = "high",
+                    textLength = 14
+                )
+            )
         )
 
-        // When
         viewModel.processImage(imageUri)
         testScheduler.advanceUntilIdle()
 
-        // Then
         val imageState = viewModel.uiState.value.imageInputState
         assertThat(imageState.isProcessing).isFalse()
         assertThat(imageState.extractedText).isEqualTo("Extracted text")
         assertThat(imageState.detectedLanguage).isEqualTo("en")
+        assertThat(imageState.imageUrl).isEqualTo("https://s3.example/image.jpg")
         assertThat(imageState.imageData).isEqualTo(imageBytes)
         assertThat(imageState.imageUri).isEqualTo(imageUri)
         assertThat(imageState.showConfirmationDialog).isTrue()
         assertThat(imageState.error).isNull()
+        assertThat(mockChatRepository.lastOcrRequest).isNotNull()
+        assertThat(mockChatRepository.lastOcrRequest!!.languageHint).isEqualTo("English")
     }
 
     @Test
     fun testProcessImageFailureUpdatesErrorState() = runTest {
-        // Given
         val imageUri = Uri.parse("content://test/image")
         every { mockContentResolver.openInputStream(imageUri) } returns ByteArrayInputStream(
             byteArrayOf(9, 8, 7)
         )
-        coEvery { mockOCRManager.recognizeTextWithLanguage(imageUri) } returns Result.failure(
-            Exception("No text found")
-        )
+        mockChatRepository.ocrResult = Result.failure(Exception("No text found"))
 
-        // When
         viewModel.processImage(imageUri)
         testScheduler.advanceUntilIdle()
 
-        // Then
         val imageState = viewModel.uiState.value.imageInputState
         assertThat(imageState.isProcessing).isFalse()
         assertThat(imageState.error).isEqualTo("No text found")
@@ -944,19 +942,16 @@ class ChatViewModelTest {
 
     @Test
     fun testProcessImageWhenImageLoadFails() = runTest {
-        // Given
         val imageUri = Uri.parse("content://test/missing")
         every { mockContentResolver.openInputStream(imageUri) } returns null
 
-        // When
         viewModel.processImage(imageUri)
         testScheduler.advanceUntilIdle()
 
-        // Then
         val imageState = viewModel.uiState.value.imageInputState
         assertThat(imageState.isProcessing).isFalse()
         assertThat(imageState.error).isEqualTo("Failed to load image data")
-        coVerify(exactly = 0) { mockOCRManager.recognizeTextWithLanguage(any()) }
+        assertThat(mockChatRepository.lastOcrRequest).isNull()
     }
 
     @Test
@@ -994,13 +989,17 @@ class ChatViewModelTest {
         val imageUri = Uri.parse("content://test/image")
         val imageData = byteArrayOf(1, 2, 3, 4)
         val extractedText = "Fact check this claim"
-        viewModel.onOcrResult(extractedText, "en", imageData, imageUri)
+        viewModel.onOcrResult(
+            extractedText,
+            "en",
+            imageData,
+            imageUri,
+            imageUrl = "https://s3.example/image.jpg"
+        )
 
-        // When
         viewModel.confirmFactCheck(extractedText)
         testScheduler.advanceUntilIdle()
 
-        // Then
         val imageState = viewModel.uiState.value.imageInputState
         assertThat(imageState.showConfirmationDialog).isFalse()
         assertThat(imageState.imageData).isNull()
@@ -1020,7 +1019,9 @@ class ChatViewModelTest {
 
         val request = mockChatRepository.lastConfirmFactCheckRequest
         assertThat(request).isNotNull()
-        assertThat(request!!.languagePreference).isEqualTo("ar")
+        assertThat(request!!.reviewedText).isEqualTo(extractedText)
+        assertThat(request.imageUrl).isEqualTo("https://s3.example/image.jpg")
+        assertThat(request.languagePreference).isEqualTo("ar")
         assertThat(request.enableThinking).isTrue()
     }
 

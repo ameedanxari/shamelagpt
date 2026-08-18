@@ -237,6 +237,12 @@ fun ChatScreen(
         !uiState.isLoading &&
         !uiState.isHydratingConversation
     val latestAssistantMessageId = uiState.messages.lastOrNull { !it.isUserMessage }?.id
+    val isFactCheckMode = if (isAuthenticated) {
+        val modePreference by viewModel.modePreference.collectAsState()
+        modePreference == ChatViewModel.MODE_FACT_CHECK
+    } else {
+        false
+    }
 
     Scaffold(
         topBar = {
@@ -245,9 +251,7 @@ fun ChatScreen(
                 actions = {
                     // Mode toggle (Research / Fact Check)
                     if (isAuthenticated) {
-                        val modePreference by viewModel.modePreference.collectAsState()
                         val isModeLoading by viewModel.isModeLoading.collectAsState()
-                        val isFactCheck = modePreference == 2
 
                         if (isModeLoading) {
                             CircularProgressIndicator(
@@ -256,20 +260,22 @@ fun ChatScreen(
                             )
                         } else {
                             FilterChip(
-                                selected = isFactCheck,
+                                selected = isFactCheckMode,
                                 onClick = {
-                                    viewModel.updateModePreference(if (isFactCheck) 1 else 2)
+                                    viewModel.updateModePreference(
+                                        if (isFactCheckMode) ChatViewModel.MODE_RESEARCH else ChatViewModel.MODE_FACT_CHECK
+                                    )
                                 },
                                 modifier = Modifier.testTag(TestTags.Chat.ModeToggleChip),
                                 label = {
                                     Text(
-                                        text = if (isFactCheck) stringResource(R.string.settings_mode_fact_check) else stringResource(R.string.settings_mode_research),
+                                        text = if (isFactCheckMode) stringResource(R.string.settings_mode_fact_check) else stringResource(R.string.settings_mode_research),
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 },
                                 leadingIcon = {
                                     Icon(
-                                        imageVector = if (isFactCheck) Icons.AutoMirrored.Filled.FactCheck else Icons.Default.Search,
+                                        imageVector = if (isFactCheckMode) Icons.AutoMirrored.Filled.FactCheck else Icons.Default.Search,
                                         contentDescription = null,
                                         modifier = Modifier.size(16.dp)
                                     )
@@ -330,7 +336,8 @@ fun ChatScreen(
                     },
                     onImageClick = { uri ->
                         viewModel.processImage(uri)
-                    }
+                    },
+                    showAttachButton = isFactCheckMode
                 )
             }
         }
