@@ -13,6 +13,7 @@ import com.shamelagpt.android.core.util.VoiceAudioRecorder
 import com.shamelagpt.android.core.util.VoiceInputManager
 import com.shamelagpt.android.core.preferences.PreferencesManager
 import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
+import com.shamelagpt.android.data.remote.dto.StreamEvent
 import com.shamelagpt.android.data.remote.dto.TranscribeResponse
 import com.shamelagpt.android.domain.repository.AuthRepository
 import com.shamelagpt.android.domain.usecase.SendMessageUseCase
@@ -1095,5 +1096,47 @@ class ChatViewModelTest {
 
         // Then
         assertThat(viewModel.uiState.value.error).isNull()
+    }
+
+    @Test
+    fun testCutOffStreamPersistsIncompleteAssistantMessage() = runTest {
+        mockChatRepository.streamEvents = listOf(
+            StreamEvent(type = "chunk", content = "Partial answer")
+        )
+        viewModel.updateInputText("What is prayer?")
+
+        viewModel.sendMessage()
+        testScheduler.advanceUntilIdle()
+
+        val assistant = viewModel.uiState.value.messages.lastOrNull { !it.isUserMessage }
+        assertThat(assistant).isNotNull()
+        assertThat(assistant!!.content).isEqualTo("Partial answer")
+        assertThat(assistant.isComplete).isFalse()
+        assertThat(viewModel.uiState.value.isLoading).isFalse()
+        assertThat(viewModel.uiState.value.error).isNull()
+        assertThat(viewModel.uiState.value.inputText).isEmpty()
+    }
+
+    @Test
+    fun testRegenerateAnswerResendsPreviousUserPrompt() = runTest {
+        val conversationId = "conv-regenerate"
+        val assistantId = "ai-last"
+        mockConversationRepository.addConversation(
+            TestData.createConversation(
+                id = conversationId,
+                messages = listOf(
+                    TestData.createMessage(id = "user-1", content = "What is zakat?", isUserMessage = true),
+                    TestData.createMessage(id = assistantId, content = "Initial answer", isUserMessage = false)
+                )
+            )
+        )
+        viewModel.loadConversation(conversationId)
+        testScheduler.advanceUntilIdle()
+
+        viewModel.regenerateAnswer(assistantId)
+        testScheduler.advanceUntilIdle()
+
+        assertThat(mockChatRepository.streamMessageCallCount).isEqualTo(1)
+        assertThat(mockChatRepository.lastQuestion).isEqualTo("What is zakat?")
     }
 }

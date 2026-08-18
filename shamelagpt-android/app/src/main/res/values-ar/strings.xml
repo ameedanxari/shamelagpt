@@ -72,6 +72,7 @@
     <string name="just_now">الآن</string>
     <string name="history_locked_title">احفظ محادثاتك</string>
     <string name="history_locked_message">سجل الدخول للاحتفاظ بسجل محادثاتك، وتصديرها، والوصول إليها عبر الأجهزة.</string>
+    <string name="history_share_failed">تعذرت مشاركة هذه المحادثة. يرجى المحاولة مرة أخرى.</string>
 
     <!-- Settings Screen -->
     <string name="settings_general">عام</string>
@@ -223,6 +224,8 @@
     <string name="chat_warning_showing_saved_messages">تعذر التحديث من الخادم. يتم عرض الرسائل المحفوظة.</string>
     <string name="chat_warning_continuity_not_saved">قد لا يكون سياق المحادثة قد حُفظ. قد تفقد الردود القادمة السياق.</string>
     <string name="chat_warning_mode_preference_not_saved">تعذر مزامنة وضع الدردشة. سيتم استخدام آخر وضع محفوظ.</string>
+    <string name="chat_stop_answer">إيقاف</string>
+    <string name="chat_regenerate_answer">إعادة التوليد</string>
     
     <!-- Network Error Messages (user-friendly) -->
     <string name="network_no_connection">لا يوجد اتصال بالإنترنت. يرجى التحقق من إعدادات الشبكة.</string>

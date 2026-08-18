@@ -215,7 +215,7 @@ class ChatRemoteDataSourceImpl(
             )
         }
         when (event.type) {
-            "metadata", "thinking", "chunk", "done" -> Unit
+            "metadata", "thinking", "chunk", "done", "cancelled" -> Unit
             "error" -> throw ChatOperationException(
                 operation = ChatOperation.SEND_MESSAGE,
                 code = "E-CHAT-STREAM-BACKEND",

@@ -22,6 +22,8 @@ import com.shamelagpt.android.data.remote.dto.ConfirmFactCheckRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
 import com.shamelagpt.android.data.remote.dto.TranscribeResponse
+import com.shamelagpt.android.data.remote.dto.ShareConversationRequest
+import com.shamelagpt.android.data.remote.dto.ShareStatusResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -61,6 +63,7 @@ interface ApiService {
     /**
      * Streaming chat endpoint (SSE).
      */
+    @retrofit2.http.Headers("Accept: text/event-stream")
     @Streaming
     @POST("api/chat/stream")
     suspend fun streamMessage(@Body request: ChatRequest): ResponseBody
@@ -68,6 +71,7 @@ interface ApiService {
     /**
      * Guest streaming chat endpoint (SSE).
      */
+    @retrofit2.http.Headers("Accept: text/event-stream")
     @Streaming
     @POST("api/guest/chat/stream")
     suspend fun streamGuestMessage(@Body request: ChatRequest): ResponseBody
@@ -170,6 +174,7 @@ interface ApiService {
     /**
      * Confirm and fact-check endpoint (SSE).
      */
+    @retrofit2.http.Headers("Accept: text/event-stream")
     @Streaming
     @POST("api/chat/confirm-factcheck")
     suspend fun confirmFactCheck(@Body request: ConfirmFactCheckRequest): ResponseBody
@@ -203,4 +208,13 @@ interface ApiService {
      */
     @GET("api/conversations/{conversation_id}/messages")
     suspend fun getMessages(@Path("conversation_id") conversationId: String): ConversationMessagesResponse
+
+    /**
+     * Publish or unpublish a conversation so others can open the public link.
+     */
+    @PUT("api/conversations/{conversation_id}/share")
+    suspend fun setShareStatus(
+        @Path("conversation_id") conversationId: String,
+        @Body request: ShareConversationRequest
+    ): ShareStatusResponse
 }

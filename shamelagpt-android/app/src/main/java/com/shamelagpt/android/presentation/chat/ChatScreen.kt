@@ -236,6 +236,7 @@ fun ChatScreen(
     val uiCanStartNew = uiHasActiveConversation &&
         !uiState.isLoading &&
         !uiState.isHydratingConversation
+    val latestAssistantMessageId = uiState.messages.lastOrNull { !it.isUserMessage }?.id
 
     Scaffold(
         topBar = {
@@ -314,6 +315,7 @@ fun ChatScreen(
                     text = uiState.inputText,
                     onTextChange = viewModel::updateInputText,
                     onSendClick = { viewModel.sendMessage(uiState.inputText) },
+                    onStopClick = viewModel::stopGenerating,
                     isLoading = uiState.isLoading,
                     isRecording = uiState.voiceInputState.isRecording,
                     isTranscribing = uiState.voiceInputState.isTranscribing,
@@ -365,11 +367,15 @@ fun ChatScreen(
                     contentPadding = PaddingValues(vertical = 8.dp)
                 ) {
                     items(
-                        items = uiState.messages,
+                        items = uiState.messages.filter { it.id != uiState.streamingMessage?.id },
                         key = { message -> message.id }
                     ) { message ->
                         MessageBubble(
                             message = message,
+                            showRegenerate = !uiState.isLoading &&
+                                !message.isUserMessage &&
+                                message.id == latestAssistantMessageId,
+                            onRegenerate = { viewModel.regenerateAnswer(message.id) },
                             modifier = Modifier.animateItem()
                         )
                     }

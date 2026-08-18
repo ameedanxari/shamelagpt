@@ -33,7 +33,8 @@ fun MessageEntity.toDomain(): Message {
         sources = sourceList,
         imageData = imageData,
         detectedLanguage = detectedLanguage,
-        isFactCheckMessage = isFactCheckMessage
+        isFactCheckMessage = isFactCheckMessage,
+        isComplete = isComplete
     )
 }
 
@@ -62,7 +63,8 @@ fun Message.toEntity(conversationId: String): MessageEntity {
         sources = sourcesJson,
         imageData = imageData,
         detectedLanguage = detectedLanguage,
-        isFactCheckMessage = isFactCheckMessage
+        isFactCheckMessage = isFactCheckMessage,
+        isComplete = isComplete
     )
 }
 
@@ -100,6 +102,7 @@ fun MessageResponse.toDomainModel(): Message {
         content = content ?: "",
         isUserMessage = isUser,
         timestamp = timestamp,
-        sources = if (parsed.second.isEmpty()) null else parsed.second
+        sources = if (parsed.second.isEmpty()) null else parsed.second,
+        isComplete = isComplete ?: true
     )
 }

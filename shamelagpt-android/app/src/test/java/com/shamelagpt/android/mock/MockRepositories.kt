@@ -40,6 +40,7 @@ class MockChatRepository(
     var lastLanguagePreference: String? = null
     var lastEnableThinking: Boolean? = null
     var lastConfirmFactCheckRequest: ConfirmFactCheckRequest? = null
+    var streamEvents: List<StreamEvent>? = null
     var transcribeResult: Result<TranscribeResponse> = Result.success(
         TranscribeResponse(text = "Mock transcript", language = "en")
     )
@@ -132,6 +133,12 @@ class MockChatRepository(
             emit(StreamEvent(type = "metadata", threadId = response.threadId))
         }
 
+        val customEvents = streamEvents
+        if (customEvents != null) {
+            customEvents.forEach { emit(it) }
+            return@flow
+        }
+
         // Simple mock streaming implementation
         emit(StreamEvent(type = "chunk", content = "Mock response chunk"))
         emit(StreamEvent(type = "done", content = "Mock response complete"))
@@ -194,6 +201,7 @@ class MockChatRepository(
         lastTranscribeLanguage = null
         streamMessageCallCount = 0
         confirmFactCheckCallCount = 0
+        streamEvents = null
         delayMs = 0
     }
 }
@@ -243,7 +251,7 @@ class MockConversationRepository : ConversationRepository {
 
     override suspend fun saveMessage(message: Message, conversationId: String) {
         val conversation = conversations[conversationId] ?: return
-        val updatedMessages = conversation.messages + message
+        val updatedMessages = conversation.messages.filterNot { it.id == message.id } + message
         conversations[conversationId] = conversation.copy(
             messages = updatedMessages,
             updatedAt = System.currentTimeMillis()
@@ -273,6 +281,20 @@ class MockConversationRepository : ConversationRepository {
 
     override suspend fun syncConversations(forceRefresh: Boolean): Result<Unit> = Result.success(Unit)
 
+    var setConversationSharedResult: Result<String?> = Result.success(
+        "https://shamelagpt.com/shared?chatid=mock"
+    )
+    var setConversationSharedCallCount = 0
+    var lastSetConversationSharedId: String? = null
+    var lastSetConversationSharedValue: Boolean? = null
+
+    override suspend fun setConversationShared(id: String, isShared: Boolean): Result<String?> {
+        setConversationSharedCallCount++
+        lastSetConversationSharedId = id
+        lastSetConversationSharedValue = isShared
+        return setConversationSharedResult
+    }
+
     // Test helper methods
 
     fun addConversation(conversation: Conversation) {
@@ -297,6 +319,10 @@ class MockConversationRepository : ConversationRepository {
         messagesFlows.clear()
         createConversationResult = null
         deleteConversationError = null
+        setConversationSharedResult = Result.success("https://shamelagpt.com/shared?chatid=mock")
+        setConversationSharedCallCount = 0
+        lastSetConversationSharedId = null
+        lastSetConversationSharedValue = null
     }
 
     private fun emitConversations() {

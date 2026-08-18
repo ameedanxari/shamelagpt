@@ -10,6 +10,7 @@ import com.shamelagpt.android.mock.MockScenarioId
 import com.shamelagpt.android.mock.TestData
 import com.shamelagpt.android.util.MainCoroutineRule
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -427,4 +428,5 @@ class ChatRepositoryImplTest {
         assertThat(result.isSuccess).isTrue()
         assertThat(result.getOrNull()).isEqualTo(response)
     }
+
 }

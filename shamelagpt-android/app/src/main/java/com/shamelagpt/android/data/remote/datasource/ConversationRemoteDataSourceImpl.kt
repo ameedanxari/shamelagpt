@@ -6,6 +6,8 @@ import com.shamelagpt.android.data.remote.dto.ConversationRequest
 import com.shamelagpt.android.data.remote.dto.ConversationResponse
 import com.shamelagpt.android.data.remote.dto.ConversationMessagesResponse
 import com.shamelagpt.android.data.remote.dto.EmptyResponse
+import com.shamelagpt.android.data.remote.dto.ShareConversationRequest
+import com.shamelagpt.android.data.remote.dto.ShareStatusResponse
 
 class ConversationRemoteDataSourceImpl(
     private val apiService: ApiService,
@@ -34,5 +36,12 @@ class ConversationRemoteDataSourceImpl(
 
     override suspend fun getMessages(conversationId: String): Result<ConversationMessagesResponse> = callWithAuth {
         apiService.getMessages(conversationId)
+    }
+
+    override suspend fun setShareStatus(
+        conversationId: String,
+        isShared: Boolean
+    ): Result<ShareStatusResponse> = callWithAuth {
+        apiService.setShareStatus(conversationId, ShareConversationRequest(isShared))
     }
 }

@@ -18,7 +18,7 @@ import com.shamelagpt.android.data.local.entity.MessageEntity
         ConversationEntity::class,
         MessageEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

@@ -103,6 +103,7 @@ val presentationModule = module {
         HistoryViewModel(
             getConversationsUseCase = get(),
             deleteConversationUseCase = get(),
+            conversationRepository = get(),
             appContext = androidContext()
         )
     }

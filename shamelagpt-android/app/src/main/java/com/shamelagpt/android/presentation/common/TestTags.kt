@@ -37,12 +37,15 @@ object TestTags {
         const val HydrationOverlay = "chatHydrationOverlay"
         const val MessageInputField = "messageInputField"
         const val SendButton = "sendButton"
+        const val StopButton = "stopButton"
         const val CameraButton = "cameraButton"
         const val MicButton = "micButton"
         const val ModeToggleChip = "modeToggleChip"
         const val NewChatButton = "newChatButton"
         const val ErrorBanner = "chatErrorBanner"
         const val ErrorBannerDismissButton = "chatErrorBannerDismissButton"
+        const val CopyButton = "chatCopyButton"
+        const val RegenerateButton = "chatRegenerateButton"
     }
 
     object History {

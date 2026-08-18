@@ -38,7 +38,8 @@ class HistoryViewModelTest {
 
         viewModel = HistoryViewModel(
             getConversationsUseCase = getConversationsUseCase,
-            deleteConversationUseCase = deleteConversationUseCase
+            deleteConversationUseCase = deleteConversationUseCase,
+            conversationRepository = mockConversationRepository
         )
     }
 
@@ -334,6 +335,67 @@ class HistoryViewModelTest {
         assertThat(exported).contains("/shared?chatid=")
     }
 
+    @Test
+    fun testEnableSharingCallsRepositoryWithIsSharedTrue() = runTest {
+        val conversation = TestData.createConversation(id = "conv-abc")
+        mockConversationRepository.setConversationSharedResult =
+            Result.success("https://shamelagpt.com/shared?chatid=conv-abc")
+
+        viewModel.enableSharing(conversation)
+
+        assertThat(mockConversationRepository.setConversationSharedCallCount).isEqualTo(1)
+        assertThat(mockConversationRepository.lastSetConversationSharedId).isEqualTo("conv-abc")
+        assertThat(mockConversationRepository.lastSetConversationSharedValue).isTrue()
+    }
+
+    @Test
+    fun testEnableSharingReturnsServerProvidedUrl() = runTest {
+        val conversation = TestData.createConversation(id = "conv-abc")
+        mockConversationRepository.setConversationSharedResult =
+            Result.success("https://shamelagpt.com/shared?chatid=server-supplied-id")
+
+        val url = viewModel.enableSharing(conversation).getOrThrow()
+
+        assertThat(url).isEqualTo("https://shamelagpt.com/shared?chatid=server-supplied-id")
+    }
+
+    @Test
+    fun testEnableSharingFallsBackWhenServerReturnsNull() = runTest {
+        val conversation = TestData.createConversation(id = "conv-xyz")
+        mockConversationRepository.setConversationSharedResult = Result.success(null)
+
+        val url = viewModel.enableSharing(conversation).getOrThrow()
+
+        assertThat(url).isEqualTo("https://shamelagpt.com/shared?chatid=conv-xyz")
+    }
+
+    @Test
+    fun testEnableSharingNormalizesLegacyPathSegmentUrl() = runTest {
+        val conversation = TestData.createConversation(id = "conv-legacy")
+        mockConversationRepository.setConversationSharedResult =
+            Result.success("https://shamelagpt.com/shared/conv-legacy")
+
+        val url = viewModel.enableSharing(conversation).getOrThrow()
+
+        assertThat(url).isEqualTo("https://shamelagpt.com/shared?chatid=conv-legacy")
+    }
+
+    @Test
+    fun testEnableSharingPropagatesRepositoryError() = runTest {
+        val conversation = TestData.createConversation(id = "conv-fail")
+        val expected = IllegalStateException("Share failed")
+        mockConversationRepository.setConversationSharedResult = Result.failure(expected)
+
+        val result = viewModel.enableSharing(conversation)
+
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(expected)
+        assertThat(mockConversationRepository.setConversationSharedCallCount).isEqualTo(1)
+        assertThat(viewModel.uiState.value.error).isEqualTo(
+            "Couldn't share this conversation. Please try again."
+        )
+    }
+
     // MARK: - Conversation Type Tests
 
     @Test
@@ -373,7 +435,8 @@ class HistoryViewModelTest {
         // Note: ViewModel loads conversations in init, so we need a fresh instance
         val freshViewModel = HistoryViewModel(
             getConversationsUseCase = getConversationsUseCase,
-            deleteConversationUseCase = deleteConversationUseCase
+            deleteConversationUseCase = deleteConversationUseCase,
+            conversationRepository = mockConversationRepository
         )
 
         // Advance to allow init to complete
@@ -391,7 +454,8 @@ class HistoryViewModelTest {
         // Given - Create fresh ViewModel to test loading state
         val freshViewModel = HistoryViewModel(
             getConversationsUseCase = getConversationsUseCase,
-            deleteConversationUseCase = deleteConversationUseCase
+            deleteConversationUseCase = deleteConversationUseCase,
+            conversationRepository = mockConversationRepository
         )
 
         // When - Check state immediately (before advanceUntilIdle)

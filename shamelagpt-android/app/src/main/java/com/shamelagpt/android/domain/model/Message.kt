@@ -11,6 +11,7 @@ package com.shamelagpt.android.domain.model
  * @property imageData Compressed image thumbnail as byte array (for fact-check messages)
  * @property detectedLanguage ISO language code of detected text (e.g., "en", "ar")
  * @property isFactCheckMessage True if this is a fact-checking message
+ * @property isComplete False when the AI stream was cut off and can be continued
  */
 data class Message(
     val id: String,
@@ -20,7 +21,8 @@ data class Message(
     val sources: List<Source>? = null,
     val imageData: ByteArray? = null,
     val detectedLanguage: String? = null,
-    val isFactCheckMessage: Boolean = false
+    val isFactCheckMessage: Boolean = false,
+    val isComplete: Boolean = true
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -39,6 +41,7 @@ data class Message(
         } else if (other.imageData != null) return false
         if (detectedLanguage != other.detectedLanguage) return false
         if (isFactCheckMessage != other.isFactCheckMessage) return false
+        if (isComplete != other.isComplete) return false
 
         return true
     }
@@ -52,6 +55,7 @@ data class Message(
         result = 31 * result + (imageData?.contentHashCode() ?: 0)
         result = 31 * result + (detectedLanguage?.hashCode() ?: 0)
         result = 31 * result + isFactCheckMessage.hashCode()
+        result = 31 * result + isComplete.hashCode()
         return result
     }
 }
