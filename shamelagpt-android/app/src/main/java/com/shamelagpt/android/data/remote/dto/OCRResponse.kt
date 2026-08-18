@@ -15,7 +15,7 @@ data class OCRResponse(
     @SerializedName("image_url")
     val imageUrl: String,
     @SerializedName("metadata")
-    val metadata: OCRMetadata
+    val metadata: OCRMetadata? = null
 )
 
 /**

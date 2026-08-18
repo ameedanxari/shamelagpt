@@ -57,6 +57,7 @@ fun InputBar(
     requiresMicPermission: Boolean = true,
     onVoiceClick: () -> Unit = {},
     onImageClick: (Uri) -> Unit = {},
+    showAttachButton: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -102,27 +103,28 @@ fun InputBar(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Image/Camera button
-            IconButton(
-                onClick = { showImagePicker = true },
-                enabled = !isLoading && !isRecording && !isTranscribing && !isProcessingImage,
-                modifier = Modifier.testTag(TestTags.Chat.CameraButton)
-            ) {
-                if (isProcessingImage) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add image",
-                        tint = if (isLoading || isRecording || isTranscribing) {
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        }
-                    )
+            if (showAttachButton) {
+                IconButton(
+                    onClick = { showImagePicker = true },
+                    enabled = !isLoading && !isRecording && !isTranscribing && !isProcessingImage,
+                    modifier = Modifier.testTag(TestTags.Chat.CameraButton)
+                ) {
+                    if (isProcessingImage) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add image",
+                            tint = if (isLoading || isRecording || isTranscribing) {
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    }
                 }
             }
 
@@ -215,7 +217,7 @@ fun InputBar(
     }
 
     // Image picker bottom sheet
-    if (showImagePicker) {
+    if (showImagePicker && showAttachButton) {
         ImagePickerDialog(
             onDismiss = { showImagePicker = false },
             onCameraClick = {

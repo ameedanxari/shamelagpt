@@ -2,7 +2,6 @@ package com.shamelagpt.android.core.di
 
 import com.shamelagpt.android.core.preferences.PreferencesManager
 import com.shamelagpt.android.core.util.LanguageManager
-import com.shamelagpt.android.core.util.OCRManager
 import com.shamelagpt.android.core.util.VoiceAudioRecorder
 import com.shamelagpt.android.core.util.VoiceInputManager
 import com.shamelagpt.android.data.billing.GooglePlayDonationBillingService
@@ -16,9 +15,6 @@ import com.shamelagpt.android.presentation.settings.SettingsViewModel
 import com.shamelagpt.android.presentation.welcome.WelcomeViewModel
 import com.shamelagpt.android.presentation.auth.AuthViewModel
 import com.shamelagpt.android.presentation.startup.AppStartupViewModel
-import com.shamelagpt.android.domain.usecase.StreamMessageUseCase
-import com.shamelagpt.android.domain.usecase.OCRUseCase
-import com.shamelagpt.android.domain.usecase.ConfirmFactCheckUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -32,7 +28,6 @@ import org.koin.dsl.module
  * - SettingsViewModel
  * - WelcomeViewModel
  * - VoiceInputManager
- * - OCRManager
  * - PreferencesManager
  * - LanguageManager
  * - Use Cases
@@ -61,11 +56,6 @@ val presentationModule = module {
         VoiceAudioRecorder(androidContext())
     }
 
-    // OCR Manager (factory-scoped so closed recognizer is never reused across ChatViewModel instances)
-    factory {
-        OCRManager(androidContext())
-    }
-
     // Google Play Billing for donation subscriptions
     single<DonationBillingService> {
         GooglePlayDonationBillingService(androidContext())
@@ -91,7 +81,6 @@ val presentationModule = module {
             voiceInputManager = get(),
             voiceAudioRecorder = get(),
             transcribeUseCase = get(),
-            ocrManager = get(),
             context = androidContext(),
             preferencesManager = get(),
             authRepository = get()

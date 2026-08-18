@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shamelagpt.android.core.util.ChatFlowDiagnostics
 import com.shamelagpt.android.core.util.Logger
-import com.shamelagpt.android.core.util.OCRManager
 import com.shamelagpt.android.core.util.VoiceAudioRecorder
 import com.shamelagpt.android.core.util.VoiceInputManager
 import com.shamelagpt.android.domain.usecase.TranscribeUseCase
@@ -42,7 +41,6 @@ import kotlin.coroutines.coroutineContext
  * @property sendMessageUseCase Use case for sending messages
  * @property conversationRepository Repository for conversation operations
  * @property voiceInputManager Manager for voice input
- * @property ocrManager Manager for OCR processing
  * @property context Application context for accessing content resolver
  */
 class ChatViewModel(
@@ -54,7 +52,6 @@ class ChatViewModel(
     private val voiceInputManager: VoiceInputManager,
     private val voiceAudioRecorder: VoiceAudioRecorder,
     private val transcribeUseCase: TranscribeUseCase,
-    private val ocrManager: OCRManager,
     private val context: Context,
     private val preferencesManager: PreferencesManager? = null,
     private val authRepository: AuthRepository? = null
@@ -513,11 +510,6 @@ class ChatViewModel(
                             )
                         }
                         else -> {
-                            // Forward-compatible: silently ignore unknown event
-                            // types. See ChatRemoteDataSourceImpl.validateStreamEvent
-                            // for context — new SSE event types from the backend
-                            // (e.g. "title", "fact_check_result") used to crash
-                            // every new-conversation send with E-CHAT-STREAM-UNKNOWN.
                             Logger.d(TAG, "Ignoring unknown stream event type '${event.type}'")
                         }
                     }
@@ -918,13 +910,6 @@ class ChatViewModel(
         }
     }
 
-    // Image Input Methods
-
-    /**
-     * Processes an image for text extraction via OCR with language detection.
-     *
-     * @param imageUri URI of the image to process
-     */
     fun processImage(imageUri: Uri) {
         Logger.i("ChatVM", "processImage called with URI: $imageUri")
 
@@ -934,7 +919,6 @@ class ChatViewModel(
         }
 
         viewModelScope.launch {
-            Logger.d("ChatVM", "Setting image processing state")
             _uiState.update { state ->
                 state.copy(
                     imageInputState = state.imageInputState.copy(
@@ -942,86 +926,83 @@ class ChatViewModel(
                         extractedText = "",
                         detectedLanguage = null,
                         imageData = null,
+                        imageUrl = null,
+                        imageBase64 = null,
                         imageUri = imageUri,
                         error = null
                     )
                 )
             }
 
-            // Load image data from URI
-            Logger.d("ChatVM", "Loading image data from content resolver")
             val imageData = try {
-                context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
-                    val bytes = inputStream.readBytes()
-                    Logger.d("ChatVM", "Image data loaded successfully, size: ${bytes.size} bytes")
-                    bytes
-                }
+                context.contentResolver.openInputStream(imageUri)?.use { it.readBytes() }
             } catch (e: Exception) {
                 Logger.e("ChatVM", "Failed to load image data from URI", e)
                 null
             }
 
             if (imageData == null) {
-                Logger.e("ChatVM", "Image data is null, cannot proceed with OCR")
                 onOcrError("Failed to load image data")
                 return@launch
             }
 
-            Logger.d("ChatVM", "Calling ocrManager.recognizeTextWithLanguage")
-            try {
-                val result = ocrManager.recognizeTextWithLanguage(imageUri)
-                result.fold(
-                    onSuccess = { ocrResult ->
-                        Logger.i("ChatVM", "OCR result received, text length: ${ocrResult.text.length}")
-                        onOcrResult(
-                            text = ocrResult.text,
-                            detectedLanguage = ocrResult.detectedLanguage,
-                            imageData = imageData,
-                            imageUri = imageUri
-                        )
-                    },
-                    onFailure = { error ->
-                        Logger.e("ChatVM", "OCR failed: ${error.message}")
-                        onOcrError(error.message ?: "OCR failed")
+            val imageBase64 = Base64.encodeToString(imageData, Base64.NO_WRAP)
+            ocrUseCase(
+                imageBase64 = imageBase64,
+                threadId = _uiState.value.threadId,
+                languageHint = ocrLanguageHint()
+            ).fold(
+                onSuccess = { response ->
+                    val extracted = response.extractedText.trim()
+                    if (extracted.isEmpty()) {
+                        onOcrError(context.getString(R.string.ocr_error_no_text))
+                        return@fold
                     }
-                )
-            } catch (e: Exception) {
-                Logger.e("ChatVM", "OCR exception: ${e.message}")
-                onOcrError(e.message ?: "OCR failed")
-            }
+                    onOcrResult(
+                        text = extracted,
+                        detectedLanguage = normalizeDetectedLanguage(response.metadata?.detectedLanguage),
+                        imageData = imageData,
+                        imageUri = imageUri,
+                        imageUrl = response.imageUrl.trim().takeIf { it.isNotBlank() },
+                        imageBase64 = imageBase64
+                    )
+                },
+                onFailure = { error ->
+                    Logger.e("ChatVM", "OCR failed: ${error.message}")
+                    val message = when (error) {
+                        is NetworkError -> ChatOperationError.from(context, ChatOperation.OCR, error).userMessage
+                        else -> error.message ?: "OCR failed"
+                    }
+                    onOcrError(message)
+                }
+            )
         }
     }
 
-    /**
-     * Handles successful OCR result and shows confirmation dialog.
-     *
-     * @param text Extracted text
-     * @param detectedLanguage Detected language code
-     * @param imageData Raw image data
-     * @param imageUri Image URI
-     */
-    fun onOcrResult(text: String, detectedLanguage: String?, imageData: ByteArray, imageUri: Uri) {
+    fun onOcrResult(
+        text: String,
+        detectedLanguage: String?,
+        imageData: ByteArray,
+        imageUri: Uri,
+        imageUrl: String? = null,
+        imageBase64: String? = null
+    ) {
         Logger.i("ChatVM", "onOcrResult called - showing confirmation dialog")
-        Logger.d("ChatVM", "Extracted text preview: ${text.take(100)}")
-        Logger.d("ChatVM", "Detected language: $detectedLanguage")
-        Logger.d("ChatVM", "Image data size: ${imageData.size} bytes")
-
         _uiState.update { state ->
             state.copy(
                 imageInputState = state.imageInputState.copy(
                     isProcessing = false,
                     extractedText = text,
-                    detectedLanguage = detectedLanguage,
+                    detectedLanguage = normalizeDetectedLanguage(detectedLanguage) ?: detectedLanguage,
                     imageData = imageData,
-                    imageBase64 = Base64.encodeToString(imageData, Base64.NO_WRAP),
+                    imageUrl = imageUrl?.trim()?.takeIf { it.isNotBlank() },
+                    imageBase64 = imageBase64 ?: Base64.encodeToString(imageData, Base64.NO_WRAP),
                     imageUri = imageUri,
                     showConfirmationDialog = true,
                     error = null
                 )
             )
         }
-
-        Logger.d("ChatVM", "Confirmation dialog state updated, showConfirmationDialog = true")
     }
 
     /**
@@ -1240,11 +1221,7 @@ class ChatViewModel(
                                     )
                                 }
                                 else -> {
-                                    throw ChatOperationException(
-                                        operation = ChatOperation.FACT_CHECK,
-                                        code = "E-CHAT-FACT-UNKNOWN",
-                                        message = "Unknown fact-check event type '${event.type}'"
-                                    )
+                                    Logger.d(TAG, "Ignoring unknown stream event type '${event.type}'")
                                 }
                             }
                         }
@@ -1430,7 +1407,6 @@ class ChatViewModel(
         ChatFlowDiagnostics.clear(detail = "chat.vmCleared")
         voiceAudioRecorder.destroy()
         voiceInputManager.destroy()
-        ocrManager.close()
     }
 
     private fun createFreshUiState(): ChatUiState {
@@ -1440,6 +1416,22 @@ class ChatViewModel(
                 requiresMicPermission = true
             )
         )
+    }
+
+    private fun ocrLanguageHint(): String? {
+        return when (resolveLanguagePreference().lowercase(Locale.ROOT)) {
+            "ar", "arabic" -> "Arabic"
+            "en", "english" -> "English"
+            else -> null
+        }
+    }
+
+    private fun normalizeDetectedLanguage(raw: String?): String? {
+        return when (raw?.trim()?.lowercase(Locale.ROOT)) {
+            "ar", "arabic" -> "ar"
+            "en", "english" -> "en"
+            else -> raw?.trim()?.takeIf { it.isNotBlank() }
+        }
     }
 
     private fun resolveLanguagePreference(): String {
@@ -1565,12 +1557,12 @@ class ChatViewModel(
             shouldRequireGuestSignup(conversationId, messages)
     }
 
-    private companion object {
-        const val DEFAULT_THINKING_MESSAGE = "Thinking..."
+    companion object {
         const val MODE_RESEARCH = 1
         const val MODE_FACT_CHECK = 2
-        const val GUEST_FREE_QUESTION_LIMIT = 10
+        private const val DEFAULT_THINKING_MESSAGE = "Thinking..."
+        private const val GUEST_FREE_QUESTION_LIMIT = 10
         @Volatile
-        var factCheckRequiresImageUrl: Boolean = false
+        private var factCheckRequiresImageUrl: Boolean = false
     }
 }
