@@ -52,6 +52,8 @@
 
                 <data android:scheme="https" android:host="shamelagpt.com" android:pathPrefix="/chat" />
                 <data android:scheme="https" android:host="www.shamelagpt.com" android:pathPrefix="/chat" />
+                <data android:scheme="https" android:host="shamelagpt.com" android:pathPrefix="/shared" />
+                <data android:scheme="https" android:host="www.shamelagpt.com" android:pathPrefix="/shared" />
             </intent-filter>
         </activity>
 

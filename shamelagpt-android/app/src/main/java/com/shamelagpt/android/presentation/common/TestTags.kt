@@ -61,6 +61,7 @@ object TestTags {
         const val LengthItem = "settingLengthItem"
         const val StyleItem = "settingStyleItem"
         const val FocusItem = "settingFocusItem"
+        const val MadhabItem = "settingMadhabItem"
         const val SavePreferencesButton = "savePreferencesButton"
         const val SignInButton = "settingsSignInButton"
         const val SupportItem = "settingsSupportItem"

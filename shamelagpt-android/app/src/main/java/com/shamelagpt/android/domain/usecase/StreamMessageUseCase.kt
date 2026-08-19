@@ -7,7 +7,6 @@ import com.shamelagpt.android.data.remote.dto.StreamEvent
 import com.shamelagpt.android.domain.repository.ChatRepository
 import com.shamelagpt.android.domain.repository.ConversationRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import java.util.Locale
 
 private const val TAG = "StreamMessageUseCase"
@@ -61,17 +60,18 @@ class StreamMessageUseCase(
             Log.d(TAG, "Created new conversation: ${conversation.id}")
             conversation.id
         }
-        val resolvedThreadId = if (
-            existingConversation != null &&
-            !existingConversation.isLocalOnly &&
-            existingConversation.threadId.isNullOrBlank() &&
-            conversationRepository.getMessagesByConversationId(existingConversation.id).first().isNotEmpty()
-        ) {
-            Log.d(TAG, "Thread ID missing; defaulting to conversationId for continuity")
-            conversationRepository.updateConversationThread(existingConversation.id, existingConversation.id)
-            existingConversation.id
-        } else {
-            existingConversation?.threadId ?: threadId
+        val createdOrLoaded = existingConversation
+            ?: conversationRepository.getConversationById(actualConversationId)
+        val resolvedThreadId = when {
+            createdOrLoaded?.isLocalOnly == true ->
+                createdOrLoaded.threadId ?: threadId
+            !createdOrLoaded?.threadId.isNullOrBlank() ->
+                createdOrLoaded?.threadId
+            !threadId.isNullOrBlank() -> threadId
+            else -> {
+                conversationRepository.updateConversationThread(actualConversationId, actualConversationId)
+                actualConversationId
+            }
         }
 
         // Send message to repository for streaming

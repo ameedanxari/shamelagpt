@@ -178,13 +178,14 @@ class HistoryViewModel(
      * Marks the conversation as public and returns a shareable link.
      */
     suspend fun enableSharing(conversation: Conversation): Result<String> {
+        val shareId = ShareLink.targetId(conversation.id, conversation.threadId)
         val result = conversationRepository.setConversationShared(
-            id = conversation.id,
+            id = shareId,
             isShared = true
         )
         return result.fold(
             onSuccess = { serverUrl ->
-                Result.success(ShareLink.normalize(serverUrl, conversation.id))
+                Result.success(ShareLink.normalize(serverUrl, shareId))
             },
             onFailure = { error ->
                 Log.e(TAG, "Failed to enable sharing for conversation ${conversation.id}", error)
@@ -203,7 +204,10 @@ class HistoryViewModel(
 
     fun exportConversation(conversation: Conversation, shareUrl: String? = null): String {
         val title = displayTitle(conversation)
-        val link = ShareLink.normalize(shareUrl, conversation.id)
+        val link = ShareLink.normalize(
+            shareUrl,
+            ShareLink.targetId(conversation.id, conversation.threadId)
+        )
         val preview = messagePreview(conversation)
         val updated = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
             .format(Date(conversation.updatedAt))

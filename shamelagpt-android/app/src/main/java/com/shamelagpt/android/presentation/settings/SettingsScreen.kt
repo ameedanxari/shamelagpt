@@ -150,6 +150,28 @@ fun SettingsScreen(
                         val practicalText = stringResource(R.string.settings_pref_focus_practical)
                         val theoreticalText = stringResource(R.string.settings_pref_focus_theoretical)
                         val historicalText = stringResource(R.string.settings_pref_focus_historical)
+                        var showMadhabDialog by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+                        val madhabPreference = viewModel.madhabPreference.collectAsState().value
+                        val madhabAll = stringResource(R.string.settings_madhab_all)
+                        val madhabHanafi = stringResource(R.string.settings_madhab_hanafi)
+                        val madhabMaliki = stringResource(R.string.settings_madhab_maliki)
+                        val madhabShafii = stringResource(R.string.settings_madhab_shafii)
+                        val madhabHanbali = stringResource(R.string.settings_madhab_hanbali)
+                        val madhabLabel = when (madhabPreference) {
+                            "hanafi" -> madhabHanafi
+                            "maliki" -> madhabMaliki
+                            "shafii" -> madhabShafii
+                            "hanbali" -> madhabHanbali
+                            else -> madhabAll
+                        }
+
+                        SettingsItem(
+                            title = stringResource(R.string.settings_madhab_title),
+                            subtitle = madhabLabel,
+                            icon = Icons.Default.AccountBalance,
+                            onClick = { showMadhabDialog = true },
+                            modifier = Modifier.testTag(TestTags.Settings.MadhabItem)
+                        )
 
                         SettingsItem(
                             title = stringResource(R.string.settings_pref_length_title),
@@ -205,6 +227,35 @@ fun SettingsScreen(
                         }
 
                         // Dialogs
+                        if (showMadhabDialog) {
+                            val options = listOf(
+                                "all" to madhabAll,
+                                "hanafi" to madhabHanafi,
+                                "maliki" to madhabMaliki,
+                                "shafii" to madhabShafii,
+                                "hanbali" to madhabHanbali
+                            )
+                            AlertDialog(
+                                onDismissRequest = { showMadhabDialog = false },
+                                title = { Text(stringResource(R.string.settings_madhab_title)) },
+                                text = {
+                                    Column {
+                                        options.forEach { (value, label) ->
+                                            ListItem(
+                                                headlineContent = { Text(label) },
+                                                modifier = Modifier.clickable {
+                                                    viewModel.updateMadhabPreference(value)
+                                                    showMadhabDialog = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                },
+                                confirmButton = {},
+                                dismissButton = {}
+                            )
+                        }
+
                         if (showLengthDialog) {
                             val options = listOf("short" to shortText, "medium" to mediumText, "detailed" to detailedText)
                             AlertDialog(

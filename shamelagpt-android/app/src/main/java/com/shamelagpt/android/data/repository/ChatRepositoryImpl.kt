@@ -48,7 +48,12 @@ class ChatRepositoryImpl(
         val conversation = conversationRepository.getConversationById(conversationId)
         val isGuestConversation = conversation?.isLocalOnly == true
         Log.d(TAG, "isGuestConversation=$isGuestConversation")
-        val effectiveThreadId = conversation?.threadId ?: threadId
+        val effectiveThreadId = resolveServerThreadId(
+            conversation = conversation,
+            conversationId = conversationId,
+            threadId = threadId,
+            isGuest = isGuestConversation
+        )
         val sessionId = if (isGuestConversation) {
             effectiveThreadId ?: conversationId
         } else null
@@ -136,7 +141,12 @@ class ChatRepositoryImpl(
         val conversation = conversationRepository.getConversationById(conversationId)
         val isGuestConversation = conversation?.isLocalOnly == true
         Log.d(TAG, "isGuestConversation=$isGuestConversation")
-        val effectiveThreadId = conversation?.threadId ?: threadId
+        val effectiveThreadId = resolveServerThreadId(
+            conversation = conversation,
+            conversationId = conversationId,
+            threadId = threadId,
+            isGuest = isGuestConversation
+        )
         val sessionId = if (isGuestConversation) {
             effectiveThreadId ?: conversationId
         } else null
@@ -210,5 +220,24 @@ class ChatRepositoryImpl(
 
     override suspend fun checkHealth(): Result<HealthResponse> {
         return chatRemoteDataSource.checkHealth()
+    }
+
+    /**
+     * `/api/chat/stream` treats a missing `thread_id` as "create a new conversation".
+     * Android already created one via POST /api/conversations, so the first message
+     * must send that id or the share link points at an empty chat.
+     */
+    private fun resolveServerThreadId(
+        conversation: com.shamelagpt.android.domain.model.Conversation?,
+        conversationId: String,
+        threadId: String?,
+        isGuest: Boolean
+    ): String? {
+        val stored = conversation?.threadId?.trim()?.takeIf { it.isNotEmpty() }
+        val passed = threadId?.trim()?.takeIf { it.isNotEmpty() }
+        if (isGuest) {
+            return stored ?: passed
+        }
+        return stored ?: passed ?: conversationId
     }
 }

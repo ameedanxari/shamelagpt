@@ -1,9 +1,11 @@
 package com.shamelagpt.android.presentation.settings
 
 import android.util.Log
+import com.shamelagpt.android.core.util.Logger
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shamelagpt.android.core.util.LanguageManager
+import com.shamelagpt.android.domain.model.MadhabPreference
 import com.shamelagpt.android.domain.model.ResponsePreferences
 import com.shamelagpt.android.domain.model.UserPreferences
 import com.shamelagpt.android.domain.repository.AuthRepository
@@ -33,6 +35,8 @@ class SettingsViewModel(
     val customPrompt: StateFlow<String> = _customPrompt.asStateFlow()
     private val _responsePreferences = MutableStateFlow(ResponsePreferences())
     val responsePreferences: StateFlow<ResponsePreferences> = _responsePreferences.asStateFlow()
+    private val _madhabPreference = MutableStateFlow(MadhabPreference.ALL)
+    val madhabPreference: StateFlow<String> = _madhabPreference.asStateFlow()
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
@@ -50,6 +54,7 @@ class SettingsViewModel(
             _isAuthenticated.value = authRepository.isLoggedIn()
             if (_isAuthenticated.value) {
                 loadPreferences()
+                loadMadhabPreference()
             }
         }
     }
@@ -98,6 +103,27 @@ class SettingsViewModel(
             Log.d(TAG, "Saving preferences with language: ${prefs.languagePreference}")
             preferencesRepository.updatePreferences(prefs)
             Log.d(TAG, "savePreferences() completed")
+        }
+    }
+
+    fun updateMadhabPreference(madhab: String) {
+        val normalized = MadhabPreference.normalize(madhab)
+        _madhabPreference.value = normalized
+        viewModelScope.launch {
+            authRepository.setMadhabPreference(normalized).onSuccess { response ->
+                val saved = MadhabPreference.normalize(response.madhabPreference)
+                _madhabPreference.value = saved
+            }.onFailure { error ->
+                Logger.e(TAG, "Failed to save madhab preference: ${error.message}", error)
+                _error.value = error.message
+                loadMadhabPreference()
+            }
+        }
+    }
+
+    private suspend fun loadMadhabPreference() {
+        authRepository.getMadhabPreference().onSuccess { response ->
+            _madhabPreference.value = MadhabPreference.normalize(response.madhabPreference)
         }
     }
 

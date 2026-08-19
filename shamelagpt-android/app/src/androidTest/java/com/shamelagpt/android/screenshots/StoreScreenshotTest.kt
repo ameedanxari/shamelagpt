@@ -203,6 +203,7 @@ class StoreScreenshotTest {
         every { vm.responsePreferences } returns prefsFlow
         every { vm.isDeletingAccount } returns MutableStateFlow(false)
         every { vm.deleteAccountError } returns MutableStateFlow(false)
+        every { vm.madhabPreference } returns MutableStateFlow("hanafi")
         return vm
     }
 

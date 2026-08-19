@@ -21,6 +21,8 @@ import com.shamelagpt.android.data.remote.dto.OCRResponse
 import com.shamelagpt.android.data.remote.dto.ConfirmFactCheckRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
+import com.shamelagpt.android.data.remote.dto.MadhabPreferenceRequest
+import com.shamelagpt.android.data.remote.dto.MadhabPreferenceResponse
 import com.shamelagpt.android.data.remote.dto.TranscribeResponse
 import com.shamelagpt.android.data.remote.dto.ShareConversationRequest
 import com.shamelagpt.android.data.remote.dto.ShareStatusResponse
@@ -150,6 +152,12 @@ interface ApiService {
      */
     @PUT("api/auth/me/mode")
     suspend fun setModePreference(@Body request: ModePreferenceRequest): ModePreferenceResponse
+
+    @GET("api/auth/me/madhab")
+    suspend fun getMadhabPreference(): MadhabPreferenceResponse
+
+    @PUT("api/auth/me/madhab")
+    suspend fun setMadhabPreference(@Body request: MadhabPreferenceRequest): MadhabPreferenceResponse
 
     @POST("api/chat/generate-title")
     suspend fun generateTitle(@Body request: ConversationRequest): com.shamelagpt.android.data.remote.dto.GenerateTitleResponse

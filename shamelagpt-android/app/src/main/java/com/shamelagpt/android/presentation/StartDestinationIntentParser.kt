@@ -2,6 +2,7 @@ package com.shamelagpt.android.presentation
 
 import android.content.Intent
 import android.net.Uri
+import com.shamelagpt.android.core.util.ShareLink
 import com.shamelagpt.android.presentation.navigation.ChatRoute
 import com.shamelagpt.android.presentation.navigation.HistoryRoute
 import com.shamelagpt.android.presentation.navigation.SettingsRoute
@@ -68,8 +69,15 @@ object StartDestinationIntentParser {
     }
 
     private fun chatRouteFromUriWithChatId(data: Uri): ChatRoute {
-        // handles /shared?chatid=...
-        val conversationId = data.getQueryParameter("chatid")?.takeIf { it.isNotBlank() }
+        val conversationId = ShareLink.conversationIdFrom(
+            path = data.path.orEmpty(),
+            chatIdQuery = data.getQueryParameter("chatid"),
+            idQuery = data.getQueryParameter("id")
+        )
         return ChatRoute(conversationId)
+    }
+
+    fun isSharedPath(data: Uri): Boolean {
+        return data.path.orEmpty().lowercase().startsWith("/shared")
     }
 }

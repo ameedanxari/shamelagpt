@@ -1,7 +1,10 @@
 package com.shamelagpt.android.presentation
 
 import android.os.Bundle
+import android.content.ComponentName
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -28,12 +31,16 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.shamelagpt.android.R
+import com.shamelagpt.android.core.util.ShareLink
+import com.shamelagpt.android.core.util.DonationLinkHandler
 import com.shamelagpt.android.core.util.FactCheckSharePayloadStore
+import com.shamelagpt.android.core.util.EmailIntentHelper
+import com.shamelagpt.android.domain.repository.ConversationRepository
 import com.shamelagpt.android.presentation.navigation.AuthRoute
 import com.shamelagpt.android.presentation.navigation.ChatRoute
 import com.shamelagpt.android.presentation.theme.ShamelaGPTTheme
 import com.shamelagpt.android.presentation.welcome.WelcomeScreen
-import com.shamelagpt.android.core.util.EmailIntentHelper
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -53,6 +60,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var lastShakeTime = 0L
     private var onShake: (() -> Unit)? = null
     private val startupViewModel: com.shamelagpt.android.presentation.startup.AppStartupViewModel by viewModel()
+    private val conversationRepository: ConversationRepository by inject()
     override fun onCreate(savedInstanceState: Bundle?) {
         // Install splash screen before super.onCreate()
         val splashScreen = installSplashScreen()
@@ -67,34 +75,39 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
 
         startupViewModel.bootstrap()
+        val incomingDestination = mutableStateOf<Any?>(null)
+        val incomingReady = mutableStateOf(false)
         lifecycleScope.launch {
             startupViewModel.uiState.first { !it.isBootstrapping }
+            incomingDestination.value = resolveIncomingDestination(intent)
+            incomingReady.value = true
             keepSplashScreen = false
         }
-
-        // Parse intent for possible deep link or shared payload and provide as initial start destination
-        val initialStartDestination: Any? = parseIntentForStartDestination(intent)
 
         setContent {
             ShamelaGPTTheme {
                 val startupUiState by startupViewModel.uiState.collectAsState()
                 
-                // Track start destination if coming from Welcome screen
-                val startDestination = remember { mutableStateOf<Any?>(initialStartDestination) }
-                
-                // State to control welcome screen visibility
+                val startDestination = incomingDestination
                 val showWelcome = remember { mutableStateOf(false) }
                 val showFeedbackDialog = remember { mutableStateOf(false) }
                 val context = LocalContext.current
+                val incomingResolved by incomingReady
 
                 DisposableEffect(Unit) {
                     onShake = { showFeedbackDialog.value = true }
                     onDispose { onShake = null }
                 }
 
-                LaunchedEffect(startupUiState.isBootstrapping, startupUiState.isAuthenticated) {
-                    if (!startupUiState.isBootstrapping) {
-                        showWelcome.value = !startupUiState.isAuthenticated
+                LaunchedEffect(
+                    startupUiState.isBootstrapping,
+                    startupUiState.isAuthenticated,
+                    incomingResolved,
+                    startDestination.value
+                ) {
+                    if (!startupUiState.isBootstrapping && incomingResolved) {
+                        showWelcome.value =
+                            startDestination.value == null && !startupUiState.isAuthenticated
                     }
                 }
 
@@ -102,8 +115,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (startupUiState.isBootstrapping) {
-                        // Hidden behind native splash while bootstrapping.
+                    if (startupUiState.isBootstrapping || !incomingResolved) {
                         Box(modifier = Modifier.fillMaxSize())
                     } else if (!showWelcome.value) {
                         // Show main app (either auth or chat depending on login state or override)
@@ -155,9 +167,46 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    private fun parseIntentForStartDestination(intent: Intent?): Any? {
+    private suspend fun resolveIncomingDestination(intent: Intent?): Any? {
         FactCheckSharePayloadStore.storeFromIntent(this, intent)
-        return StartDestinationIntentParser.parse(intent)
+        val parsed = StartDestinationIntentParser.parse(intent)
+        val data = intent?.data ?: return parsed
+        if (!StartDestinationIntentParser.isSharedPath(data)) {
+            return parsed
+        }
+
+        val conversationId = ShareLink.conversationIdFrom(
+            path = data.path.orEmpty(),
+            chatIdQuery = data.getQueryParameter("chatid"),
+            idQuery = data.getQueryParameter("id")
+        ) ?: return ChatRoute()
+
+        return when (val action = SharedConversationRouter.resolve(conversationId, conversationRepository)) {
+            is SharedLinkAction.OpenInApp -> ChatRoute(conversationId)
+            is SharedLinkAction.OpenInBrowser -> {
+                openPublicShare(action.url)
+                null
+            }
+        }
+    }
+
+    private fun openPublicShare(url: String) {
+        val uri = Uri.parse(url)
+        try {
+            val viewIntent = Intent(Intent.ACTION_VIEW, uri).apply {
+                addCategory(Intent.CATEGORY_BROWSABLE)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    putExtra(
+                        Intent.EXTRA_EXCLUDE_COMPONENTS,
+                        arrayOf(ComponentName(this@MainActivity, MainActivity::class.java))
+                    )
+                }
+            }
+            startActivity(viewIntent)
+        } catch (_: Exception) {
+            DonationLinkHandler.openUrl(this, url)
+        }
     }
 
     override fun onResume() {
@@ -175,9 +224,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     // Handle new intents from deep links or intent forwarding
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        // Replace current intent and recreate to allow Compose to pick up new startDestination
-        setIntent(intent)
-        recreate()
+        lifecycleScope.launch {
+            val destination = resolveIncomingDestination(intent)
+            if (destination != null) {
+                setIntent(intent)
+                recreate()
+            }
+        }
     }
 
     override fun onSensorChanged(event: SensorEvent?) {

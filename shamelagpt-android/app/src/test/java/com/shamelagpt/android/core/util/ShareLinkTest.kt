@@ -63,4 +63,41 @@ class ShareLinkTest {
         val result = ShareLink.normalize("https://shamelagpt.com/pricing", conversationId = "abc-123")
         assertThat(result).isEqualTo("https://shamelagpt.com/shared?chatid=abc-123")
     }
+
+    @Test
+    fun conversationIdFromQueryChatId() {
+        val id = ShareLink.conversationIdFrom(
+            path = "/shared",
+            chatIdQuery = "abc-123",
+            idQuery = null
+        )
+        assertThat(id).isEqualTo("abc-123")
+    }
+
+    @Test
+    fun conversationIdFromLegacyPathSegment() {
+        val id = ShareLink.conversationIdFrom(
+            path = "/shared/conv-legacy",
+            chatIdQuery = null,
+            idQuery = null
+        )
+        assertThat(id).isEqualTo("conv-legacy")
+    }
+
+    @Test
+    fun conversationIdFromSharedPathWithoutIdIsNull() {
+        val id = ShareLink.conversationIdFrom(
+            path = "/shared",
+            chatIdQuery = null,
+            idQuery = null
+        )
+        assertThat(id).isNull()
+    }
+
+    @Test
+    fun targetIdPrefersThreadIdWhenPresent() {
+        assertThat(ShareLink.targetId("local-id", "server-id")).isEqualTo("server-id")
+        assertThat(ShareLink.targetId("local-id", "  ")).isEqualTo("local-id")
+        assertThat(ShareLink.targetId("local-id", null)).isEqualTo("local-id")
+    }
 }

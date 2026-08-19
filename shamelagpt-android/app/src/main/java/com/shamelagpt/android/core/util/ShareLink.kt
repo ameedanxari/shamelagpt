@@ -12,6 +12,24 @@ object ShareLink {
 
     private const val PRODUCTION_ORIGIN = "https://shamelagpt.com"
 
+    fun targetId(conversationId: String, threadId: String?): String {
+        return threadId?.trim()?.takeIf { it.isNotEmpty() } ?: conversationId
+    }
+
+    fun conversationIdFrom(
+        path: String,
+        chatIdQuery: String?,
+        idQuery: String?
+    ): String? {
+        chatIdQuery?.trim()?.takeIf { it.isNotEmpty() }?.let { return it }
+        idQuery?.trim()?.takeIf { it.isNotEmpty() }?.let { return it }
+        val segments = path.split("/").filter { it.isNotEmpty() }
+        if (segments.size >= 2 && segments.first().equals("shared", ignoreCase = true)) {
+            return segments[1].takeIf { it.isNotBlank() }
+        }
+        return null
+    }
+
     fun normalize(raw: String?, conversationId: String): String {
         val canonical = canonical(conversationId)
         val trimmed = raw?.trim().orEmpty()
