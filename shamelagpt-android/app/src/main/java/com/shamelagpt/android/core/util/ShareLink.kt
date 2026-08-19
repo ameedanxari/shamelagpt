@@ -5,30 +5,13 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 /**
- * Builds the canonical public share link for a conversation.
- *
- * The app and backend deploy independently. An older backend still returns the
- * legacy path-segment form `https://shamelagpt.com/shared/<id>`, which the web
- * SPA does not route. Normalizing client-side makes the shared link work
- * regardless of which side ships first.
+ * Public share URL: `https://shamelagpt.com/shared?chatid=<id>`.
+ * Older backends return `/shared/<id>`; normalize that so the web SPA can open it.
  */
 object ShareLink {
 
-    const val PRODUCTION_ORIGIN = "https://shamelagpt.com"
+    private const val PRODUCTION_ORIGIN = "https://shamelagpt.com"
 
-    fun canonical(conversationId: String, origin: String = PRODUCTION_ORIGIN): String {
-        val escaped = URLEncoder.encode(conversationId, StandardCharsets.UTF_8.name())
-            .replace("+", "%20")
-        return "$origin/shared?chatid=$escaped"
-    }
-
-    /**
-     * Normalizes a server-supplied share URL into the working query form.
-     *
-     * @param raw The `share_url` returned by the backend, if any.
-     * @param conversationId The conversation the link should point at.
-     * @return A link of the shape `<origin>/shared?chatid=<id>`.
-     */
     fun normalize(raw: String?, conversationId: String): String {
         val canonical = canonical(conversationId)
         val trimmed = raw?.trim().orEmpty()
@@ -69,5 +52,11 @@ object ShareLink {
             origin += ":${uri.port}"
         }
         return canonical(conversationId, origin)
+    }
+
+    private fun canonical(conversationId: String, origin: String = PRODUCTION_ORIGIN): String {
+        val escaped = URLEncoder.encode(conversationId, StandardCharsets.UTF_8.name())
+            .replace("+", "%20")
+        return "$origin/shared?chatid=$escaped"
     }
 }

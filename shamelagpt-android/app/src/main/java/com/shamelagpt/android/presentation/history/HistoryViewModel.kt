@@ -175,9 +175,7 @@ class HistoryViewModel(
     }
 
     /**
-     * Enables sharing server-side and returns the canonical public link.
-     * The PUT must happen before the share sheet: without it `is_shared` stays
-     * false and the recipient's GET /api/shared/{id} returns 404.
+     * Marks the conversation as public and returns a shareable link.
      */
     suspend fun enableSharing(conversation: Conversation): Result<String> {
         val result = conversationRepository.setConversationShared(

@@ -11,7 +11,7 @@ package com.shamelagpt.android.domain.model
  * @property imageData Compressed image thumbnail as byte array (for fact-check messages)
  * @property detectedLanguage ISO language code of detected text (e.g., "en", "ar")
  * @property isFactCheckMessage True if this is a fact-checking message
- * @property isComplete False when the AI stream was cut off and can be continued
+ * @property isComplete False when the AI stream was cut off
  */
 data class Message(
     val id: String,

@@ -83,7 +83,7 @@ class ChatViewModel(
     private fun loadModePreference() {
         if (authRepository == null) return
         _isModeLoading.value = true
-        activeGenerationJob = viewModelScope.launch {
+        viewModelScope.launch {
             authRepository.getModePreference().onSuccess { response ->
                 _modePreference.value = response.modePreference
             }.onFailure {
@@ -114,6 +114,8 @@ class ChatViewModel(
     private var activeConversationLoadId: String? = null
     private var activeGenerationJob: Job? = null
     private var stopRequestedByUser: Boolean = false
+    private var lastFactCheckImageUrl: String? = null
+    private var lastFactCheckImageBase64: String? = null
 
     // Track if streaming was interrupted by app backgrounding
     private var streamInterrupted = false
@@ -488,10 +490,11 @@ class ChatViewModel(
                             sawDone = true
                             val partial = event.fullAnswer ?: event.content ?: assembledContent
                             if (partial.isNotBlank()) {
-                                persistIncompleteAssistant(
+                                persistAssistantResponse(
                                     conversationId = actualConversationId,
                                     content = partial,
-                                    localId = assistantMessageId
+                                    isComplete = false,
+                                    preferredId = assistantMessageId
                                 )
                             }
                             _uiState.update { state ->
@@ -516,10 +519,11 @@ class ChatViewModel(
                 }
                 if (!sawDone) {
                     if (assembledContent.isNotBlank()) {
-                        persistIncompleteAssistant(
+                        persistAssistantResponse(
                             conversationId = actualConversationId,
                             content = assembledContent,
-                            localId = assistantMessageId
+                            isComplete = false,
+                            preferredId = assistantMessageId
                         )
                         _uiState.update { state ->
                             state.copy(
@@ -620,10 +624,11 @@ class ChatViewModel(
         viewModelScope.launch {
             if (conversationId != null && partial != null && partial.content.isNotBlank()) {
                 runCatching {
-                    persistIncompleteAssistant(
+                    persistAssistantResponse(
                         conversationId = conversationId,
                         content = partial.content,
-                        localId = partial.id,
+                        isComplete = false,
+                        preferredId = partial.id,
                         isFactCheck = partial.isFactCheckMessage
                     )
                 }.onFailure {
@@ -638,14 +643,6 @@ class ChatViewModel(
                     thinkingMessages = emptyList()
                 )
             }
-
-            if (conversationId != null && authRepository?.isLoggedIn() == true) {
-                loadConversation(conversationId, showHydrationUi = false)
-                viewModelScope.launch {
-                    kotlinx.coroutines.delay(1200)
-                    loadConversation(conversationId, showHydrationUi = false)
-                }
-            }
         }
     }
 
@@ -656,14 +653,32 @@ class ChatViewModel(
         val assistantIndex = state.messages.indexOfFirst { it.id == messageId && !it.isUserMessage }
         if (assistantIndex <= 0) return
 
-        val prompt = state.messages
+        val promptMessage = state.messages
             .subList(0, assistantIndex)
             .lastOrNull { it.isUserMessage }
-            ?.content
-            ?.trim()
             ?: return
-
+        val prompt = promptMessage.content.trim()
         if (prompt.isBlank()) return
+
+        if (promptMessage.isFactCheckMessage) {
+            val imageData = promptMessage.imageData
+            val imageBase64 = lastFactCheckImageBase64
+                ?: imageData?.let { Base64.encodeToString(it, Base64.NO_WRAP) }
+            _uiState.update { current ->
+                current.copy(
+                    imageInputState = ImageInputState(
+                        imageData = imageData,
+                        imageBase64 = imageBase64,
+                        imageUrl = lastFactCheckImageUrl,
+                        detectedLanguage = promptMessage.detectedLanguage,
+                        extractedText = prompt
+                    )
+                )
+            }
+            confirmFactCheck(prompt)
+            return
+        }
+
         sendMessage(prompt)
     }
 
@@ -1005,11 +1020,6 @@ class ChatViewModel(
         }
     }
 
-    /**
-     * Confirms the OCR result and sends as fact-check message using the new backend flow.
-     *
-     * @param confirmedText The final text after user edits
-     */
     fun confirmFactCheck(confirmedText: String) {
         Logger.i("ChatVM", "confirmFactCheck (streaming) called with text: ${confirmedText.take(100)}")
         ChatFlowDiagnostics.markPhase(
@@ -1022,11 +1032,11 @@ class ChatViewModel(
         val currentState = _uiState.value
         val imageState = currentState.imageInputState
         val imageData = imageState.imageData
-        val imageBase64 = imageState.imageBase64
-        val imageUrl = imageState.imageUrl
+        val imageBase64 = imageState.imageBase64 ?: lastFactCheckImageBase64
+        val imageUrl = imageState.imageUrl ?: lastFactCheckImageUrl
         val detectedLanguage = imageState.detectedLanguage
 
-        if (imageData == null) {
+        if (imageData == null && imageUrl.isNullOrBlank() && imageBase64.isNullOrBlank()) {
             Logger.e("ChatVM", "Missing image data for fact-check confirmation")
             val failure = ChatOperationError.from(
                 context,
@@ -1042,9 +1052,11 @@ class ChatViewModel(
             return
         }
 
+        lastFactCheckImageUrl = imageUrl
+        lastFactCheckImageBase64 = imageBase64
         Logger.d("ChatVM", "Dismissing confirmation dialog and starting backend stream")
 
-        viewModelScope.launch {
+        activeGenerationJob = viewModelScope.launch {
             if (shouldRequireGuestSignup(currentState.conversationId, currentState.messages)) {
                 _uiState.update { it.copy(imageInputState = ImageInputState(), isLoading = false) }
                 _events.send(ChatEvent.RequireSignup(guestLimitSignupMessage()))
@@ -1159,7 +1171,9 @@ class ChatViewModel(
                                                 id = assistantMessageId!!,
                                                 content = assembledContent,
                                                 isUserMessage = false,
-                                                timestamp = System.currentTimeMillis()
+                                                timestamp = System.currentTimeMillis(),
+                                                isFactCheckMessage = true,
+                                                isComplete = false
                                             )
                                         )
                                     }
@@ -1200,10 +1214,11 @@ class ChatViewModel(
                                     sawDone = true
                                     val partial = event.fullAnswer ?: event.content ?: assembledContent
                                     if (partial.isNotBlank()) {
-                                        persistIncompleteAssistant(
+                                        persistAssistantResponse(
                                             conversationId = actualConversationId,
                                             content = partial,
-                                            localId = assistantMessageId,
+                                            isComplete = false,
+                                            preferredId = assistantMessageId,
                                             isFactCheck = true
                                         )
                                     }
@@ -1227,10 +1242,11 @@ class ChatViewModel(
                         }
                         if (!sawDone) {
                             if (assembledContent.isNotBlank()) {
-                                persistIncompleteAssistant(
+                                persistAssistantResponse(
                                     conversationId = actualConversationId,
                                     content = assembledContent,
-                                    localId = assistantMessageId,
+                                    isComplete = false,
+                                    preferredId = assistantMessageId,
                                     isFactCheck = true
                                 )
                                 _uiState.update { it.copy(
@@ -1278,6 +1294,11 @@ class ChatViewModel(
                 Logger.i("ChatVM", "Fact-check stream cancelled by user")
                 ChatFlowDiagnostics.clear(detail = "chat.factCheck.cancelledByUser")
             } catch (e: Exception) {
+                if (stopRequestedByUser) {
+                    Logger.i("ChatVM", "Ignoring fact-check failure caused by user stop: ${e.message}")
+                    ChatFlowDiagnostics.clear(detail = "chat.factCheck.stopIgnoredError")
+                    return@launch
+                }
                 Logger.e("ChatVM", "Fact-check stream failed", e)
                 ChatFlowDiagnostics.markPhase(
                     phaseName = "chat.factCheck.failed",
@@ -1471,38 +1492,6 @@ class ChatViewModel(
                 isComplete = isComplete
             ),
             conversationId
-        )
-    }
-
-    /**
-     * Saves a cut-off AI answer. Prefers the server message UUID from a refetch so Continue
-     * can call POST /api/chat/continue with a real message_id.
-     */
-    private suspend fun persistIncompleteAssistant(
-        conversationId: String,
-        content: String,
-        localId: String?,
-        isFactCheck: Boolean = false
-    ) {
-        var idToUse = localId
-        if (authRepository?.isLoggedIn() == true) {
-            conversationRepository.fetchMessages(conversationId, forceRefresh = true)
-            val messages = conversationRepository.getMessagesByConversationId(conversationId).first()
-            val lastAi = messages.lastOrNull { !it.isUserMessage && it.content.isNotBlank() }
-            if (lastAi != null && (
-                    content.startsWith(lastAi.content) ||
-                    lastAi.content.startsWith(content)
-                )
-            ) {
-                idToUse = lastAi.id
-            }
-        }
-        persistAssistantResponse(
-            conversationId = conversationId,
-            content = content,
-            isComplete = false,
-            preferredId = idToUse,
-            isFactCheck = isFactCheck
         )
     }
 
