@@ -30,6 +30,12 @@ class SettingsViewModelTest {
         Dispatchers.setMain(testDispatcher)
         every { languageManager.getLanguage() } returns "en"
         every { authRepository.isLoggedIn() } returns true
+        coEvery { authRepository.getMadhabPreference() } returns Result.success(
+            com.shamelagpt.android.data.remote.dto.MadhabPreferenceResponse(
+                madhabPreference = "all",
+                madhabName = "All Schools"
+            )
+        )
 
         // Mock fetchPreferences to avoid crash in init
         coEvery { preferencesRepository.fetchPreferences() } returns Result.success(UserPreferences())
@@ -72,6 +78,22 @@ class SettingsViewModelTest {
         // not override the locally-applied locale (see SettingsViewModel.loadPreferences).
         assertEquals("en", viewModel.selectedLanguage.value)
         assertEquals("Prompt", viewModel.customPrompt.value)
+    }
+
+    @Test
+    fun `updateMadhabPreference persists to auth repository`() = runTest {
+        coEvery { authRepository.setMadhabPreference("hanafi") } returns Result.success(
+            com.shamelagpt.android.data.remote.dto.MadhabPreferenceResponse(
+                madhabPreference = "hanafi",
+                status = "success"
+            )
+        )
+
+        viewModel.updateMadhabPreference("hanafi")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("hanafi", viewModel.madhabPreference.value)
+        coVerify { authRepository.setMadhabPreference("hanafi") }
     }
 
     @Test

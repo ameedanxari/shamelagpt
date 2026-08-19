@@ -14,6 +14,8 @@ import com.shamelagpt.android.data.remote.dto.ForgotPasswordRequest
 import com.shamelagpt.android.data.remote.dto.GoogleSignInRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
+import com.shamelagpt.android.data.remote.dto.MadhabPreferenceRequest
+import com.shamelagpt.android.data.remote.dto.MadhabPreferenceResponse
 import com.shamelagpt.android.data.remote.dto.RefreshTokenRequest
 
 private const val TAG = "AuthRemoteDataSourceImpl"
@@ -86,5 +88,13 @@ class AuthRemoteDataSourceImpl(
 
     override suspend fun setModePreference(request: ModePreferenceRequest): Result<ModePreferenceResponse> = callWithAuth {
         apiService.setModePreference(request)
+    }
+
+    override suspend fun getMadhabPreference(): Result<MadhabPreferenceResponse> = callWithAuth {
+        apiService.getMadhabPreference()
+    }
+
+    override suspend fun setMadhabPreference(request: MadhabPreferenceRequest): Result<MadhabPreferenceResponse> = callWithAuth {
+        apiService.setMadhabPreference(request)
     }
 }

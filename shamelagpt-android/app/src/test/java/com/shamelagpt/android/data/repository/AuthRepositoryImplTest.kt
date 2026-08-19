@@ -8,6 +8,8 @@ import com.shamelagpt.android.data.remote.dto.SignupRequest
 import com.shamelagpt.android.data.remote.dto.EmptyResponse
 import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
+import com.shamelagpt.android.data.remote.dto.MadhabPreferenceRequest
+import com.shamelagpt.android.data.remote.dto.MadhabPreferenceResponse
 import com.shamelagpt.android.util.MainCoroutineRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -123,6 +125,32 @@ class AuthRepositoryImplTest {
         assertEquals(expected, result.getOrNull())
         coVerify(exactly = 1) {
             authRemoteDataSource.setModePreference(ModePreferenceRequest(modePreference = 1))
+        }
+    }
+
+    @Test
+    fun `getMadhabPreference delegates to datasource`() = runTest {
+        val expected = MadhabPreferenceResponse(madhabPreference = "hanafi", madhabName = "Hanafi")
+        coEvery { authRemoteDataSource.getMadhabPreference() } returns Result.success(expected)
+
+        val result = repository.getMadhabPreference()
+
+        assertTrue(result.isSuccess)
+        assertEquals(expected, result.getOrNull())
+        coVerify(exactly = 1) { authRemoteDataSource.getMadhabPreference() }
+    }
+
+    @Test
+    fun `setMadhabPreference sends request and returns datasource response`() = runTest {
+        val expected = MadhabPreferenceResponse(madhabPreference = "maliki", status = "success")
+        coEvery { authRemoteDataSource.setMadhabPreference(any()) } returns Result.success(expected)
+
+        val result = repository.setMadhabPreference("maliki")
+
+        assertTrue(result.isSuccess)
+        assertEquals(expected, result.getOrNull())
+        coVerify(exactly = 1) {
+            authRemoteDataSource.setMadhabPreference(MadhabPreferenceRequest(madhabPreference = "maliki"))
         }
     }
 }

@@ -34,6 +34,7 @@ class SettingsScreenTest {
         every { mockViewModel.responsePreferences } returns MutableStateFlow(ResponsePreferences())
         every { mockViewModel.isDeletingAccount } returns MutableStateFlow(false)
         every { mockViewModel.deleteAccountError } returns MutableStateFlow(false)
+        every { mockViewModel.madhabPreference } returns MutableStateFlow("all")
 
         composeTestRule.setContent {
             SettingsScreen(
@@ -61,6 +62,8 @@ class SettingsScreenTest {
         composeTestRule.onNodeWithTag(TestTags.Settings.StyleItem, useUnmergedTree = true).assertIsDisplayed()
         scrollToTag(TestTags.Settings.FocusItem)
         composeTestRule.onNodeWithTag(TestTags.Settings.FocusItem, useUnmergedTree = true).assertIsDisplayed()
+        scrollToTag(TestTags.Settings.MadhabItem)
+        composeTestRule.onNodeWithTag(TestTags.Settings.MadhabItem, useUnmergedTree = true).assertIsDisplayed()
         scrollToTag(TestTags.Settings.SavePreferencesButton)
         composeTestRule.onNodeWithTag(TestTags.Settings.SavePreferencesButton, useUnmergedTree = true).assertIsDisplayed()
         
@@ -84,6 +87,7 @@ class SettingsScreenTest {
         every { mockViewModel.responsePreferences } returns MutableStateFlow(ResponsePreferences())
         every { mockViewModel.isDeletingAccount } returns MutableStateFlow(false)
         every { mockViewModel.deleteAccountError } returns MutableStateFlow(false)
+        every { mockViewModel.madhabPreference } returns MutableStateFlow("all")
         
         composeTestRule.setContent {
             SettingsScreen(
@@ -113,6 +117,7 @@ class SettingsScreenTest {
         every { mockViewModel.responsePreferences } returns MutableStateFlow(ResponsePreferences())
         every { mockViewModel.isDeletingAccount } returns MutableStateFlow(false)
         every { mockViewModel.deleteAccountError } returns MutableStateFlow(false)
+        every { mockViewModel.madhabPreference } returns MutableStateFlow("all")
 
         var navigateCalled = false
         composeTestRule.setContent {
@@ -139,6 +144,7 @@ class SettingsScreenTest {
         every { mockViewModel.responsePreferences } returns MutableStateFlow(ResponsePreferences())
         every { mockViewModel.isDeletingAccount } returns MutableStateFlow(false)
         every { mockViewModel.deleteAccountError } returns MutableStateFlow(false)
+        every { mockViewModel.madhabPreference } returns MutableStateFlow("all")
 
         composeTestRule.setContent {
             SettingsScreen(

@@ -93,6 +93,12 @@
     <string name="settings_custom_prompt">مخصوص سسٹم پرامپٹ</string>
     <string name="settings_custom_prompt_optional">اختیاری</string>
     <string name="settings_not_set">سیٹ نہیں ہے</string>
+    <string name="settings_madhab_title">فقہی مکتب فکر</string>
+    <string name="settings_madhab_all">تمام مذاہب</string>
+    <string name="settings_madhab_hanafi">حنفی</string>
+    <string name="settings_madhab_maliki">مالکی</string>
+    <string name="settings_madhab_shafii">شافعی</string>
+    <string name="settings_madhab_hanbali">حنبلی</string>
     <string name="settings_mode_preference">چیٹ موڈ</string>
     <string name="settings_mode_research">تحقیق</string>
     <string name="settings_mode_fact_check">فیکٹ چیک</string>

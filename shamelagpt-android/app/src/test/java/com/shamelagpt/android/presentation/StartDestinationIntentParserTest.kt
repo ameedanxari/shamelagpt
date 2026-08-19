@@ -145,6 +145,37 @@ class StartDestinationIntentParserTest {
     }
 
     @Test
+    fun parseHttpsSharedPathSegmentRoutesToChatConversation() {
+        val intent = mockIntent(
+            data = mockUri(
+                scheme = "https",
+                host = "shamelagpt.com",
+                path = "/shared/conv-legacy"
+            )
+        )
+
+        val route = StartDestinationIntentParser.parse(intent)
+
+        assertThat(route).isEqualTo(ChatRoute("conv-legacy"))
+    }
+
+    @Test
+    fun parseHttpsSharedQueryIdIsAccepted() {
+        val intent = mockIntent(
+            data = mockUri(
+                scheme = "https",
+                host = "shamelagpt.com",
+                path = "/shared",
+                queryConversationId = "conv-id-param"
+            )
+        )
+
+        val route = StartDestinationIntentParser.parse(intent)
+
+        assertThat(route).isEqualTo(ChatRoute("conv-id-param"))
+    }
+
+    @Test
     fun parseUnknownDeepLinkReturnsNull() {
         val intent = mockIntent(
             data = mockUri(

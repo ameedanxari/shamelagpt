@@ -6,7 +6,6 @@ import com.shamelagpt.android.core.error.ChatOperationException
 import com.shamelagpt.android.data.remote.dto.ChatResponse
 import com.shamelagpt.android.domain.repository.ChatRepository
 import com.shamelagpt.android.domain.repository.ConversationRepository
-import kotlinx.coroutines.flow.first
 import java.util.Locale
 
 private const val TAG = "SendMessageUseCase"
@@ -74,16 +73,18 @@ class SendMessageUseCase(
             Log.d(TAG, "Created new conversation: ${conversation.id}")
             conversation.id
         }
-        val resolvedThreadId = if (
-            existingConversation != null &&
-            !existingConversation.isLocalOnly &&
-            existingConversation.threadId.isNullOrBlank() &&
-            conversationRepository.getMessagesByConversationId(existingConversation.id).first().isNotEmpty()
-        ) {
-            conversationRepository.updateConversationThread(existingConversation.id, existingConversation.id)
-            existingConversation.id
-        } else {
-            existingConversation?.threadId ?: threadId
+        val createdOrLoaded = existingConversation
+            ?: conversationRepository.getConversationById(actualConversationId)
+        val resolvedThreadId = when {
+            createdOrLoaded?.isLocalOnly == true ->
+                createdOrLoaded.threadId ?: threadId
+            !createdOrLoaded?.threadId.isNullOrBlank() ->
+                createdOrLoaded?.threadId
+            !threadId.isNullOrBlank() -> threadId
+            else -> {
+                conversationRepository.updateConversationThread(actualConversationId, actualConversationId)
+                actualConversationId
+            }
         }
 
         // Send message to API

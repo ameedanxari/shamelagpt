@@ -385,6 +385,22 @@ class HistoryViewModelTest {
         )
     }
 
+    @Test
+    fun testEnableSharingUsesThreadIdWhenItDiffersFromLocalId() = runTest {
+        val conversation = TestData.createConversation(
+            id = "19ffc609-empty-shell",
+            threadId = "9be5-messages-live-here"
+        )
+        mockConversationRepository.setConversationSharedResult =
+            Result.success("https://shamelagpt.com/shared?chatid=9be5-messages-live-here")
+
+        val url = viewModel.enableSharing(conversation).getOrThrow()
+
+        assertThat(mockConversationRepository.lastSetConversationSharedId)
+            .isEqualTo("9be5-messages-live-here")
+        assertThat(url).isEqualTo("https://shamelagpt.com/shared?chatid=9be5-messages-live-here")
+    }
+
     // MARK: - Conversation Type Tests
 
     @Test

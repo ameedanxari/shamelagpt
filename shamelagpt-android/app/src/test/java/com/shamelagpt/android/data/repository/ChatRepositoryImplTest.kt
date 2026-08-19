@@ -10,6 +10,7 @@ import com.shamelagpt.android.mock.MockScenarioId
 import com.shamelagpt.android.mock.TestData
 import com.shamelagpt.android.util.MainCoroutineRule
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -64,7 +65,7 @@ class ChatRepositoryImplTest {
         )
 
         coEvery {
-            mockRemoteDataSource.sendMessage(question, threadId)
+            mockRemoteDataSource.sendMessage(question, conversationId)
         } returns Result.success(response)
 
         // When
@@ -427,6 +428,22 @@ class ChatRepositoryImplTest {
 
         assertThat(result.isSuccess).isTrue()
         assertThat(result.getOrNull()).isEqualTo(response)
+    }
+
+    @Test
+    fun testSendMessageUsesConversationIdWhenThreadIdMissing() = runTest {
+        val question = "What is prayer?"
+        val conversationId = "conv-123"
+        mockConversationRepository.addConversation(
+            TestData.createConversation(id = conversationId, threadId = null)
+        )
+        coEvery {
+            mockRemoteDataSource.sendMessage(question, conversationId)
+        } returns Result.success(TestData.sampleChatResponse)
+
+        chatRepository.sendMessage(question, conversationId, null)
+
+        coVerify { mockRemoteDataSource.sendMessage(question, conversationId) }
     }
 
 }

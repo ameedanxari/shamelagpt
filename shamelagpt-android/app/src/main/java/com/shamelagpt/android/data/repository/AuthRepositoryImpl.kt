@@ -12,6 +12,8 @@ import com.shamelagpt.android.data.remote.dto.ForgotPasswordRequest
 import com.shamelagpt.android.data.remote.dto.GoogleSignInRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceRequest
 import com.shamelagpt.android.data.remote.dto.ModePreferenceResponse
+import com.shamelagpt.android.data.remote.dto.MadhabPreferenceRequest
+import com.shamelagpt.android.data.remote.dto.MadhabPreferenceResponse
 import com.shamelagpt.android.data.remote.dto.RefreshTokenRequest
 import com.shamelagpt.android.domain.repository.AuthRepository
 import com.shamelagpt.android.core.util.Logger
@@ -92,6 +94,14 @@ class AuthRepositoryImpl(
 
     override suspend fun setModePreference(modePreference: Int): Result<ModePreferenceResponse> {
         return authRemoteDataSource.setModePreference(ModePreferenceRequest(modePreference))
+    }
+
+    override suspend fun getMadhabPreference(): Result<MadhabPreferenceResponse> {
+        return authRemoteDataSource.getMadhabPreference()
+    }
+
+    override suspend fun setMadhabPreference(madhabPreference: String): Result<MadhabPreferenceResponse> {
+        return authRemoteDataSource.setMadhabPreference(MadhabPreferenceRequest(madhabPreference))
     }
 
     override fun logout() {

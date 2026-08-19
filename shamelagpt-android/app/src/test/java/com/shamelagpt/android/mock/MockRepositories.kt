@@ -404,6 +404,18 @@ class MockAuthRepository : com.shamelagpt.android.domain.repository.AuthReposito
             modeName = if (modePreference == 2) "fact_check" else "research"
         )
     )
+    override suspend fun getMadhabPreference(): Result<com.shamelagpt.android.data.remote.dto.MadhabPreferenceResponse> = Result.success(
+        com.shamelagpt.android.data.remote.dto.MadhabPreferenceResponse(
+            madhabPreference = "all",
+            madhabName = "All Schools"
+        )
+    )
+    override suspend fun setMadhabPreference(madhabPreference: String): Result<com.shamelagpt.android.data.remote.dto.MadhabPreferenceResponse> = Result.success(
+        com.shamelagpt.android.data.remote.dto.MadhabPreferenceResponse(
+            madhabPreference = madhabPreference,
+            status = "success"
+        )
+    )
     override fun logout() {}
     override fun getToken(): String? = "mock_token"
     override fun isLoggedIn(): Boolean = true

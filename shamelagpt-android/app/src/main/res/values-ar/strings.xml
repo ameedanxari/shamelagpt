@@ -120,6 +120,12 @@
     <string name="settings_custom_prompt">موجه النظام المخصص</string>
     <string name="settings_custom_prompt_optional">اختياري</string>
     <string name="settings_not_set">غير محدد</string>
+    <string name="settings_madhab_title">المذهب الفقهي</string>
+    <string name="settings_madhab_all">جميع المذاهب</string>
+    <string name="settings_madhab_hanafi">حنفي</string>
+    <string name="settings_madhab_maliki">مالكي</string>
+    <string name="settings_madhab_shafii">شافعي</string>
+    <string name="settings_madhab_hanbali">حنبلي</string>
     <string name="settings_mode_preference">وضع المحادثة</string>
     <string name="settings_mode_research">بحث</string>
     <string name="settings_mode_fact_check">تحقق من الحقائق</string>
