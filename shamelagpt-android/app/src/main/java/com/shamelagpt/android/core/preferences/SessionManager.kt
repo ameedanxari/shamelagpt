@@ -5,9 +5,7 @@ import android.content.SharedPreferences
 import com.shamelagpt.android.core.util.Logger
 import java.util.concurrent.TimeUnit
 
-/**
- * Handles persisted auth session (tokens and metadata).
- */
+/** Persists auth tokens. Does not store email/password. */
 class SessionManager(context: Context) {
 
     private val prefs: SharedPreferences =
@@ -26,6 +24,8 @@ class SessionManager(context: Context) {
             .putString(KEY_TOKEN, token)
             .putString(KEY_REFRESH_TOKEN, refreshToken)
             .putLong(KEY_EXPIRES_AT, expiresInSeconds?.let { nowMs() + TimeUnit.SECONDS.toMillis(it) } ?: 0L)
+            .remove(KEY_EMAIL)
+            .remove(KEY_PASSWORD)
             .apply()
     }
 
@@ -54,23 +54,7 @@ class SessionManager(context: Context) {
 
     fun isLoggedIn(): Boolean = getToken() != null
 
-    // Credential storage for silent re-login
-    fun saveCredentials(email: String, password: String) {
-        Logger.i(TAG, "saveCredentials called")
-        prefs.edit()
-            .putString(KEY_EMAIL, email)
-            .putString(KEY_PASSWORD, password)
-            .apply()
-    }
-
-    fun getCredentials(): Pair<String, String>? {
-        val email = prefs.getString(KEY_EMAIL, null)
-        val password = prefs.getString(KEY_PASSWORD, null)
-        return if (!email.isNullOrBlank() && !password.isNullOrBlank()) {
-            email to password
-        } else null
-    }
-
+    /** Clears legacy email/password keys from older installs. */
     fun clearCredentials() {
         Logger.i(TAG, "clearCredentials called")
         prefs.edit()

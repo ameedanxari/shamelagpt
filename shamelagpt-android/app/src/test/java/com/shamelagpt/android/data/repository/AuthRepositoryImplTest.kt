@@ -41,7 +41,7 @@ class AuthRepositoryImplTest {
     }
 
     @Test
-    fun `login success persists session and credentials`() = runTest {
+    fun `login success persists session`() = runTest {
         // Given
         val request = LoginRequest("test@example.com", "password")
         val response = AuthResponse("token", "refresh", "3600", mockk())
@@ -54,7 +54,6 @@ class AuthRepositoryImplTest {
         assertTrue(result.isSuccess)
         assertEquals(response, result.getOrNull())
         verify { sessionManager.saveSession("token", "refresh", 3600L) }
-        verify { sessionManager.saveCredentials("test@example.com", "password") }
     }
 
     @Test
