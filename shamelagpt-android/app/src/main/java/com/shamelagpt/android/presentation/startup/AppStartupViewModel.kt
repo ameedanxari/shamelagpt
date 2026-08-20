@@ -21,6 +21,8 @@ class AppStartupViewModel(
         if (!_uiState.value.isBootstrapping) return
 
         viewModelScope.launch {
+            sessionManager.clearCredentials()
+
             if (sessionManager.isLoggedIn()) {
                 _uiState.value = AppStartupUiState(
                     isBootstrapping = false,
@@ -29,10 +31,7 @@ class AppStartupViewModel(
                 return@launch
             }
 
-            val canAttemptRestore = !sessionManager.getRefreshToken().isNullOrBlank() ||
-                sessionManager.getCredentials() != null
-
-            if (canAttemptRestore) {
+            if (!sessionManager.getRefreshToken().isNullOrBlank()) {
                 val restored = authRetryManager.restoreSession()
                 _uiState.value = AppStartupUiState(
                     isBootstrapping = false,

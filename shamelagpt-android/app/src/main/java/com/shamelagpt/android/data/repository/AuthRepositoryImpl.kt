@@ -33,10 +33,7 @@ class AuthRepositoryImpl(
 
     override suspend fun login(request: LoginRequest): Result<AuthResponse> {
         val result = authRemoteDataSource.login(request)
-        result.onSuccess { authResponse ->
-            persistSession(authResponse)
-            sessionManager.saveCredentials(request.email, request.password)
-        }
+        result.onSuccess { persistSession(it) }
         return result
     }
 
