@@ -14,7 +14,13 @@ enum KeychainHelper {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: key,
-            kSecValueData as String: data
+            kSecValueData as String: data,
+            // Without an explicit accessibility attribute the item defaults to
+            // kSecAttrAccessibleWhenUnlocked, which is carried in encrypted device
+            // backups and restored onto a new phone. ThisDeviceOnly keeps the session
+            // on the device that created it; AfterFirstUnlock still allows a token
+            // refresh to run before the user unlocks after a reboot.
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         ]
 
         SecItemDelete(query as CFDictionary)

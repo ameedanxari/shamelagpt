@@ -47,7 +47,14 @@ class DependencyContainer {
         let isUITesting = Self.isUITestEnvironment()
         let sessionManager = SessionManager(useKeychain: !isUITesting)
         AppLogger.app.logInfo("DependencyContainer.registerCore - SessionManager initialized (useKeychain: \(!isUITesting))")
-        
+
+        // Must run before anything reads the session, otherwise a reinstall would be
+        // treated as authenticated off the back of keychain entries the delete left behind.
+        if !isUITesting {
+            sessionManager.clearKeychainResidueIfFreshInstall()
+        }
+
+
         // In UI Testing, properly mock/seed the session state
         // This avoids having test-specific logic in the main App struct
         if Self.isUITestEnvironment() {

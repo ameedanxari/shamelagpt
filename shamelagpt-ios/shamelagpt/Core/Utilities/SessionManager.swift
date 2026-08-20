@@ -14,6 +14,7 @@ final class SessionManager {
     private let expiresAtKey = "expires_at"
     private let credentialsEmailKey = "auth_email"
     private let credentialsPasswordKey = "auth_password"
+    private let installMarkerKey = "install_marker"
     private let useKeychain: Bool
     private let defaults: UserDefaults
     
@@ -96,30 +97,29 @@ final class SessionManager {
         defaults.removeObject(forKey: guestSessionIdKey)
     }
 
-    // MARK: - Credential Storage (username/password)
+    // MARK: - Legacy Credential Purge
 
-    func saveCredentials(email: String, password: String) {
-        AppLogger.session.logInfo("saveCredentials called")
-        setItem(email, for: credentialsEmailKey)
-        setItem(password, for: credentialsPasswordKey)
-    }
-
-    func storedCredentials() -> (email: String, password: String)? {
-        guard
-            let email = getItem(credentialsEmailKey),
-            let password = getItem(credentialsPasswordKey),
-            !email.isEmpty,
-            !password.isEmpty
-        else {
-            return nil
-        }
-        return (email, password)
-    }
-
+    /// Builds before this change persisted the user's email and password so the app
+    /// could silently re-login on launch. Nothing writes those keys any more, but
+    /// upgrading installs still carry them, so every session teardown removes them.
     func clearCredentials() {
         AppLogger.session.logInfo("clearCredentials called")
         removeItem(credentialsEmailKey)
         removeItem(credentialsPasswordKey)
+    }
+
+    // MARK: - Fresh Install Detection
+
+    /// Keychain items outlive app deletion on iOS, so a delete-and-reinstall would
+    /// otherwise restore the previous session and look like an unrequested auto-login.
+    /// UserDefaults *is* cleared on delete, so a missing marker means fresh install:
+    /// drop any keychain residue and start at the login screen.
+    func clearKeychainResidueIfFreshInstall() {
+        guard !defaults.bool(forKey: installMarkerKey) else { return }
+        AppLogger.session.logInfo("fresh install detected; clearing keychain residue")
+        clearSession()
+        clearCredentials()
+        defaults.set(true, forKey: installMarkerKey)
     }
     
     // MARK: - Storage Helpers
