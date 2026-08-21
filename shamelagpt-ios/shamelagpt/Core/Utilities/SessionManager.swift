@@ -112,14 +112,26 @@ final class SessionManager {
 
     /// Keychain items outlive app deletion on iOS, so a delete-and-reinstall would
     /// otherwise restore the previous session and look like an unrequested auto-login.
-    /// UserDefaults *is* cleared on delete, so a missing marker means fresh install:
-    /// drop any keychain residue and start at the login screen.
+    /// UserDefaults *is* cleared on delete, which is what makes it usable as evidence
+    /// that an install is new.
+    ///
+    /// The marker alone is not enough: it ships for the first time in this build, so
+    /// installs upgrading in place are also missing it and must not be logged out.
+    /// Session metadata in UserDefaults distinguishes them — it is written at login and
+    /// survives an upgrade, whereas a genuine reinstall starts with UserDefaults empty
+    /// and only the keychain carried over.
     func clearKeychainResidueIfFreshInstall() {
         guard !defaults.bool(forKey: installMarkerKey) else { return }
+        defer { defaults.set(true, forKey: installMarkerKey) }
+
+        if defaults.object(forKey: expiresAtKey) != nil {
+            AppLogger.session.logInfo("existing install upgraded; session retained")
+            return
+        }
+
         AppLogger.session.logInfo("fresh install detected; clearing keychain residue")
         clearSession()
         clearCredentials()
-        defaults.set(true, forKey: installMarkerKey)
     }
     
     // MARK: - Storage Helpers
