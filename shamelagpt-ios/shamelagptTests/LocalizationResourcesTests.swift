@@ -36,6 +36,52 @@ final class LocalizationResourcesTests: XCTestCase {
         }
     }
 
+    /// The madhhab picker is entirely localized text, so a missing entry in any
+    /// locale shows a raw key like "settings.madhab.hanafi" in the UI.
+    func testMadhabKeysLocalizedInAllSupportedLocales() throws {
+        let bundle = Bundle(for: SessionManager.self)
+
+        let madhabKeys = [
+            LocalizationKeys.madhabTitle,
+            LocalizationKeys.madhabTitleArabic,
+            LocalizationKeys.madhabHelp,
+            LocalizationKeys.madhabLoadFailed,
+            LocalizationKeys.madhabUpdateFailed,
+            LocalizationKeys.madhabSelectAccessibility
+        ] + MadhabPreference.allCases.flatMap { [$0.titleKey, $0.arabicNameKey, $0.descriptionKey] }
+
+        for locale in ["en", "ar", "ur"] {
+            let localeBundle = try XCTUnwrap(
+                Bundle(path: try XCTUnwrap(bundle.path(forResource: locale, ofType: "lproj"))),
+                "Missing \(locale).lproj"
+            )
+            for key in madhabKeys {
+                let value = localeBundle.localizedString(forKey: key, value: nil, table: "Localizable")
+                XCTAssertFalse(value.isEmpty, "\(locale) translation missing for \(key)")
+                XCTAssertNotEqual(value, key, "\(locale) entry falls back to the key for \(key)")
+            }
+        }
+    }
+
+    /// Arabic school names stay in Arabic script in every app language,
+    /// mirroring the web.
+    func testMadhabArabicNamesAreArabicScriptInEveryLocale() throws {
+        let bundle = Bundle(for: SessionManager.self)
+
+        for locale in ["en", "ar", "ur"] {
+            let localeBundle = try XCTUnwrap(
+                Bundle(path: try XCTUnwrap(bundle.path(forResource: locale, ofType: "lproj")))
+            )
+            for madhab in MadhabPreference.allCases {
+                let value = localeBundle.localizedString(forKey: madhab.arabicNameKey, value: nil, table: "Localizable")
+                XCTAssertTrue(
+                    value.range(of: "\\p{Arabic}", options: .regularExpression) != nil,
+                    "\(locale) entry for \(madhab.arabicNameKey) should be Arabic script"
+                )
+            }
+        }
+    }
+
     func testArabicLocalizationsContainRTLScript() throws {
         let bundle = Bundle(for: SessionManager.self)
         let arabicBundle = try XCTUnwrap(Bundle(path: try XCTUnwrap(bundle.path(forResource: "ar", ofType: "lproj"))))

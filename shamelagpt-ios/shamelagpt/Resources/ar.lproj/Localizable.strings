@@ -305,6 +305,30 @@
 "settings.pref.focus.theoretical" = "نظري";
 "settings.pref.focus.historical" = "تاريخي";
 
+// MARK: - School of Thought (Madhhab)
+
+"settings.madhab.title" = "المذهب الفقهي";
+"settings.madhab.titleArabic" = "المذهب الفقهي";
+"settings.madhab.help" = "تصفية نتائج الفقه حسب مذهبك المفضل. الحديث والتفسير والمصادر المشتركة تُضمّن دائماً.";
+"settings.madhab.all" = "جميع المذاهب";
+"settings.madhab.allArabic" = "جميع المذاهب";
+"settings.madhab.allDescription" = "نتائج من المذاهب الأربعة";
+"settings.madhab.hanafi" = "حنفي";
+"settings.madhab.hanafiArabic" = "حنفي";
+"settings.madhab.hanafiDescription" = "أبو حنيفة (ت 767م)";
+"settings.madhab.maliki" = "مالكي";
+"settings.madhab.malikiArabic" = "مالكي";
+"settings.madhab.malikiDescription" = "مالك بن أنس (ت 795م)";
+"settings.madhab.shafii" = "شافعي";
+"settings.madhab.shafiiArabic" = "شافعي";
+"settings.madhab.shafiiDescription" = "الشافعي (ت 820م)";
+"settings.madhab.hanbali" = "حنبلي";
+"settings.madhab.hanbaliArabic" = "حنبلي";
+"settings.madhab.hanbaliDescription" = "أحمد بن حنبل (ت 855م)";
+"settings.madhab.loadFailed" = "تعذّر تحميل المذهب. سيتم عرض جميع المذاهب.";
+"settings.madhab.updateFailed" = "فشل تحديث المذهب.";
+"settings.madhab.selectAccessibility" = "اختر مذهب %@ لمصادر الفقه";
+
 // MARK: - Donation
 
 "settings.donate" = "❤️ تبرع";

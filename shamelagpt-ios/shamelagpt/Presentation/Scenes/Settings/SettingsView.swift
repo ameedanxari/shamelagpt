@@ -26,6 +26,10 @@ struct SettingsView: View {
     @State private var isDeletingAccount = false
     @State private var deleteAccountError: String?
     @State private var showFeedbackPrompt = false
+    /// Owns the server-backed school-of-thought preference. Held here (not in
+    /// `MadhabSelectionView`) so the Settings row can show the current school
+    /// without re-fetching, and so the pushed picker mutates the same state.
+    @StateObject private var madhabViewModel = MadhabPreferenceViewModel()
     private let preferencesRepository: PreferencesRepository? = DependencyContainer.shared.resolve(PreferencesRepository.self)
     private let authRepository: AuthRepository? = DependencyContainer.shared.resolve(AuthRepository.self)
 
@@ -152,11 +156,33 @@ struct SettingsView: View {
                             }
                     }
                     .accessibilityIdentifier(AccessibilityID.Settings.preferenceFocusRow)
+
+                    NavigationLink(destination: MadhabSelectionView(viewModel: madhabViewModel)) {
+                        HStack {
+                            Image(systemName: "book.closed")
+                                .foregroundColor(AppTheme.Colors.primary)
+                                .frame(width: AppTheme.Layout.iconSize)
+
+                            Text(LocalizationKeys.madhabTitle.localizedKey)
+                                .font(AppTheme.Typography.body)
+
+                            Spacer()
+
+                            Text(madhabViewModel.selection.titleKey.localizedKey)
+                                .font(AppTheme.Typography.body)
+                                .foregroundColor(AppTheme.Colors.tertiaryText)
+                        }
+                    }
+                    .accessibilityIdentifier(AccessibilityID.Settings.madhabRow)
+
                     if let error = error {
                         Text(error).foregroundColor(.red)
                     }
                     Button(LocalizationKeys.refreshPreferences.localizedKey) {
-                        Task { await loadPreferences(force: true) }
+                        Task {
+                            await loadPreferences(force: true)
+                            await madhabViewModel.load(force: true)
+                        }
                     }
                     .accessibilityIdentifier(AccessibilityID.Settings.refreshPreferencesButton)
                     .disabled(isLoading)
@@ -343,6 +369,12 @@ struct SettingsView: View {
         .task {
             if isAuthenticated && !hasLoadedPreferences {
                 await loadPreferences()
+            }
+            if isAuthenticated {
+                // Reflect the server value in the row: the same account may have
+                // set a school on the web, and the preference is applied to
+                // retrieval whether or not the app ever displayed it.
+                await madhabViewModel.load()
             }
         }
         .alert(LocalizationKeys.deleteAccount.localizedKey, isPresented: $showDeleteAccountConfirmation) {

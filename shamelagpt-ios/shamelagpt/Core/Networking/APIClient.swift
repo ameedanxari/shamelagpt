@@ -28,6 +28,8 @@ protocol APIClientProtocol {
     func setPreferences(_ request: UserPreferencesRequest) async throws
     func getModePreference() async throws -> ModePreferenceResponse
     func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse
+    func getMadhabPreference() async throws -> MadhabPreferenceResponse
+    func setMadhabPreference(_ request: MadhabPreferenceRequest) async throws -> MadhabPreferenceResponse
     func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data
     func listConversations() async throws -> [ConversationResponse]
     func createConversation(_ request: ConversationRequest) async throws -> ConversationResponse
@@ -277,6 +279,16 @@ final class APIClient: APIClientProtocol {
 
     func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse {
         let endpoint = baseURL.appendingPathComponent("api/auth/me/mode")
+        return try await performRequest(url: endpoint, method: "PUT", body: request)
+    }
+
+    func getMadhabPreference() async throws -> MadhabPreferenceResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me/madhab")
+        return try await performRequest(url: endpoint, method: "GET")
+    }
+
+    func setMadhabPreference(_ request: MadhabPreferenceRequest) async throws -> MadhabPreferenceResponse {
+        let endpoint = baseURL.appendingPathComponent("api/auth/me/madhab")
         return try await performRequest(url: endpoint, method: "PUT", body: request)
     }
 
@@ -863,6 +875,14 @@ final class PreviewMockAPIClient: APIClientProtocol {
             modePreference: request.modePreference,
             modeName: request.modePreference == 2 ? "fact_check" : "research"
         )
+    }
+
+    func getMadhabPreference() async throws -> MadhabPreferenceResponse {
+        MadhabPreferenceResponse(madhabPreference: MadhabPreference.all.rawValue, madhabName: "All Schools")
+    }
+
+    func setMadhabPreference(_ request: MadhabPreferenceRequest) async throws -> MadhabPreferenceResponse {
+        MadhabPreferenceResponse(madhabPreference: request.madhabPreference, madhabName: request.madhabPreference)
     }
 
     func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data {

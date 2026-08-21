@@ -31,6 +31,7 @@ class MockAPIClient: APIClientProtocol {
     var mockCreateConversationResponse: ConversationResponse?
     var mockUserPreferencesResponse: UserPreferencesRequest?
     var mockModePreferenceResponse = ModePreferenceResponse(modePreference: 1, modeName: "research")
+    var mockMadhabPreferenceResponse = MadhabPreferenceResponse(madhabPreference: "all", madhabName: "All Schools")
 
     // Track calls
     var healthCheckCallCount = 0
@@ -51,6 +52,8 @@ class MockAPIClient: APIClientProtocol {
     var setPreferencesCallCount = 0
     var getModePreferenceCallCount = 0
     var setModePreferenceCallCount = 0
+    var getMadhabPreferenceCallCount = 0
+    var setMadhabPreferenceCallCount = 0
     var generateTitleCallCount = 0
     var listConversationsCallCount = 0
     var createConversationCallCount = 0
@@ -63,6 +66,7 @@ class MockAPIClient: APIClientProtocol {
     var lastSendMessageRequest: ChatRequest?
     var lastSetPreferencesRequest: UserPreferencesRequest?
     var lastSetModePreferenceRequest: ModePreferenceRequest?
+    var lastSetMadhabPreferenceRequest: MadhabPreferenceRequest?
 
     // Transcription (`POST /api/transcribe`). Controlled independently of `shouldFail` so a
     // test can fail transcription without failing every other endpoint.
@@ -296,6 +300,29 @@ class MockAPIClient: APIClientProtocol {
         return mockModePreferenceResponse
     }
 
+    func getMadhabPreference() async throws -> MadhabPreferenceResponse {
+        getMadhabPreferenceCallCount += 1
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        return mockMadhabPreferenceResponse
+    }
+
+    func setMadhabPreference(_ request: MadhabPreferenceRequest) async throws -> MadhabPreferenceResponse {
+        setMadhabPreferenceCallCount += 1
+        lastSetMadhabPreferenceRequest = request
+        if requestDelay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
+        }
+        if shouldFail { throw errorToThrow }
+        mockMadhabPreferenceResponse = MadhabPreferenceResponse(
+            madhabPreference: request.madhabPreference,
+            madhabName: request.madhabPreference
+        )
+        return mockMadhabPreferenceResponse
+    }
+
     func generateConversationTitle(_ request: GenerateTitleRequest) async throws -> Data {
         generateTitleCallCount += 1
         if requestDelay > 0 {
@@ -467,6 +494,10 @@ class MockAPIClient: APIClientProtocol {
         lastSetPreferencesRequest = nil
         mockModePreferenceResponse = ModePreferenceResponse(modePreference: 1, modeName: "research")
         lastSetModePreferenceRequest = nil
+        getMadhabPreferenceCallCount = 0
+        setMadhabPreferenceCallCount = 0
+        mockMadhabPreferenceResponse = MadhabPreferenceResponse(madhabPreference: "all", madhabName: "All Schools")
+        lastSetMadhabPreferenceRequest = nil
         transcribeResult = TranscriptionResponse(text: "Mock transcription", language: "en")
         transcribeError = nil
         transcribeCallCount = 0

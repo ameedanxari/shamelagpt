@@ -307,6 +307,30 @@
 "settings.pref.focus.theoretical" = "نظری";
 "settings.pref.focus.historical" = "تاریخی";
 
+// MARK: - School of Thought (Madhhab)
+
+"settings.madhab.title" = "فقہی مکتب";
+"settings.madhab.titleArabic" = "المذهب الفقهي";
+"settings.madhab.help" = "فقہ نتائج اپنے مکتب کے مطابق۔ حدیث و تفسیر ہمیشہ شامل۔";
+"settings.madhab.all" = "تمام مکاتب";
+"settings.madhab.allArabic" = "جميع المذاهب";
+"settings.madhab.allDescription" = "چاروں مکاتب سے نتائج";
+"settings.madhab.hanafi" = "حنفی";
+"settings.madhab.hanafiArabic" = "حنفي";
+"settings.madhab.hanafiDescription" = "ابو حنیفہ (767ء)";
+"settings.madhab.maliki" = "مالکی";
+"settings.madhab.malikiArabic" = "مالكي";
+"settings.madhab.malikiDescription" = "مالک بن انس (795ء)";
+"settings.madhab.shafii" = "شافعی";
+"settings.madhab.shafiiArabic" = "شافعي";
+"settings.madhab.shafiiDescription" = "امام شافعی (820ء)";
+"settings.madhab.hanbali" = "حنبلی";
+"settings.madhab.hanbaliArabic" = "حنبلي";
+"settings.madhab.hanbaliDescription" = "احمد بن حنبل (855ء)";
+"settings.madhab.loadFailed" = "مکتب لوڈ نہیں ہو سکا۔ تمام مکاتب دکھائے جا رہے ہیں۔";
+"settings.madhab.updateFailed" = "مکتب اپ ڈیٹ نہیں ہو سکا۔";
+"settings.madhab.selectAccessibility" = "فقہ ذرائع کے لیے %@ مکتب منتخب کریں";
+
 // MARK: - Donation
 
 "settings.donate" = "❤️ عطیہ دیں";

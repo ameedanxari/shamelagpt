@@ -356,6 +356,11 @@ class MockURLProtocol: URLProtocol {
             return mockModePreferenceResponse(delay: delay)
         }
 
+        // Madhhab (school of thought) preference endpoint
+        if urlString.contains("/api/auth/me/madhab") {
+            return mockMadhabPreferenceResponse(delay: delay)
+        }
+
         if urlString.contains("/api/auth/signup") ||
             urlString.contains("/api/auth/login") ||
             urlString.contains("/api/auth/google") ||
@@ -495,6 +500,40 @@ class MockURLProtocol: URLProtocol {
             "mode_name": "research"
         ]
         return MockURLProtocol.successResponse(json: defaultMode, statusCode: 200, delay: delay)
+    }
+
+    private func mockMadhabPreferenceResponse(delay: TimeInterval) -> MockResponse? {
+        let method = request.httpMethod?.uppercased() ?? "GET"
+
+        if let madhabErrorJSON = UserDefaults.standard.string(forKey: "mockMadhabPreferenceError"),
+           let madhabErrorData = madhabErrorJSON.data(using: .utf8) {
+            let statusCode = parseStatusCode(from: madhabErrorJSON) ?? 400
+            let response = MockURLProtocol.httpResponse(statusCode: statusCode)
+            return MockResponse(data: madhabErrorData, response: response, delay: delay)
+        }
+
+        if method == "PUT",
+           let body = request.httpBody,
+           let payload = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
+           let madhabPreference = payload["madhab_preference"] as? String {
+            let responseJSON: [String: Any] = [
+                "madhab_preference": madhabPreference,
+                "madhab_name": madhabPreference
+            ]
+            return MockURLProtocol.successResponse(json: responseJSON, statusCode: 200, delay: delay)
+        }
+
+        if let madhabJSON = UserDefaults.standard.string(forKey: "mockMadhabPreference"),
+           let madhabData = madhabJSON.data(using: .utf8) {
+            let response = MockURLProtocol.httpResponse(statusCode: 200)
+            return MockResponse(data: madhabData, response: response, delay: delay)
+        }
+
+        let defaultMadhab: [String: Any] = [
+            "madhab_preference": "all",
+            "madhab_name": "All Schools"
+        ]
+        return MockURLProtocol.successResponse(json: defaultMadhab, statusCode: 200, delay: delay)
     }
 
     private func mockConversationsResponse(delay: TimeInterval) -> MockResponse? {
