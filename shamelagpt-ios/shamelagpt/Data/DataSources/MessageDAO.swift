@@ -32,6 +32,7 @@ final class MessageDAO: @unchecked Sendable {
     ///   - imageData: Optional image data for fact-checking
     ///   - detectedLanguage: Optional detected language code
     ///   - isFactCheckMessage: Whether this is a fact-checking message
+    ///   - reasoning: Optional chain-of-thought captured for an assistant message
     ///   - conversation: The parent conversation entity
     ///   - context: The managed object context to use
     /// - Returns: The created MessageEntity
@@ -46,6 +47,7 @@ final class MessageDAO: @unchecked Sendable {
         imageData: Data? = nil,
         detectedLanguage: String? = nil,
         isFactCheckMessage: Bool = false,
+        reasoning: String? = nil,
         conversation: ConversationEntity,
         in context: NSManagedObjectContext
     ) -> MessageEntity {
@@ -59,6 +61,7 @@ final class MessageDAO: @unchecked Sendable {
         entity.imageData = imageData
         entity.detectedLanguage = detectedLanguage
         entity.isFactCheckMessage = isFactCheckMessage
+        entity.reasoning = reasoning
         entity.conversation = conversation
         return entity
     }

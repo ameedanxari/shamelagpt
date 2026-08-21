@@ -392,6 +392,17 @@ struct ChatView: View {
                             .id("thinking-bubble")
                     }
 
+                    // Reasoning arrives before the first content chunk, so there is no
+                    // assistant bubble to hang it off yet. Once the first chunk lands the
+                    // message exists and carries `reasoning`, and MessageBubbleView takes
+                    // over rendering the panel — hence the isAwaitingFirstResponseChunk guard,
+                    // which is also what stops the two showing at once.
+                    if viewModel.isAwaitingFirstResponseChunk && !viewModel.streamingReasoning.isEmpty {
+                        ReasoningPanelView(reasoning: viewModel.streamingReasoning)
+                            .padding(.horizontal, AppTheme.Spacing.md)
+                            .id("reasoning-panel")
+                    }
+
                     // Bottom spacer for padding
                     Color.clear
                         .frame(height: 1)
@@ -461,7 +472,11 @@ struct ChatView: View {
         let targetId: String
         let anchor: UnitPoint
         
-        if viewModel.isAwaitingFirstResponseChunk && !viewModel.thinkingMessages.isEmpty {
+        if viewModel.isAwaitingFirstResponseChunk && !viewModel.streamingReasoning.isEmpty {
+            // Lowest element in the list while streaming, so it is the true bottom.
+            targetId = "reasoning-panel"
+            anchor = .bottom
+        } else if viewModel.isAwaitingFirstResponseChunk && !viewModel.thinkingMessages.isEmpty {
             targetId = "thinking-bubble"
             anchor = .bottom
         } else if viewModel.isAwaitingFirstResponseChunk && viewModel.isLoading {

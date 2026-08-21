@@ -25,6 +25,9 @@
 "chat.extractingText" = "جاري استخراج النص...";
 "chat.transcribing" = "جاري تحويل الصوت إلى نص...";
 "chat.thinking" = "جاري التفكير...";
+"chat.reasoning.title" = "التفكير المنطقي";
+"chat.reasoning.show" = "إظهار التفكير المنطقي";
+"chat.reasoning.hide" = "إخفاء التفكير المنطقي";
 "chat.loadingMessages" = "جاري تحميل الرسائل...";
 "chat.startConversation" = "ابدأ محادثة";
 "chat.noMessagesYet" = "لا توجد رسائل بعد";

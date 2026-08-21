@@ -28,6 +28,18 @@ final class CoreDataStack: @unchecked Sendable {
             container.persistentStoreDescriptions = [description]
         }
 
+        // Lightweight migration. The model is versioned inside ShamelaGPT.xcdatamodeld
+        // ("ShamelaGPT" -> "ShamelaGPT 2", which adds the optional `reasoning` attribute
+        // to MessageEntity). Every change so far is additive and optional, so Core Data
+        // can infer the mapping model instead of us shipping a heavyweight one.
+        // These two flags default to true on descriptions NSPersistentContainer creates,
+        // but the in-memory branch above replaces the descriptions wholesale, so set them
+        // explicitly rather than relying on which branch ran.
+        for description in container.persistentStoreDescriptions {
+            description.shouldMigrateStoreAutomatically = true
+            description.shouldInferMappingModelAutomatically = true
+        }
+
         container.loadPersistentStores { storeDescription, error in
             if let error = error as NSError? {
                 // In production, you should handle this more gracefully
