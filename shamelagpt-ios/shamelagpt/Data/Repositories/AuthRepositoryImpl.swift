@@ -10,10 +10,18 @@ import Foundation
 final class AuthRepositoryImpl: AuthRepository {
     private let apiClient: APIClientProtocol
     private let sessionManager: SessionManager
+    /// Owned by the chat feature, but the wipe belongs here: putting it inside `logout()`
+    /// is what makes it impossible for a caller to end a session and forget the data.
+    private let chatRepository: ChatRepository?
 
-    init(apiClient: APIClientProtocol, sessionManager: SessionManager) {
+    init(
+        apiClient: APIClientProtocol,
+        sessionManager: SessionManager,
+        chatRepository: ChatRepository? = nil
+    ) {
         self.apiClient = apiClient
         self.sessionManager = sessionManager
+        self.chatRepository = chatRepository
     }
 
     func signup(request: SignupRequest) async throws -> AuthResponse {
@@ -135,7 +143,7 @@ final class AuthRepositoryImpl: AuthRepository {
     func deleteCurrentUser() async throws {
         do {
             try await apiClient.deleteCurrentUser()
-            logout()
+            await logout()
         } catch {
             throw normalizeError(error)
         }
@@ -181,10 +189,21 @@ final class AuthRepositoryImpl: AuthRepository {
         }
     }
 
-    func logout() {
+    func logout() async {
         AppLogger.auth.logInfo("logout called")
         sessionManager.clearSession()
         sessionManager.clearCredentials()
+
+        // Conversations are cached with no owner column, so whatever stays on disk is
+        // readable by the next person to use the device — including photographed documents
+        // held in `imageData`. The server copy is authoritative and comes back through
+        // `syncRemoteConversations` the next time History loads for a signed-in user.
+        do {
+            try await chatRepository?.clearLocalData()
+            AppLogger.auth.logInfo("logout cleared locally cached conversations")
+        } catch {
+            AppLogger.auth.logError("logout failed to clear locally cached conversations", error: error)
+        }
     }
 
     func token() -> String? {

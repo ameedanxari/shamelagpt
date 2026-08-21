@@ -514,6 +514,168 @@ final class ChatRepositoryTests: XCTestCase {
             XCTFail("Should throw CoreDataError.notFound, got: \(error)")
         }
     }
+
+    // MARK: - Remote Sync-Down
+
+    /// Local storage is only a safe place to wipe on logout if the server copy can be
+    /// pulled back, so this is the guarantee the logout wipe leans on.
+    func testSyncRemoteConversationsPopulatesLocalStorage() async throws {
+        // Given - server has two conversations the device has never seen
+        let apiClient = MockAPIClient()
+        apiClient.mockListConversationsResponse = [
+            ConversationResponse(
+                id: "server-1",
+                threadId: "thread-1",
+                title: "Ruling on travel prayer",
+                createdAt: "2025-01-01T00:00:00Z",
+                updatedAt: "2025-01-02T00:00:00Z"
+            ),
+            ConversationResponse(
+                id: "server-2",
+                threadId: "thread-2",
+                title: "Zakat on savings",
+                createdAt: "2025-01-03T00:00:00Z",
+                updatedAt: "2025-01-04T00:00:00Z"
+            )
+        ]
+        apiClient.mockMessagesByConversationId = [
+            "server-1": ConversationMessagesResponse(
+                conversationId: "server-1",
+                messages: [
+                    MessageResponse(id: "m1", role: "user", content: "How do I pray while travelling?", createdAt: nil),
+                    MessageResponse(id: "m2", role: "assistant", content: "You may shorten the prayer.", createdAt: nil)
+                ]
+            )
+        ]
+        let repository = makeRepository(apiClient: apiClient)
+
+        // When
+        try await repository.syncRemoteConversations(forceRefresh: true)
+
+        // Then - conversations landed in Core Data with their server ids and titles
+        let conversations = try await repository.fetchAllConversations()
+        XCTAssertEqual(apiClient.listConversationsCallCount, 1)
+        XCTAssertEqual(Set(conversations.map(\.id)), ["server-1", "server-2"])
+        XCTAssertEqual(conversations.first(where: { $0.id == "server-1" })?.title, "Ruling on travel prayer")
+        XCTAssertEqual(conversations.first(where: { $0.id == "server-2" })?.threadId, "thread-2")
+
+        // And message bodies were hydrated through the existing getMessages endpoint
+        let messages = try await repository.fetchMessages(forConversation: "server-1")
+        XCTAssertEqual(messages.count, 2)
+        XCTAssertEqual(messages.first?.content, "How do I pray while travelling?")
+        XCTAssertTrue(messages.first?.isUserMessage == true)
+        XCTAssertFalse(messages.last?.isUserMessage == true)
+    }
+
+    // MARK: - Local Data Wipe (logout)
+
+    func testClearLocalDataRemovesConversationsAndMessages() async throws {
+        // Given
+        let conversation = try await sut.createConversation(title: "Private question")
+        _ = try await sut.addMessage(
+            toConversation: conversation.id,
+            content: "Something personal",
+            isUserMessage: true,
+            sources: []
+        )
+
+        // When
+        try await sut.clearLocalData()
+
+        // Then
+        let conversations = try await sut.fetchAllConversations()
+        XCTAssertTrue(conversations.isEmpty, "No conversation may survive a logout wipe")
+
+        let orphanMessages = try messageDAO.fetchAll(
+            forConversationId: conversation.id,
+            from: testCoreDataStack.viewContext
+        )
+        XCTAssertTrue(orphanMessages.isEmpty, "Message bodies must go with their conversation")
+    }
+
+    /// Local-only conversations are unrecoverable, so the wipe removing them is a
+    /// deliberate choice rather than an accident. Pinned here so it cannot regress silently.
+    func testClearLocalDataAlsoRemovesLocalOnlyConversations() async throws {
+        // Given - one server-backed and one guest/offline conversation
+        _ = try await sut.createConversation(title: "Synced", isLocalOnly: false)
+        _ = try await sut.createConversation(title: "Guest only", isLocalOnly: true)
+        let beforeWipe = try await sut.fetchAllConversations()
+        XCTAssertEqual(beforeWipe.count, 2)
+
+        // When
+        try await sut.clearLocalData()
+
+        // Then
+        let conversations = try await sut.fetchAllConversations()
+        XCTAssertTrue(
+            conversations.isEmpty,
+            "Logout means removing this person's data from the device, local-only included"
+        )
+    }
+
+    /// The wipe must not delete the account's server history - that is what makes it
+    /// recoverable, and what distinguishes it from `deleteAllConversations()`.
+    func testClearLocalDataDoesNotDeleteServerConversations() async throws {
+        // Given
+        let apiClient = MockAPIClient()
+        let repository = makeRepository(apiClient: apiClient)
+        _ = try await repository.createConversation(title: "Kept on the server", isLocalOnly: true)
+
+        // When
+        try await repository.clearLocalData()
+
+        // Then
+        XCTAssertEqual(
+            apiClient.deleteAllConversationsCallCount,
+            0,
+            "Logout must not destroy the user's server-side history"
+        )
+    }
+
+    /// Freshness markers gate the network call. Left behind after a wipe they would make
+    /// the next sign-in show an empty History until the TTL expired.
+    func testClearLocalDataResetsSyncFreshnessSoNextLoginResyncs() async throws {
+        // Given - a completed sync, so the freshness marker is set
+        let defaults = UserDefaults(suiteName: #function)!
+        defaults.removePersistentDomain(forName: #function)
+        let freshnessStore = ConversationSyncFreshnessStore(userDefaults: defaults)
+        let apiClient = MockAPIClient()
+        let repository = makeRepository(apiClient: apiClient, freshnessStore: freshnessStore)
+
+        try await repository.syncRemoteConversations(forceRefresh: true)
+        XCTAssertFalse(
+            freshnessStore.shouldSyncConversations(forceRefresh: false),
+            "Precondition: the cache should look fresh right after a sync"
+        )
+
+        // When
+        try await repository.clearLocalData()
+
+        // Then - a plain (non-forced) load would go back to the network
+        XCTAssertTrue(
+            freshnessStore.shouldSyncConversations(forceRefresh: false),
+            "A wiped cache must not still look fresh"
+        )
+        defaults.removePersistentDomain(forName: #function)
+    }
+
+    // MARK: - Helpers
+
+    private func makeRepository(
+        apiClient: APIClientProtocol,
+        freshnessStore: ConversationSyncFreshnessStore = ConversationSyncFreshnessStore(
+            userDefaults: UserDefaults(suiteName: UUID().uuidString)!
+        )
+    ) -> ChatRepositoryImpl {
+        ChatRepositoryImpl(
+            coreDataStack: testCoreDataStack,
+            conversationDAO: conversationDAO,
+            messageDAO: messageDAO,
+            apiClient: apiClient,
+            networkMonitor: MockNetworkMonitor(),
+            freshnessStore: freshnessStore
+        )
+    }
 }
 
 // MARK: - Test Core Data Stack

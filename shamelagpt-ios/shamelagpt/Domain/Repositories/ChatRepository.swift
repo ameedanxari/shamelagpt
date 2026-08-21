@@ -55,6 +55,13 @@ protocol ChatRepository {
     /// Deletes all conversations
     func deleteAllConversations() async throws
 
+    /// Drops every locally cached conversation and message *without* touching the server.
+    ///
+    /// Distinct from `deleteAllConversations()`, which also wipes the user's server-side
+    /// history. This is the logout path: the account keeps its conversations, the device
+    /// does not, and `syncRemoteConversations` pulls them back on the next sign-in.
+    func clearLocalData() async throws
+
     /// Sync conversations from server when authenticated.
     /// When `forceRefresh` is false, implementation may skip network if cache is still fresh.
     func syncRemoteConversations(forceRefresh: Bool) async throws
