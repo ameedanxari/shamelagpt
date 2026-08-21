@@ -195,12 +195,26 @@ final class AuthRepositoryImpl: AuthRepository {
         sessionManager.isLoggedIn()
     }
 
+    /// Used when the server does not give us a usable lifetime. Matches the hour the
+    /// backend currently issues, so a malformed value degrades to the normal case
+    /// rather than to "already expired".
+    private static let defaultSessionLifetime: TimeInterval = 3600
+
     private func persistSession(from response: AuthResponse) {
-        let expires = Double(response.expiresIn) ?? 0
+        // expires_in arrives as a string ("3600") because it is passed through from
+        // Firebase unchanged. A `?? 0` fallback here would stamp the expiry at the
+        // current instant, so the token would read as expired the moment it was
+        // stored and every later request would go out unauthenticated.
+        let parsed = Double(response.expiresIn)
+        if parsed == nil {
+            AppLogger.auth.logWarning(
+                "expires_in not numeric (\(response.expiresIn)); using default lifetime"
+            )
+        }
         sessionManager.saveSession(
             token: response.token,
             refreshToken: response.refreshToken,
-            expiresInSeconds: expires
+            expiresInSeconds: parsed ?? Self.defaultSessionLifetime
         )
     }
 
