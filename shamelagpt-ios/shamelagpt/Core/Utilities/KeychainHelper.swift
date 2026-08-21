@@ -48,7 +48,10 @@ enum KeychainHelper {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: key
         ]
+        // print() goes to the device console in release builds too. This now runs on
+        // every login via clearCredentials(), so route it through the logger, which is
+        // already the convention everywhere else in the app.
         let status = SecItemDelete(query as CFDictionary)
-        print("KeychainHelper: Removed key '\(key)' with status: \(status)")
+        AppLogger.session.logDebug("keychain remove key=\(key) status=\(status)")
     }
 }
