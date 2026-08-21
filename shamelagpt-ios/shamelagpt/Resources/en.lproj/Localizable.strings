@@ -25,6 +25,9 @@
 "chat.extractingText" = "Extracting text...";
 "chat.transcribing" = "Transcribing...";
 "chat.thinking" = "Thinking...";
+"chat.reasoning.title" = "Reasoning";
+"chat.reasoning.show" = "Show reasoning";
+"chat.reasoning.hide" = "Hide reasoning";
 "chat.loadingMessages" = "Loading messages...";
 "chat.startConversation" = "Start a conversation";
 "chat.noMessagesYet" = "No messages yet";

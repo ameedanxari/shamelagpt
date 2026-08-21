@@ -85,6 +85,73 @@ final class ChatViewModelStreamingTests: XCTestCase {
         XCTAssertTrue(viewModel.thinkingMessages.isEmpty, "Thinking indicators should clear after done event")
     }
 
+    func testStreamingReasoningDeltasRebuildTheOriginalTextOnTheAssistantMessage() async throws {
+        // Given - reasoning deltas split mid-word ("trav|elling"), as the provider sends them
+        mockAPIClient.streamMessageLines = [
+            "data: {\"type\":\"thinking\",\"content\":\"Planning search\"}\n\n",
+            "data: {\"type\":\"reasoning\",\"content\":\"The user asks about trav\"}\n\n",
+            "data: {\"type\":\"reasoning\",\"content\":\"elling. I should check \"}\n\n",
+            "data: {\"type\":\"reasoning\",\"content\":\"all four schools.\"}\n\n",
+            "data: {\"type\":\"chunk\",\"content\":\"You may combine prayers.\"}\n\n",
+            "data: {\"type\":\"done\",\"full_answer\":\"You may combine prayers.\"}\n\n",
+            "data: [DONE]\n\n"
+        ]
+
+        let finished = expectation(description: "stream completes")
+        viewModel.$isLoading
+            .dropFirst()
+            .removeDuplicates()
+            .sink { isLoading in
+                if !isLoading {
+                    finished.fulfill()
+                }
+            }
+            .store(in: &cancellables)
+
+        // When
+        viewModel.inputText = "Can I combine prayers while travelling?"
+        viewModel.sendMessage()
+
+        // Then
+        await fulfillment(of: [finished], timeout: 3.0)
+
+        let expected = "The user asks about travelling. I should check all four schools."
+        XCTAssertEqual(viewModel.streamingReasoning, expected, "Deltas must be joined with no separator")
+        XCTAssertEqual(viewModel.messages.last?.reasoning, expected, "The assistant message should carry the reasoning")
+        XCTAssertTrue(viewModel.messages.last?.hasReasoning == true)
+    }
+
+    func testStreamWithoutReasoningLeavesAssistantMessageReasoningNil() async throws {
+        // Given - a turn from a backend that emits no reasoning events
+        mockAPIClient.streamMessageLines = [
+            "data: {\"type\":\"thinking\",\"content\":\"Writing answer\"}\n\n",
+            "data: {\"type\":\"chunk\",\"content\":\"Hello\"}\n\n",
+            "data: {\"type\":\"done\",\"full_answer\":\"Hello\"}\n\n",
+            "data: [DONE]\n\n"
+        ]
+
+        let finished = expectation(description: "stream completes")
+        viewModel.$isLoading
+            .dropFirst()
+            .removeDuplicates()
+            .sink { isLoading in
+                if !isLoading {
+                    finished.fulfill()
+                }
+            }
+            .store(in: &cancellables)
+
+        // When
+        viewModel.inputText = "Hi"
+        viewModel.sendMessage()
+
+        // Then
+        await fulfillment(of: [finished], timeout: 3.0)
+
+        XCTAssertTrue(viewModel.streamingReasoning.isEmpty)
+        XCTAssertNil(viewModel.messages.last?.reasoning, "No reasoning events must leave the field nil, not empty")
+    }
+
     func testStreamingFailureSetsErrorAndRestoresInput() async throws {
         // Given
         mockAPIClient.streamMessageError = NetworkError.httpError(statusCode: 500)

@@ -32,6 +32,7 @@ final class MessageDAO: @unchecked Sendable {
     ///   - imageData: Optional image data for fact-checking
     ///   - detectedLanguage: Optional detected language code
     ///   - isFactCheckMessage: Whether this is a fact-checking message
+    ///   - reasoning: Optional chain-of-thought captured for an assistant message
     ///   - conversation: The parent conversation entity
     ///   - context: The managed object context to use
     /// - Returns: The created MessageEntity
@@ -46,6 +47,7 @@ final class MessageDAO: @unchecked Sendable {
         imageData: Data? = nil,
         detectedLanguage: String? = nil,
         isFactCheckMessage: Bool = false,
+        reasoning: String? = nil,
         conversation: ConversationEntity,
         in context: NSManagedObjectContext
     ) -> MessageEntity {
@@ -59,6 +61,7 @@ final class MessageDAO: @unchecked Sendable {
         entity.imageData = imageData
         entity.detectedLanguage = detectedLanguage
         entity.isFactCheckMessage = isFactCheckMessage
+        entity.reasoning = reasoning
         entity.conversation = conversation
         return entity
     }
@@ -181,6 +184,22 @@ final class MessageDAO: @unchecked Sendable {
 
         do {
             try context.execute(batchDeleteRequest)
+        } catch {
+            throw CoreDataError.deleteFailed(error)
+        }
+    }
+
+    /// Deletes every message in the store, including any that are no longer attached to a
+    /// conversation. Deletes object-by-object rather than via `NSBatchDeleteRequest` so the
+    /// caller's context sees the removals immediately and cascade rules still apply.
+    /// - Parameter context: The managed object context to use
+    /// - Throws: CoreDataError if deletion fails
+    func deleteAll(from context: NSManagedObjectContext) throws {
+        let request: NSFetchRequest<MessageEntity> = MessageEntity.fetchRequest()
+
+        do {
+            let messages = try context.fetch(request)
+            messages.forEach { context.delete($0) }
         } catch {
             throw CoreDataError.deleteFailed(error)
         }

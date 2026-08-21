@@ -31,9 +31,21 @@ final class SessionManager {
         if let refresh = refreshToken {
             setItem(refresh, for: refreshTokenKey)
         }
-        if let expires = expiresInSeconds {
+        if let expires = expiresInSeconds, expires > 0 {
             let expiryDate = Date().addingTimeInterval(expires)
             defaults.set(expiryDate.timeIntervalSince1970, forKey: expiresAtKey)
+        } else {
+            // A zero or negative lifetime would stamp the expiry at or before now, so
+            // token() would discard a token the server considers perfectly valid and
+            // every request after it would go out unauthenticated. Record no expiry
+            // instead and let the backend be the one to reject it. Removing rather than
+            // leaving the key also clears any expiry from a previous session.
+            if let expires = expiresInSeconds {
+                AppLogger.session.logWarning(
+                    "ignoring non-positive session lifetime \(expires); no local expiry recorded"
+                )
+            }
+            defaults.removeObject(forKey: expiresAtKey)
         }
     }
 

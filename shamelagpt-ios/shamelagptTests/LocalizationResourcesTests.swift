@@ -22,7 +22,10 @@ final class LocalizationResourcesTests: XCTestCase {
             LocalizationKeys.networkNoConnection,
             LocalizationKeys.networkTooManyRequests,
             LocalizationKeys.welcomeTitle,
-            LocalizationKeys.share
+            LocalizationKeys.share,
+            LocalizationKeys.chatReasoningTitle,
+            LocalizationKeys.chatReasoningShow,
+            LocalizationKeys.chatReasoningHide
         ]
 
         for key in criticalKeys {
@@ -89,7 +92,8 @@ final class LocalizationResourcesTests: XCTestCase {
         let rtlSensitiveKeys = [
             LocalizationKeys.welcomeIntro,
             LocalizationKeys.historyLockedMessage,
-            LocalizationKeys.networkAccessForbidden
+            LocalizationKeys.networkAccessForbidden,
+            LocalizationKeys.chatReasoningTitle
         ]
 
         for key in rtlSensitiveKeys {

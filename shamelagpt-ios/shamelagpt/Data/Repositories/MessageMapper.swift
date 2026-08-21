@@ -27,7 +27,8 @@ struct MessageMapper {
             sources: sources,
             imageData: entity.imageData,
             detectedLanguage: entity.detectedLanguage,
-            isFactCheckMessage: entity.isFactCheckMessage
+            isFactCheckMessage: entity.isFactCheckMessage,
+            reasoning: entity.reasoning
         )
     }
 

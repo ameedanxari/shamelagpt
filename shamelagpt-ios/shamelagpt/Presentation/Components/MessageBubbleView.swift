@@ -29,6 +29,13 @@ struct MessageBubbleView: View {
             }
 
             VStack(alignment: message.isUserMessage ? .trailing : .leading, spacing: AppTheme.Spacing.xxs) {
+                // Chain-of-thought, collapsed. Sits above the answer because that is the
+                // order it was produced in, and stays out of `messageBubble` so it is not
+                // swept into the copy/share content or the bubble's context menu.
+                if message.isAssistantMessage, let reasoning = message.reasoning, message.hasReasoning {
+                    ReasoningPanelView(reasoning: reasoning)
+                }
+
                 // Message bubble
                 messageBubble
 

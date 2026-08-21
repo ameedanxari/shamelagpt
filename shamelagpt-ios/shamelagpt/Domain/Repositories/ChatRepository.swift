@@ -55,6 +55,13 @@ protocol ChatRepository {
     /// Deletes all conversations
     func deleteAllConversations() async throws
 
+    /// Drops every locally cached conversation and message *without* touching the server.
+    ///
+    /// Distinct from `deleteAllConversations()`, which also wipes the user's server-side
+    /// history. This is the logout path: the account keeps its conversations, the device
+    /// does not, and `syncRemoteConversations` pulls them back on the next sign-in.
+    func clearLocalData() async throws
+
     /// Sync conversations from server when authenticated.
     /// When `forceRefresh` is false, implementation may skip network if cache is still fresh.
     func syncRemoteConversations(forceRefresh: Bool) async throws
@@ -81,12 +88,14 @@ protocol ChatRepository {
     ///   - content: The message content
     ///   - isUserMessage: Whether this is a user message
     ///   - sources: Optional array of sources
+    ///   - reasoning: Optional chain-of-thought to store alongside an assistant message
     /// - Returns: The created Message
     func addMessage(
         toConversation conversationId: String,
         content: String,
         isUserMessage: Bool,
-        sources: [Source]
+        sources: [Source],
+        reasoning: String?
     ) async throws -> Message
 
     /// Adds a fact-check message to a conversation
@@ -156,5 +165,22 @@ extension ChatRepository {
 
     func fetchMessages(forConversation conversationId: String) async throws -> [Message] {
         try await fetchMessages(forConversation: conversationId, forceRefresh: false)
+    }
+
+    /// Most callers store a message that has no chain-of-thought (every user message,
+    /// and assistant messages from turns where the backend emitted no `reasoning` events).
+    func addMessage(
+        toConversation conversationId: String,
+        content: String,
+        isUserMessage: Bool,
+        sources: [Source]
+    ) async throws -> Message {
+        try await addMessage(
+            toConversation: conversationId,
+            content: content,
+            isUserMessage: isUserMessage,
+            sources: sources,
+            reasoning: nil
+        )
     }
 }

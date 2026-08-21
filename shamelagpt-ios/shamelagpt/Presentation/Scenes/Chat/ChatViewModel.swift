@@ -28,6 +28,12 @@ final class ChatViewModel: ObservableObject {
     @Published var thinkingMessages: [String] = []
     @Published var isAwaitingFirstResponseChunk: Bool = false
 
+    /// Chain-of-thought for the turn currently streaming, built by appending every
+    /// `{"type":"reasoning"}` delta with NO separator. The backend forwards the
+    /// provider's raw thinking stream, whose deltas split mid-word, so inserting a
+    /// space or newline between them would corrupt the text.
+    @Published private(set) var streamingReasoning: String = ""
+
     // Voice input properties
     @Published var isRecording: Bool = false
     @Published var voiceInputError: VoiceInputError?
@@ -437,6 +443,7 @@ final class ChatViewModel: ObservableObject {
                 errorMessage = nil
                 let isGuestFlow = isGuest || forceGuestForConversation
                 thinkingMessages = isGuestFlow ? [] : [LocalizationKeys.thinking.localized]
+                streamingReasoning = ""
 
                 // Guest path: use streaming SSE endpoint to receive incremental chunks
                 if let apiClient = apiClient {
@@ -497,6 +504,10 @@ final class ChatViewModel: ObservableObject {
                             guard isAwaitingFirstResponseChunk else { break }
                             AppLogger.chat.logDebug("Stream: thinking event received: \(text)")
                             thinkingMessages = [text]
+                        case .reasoning(let delta):
+                            // No separator: the deltas are fragments of one string.
+                            streamingReasoning += delta
+                            upsertAssistantMessage(content: assembled, assistantMessageId: &assistantMessageId, activeConversationId: activeConversationId, onlyIfPresent: true)
                         case .chunk(let piece):
                             if isAwaitingFirstResponseChunk {
                                 isAwaitingFirstResponseChunk = false
@@ -545,7 +556,8 @@ final class ChatViewModel: ObservableObject {
                                 toConversation: activeConversationId,
                                 content: assistant.content,
                                 isUserMessage: false,
-                                sources: assistant.sources
+                                sources: assistant.sources,
+                                reasoning: assistant.reasoning
                             )
                         }
                     }
@@ -1248,6 +1260,7 @@ final class ChatViewModel: ObservableObject {
             isAwaitingFirstResponseChunk = true
             error = nil
             errorMessage = nil
+            streamingReasoning = ""
 
             // Save user message locally
             _ = try await chatRepository.addFactCheckMessage(
@@ -1289,6 +1302,9 @@ final class ChatViewModel: ObservableObject {
 
                     assembled = ""
                     assistantMessageId = nil
+                    // A retry replays the whole turn, so start the chain-of-thought over
+                    // rather than concatenating the abandoned attempt onto the new one.
+                    streamingReasoning = ""
                     var sawDone = false
 
                     for try await event in stream {
@@ -1299,6 +1315,10 @@ final class ChatViewModel: ObservableObject {
                             guard isAwaitingFirstResponseChunk else { break }
                             AppLogger.chat.logDebug("Fact-check stream: thinking event received: \(text)")
                             thinkingMessages = [text]
+                        case .reasoning(let delta):
+                            // No separator: the deltas are fragments of one string.
+                            streamingReasoning += delta
+                            upsertAssistantMessage(content: assembled, assistantMessageId: &assistantMessageId, activeConversationId: activeConversationId, onlyIfPresent: true)
                         case .chunk(let piece):
                             if isAwaitingFirstResponseChunk {
                                 isAwaitingFirstResponseChunk = false
@@ -1367,7 +1387,8 @@ final class ChatViewModel: ObservableObject {
                     toConversation: activeConversationId,
                     content: assistant.content,
                     isUserMessage: false,
-                    sources: assistant.sources
+                    sources: assistant.sources,
+                    reasoning: assistant.reasoning
                 )
             }
 
@@ -1426,7 +1447,18 @@ final class ChatViewModel: ObservableObject {
         return error.localizedDescription.localizedCaseInsensitiveContains("image_url")
     }
 
-    private func upsertAssistantMessage(content: String, assistantMessageId: inout String?, activeConversationId: String) {
+    /// - Parameter onlyIfPresent: when true, refresh the assistant message only if it
+    ///   already exists. Reasoning deltas arrive before the first content chunk, and an
+    ///   empty bubble in the transcript would look like a broken response — until then
+    ///   the live `ReasoningPanelView` under the typing indicator carries the text.
+    private func upsertAssistantMessage(
+        content: String,
+        assistantMessageId: inout String?,
+        activeConversationId: String,
+        onlyIfPresent: Bool = false
+    ) {
+        let reasoning = streamingReasoning.isEmpty ? nil : streamingReasoning
+
         if let id = assistantMessageId, let idx = messages.firstIndex(where: { $0.id == id }) {
             // Update existing assistant message in place
             let old = messages[idx]
@@ -1439,21 +1471,25 @@ final class ChatViewModel: ObservableObject {
                 sources: old.sources,
                 imageData: old.imageData,
                 detectedLanguage: old.detectedLanguage,
-                isFactCheckMessage: old.isFactCheckMessage
+                isFactCheckMessage: old.isFactCheckMessage,
+                reasoning: reasoning ?? old.reasoning
             )
             messages[idx] = updated
         } else {
+            guard !onlyIfPresent else { return }
+
             // Create a new assistant message
             let newId = assistantMessageId ?? UUID().uuidString
             assistantMessageId = newId
-            
+
             let assistant = Message(
                 id: newId,
                 conversationId: activeConversationId,
                 content: content,
                 isUserMessage: false,
                 timestamp: Date(),
-                sources: []
+                sources: [],
+                reasoning: reasoning
             )
             messages.append(assistant)
         }
@@ -1767,6 +1803,8 @@ class MockChatRepository: ChatRepository {
 
     func syncRemoteConversations(forceRefresh: Bool) async throws {}
 
+    func clearLocalData() async throws {}
+
     func setConversationShared(id: String, isShared: Bool) async throws -> String? {
         return isShared ? "https://shamelagpt.com/shared?chatid=\(id)" : nil
     }
@@ -1783,7 +1821,7 @@ class MockChatRepository: ChatRepository {
 
     func deleteAllConversations() async throws {}
 
-    func addMessage(toConversation conversationId: String, content: String, isUserMessage: Bool, sources: [Source]) async throws -> Message {
+    func addMessage(toConversation conversationId: String, content: String, isUserMessage: Bool, sources: [Source], reasoning: String?) async throws -> Message {
         fatalError("Mock implementation")
     }
 

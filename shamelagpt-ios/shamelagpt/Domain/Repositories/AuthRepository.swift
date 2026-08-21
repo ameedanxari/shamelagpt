@@ -24,7 +24,9 @@ protocol AuthRepository {
     func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse
     func getMadhabPreference() async throws -> MadhabPreferenceResponse
     func setMadhabPreference(_ request: MadhabPreferenceRequest) async throws -> MadhabPreferenceResponse
-    func logout()
+    /// Ends the session and removes this user's data from the device.
+    /// Async because clearing the local conversation cache touches Core Data.
+    func logout() async
     func token() -> String?
     func isLoggedIn() -> Bool
 }

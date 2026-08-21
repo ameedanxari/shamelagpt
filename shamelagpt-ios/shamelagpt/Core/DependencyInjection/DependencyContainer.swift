@@ -200,7 +200,9 @@ class DependencyContainer {
         if let apiClient = resolve(APIClientProtocol.self), let sessionManager = resolve(SessionManager.self) {
             let authRepository = AuthRepositoryImpl(
                 apiClient: apiClient,
-                sessionManager: sessionManager
+                sessionManager: sessionManager,
+                // Registered above, so no cycle: chat knows nothing about auth.
+                chatRepository: chatRepository
             )
             register(AuthRepository.self, instance: authRepository)
         }

@@ -131,7 +131,7 @@ class MockAuthRepository: AuthRepository {
         return mockMadhabPreferenceResponse
     }
 
-    func logout() {
+    func logout() async {
         logoutCallCount += 1
         mockIsLoggedIn = false
     }

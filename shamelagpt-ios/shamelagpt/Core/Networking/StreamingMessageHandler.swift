@@ -11,6 +11,10 @@ import Foundation
 enum StreamEvent {
     case metadata(threadId: String)
     case thinking(String)
+    /// One delta of the model's chain-of-thought. The backend forwards the provider's
+    /// raw thinking stream, which splits mid-word, so callers must append these with
+    /// no separator at all — a space or newline corrupts the text.
+    case reasoning(String)
     case chunk(String)
     case done(fullAnswer: String?)
     case error(Error)
@@ -147,6 +151,13 @@ class StreamingMessageHandler: StreamingMessageHandlerProtocol {
         case "thinking":
             if let text = rawEvent.content?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines), !text.isEmpty {
                 continuation.yield(.thinking(text))
+            }
+        case "reasoning":
+            // Deliberately NOT trimmed: unlike "thinking" (whole short labels) these are
+            // deltas of one continuous string, so the whitespace at the edges is part of
+            // the text. Empty deltas are dropped because they add nothing.
+            if let text = rawEvent.content, !text.isEmpty {
+                continuation.yield(.reasoning(text))
             }
         case "chunk":
             continuation.yield(.chunk(rawEvent.content ?? ""))
