@@ -34,7 +34,10 @@ final class AuthRepositoryImpl: AuthRepository {
             AppLogger.auth.logDebug("login request started")
             let response = try await apiClient.login(request)
             persistSession(from: response)
-            sessionManager.saveCredentials(email: request.email, password: request.password)
+            // Deliberately not persisting the password: the refresh token issued above
+            // is the only credential the app needs to restore a session, and unlike a
+            // password it is scoped to this app and revocable server-side.
+            sessionManager.clearCredentials()
             AppLogger.auth.logInfo("login request succeeded")
             return response
         } catch {

@@ -62,6 +62,10 @@ final class AuthRepositoryTests: XCTestCase {
         XCTAssertEqual(result.token, "token123")
         XCTAssertTrue(sut.isLoggedIn())
         XCTAssertEqual(sut.token(), "token123")
+        // The refresh token is enough to restore a session; keeping the password would
+        // let the app silently re-authenticate and would outlive a server-side logout.
+        XCTAssertNil(KeychainHelper.get("auth_password"), "login must not persist the password")
+        XCTAssertNil(KeychainHelper.get("auth_email"), "login must not persist the email")
     }
     
     func testSignupSuccess() async throws {

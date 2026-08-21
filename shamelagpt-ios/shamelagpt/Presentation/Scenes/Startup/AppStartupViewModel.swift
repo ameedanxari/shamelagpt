@@ -45,12 +45,10 @@ final class AppStartupViewModel: ObservableObject {
             return
         }
 
-        let canAttemptRestore = (sessionManager.refreshToken()?.isEmpty == false) ||
-            sessionManager.storedCredentials() != nil
-        guard canAttemptRestore else {
+        guard sessionManager.refreshToken()?.isEmpty == false else {
             AppLogger.auth.logInfo(
                 prefix: AppLogger.LogPrefix.authState,
-                "event=startup.bootstrap.restoreSkipped reason=noRefreshTokenOrCredentials"
+                "event=startup.bootstrap.restoreSkipped reason=noRefreshToken"
             )
             isAuthenticated = false
             isBootstrapping = false
@@ -59,7 +57,7 @@ final class AppStartupViewModel: ObservableObject {
 
         AppLogger.auth.logInfo(
             prefix: AppLogger.LogPrefix.authState,
-            "event=startup.bootstrap.restoreStarted refreshTokenPresent=\(sessionManager.refreshToken()?.isEmpty == false) credentialsPresent=\(sessionManager.storedCredentials() != nil)"
+            "event=startup.bootstrap.restoreStarted"
         )
         Task {
             let restored = await restoreSession()
@@ -72,17 +70,11 @@ final class AppStartupViewModel: ObservableObject {
         }
     }
 
+    /// Restores only from the refresh token. Earlier builds fell back to replaying a
+    /// stored email/password, which meant the app could re-authenticate from scratch
+    /// without the user ever asking — and required keeping their password on device.
     private func restoreSession() async -> Bool {
         switch await tryRefreshToken() {
-        case .success:
-            return true
-        case .unauthorized:
-            sessionManager.clearSession()
-        case .failed, .skipped:
-            break
-        }
-
-        switch await tryCredentialsLogin() {
         case .success:
             return true
         case .unauthorized:
@@ -119,35 +111,6 @@ final class AppStartupViewModel: ObservableObject {
             AppLogger.auth.logWarning(
                 prefix: AppLogger.LogPrefix.authState,
                 "event=startup.refresh.failure unauthorized=\(isUnauthorized(error)) reason=\(type(of: error))"
-            )
-            return isUnauthorized(error) ? .unauthorized : .failed
-        }
-    }
-
-    private func tryCredentialsLogin() async -> AttemptResult {
-        guard let creds = sessionManager.storedCredentials() else {
-            AppLogger.auth.logDebug(
-                prefix: AppLogger.LogPrefix.authState,
-                "event=startup.credentials.skipped reason=noStoredCredentials"
-            )
-            return .skipped
-        }
-
-        do {
-            AppLogger.auth.logInfo(
-                prefix: AppLogger.LogPrefix.authState,
-                "event=startup.credentials.start email=\(AppLogger.redactedEmail(creds.email))"
-            )
-            _ = try await authRepository.login(request: LoginRequest(email: creds.email, password: creds.password))
-            AppLogger.auth.logInfo(
-                prefix: AppLogger.LogPrefix.authState,
-                "event=startup.credentials.success"
-            )
-            return .success
-        } catch {
-            AppLogger.auth.logWarning(
-                prefix: AppLogger.LogPrefix.authState,
-                "event=startup.credentials.failure unauthorized=\(isUnauthorized(error)) reason=\(type(of: error))"
             )
             return isUnauthorized(error) ? .unauthorized : .failed
         }
