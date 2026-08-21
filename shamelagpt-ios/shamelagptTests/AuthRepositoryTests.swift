@@ -89,14 +89,15 @@ final class AuthRepositoryTests: XCTestCase {
         XCTAssertTrue(sut.isLoggedIn())
     }
     
-    func testLogout() {
+    func testLogout() async {
         // Given
         sessionManager.saveSession(token: "token", refreshToken: nil, expiresInSeconds: nil)
         XCTAssertTrue(sut.isLoggedIn())
-        
+
         // When
-        sut.logout()
-        
+        await sut.logout()
+
+
         // Then
         XCTAssertFalse(sut.isLoggedIn())
         XCTAssertNil(sut.token())
@@ -200,6 +201,125 @@ final class AuthRepositoryTests: XCTestCase {
         let body = try XCTUnwrap(capturedBody)
         let json = try XCTUnwrap(try JSONSerialization.jsonObject(with: body) as? [String: Any])
         XCTAssertEqual(json["mode_preference"] as? Int, 1)
+    }
+
+    // MARK: - Logout Clears Local Data
+
+    /// Conversations are cached with no owner column, so anything left behind after logout
+    /// is readable by the next person to use the device.
+    func testLogoutClearsLocallyCachedConversationsAndMessages() async throws {
+        // Given - user A is signed in and has history on the device
+        let coreDataStack = TestCoreDataStack()
+        let chatRepository = ChatRepositoryImpl(
+            coreDataStack: coreDataStack,
+            conversationDAO: ConversationDAO(),
+            messageDAO: MessageDAO(),
+            apiClient: nil,
+            networkMonitor: nil
+        )
+        let sut = AuthRepositoryImpl(
+            apiClient: apiClient,
+            sessionManager: sessionManager,
+            chatRepository: chatRepository
+        )
+        sessionManager.saveSession(token: "token", refreshToken: "refresh", expiresInSeconds: 3600)
+
+        let conversation = try await chatRepository.createConversation(title: "Personal question")
+        _ = try await chatRepository.addMessage(
+            toConversation: conversation.id,
+            content: "Something private",
+            isUserMessage: true,
+            sources: []
+        )
+        let beforeLogout = try await chatRepository.fetchAllConversations()
+        XCTAssertEqual(beforeLogout.count, 1)
+
+        // When
+        await sut.logout()
+
+        // Then - session and cached history are both gone
+        XCTAssertFalse(sut.isLoggedIn())
+        let remaining = try await chatRepository.fetchAllConversations()
+        XCTAssertTrue(remaining.isEmpty, "User A's conversations must not survive logout")
+
+        let messages = try await chatRepository.fetchMessages(forConversation: conversation.id)
+        XCTAssertTrue(messages.isEmpty, "User A's message bodies must not survive logout")
+    }
+
+    /// The logged-out state is what user B (or the same person as a guest) sees first.
+    func testLoggedOutStateExposesNoResidualHistory() async throws {
+        // Given
+        let coreDataStack = TestCoreDataStack()
+        let chatRepository = ChatRepositoryImpl(
+            coreDataStack: coreDataStack,
+            conversationDAO: ConversationDAO(),
+            messageDAO: MessageDAO(),
+            apiClient: nil,
+            networkMonitor: nil
+        )
+        let sut = AuthRepositoryImpl(
+            apiClient: apiClient,
+            sessionManager: sessionManager,
+            chatRepository: chatRepository
+        )
+        sessionManager.saveSession(token: "token", refreshToken: "refresh", expiresInSeconds: 3600)
+        _ = try await chatRepository.createConversation(title: "Synced chat", isLocalOnly: false)
+        _ = try await chatRepository.createConversation(title: "Offline chat", isLocalOnly: true)
+
+        // When
+        await sut.logout()
+
+        // Then - nothing at all is readable, local-only rows included
+        XCTAssertNil(sut.token())
+        let remaining = try await chatRepository.fetchAllConversations()
+        XCTAssertTrue(remaining.isEmpty)
+    }
+
+    /// Wiping on logout must not leave the store in a state where a guest cannot start over.
+    func testGuestConversationsStillWorkAfterLogout() async throws {
+        // Given
+        let coreDataStack = TestCoreDataStack()
+        let chatRepository = ChatRepositoryImpl(
+            coreDataStack: coreDataStack,
+            conversationDAO: ConversationDAO(),
+            messageDAO: MessageDAO(),
+            apiClient: nil,
+            networkMonitor: nil
+        )
+        let sut = AuthRepositoryImpl(
+            apiClient: apiClient,
+            sessionManager: sessionManager,
+            chatRepository: chatRepository
+        )
+        sessionManager.saveSession(token: "token", refreshToken: "refresh", expiresInSeconds: 3600)
+        _ = try await chatRepository.createConversation(title: "Previous user chat")
+        await sut.logout()
+
+        // When - continuing as a guest after logging out
+        let guestConversation = try await chatRepository.createConversation(
+            title: "Guest chat",
+            isLocalOnly: true
+        )
+        _ = try await chatRepository.addMessage(
+            toConversation: guestConversation.id,
+            content: "Guest question",
+            isUserMessage: true,
+            sources: []
+        )
+
+        // Then - the guest's own conversation works and is the only thing present
+        let conversations = try await chatRepository.fetchAllConversations()
+        XCTAssertEqual(conversations.count, 1)
+        XCTAssertEqual(conversations.first?.title, "Guest chat")
+        XCTAssertTrue(conversations.first?.isLocalOnly == true)
+
+        let messages = try await chatRepository.fetchMessages(forConversation: guestConversation.id)
+        XCTAssertEqual(messages.count, 1)
+        XCTAssertEqual(messages.first?.content, "Guest question")
+
+        // The guest session id is independent of the auth session, so guests are not
+        // locked out by a logout that happened first.
+        XCTAssertFalse(sessionManager.getOrCreateGuestSessionId().isEmpty)
     }
 
     /// Reads a request body regardless of whether URLSession delivered it as

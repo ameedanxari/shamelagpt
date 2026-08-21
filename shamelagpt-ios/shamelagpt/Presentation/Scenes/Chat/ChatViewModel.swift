@@ -1767,6 +1767,8 @@ class MockChatRepository: ChatRepository {
 
     func syncRemoteConversations(forceRefresh: Bool) async throws {}
 
+    func clearLocalData() async throws {}
+
     func setConversationShared(id: String, isShared: Bool) async throws -> String? {
         return isShared ? "https://shamelagpt.com/shared?chatid=\(id)" : nil
     }

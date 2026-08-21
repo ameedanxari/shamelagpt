@@ -22,7 +22,9 @@ protocol AuthRepository {
     func setPreferences(_ request: UserPreferencesRequest) async throws
     func getModePreference() async throws -> ModePreferenceResponse
     func setModePreference(_ request: ModePreferenceRequest) async throws -> ModePreferenceResponse
-    func logout()
+    /// Ends the session and removes this user's data from the device.
+    /// Async because clearing the local conversation cache touches Core Data.
+    func logout() async
     func token() -> String?
     func isLoggedIn() -> Bool
 }

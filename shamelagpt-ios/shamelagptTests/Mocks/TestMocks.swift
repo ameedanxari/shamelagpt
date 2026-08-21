@@ -29,6 +29,10 @@ class MockAPIClient: APIClientProtocol {
         threadId: "mock-thread-id"
     )
     var mockCreateConversationResponse: ConversationResponse?
+    /// When set, `listConversations` returns this instead of the default single-item list.
+    var mockListConversationsResponse: [ConversationResponse]?
+    /// Per-conversation message payloads keyed by conversation id, for sync-down tests.
+    var mockMessagesByConversationId: [String: ConversationMessagesResponse] = [:]
     var mockUserPreferencesResponse: UserPreferencesRequest?
     var mockModePreferenceResponse = ModePreferenceResponse(modePreference: 1, modeName: "research")
 
@@ -311,6 +315,9 @@ class MockAPIClient: APIClientProtocol {
             try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
         }
         if shouldFail { throw errorToThrow }
+        if let mockListConversationsResponse {
+            return mockListConversationsResponse
+        }
         return [
             ConversationResponse(
                 id: "conv-1",
@@ -362,6 +369,9 @@ class MockAPIClient: APIClientProtocol {
             try await Task.sleep(nanoseconds: UInt64(requestDelay * 1_000_000_000))
         }
         if shouldFail { throw errorToThrow }
+        if let mocked = mockMessagesByConversationId[conversationId] {
+            return mocked
+        }
         return ConversationMessagesResponse(
             conversationId: conversationId,
             messages: []
@@ -459,6 +469,8 @@ class MockAPIClient: APIClientProtocol {
         setShareStatusCallCount = 0
         lastSetShareStatusIsShared = nil
         mockCreateConversationResponse = nil
+        mockListConversationsResponse = nil
+        mockMessagesByConversationId = [:]
         streamMessageLines = []
         streamGuestMessageLines = []
         streamMessageError = nil
@@ -488,6 +500,7 @@ class MockChatRepository: ChatRepository {
     var createConversationCallCount = 0
     var addMessageCallCount = 0
     var fetchMessagesCallCount = 0
+    var clearLocalDataCallCount = 0
 
     // Sharing
     /// Value handed back by `setConversationShared`; nil simulates a server
@@ -543,6 +556,12 @@ class MockChatRepository: ChatRepository {
 
     func syncRemoteConversations(forceRefresh: Bool) async throws {
         // no-op for mock
+    }
+
+    func clearLocalData() async throws {
+        clearLocalDataCallCount += 1
+        if shouldThrowError { throw errorToThrow }
+        mockConversations.removeAll()
     }
 
     func setConversationShared(id: String, isShared: Bool) async throws -> String? {

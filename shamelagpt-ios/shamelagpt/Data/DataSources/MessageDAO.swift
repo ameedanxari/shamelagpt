@@ -186,6 +186,22 @@ final class MessageDAO: @unchecked Sendable {
         }
     }
 
+    /// Deletes every message in the store, including any that are no longer attached to a
+    /// conversation. Deletes object-by-object rather than via `NSBatchDeleteRequest` so the
+    /// caller's context sees the removals immediately and cascade rules still apply.
+    /// - Parameter context: The managed object context to use
+    /// - Throws: CoreDataError if deletion fails
+    func deleteAll(from context: NSManagedObjectContext) throws {
+        let request: NSFetchRequest<MessageEntity> = MessageEntity.fetchRequest()
+
+        do {
+            let messages = try context.fetch(request)
+            messages.forEach { context.delete($0) }
+        } catch {
+            throw CoreDataError.deleteFailed(error)
+        }
+    }
+
     // MARK: - Count
 
     /// Returns the count of messages in a conversation

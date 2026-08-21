@@ -204,6 +204,34 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         }
     }
 
+    func clearLocalData() async throws {
+        let context = coreDataStack.viewContext
+
+        try await context.perform { [conversationDAO, messageDAO, coreDataStack] in
+            let existing = try conversationDAO.fetchAll(from: context)
+            // Local-only conversations (guest chats, anything created offline) were never
+            // pushed to the server, so this wipe destroys them for good. That is the
+            // intended trade: logging out means removing this person's data from the
+            // device, and a local-only row has no owner to hand it back to. Logged rather
+            // than done silently so the loss is visible in a bug report.
+            let localOnlyCount = existing.filter { $0.value(forKey: "isLocalOnly") as? Bool == true }.count
+            AppLogger.database.logInfo(
+                "Clearing local conversation cache: \(existing.count) conversations, of which \(localOnlyCount) are local-only and unrecoverable"
+            )
+
+            // Messages first: the cascade rule covers anything still attached to a
+            // conversation, but an orphaned row would otherwise survive the wipe.
+            try messageDAO.deleteAll(from: context)
+            try conversationDAO.deleteAll(from: context)
+            try coreDataStack.save(context: context)
+        }
+
+        // Server-backed conversations come back via `syncRemoteConversations`, but only if
+        // the freshness markers go with the data they describe.
+        freshnessStore.clear()
+        notifyConversationsChanged()
+    }
+
     func syncRemoteConversations(forceRefresh: Bool = false) async throws {
         guard let apiClient = apiClient,
               let networkMonitor = networkMonitor,

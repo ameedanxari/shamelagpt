@@ -35,6 +35,18 @@ final class ConversationSyncFreshnessStore: @unchecked Sendable {
         userDefaults.set(now.timeIntervalSince1970, forKey: key)
     }
 
+    /// Forgets every "synced at" marker.
+    ///
+    /// Must run whenever the local cache is wiped. The TTL is the only thing stopping
+    /// `syncRemoteConversations` from hitting the network, so a marker left behind after a
+    /// wipe would make the next user's History look permanently empty until the TTL expired.
+    func clear() {
+        userDefaults.removeObject(forKey: conversationsSyncAtKey)
+        for key in userDefaults.dictionaryRepresentation().keys where key.hasPrefix(messagesSyncPrefix) {
+            userDefaults.removeObject(forKey: key)
+        }
+    }
+
     private func isStale(lastSyncedAt: TimeInterval, ttl: TimeInterval, now: Date) -> Bool {
         if lastSyncedAt <= 0 { return true }
         return now.timeIntervalSince1970 - lastSyncedAt >= ttl

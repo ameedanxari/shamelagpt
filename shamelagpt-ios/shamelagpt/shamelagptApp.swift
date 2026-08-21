@@ -527,7 +527,6 @@ struct ShamelaGPTApp: App {
                                 prefix: AppLogger.LogPrefix.authState,
                                 "event=auth.logout requested isAuthenticated=\(isAuthenticated) isGuest=\(isGuest)"
                             )
-                            authRepository.logout()
                             isAuthenticated = false
                             isGuest = false
                             isPresentingAuth = false
@@ -535,6 +534,11 @@ struct ShamelaGPTApp: App {
                             chatSessionState.resetToNew()
                             coordinator.shouldShowWelcome = true
                             coordinator.resetTabSelectionToChat()
+                            // Return to Welcome first, then tear down. Session teardown and
+                            // the Core Data wipe run on the main context, and a large
+                            // history would otherwise stall the transition; by the time
+                            // this runs nothing on screen is reading the data being deleted.
+                            Task { await authRepository.logout() }
                         },
                         onRequireAuth: {
                             presentAuth()
