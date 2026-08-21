@@ -18,13 +18,21 @@ class MockAuthRepository: AuthRepository {
     var deleteCurrentUserCallCount = 0
     var getModePreferenceCallCount = 0
     var setModePreferenceCallCount = 0
-    
+    var getMadhabPreferenceCallCount = 0
+    var setMadhabPreferenceCallCount = 0
+    var lastSetMadhabPreferenceRequest: MadhabPreferenceRequest?
+
     // Stub Results
     var mockAuthResponse = AuthResponse(token: "mock-token", refreshToken: "mock-refresh", expiresIn: "3600", user: ["uid": AnyCodable("123")])
     var mockUserResponse = UserResponse(id: "123", firebaseUid: "fb123", email: "test@example.com", displayName: "Test User", createdAt: "", updatedAt: "", lastLogin: "")
     var mockIsLoggedIn = false
     var mockModePreferenceResponse = ModePreferenceResponse(modePreference: 1, modeName: "research")
-    
+    var mockMadhabPreferenceResponse = MadhabPreferenceResponse(madhabPreference: "all", madhabName: "All Schools")
+    /// When set, only the madhhab endpoints fail. Lets a test reject a PUT
+    /// without also failing the GET that follows it.
+    var madhabErrorToThrow: Error?
+
+
     func signup(request: SignupRequest) async throws -> AuthResponse {
         signupCallCount += 1
         if shouldFail { throw errorToThrow }
@@ -103,7 +111,26 @@ class MockAuthRepository: AuthRepository {
         )
         return mockModePreferenceResponse
     }
-    
+
+    func getMadhabPreference() async throws -> MadhabPreferenceResponse {
+        getMadhabPreferenceCallCount += 1
+        if let madhabErrorToThrow { throw madhabErrorToThrow }
+        if shouldFail { throw errorToThrow }
+        return mockMadhabPreferenceResponse
+    }
+
+    func setMadhabPreference(_ request: MadhabPreferenceRequest) async throws -> MadhabPreferenceResponse {
+        setMadhabPreferenceCallCount += 1
+        lastSetMadhabPreferenceRequest = request
+        if let madhabErrorToThrow { throw madhabErrorToThrow }
+        if shouldFail { throw errorToThrow }
+        mockMadhabPreferenceResponse = MadhabPreferenceResponse(
+            madhabPreference: request.madhabPreference,
+            madhabName: request.madhabPreference
+        )
+        return mockMadhabPreferenceResponse
+    }
+
     func logout() async {
         logoutCallCount += 1
         mockIsLoggedIn = false

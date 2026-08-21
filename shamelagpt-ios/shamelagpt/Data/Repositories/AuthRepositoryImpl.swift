@@ -189,6 +189,22 @@ final class AuthRepositoryImpl: AuthRepository {
         }
     }
 
+    func getMadhabPreference() async throws -> MadhabPreferenceResponse {
+        do {
+            return try await apiClient.getMadhabPreference()
+        } catch {
+            throw normalizeError(error)
+        }
+    }
+
+    func setMadhabPreference(_ request: MadhabPreferenceRequest) async throws -> MadhabPreferenceResponse {
+        do {
+            return try await apiClient.setMadhabPreference(request)
+        } catch {
+            throw normalizeError(error)
+        }
+    }
+
     func logout() async {
         AppLogger.auth.logInfo("logout called")
         sessionManager.clearSession()

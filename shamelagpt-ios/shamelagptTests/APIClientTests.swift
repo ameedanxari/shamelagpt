@@ -706,6 +706,68 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(json["mode_preference"] as? Int, 1)
     }
 
+    func testGetMadhabPreferenceUsesCorrectEndpointAndDecodesResponse() async throws {
+        // Given
+        let responseData = Data(#"{"madhab_preference":"shafii","madhab_name":"Shafi'i"}"#.utf8)
+
+        MockURLProtocol.requestHandler = { urlRequest in
+            XCTAssertEqual(urlRequest.url?.path, "/api/auth/me/madhab")
+            XCTAssertEqual(urlRequest.httpMethod, "GET")
+            let response = HTTPURLResponse(url: urlRequest.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, responseData)
+        }
+
+        // When
+        let response = try await sut.getMadhabPreference()
+
+        // Then
+        XCTAssertEqual(response.madhabPreference, "shafii")
+        XCTAssertEqual(response.madhabName, "Shafi'i")
+    }
+
+    func testSetMadhabPreferenceUsesCorrectEndpointAndEncodesBody() async throws {
+        // Given
+        let request = MadhabPreferenceRequest(madhabPreference: "hanbali")
+        let responseData = Data(#"{"madhab_preference":"hanbali","madhab_name":"Hanbali"}"#.utf8)
+        var capturedRequestBody: Data?
+
+        MockURLProtocol.requestHandler = { urlRequest in
+            XCTAssertEqual(urlRequest.url?.path, "/api/auth/me/madhab")
+            XCTAssertEqual(urlRequest.httpMethod, "PUT")
+            capturedRequestBody = Self.requestBody(from: urlRequest)
+            let response = HTTPURLResponse(url: urlRequest.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, responseData)
+        }
+
+        // When
+        let response = try await sut.setMadhabPreference(request)
+
+        // Then
+        XCTAssertEqual(response.madhabPreference, "hanbali")
+        // The snake_case key is the contract; a camelCase body would be a 422.
+        let body = try XCTUnwrap(capturedRequestBody)
+        let json = try XCTUnwrap(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+        XCTAssertEqual(json["madhab_preference"] as? String, "hanbali")
+    }
+
+    /// The API omits `madhab_name` on some responses; the model must still decode.
+    func testGetMadhabPreferenceDecodesWhenNameIsAbsent() async throws {
+        // Given
+        let responseData = Data(#"{"madhab_preference":"all"}"#.utf8)
+
+        MockURLProtocol.requestHandler = { urlRequest in
+            let response = HTTPURLResponse(url: urlRequest.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, responseData)
+        }
+
+        // When
+        let response = try await sut.getMadhabPreference()
+
+        // Then
+        XCTAssertEqual(response.madhabPreference, "all")
+        XCTAssertNil(response.madhabName)
+    }
+
     private static func requestBody(from request: URLRequest) -> Data? {
         if let body = request.httpBody {
             return body

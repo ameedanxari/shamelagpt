@@ -203,6 +203,65 @@ final class AuthRepositoryTests: XCTestCase {
         XCTAssertEqual(json["mode_preference"] as? Int, 1)
     }
 
+    func testGetMadhabPreferenceSuccess() async throws {
+        // Given
+        let responseData = Data(#"{"madhab_preference":"maliki","madhab_name":"Maliki"}"#.utf8)
+
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.url?.path, "/api/auth/me/madhab")
+            XCTAssertEqual(request.httpMethod, "GET")
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, responseData)
+        }
+
+        // When
+        let result = try await sut.getMadhabPreference()
+
+        // Then
+        XCTAssertEqual(result.madhabPreference, "maliki")
+        XCTAssertEqual(result.madhabName, "Maliki")
+    }
+
+    func testSetMadhabPreferenceSuccess() async throws {
+        // Given
+        let requestPayload = MadhabPreferenceRequest(madhabPreference: "hanafi")
+        let responseData = Data(#"{"madhab_preference":"hanafi","madhab_name":"Hanafi"}"#.utf8)
+        var capturedBody: Data?
+
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.url?.path, "/api/auth/me/madhab")
+            XCTAssertEqual(request.httpMethod, "PUT")
+            capturedBody = Self.requestBody(from: request)
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, responseData)
+        }
+
+        // When
+        let result = try await sut.setMadhabPreference(requestPayload)
+
+        // Then
+        XCTAssertEqual(result.madhabPreference, "hanafi")
+        let body = try XCTUnwrap(capturedBody)
+        let json = try XCTUnwrap(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+        XCTAssertEqual(json["madhab_preference"] as? String, "hanafi")
+    }
+
+    /// The repository normalizes transport failures into `NetworkError`/`AppError`
+    /// so callers never see a raw decoding error leak out of the data layer.
+    func testSetMadhabPreferencePropagatesServerError() async {
+        // Given
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(url: request.url!, statusCode: 422, httpVersion: nil, headerFields: nil)!
+            return (response, Data(#"{"detail":"invalid madhab"}"#.utf8))
+        }
+
+        // When / Then
+        do {
+            _ = try await sut.setMadhabPreference(MadhabPreferenceRequest(madhabPreference: "nonsense"))
+            XCTFail("Expected setMadhabPreference to throw on a 422")
+        } catch {
+            XCTAssertTrue(error is NetworkError || error is AppError, "Unexpected error type: \(type(of: error))")
+        }
+    }
+
     // MARK: - Logout Clears Local Data
 
     /// Conversations are cached with no owner column, so anything left behind after logout

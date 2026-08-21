@@ -313,6 +313,30 @@
 "settings.pref.focus.theoretical" = "Theoretical";
 "settings.pref.focus.historical" = "Historical";
 
+// MARK: - School of Thought (Madhhab)
+
+"settings.madhab.title" = "School of Thought";
+"settings.madhab.titleArabic" = "المذهب الفقهي";
+"settings.madhab.help" = "Filter fiqh (jurisprudence) results to your preferred school. Hadith, tafsir, and other shared sources are always included regardless of selection.";
+"settings.madhab.all" = "All Schools";
+"settings.madhab.allArabic" = "جميع المذاهب";
+"settings.madhab.allDescription" = "Results from all four schools";
+"settings.madhab.hanafi" = "Hanafi";
+"settings.madhab.hanafiArabic" = "حنفي";
+"settings.madhab.hanafiDescription" = "Abu Hanifa (d. 767 CE)";
+"settings.madhab.maliki" = "Maliki";
+"settings.madhab.malikiArabic" = "مالكي";
+"settings.madhab.malikiDescription" = "Malik ibn Anas (d. 795 CE)";
+"settings.madhab.shafii" = "Shafi'i";
+"settings.madhab.shafiiArabic" = "شافعي";
+"settings.madhab.shafiiDescription" = "Al-Shafi'i (d. 820 CE)";
+"settings.madhab.hanbali" = "Hanbali";
+"settings.madhab.hanbaliArabic" = "حنبلي";
+"settings.madhab.hanbaliDescription" = "Ahmad ibn Hanbal (d. 855 CE)";
+"settings.madhab.loadFailed" = "Could not load your school of thought. Showing all schools.";
+"settings.madhab.updateFailed" = "Failed to update school of thought.";
+"settings.madhab.selectAccessibility" = "Select %@ school of thought for fiqh sources";
+
 // MARK: - Donation
 
 "settings.donate" = "❤️ Donate";

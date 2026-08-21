@@ -88,6 +88,7 @@ enum AccessibilityID {
         static let privacyRow = "PrivacyRow"
         static let termsRow = "TermsRow"
         static let customPromptEditor = "CustomPromptEditor"
+        static let madhabRow = "MadhabRow"
 
         static func languageOption(_ code: String) -> String {
             "LanguageOption_\(code)"
@@ -95,6 +96,14 @@ enum AccessibilityID {
 
         static func languageCheckmark(_ code: String) -> String {
             "LanguageSelectedCheckmark_\(code)"
+        }
+
+        static func madhabOption(_ value: String) -> String {
+            "MadhabOption_\(value)"
+        }
+
+        static func madhabCheckmark(_ value: String) -> String {
+            "MadhabSelectedCheckmark_\(value)"
         }
     }
 
