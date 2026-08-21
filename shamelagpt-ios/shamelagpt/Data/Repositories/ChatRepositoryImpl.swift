@@ -281,7 +281,8 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         toConversation conversationId: String,
         content: String,
         isUserMessage: Bool,
-        sources: [Source]
+        sources: [Source],
+        reasoning: String?
     ) async throws -> Message {
         let context = coreDataStack.viewContext
 
@@ -304,6 +305,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
                 isUserMessage: isUserMessage,
                 timestamp: timestamp,
                 sources: sourcesJSON,
+                reasoning: reasoning,
                 conversation: conversationEntity,
                 in: context
             )
@@ -420,7 +422,8 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
                     toConversation: conversationId,
                     content: content,
                     isUserMessage: isUser,
-                    sources: isUser ? [] : parsed.sources
+                    sources: isUser ? [] : parsed.sources,
+                    reasoning: isUser ? nil : msg.reasoning
                 )
             }
 

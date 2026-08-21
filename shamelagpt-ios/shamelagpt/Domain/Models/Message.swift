@@ -19,6 +19,11 @@ struct Message: Identifiable, Equatable {
     let detectedLanguage: String?
     let isFactCheckMessage: Bool
 
+    /// The model's chain-of-thought behind an assistant answer, or nil when the turn
+    /// produced none (every user message, and every message stored before the backend
+    /// started emitting a separate `reasoning` channel).
+    let reasoning: String?
+
     init(
         id: String = UUID().uuidString,
         conversationId: String,
@@ -28,7 +33,8 @@ struct Message: Identifiable, Equatable {
         sources: [Source] = [],
         imageData: Data? = nil,
         detectedLanguage: String? = nil,
-        isFactCheckMessage: Bool = false
+        isFactCheckMessage: Bool = false,
+        reasoning: String? = nil
     ) {
         self.id = id
         self.conversationId = conversationId
@@ -39,6 +45,7 @@ struct Message: Identifiable, Equatable {
         self.imageData = imageData
         self.detectedLanguage = detectedLanguage
         self.isFactCheckMessage = isFactCheckMessage
+        self.reasoning = reasoning
     }
 
     /// Returns true if the message is from the assistant
@@ -49,6 +56,12 @@ struct Message: Identifiable, Equatable {
     /// Returns true if the message has sources
     var hasSources: Bool {
         return !sources.isEmpty
+    }
+
+    /// Returns true if there is chain-of-thought worth showing a reasoning panel for
+    var hasReasoning: Bool {
+        guard let reasoning = reasoning else { return false }
+        return !reasoning.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     /// Returns the display name for the detected language

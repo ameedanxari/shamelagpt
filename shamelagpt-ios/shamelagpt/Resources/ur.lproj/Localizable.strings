@@ -23,6 +23,9 @@
 "chat.extractingText" = "متن نکالا جا رہا ہے...";
 "chat.transcribing" = "آواز کو متن میں تبدیل کیا جا رہا ہے...";
 "chat.thinking" = "سوچا جا رہا ہے...";
+"chat.reasoning.title" = "استدلال";
+"chat.reasoning.show" = "استدلال دکھائیں";
+"chat.reasoning.hide" = "استدلال چھپائیں";
 "chat.loadingMessages" = "پیغامات لوڈ ہو رہے ہیں...";
 "chat.startConversation" = "گفتگو شروع کریں";
 "chat.noMessagesYet" = "ابھی تک کوئی پیغام نہیں";

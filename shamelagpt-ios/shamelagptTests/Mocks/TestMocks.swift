@@ -649,7 +649,8 @@ class MockChatRepository: ChatRepository {
         toConversation conversationId: String,
         content: String,
         isUserMessage: Bool,
-        sources: [Source]
+        sources: [Source],
+        reasoning: String?
     ) async throws -> Message {
         addMessageCallCount += 1
         if shouldThrowError { throw errorToThrow }
@@ -660,7 +661,8 @@ class MockChatRepository: ChatRepository {
             content: content,
             isUserMessage: isUserMessage,
             timestamp: Date(),
-            sources: sources
+            sources: sources,
+            reasoning: reasoning
         )
         mockMessages.append(message)
         return message
