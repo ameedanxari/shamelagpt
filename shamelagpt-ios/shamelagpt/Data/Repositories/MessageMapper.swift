@@ -19,11 +19,12 @@ struct MessageMapper {
         let sources = parseSources(from: entity.sources)
 
         return Message(
-            id: entity.id ?? UUID().uuidString,
+            id: entity.id ?? "",
             conversationId: entity.conversationId ?? "",
             content: entity.content ?? "",
             isUserMessage: entity.isUserMessage,
-            timestamp: entity.timestamp ?? Date(),
+            // See ConversationMapper: an undated message must not read as the newest.
+            timestamp: entity.timestamp ?? .distantPast,
             sources: sources,
             imageData: entity.imageData,
             detectedLanguage: entity.detectedLanguage,
