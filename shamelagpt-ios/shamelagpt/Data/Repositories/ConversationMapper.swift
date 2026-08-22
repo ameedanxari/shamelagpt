@@ -22,7 +22,12 @@ struct ConversationMapper {
 
         if includeMessages, let messageEntities = entity.messages?.allObjects as? [MessageEntity] {
             // Sort messages by timestamp
-            let sortedMessages = messageEntities.sorted { ($0.timestamp ?? Date()) < ($1.timestamp ?? Date()) }
+            // distantPast, not Date(): an undated message read as "now" sorts to the end
+            // and reads as the newest thing in the conversation, which is the one thing it
+            // definitely is not. Undated content does not get to claim recency.
+            let sortedMessages = messageEntities.sorted {
+                ($0.timestamp ?? .distantPast) < ($1.timestamp ?? .distantPast)
+            }
             messages = MessageMapper.toDomainModels(sortedMessages)
         }
 
@@ -42,11 +47,17 @@ struct ConversationMapper {
         }
 
         return Conversation(
-            id: entity.id ?? UUID().uuidString,
+            // A fresh UUID here would not match the stored row, so any later delete or
+            // update against this id would silently affect nothing. Empty is at least
+            // recognisable as broken.
+            id: entity.id ?? "",
             threadId: entity.threadId,
             title: entity.title ?? "Untitled Conversation",
-            createdAt: entity.createdAt ?? Date(),
-            updatedAt: entity.updatedAt ?? Date(),
+            // These feed the History sort. Defaulting to Date() put an undated
+            // conversation at the top as the most recent — the same failure the sync
+            // write path had, arriving from the read side instead.
+            createdAt: entity.createdAt ?? .distantPast,
+            updatedAt: entity.updatedAt ?? .distantPast,
             messages: messages,
             conversationType: conversationType,
             isLocalOnly: isLocalOnly
