@@ -10,7 +10,11 @@ enum UserErrorFormatter {
     static func format(message: String, code: String) -> String {
         let codeLabel = String(format: LanguageManager.shared.localizedString(forKey: LocalizationKeys.errorCodeFormat), code)
         let suffix = LanguageManager.shared.localizedString(forKey: LocalizationKeys.errorSupportSuffix)
-        return "\(message) \(codeLabel). \(suffix)"
+        // What went wrong, then the diagnostics, separated by a blank line rather than run
+        // into one paragraph. Previously the code and the reporting instructions were two
+        // further sentences appended to the message, so the part the user needed to read
+        // was a third of a wall of text and the retry button competed with it.
+        return "\(message)\n\n\(codeLabel) · \(suffix)"
     }
 }
 

@@ -168,7 +168,7 @@
 "error.permissionRequired" = "Permission required";
 "error.somethingWentWrong" = "Something went wrong";
 "error.codeFormat" = "Error code: %@";
-"error.supportSuffix" = "If this seems unexpected, please shake your device or go to Settings to report to our support team.";
+"error.supportSuffix" = "Shake your device to report this.";
 "error.retry" = "Retry";
 "error.openSettings" = "Open Settings";
 "error.tryAgain" = "Try Again";
