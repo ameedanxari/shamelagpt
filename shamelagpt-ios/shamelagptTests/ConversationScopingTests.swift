@@ -318,11 +318,24 @@ final class ConversationScopingTests: XCTestCase {
         XCTAssertNil(withoutUid.firebaseUserId)
     }
 
+    /// `.convertFromSnakeCase` rewrites coding keys, generated from a type's properties.
+    /// A dictionary decoded as `[String: _]` has no properties to match against, so its
+    /// keys are left exactly as the server sent them — verified against the live payload.
+    /// Reading the camelCased spelling alone silently yielded nil for every sign-in.
     func testAuthResponseDecodesTheSnakeCasedPayloadKey() throws {
-        // The user payload is an untyped dictionary, so the only thing guaranteeing the key
-        // is camel-cased by the time it reaches `firebaseUserId` is the decoder's
-        // key strategy applying to dictionary keys as well as coding keys.
         let json = Data(#"{"token":"t","refresh_token":"r","expires_in":"3600","user":{"firebase_uid":"firebase-uid-a"}}"#.utf8)
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        let response = try decoder.decode(AuthResponse.self, from: json)
+
+        XCTAssertEqual(response.firebaseUserId, userA)
+    }
+
+    /// Defensive: also accept the camelCased spelling, in case the payload is ever decoded
+    /// by a path that does convert or the backend switches.
+    func testAuthResponseAlsoAcceptsTheCamelCasedPayloadKey() throws {
+        let json = Data(#"{"token":"t","refresh_token":"r","expires_in":"3600","user":{"firebaseUid":"firebase-uid-a"}}"#.utf8)
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
 
