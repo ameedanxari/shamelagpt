@@ -80,8 +80,8 @@ Two terminology points for them:
 
 Beyond release notes, a first submission needs:
 
-- **Privacy nutrition label.** Derived from the manifest added in #61: email address, name, user id, user content (questions and conversations), photos (OCR), audio (voice input). All linked to the user, all for app functionality, none for tracking.
-- **Open question worth deciding before submission:** whether users' questions in a religious-guidance app should additionally be declared as *sensitive information*. Apple's category explicitly includes religious beliefs. Declared as user content today, which is accurate for what is transmitted; the classification is a product and legal call.
+- **Privacy nutrition label.** Derived from the manifest: email address, name, user id, user content (questions and conversations), photos (OCR), audio (voice input), and sensitive information. All linked to the user, all for app functionality, none for tracking.
+- **Sensitive information is declared.** Apple's definition names religious or philosophical beliefs explicitly, and the madhhab preference is the user stating their affiliation and having it stored — not something inferred from what they read. It will show on the store page under "Data Linked to You", which may cost some installs; the alternative is an inaccurate label corrected at Apple's timing rather than ours.
 - **Screenshots.** `StoreScreenshotUITests` and `TargetedScreenshotUITests` already exist and can generate them.
 - **Age rating, support URL, marketing URL, description, keywords.**
 - **Export compliance** — already answered in `Info.plist` (`ITSAppUsesNonExemptEncryption = false`), so the upload will not prompt.

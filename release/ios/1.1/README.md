@@ -61,10 +61,9 @@ The UI suite is badly contention-sensitive — individual tests take 76–260s, 
 
 ## Before submitting
 
-`release-notes.md` section 3 has the full App Store Connect checklist. The two items needing a decision rather than typing:
+`release-notes.md` section 3 has the full App Store Connect checklist. Sensitive information is now declared in the manifest — the madhhab preference is a stored statement of religious affiliation, so it qualifies. One item still needs a person rather than typing:
 
-1. **Sensitive-information declaration.** Apple's category explicitly includes religious beliefs. Users' questions are currently declared as *user content*, which is accurate for what is transmitted. Whether a religious-guidance app must go further is a legal and product call, and getting it wrong means a rejection or a post-launch label correction.
-2. **Arabic and Urdu release notes** must be written by the native speaker reviewing issue #70 — not machine-translated. They sit beside professionally written in-app copy.
+1. **Arabic and Urdu release notes** must be written by the native speaker reviewing issue #70 — not machine-translated. They sit beside professionally written in-app copy.
 
 ## Known and unfixed in this version
 

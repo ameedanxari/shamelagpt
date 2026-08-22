@@ -60,6 +60,25 @@
 				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
 			</array>
 		</dict>
+		<!-- The madhhab preference: the user selects a school of thought, which is stored
+		     against their account and sent to /api/auth/me/madhab so answers are drawn from
+		     that school's sources. Apple's definition of sensitive information names
+		     religious or philosophical beliefs explicitly, and this is the user stating
+		     their affiliation rather than anything inferred from what they read. Declared
+		     even though it is arguable, because an inaccurate privacy label is corrected at
+		     Apple's timing rather than ours. -->
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeSensitiveInfo</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<true/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
 		<!-- Images submitted to /api/chat/ocr for text recognition. -->
 		<dict>
 			<key>NSPrivacyCollectedDataType</key>
