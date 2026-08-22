@@ -19,6 +19,9 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
     private let apiClient: APIClientProtocol?
     private let networkMonitor: NetworkMonitorProtocol?
     private let freshnessStore: ConversationSyncFreshnessStore
+    /// Reports whether a signed-in session exists. Guest is a distinct auth state, so
+    /// the sync path must be able to tell "no account" from "account with no data".
+    private let isAuthenticated: (() -> Bool)?
 
     private let conversationsSubject = CurrentValueSubject<[Conversation], Never>([])
 
@@ -40,7 +43,8 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         messageDAO: MessageDAO = MessageDAO(),
         apiClient: APIClientProtocol? = nil,
         networkMonitor: NetworkMonitorProtocol? = nil,
-        freshnessStore: ConversationSyncFreshnessStore = ConversationSyncFreshnessStore()
+        freshnessStore: ConversationSyncFreshnessStore = ConversationSyncFreshnessStore(),
+        isAuthenticated: (() -> Bool)? = nil
     ) {
         self.coreDataStack = coreDataStack
         self.conversationDAO = conversationDAO
@@ -48,6 +52,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         self.apiClient = apiClient
         self.networkMonitor = networkMonitor
         self.freshnessStore = freshnessStore
+        self.isAuthenticated = isAuthenticated
     }
 
     // MARK: - Conversation Operations
@@ -236,6 +241,13 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         guard let apiClient = apiClient,
               let networkMonitor = networkMonitor,
               networkMonitor.isConnected else { return }
+        // Guests have no server-side conversation list, so this authenticated route would
+        // 403. Skipping is not a silent swallow: the transport now refuses such requests
+        // outright, and reaching it from here would trip that assertion in development.
+        if let isAuthenticated, !isAuthenticated() {
+            AppLogger.network.logDebug("Skipping conversation sync: no authenticated session")
+            return
+        }
         guard freshnessStore.shouldSyncConversations(forceRefresh: forceRefresh) else {
             return
         }
@@ -246,15 +258,31 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         try await context.perform { [conversationDAO, coreDataStack] in
             for remote in remoteConversations {
                 // Upsert conversation using server id
-                let entity = conversationDAO.upsert(
+                // Never fall back to Date() here. An unparseable timestamp read as "now"
+                // makes that conversation the newest thing in History, outranking every
+                // real one — the same shape as the `expires_in ?? 0` bug. distantPast is
+                // the honest default: we cannot date it, so it does not get to claim
+                // recency.
+                let createdAt = self.parseRemoteDate(remote.createdAt)
+                let updatedAt = self.parseRemoteDate(remote.updatedAt)
+                if createdAt == nil || updatedAt == nil {
+                    AppLogger.network.logWarning(
+                        "Unparseable timestamp for conversation \(remote.id); sorting it oldest"
+                    )
+                }
+                _ = conversationDAO.upsert(
                     id: remote.id,
                     threadId: remote.threadId,
                     title: remote.title ?? "New Chat",
-                    createdAt: self.parseRemoteDate(remote.createdAt) ?? Date(),
-                    updatedAt: self.parseRemoteDate(remote.updatedAt) ?? Date(),
+                    createdAt: createdAt ?? .distantPast,
+                    updatedAt: updatedAt ?? createdAt ?? .distantPast,
                     in: context
                 )
-                conversationDAO.markAsUpdated(entity)
+                // Deliberately no markAsUpdated here. That sets updatedAt to now, which is
+                // right when the user just added a message and wrong during a sync: it
+                // overwrote every conversation's real timestamp with the sync time, so all
+                // of them ended up seconds apart and History stopped being ordered by
+                // recency at all. Reconciliation is not local activity.
             }
             try coreDataStack.save(context: context)
         }
@@ -262,17 +290,12 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         notifyConversationsChanged()
         freshnessStore.markConversationsSynced()
 
-        // Hydrate messages for server conversations that are empty locally
-        for remote in remoteConversations {
-            do {
-                if let local = try await fetchConversation(byId: remote.id), !local.messages.isEmpty {
-                    continue
-                }
-                _ = try await fetchMessages(forConversation: remote.id, forceRefresh: forceRefresh)
-            } catch {
-                AppLogger.network.logWarning("Failed to hydrate messages for conversation \(remote.id): \(error)")
-            }
-        }
+        // Message bodies are deliberately not fetched here. The list endpoint returns only
+        // ids, titles and timestamps, which is all History renders, so a sync costs one
+        // request instead of one per conversation — on an account with a few hundred
+        // conversations that was hundreds of requests before the list could settle.
+        // Bodies load when a conversation is actually opened, via fetchMessages, and are
+        // cached in Core Data from then on.
     }
 
     // MARK: - Message Operations

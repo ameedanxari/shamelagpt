@@ -192,7 +192,10 @@ class DependencyContainer {
             conversationDAO: conversationDAO,
             messageDAO: messageDAO,
             apiClient: resolve(APIClientProtocol.self),
-            networkMonitor: resolve(NetworkMonitor.self)
+            networkMonitor: resolve(NetworkMonitor.self),
+            // Lets the sync path distinguish a guest from an account with no history,
+            // so it never dispatches the authenticated conversation list for a guest.
+            isAuthenticated: { [weak self] in self?.resolve(SessionManager.self)?.isLoggedIn() ?? false }
         )
         register(ChatRepository.self, instance: chatRepository)
 

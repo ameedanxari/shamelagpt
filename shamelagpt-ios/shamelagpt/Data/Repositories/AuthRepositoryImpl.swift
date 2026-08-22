@@ -235,6 +235,20 @@ final class AuthRepositoryImpl: AuthRepository {
     /// rather than to "already expired".
     private static let defaultSessionLifetime: TimeInterval = 3600
 
+    /// Warms History as soon as a session exists, so opening the tab renders from cache
+    /// instead of waiting on the network. Fire-and-forget: sign-in must not block on it,
+    /// and the repository's own freshness window stops repeated auth calls re-fetching.
+    private func warmConversationCache() {
+        guard let chatRepository else { return }
+        Task {
+            do {
+                try await chatRepository.syncRemoteConversations(forceRefresh: false)
+            } catch {
+                AppLogger.network.logWarning("Conversation cache warm-up failed: \(error)")
+            }
+        }
+    }
+
     private func persistSession(from response: AuthResponse) {
         // expires_in arrives as a string ("3600") because it is passed through from
         // Firebase unchanged. A `?? 0` fallback here would stamp the expiry at the
@@ -251,6 +265,10 @@ final class AuthRepositoryImpl: AuthRepository {
             refreshToken: response.refreshToken,
             expiresInSeconds: parsed ?? Self.defaultSessionLifetime
         )
+
+        // Every successful auth path lands here — login, signup, Google, Apple and a
+        // startup token refresh — so it is the one place that knows a session now exists.
+        warmConversationCache()
     }
 
     private func normalizeError(_ error: Error) -> Error {
