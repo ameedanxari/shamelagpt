@@ -133,6 +133,12 @@ class DependencyContainer {
                     refreshToken: response.refreshToken,
                     expiresInSeconds: Double(response.expiresIn)
                 )
+                // This transport-level refresh bypasses AuthRepositoryImpl entirely, so it
+                // has to record the owner itself or a long-lived session would drift into
+                // having a token and no identity.
+                if let firebaseUid = response.firebaseUserId {
+                    sessionManager.setCurrentUserId(firebaseUid)
+                }
                 AppLogger.auth.logInfo(
                     prefix: AppLogger.LogPrefix.authState,
                     "event=request.refresh.success expiresIn=\(response.expiresIn) refreshTokenPresent=\(!response.refreshToken.isEmpty)"
@@ -195,7 +201,10 @@ class DependencyContainer {
             networkMonitor: resolve(NetworkMonitor.self),
             // Lets the sync path distinguish a guest from an account with no history,
             // so it never dispatches the authenticated conversation list for a guest.
-            isAuthenticated: { [weak self] in self?.resolve(SessionManager.self)?.isLoggedIn() ?? false }
+            isAuthenticated: { [weak self] in self?.resolve(SessionManager.self)?.isLoggedIn() ?? false },
+            // Resolved per call, never captured: the repository outlives every session it
+            // serves, and the answer changes at sign-in, sign-out and expiry.
+            currentOwnerId: { [weak self] in self?.resolve(SessionManager.self)?.conversationOwnerId() }
         )
         register(ChatRepository.self, instance: chatRepository)
 

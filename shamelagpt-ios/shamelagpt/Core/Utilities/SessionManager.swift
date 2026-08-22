@@ -15,6 +15,7 @@ final class SessionManager {
     private let credentialsEmailKey = "auth_email"
     private let credentialsPasswordKey = "auth_password"
     private let installMarkerKey = "install_marker"
+    private let currentUserIdKey = "current_user_id"
     private let useKeychain: Bool
     private let defaults: UserDefaults
     
@@ -54,6 +55,46 @@ final class SessionManager {
         removeItem(tokenKey)
         removeItem(refreshTokenKey)
         defaults.removeObject(forKey: expiresAtKey)
+        defaults.removeObject(forKey: currentUserIdKey)
+    }
+
+    // MARK: - Signed-in Identity
+
+    /// The Firebase uid of the account this session belongs to.
+    ///
+    /// Kept in UserDefaults rather than the keychain on purpose: it is a pseudonymous
+    /// identifier, not a credential, and UserDefaults is wiped when the app is deleted —
+    /// which is exactly the lifetime we want for anything that says who the cache belongs
+    /// to. Keychain items outlive a delete and would attach a fresh install's data to the
+    /// previous owner.
+    func currentUserId() -> String? {
+        guard let id = defaults.string(forKey: currentUserIdKey), !id.isEmpty else { return nil }
+        return id
+    }
+
+    /// Records who is signed in. Every successful auth response and `GET /api/auth/me`
+    /// funnels through here so there is one answer to "whose device is this right now".
+    func setCurrentUserId(_ id: String?) {
+        guard let id, !id.isEmpty else {
+            defaults.removeObject(forKey: currentUserIdKey)
+            return
+        }
+        if currentUserId() == id { return }
+        AppLogger.session.logInfo("recording signed-in user id=\(AppLogger.redactedId(id))")
+        defaults.set(id, forKey: currentUserIdKey)
+    }
+
+    /// The identity locally cached conversations are filed under.
+    ///
+    /// Guests get the existing device-local guest session id rather than a second notion of
+    /// identity, so one predicate covers both auth states. `nil` means the app cannot name
+    /// anybody — no account and not a guest — and rows written before scoping existed also
+    /// carry a nil owner. Those two are deliberately allowed to meet: a fetch that cannot
+    /// name an owner returns only the unowned rows, and an identified user never sees them.
+    func conversationOwnerId() -> String? {
+        if let userId = currentUserId() { return userId }
+        if isGuest() { return getOrCreateGuestSessionId() }
+        return nil
     }
 
     func token() -> String? {

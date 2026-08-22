@@ -38,8 +38,9 @@ final class AppStartupViewModel: ObservableObject {
         if sessionManager.isLoggedIn() {
             AppLogger.auth.logInfo(
                 prefix: AppLogger.LogPrefix.authState,
-                "event=startup.bootstrap.sessionFound"
+                "event=startup.bootstrap.sessionFound userId=\(AppLogger.redactedId(sessionManager.currentUserId()))"
             )
+            resolveCurrentUserIdentityIfNeeded()
             isAuthenticated = true
             isBootstrapping = false
             return
@@ -67,6 +68,35 @@ final class AppStartupViewModel: ObservableObject {
             )
             isAuthenticated = restored && sessionManager.isLoggedIn()
             isBootstrapping = false
+        }
+    }
+
+    /// Names the account behind a session that was restored without an auth response.
+    ///
+    /// A live token short-circuits the refresh above, so an install that upgraded into
+    /// conversation scoping can be signed in with no recorded owner — and locally cached
+    /// conversations are filed by owner, so History would read as empty until the token
+    /// happened to expire. `getCurrentUser()` is the authoritative answer and records it as
+    /// a side effect. Fire-and-forget and gated on the id being missing: it costs one
+    /// request, once, on the first launch after upgrading.
+    private func resolveCurrentUserIdentityIfNeeded() {
+        guard sessionManager.currentUserId() == nil else { return }
+        Task {
+            do {
+                _ = try await authRepository.getCurrentUser()
+                AppLogger.auth.logInfo(
+                    prefix: AppLogger.LogPrefix.authState,
+                    "event=startup.identity.resolved userId=\(AppLogger.redactedId(sessionManager.currentUserId()))"
+                )
+            } catch {
+                // Offline, or the session is no longer good. Either way History stays empty
+                // rather than showing rows we cannot attribute, and the next auth response
+                // resolves it.
+                AppLogger.auth.logWarning(
+                    prefix: AppLogger.LogPrefix.authState,
+                    "event=startup.identity.unresolved reason=\(type(of: error))"
+                )
+            }
         }
     }
 

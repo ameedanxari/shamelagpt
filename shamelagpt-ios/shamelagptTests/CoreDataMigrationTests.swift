@@ -2,12 +2,17 @@
 //  CoreDataMigrationTests.swift
 //  shamelagptTests
 //
-//  Guards the ShamelaGPT -> "ShamelaGPT 2" model upgrade (the optional `reasoning`
-//  attribute on MessageEntity). Adding an optional attribute is a lightweight change,
-//  but only if BOTH model versions ship in the bundle: Core Data needs the source
-//  model to infer a mapping model, and if it cannot find one it fails to open the
-//  store and CoreDataStack calls fatalError. These tests fail loudly if a future
-//  change edits a shipped model in place instead of adding a version.
+//  Guards the model version chain: "ShamelaGPT" -> "ShamelaGPT 2" (the optional
+//  `reasoning` attribute on MessageEntity) -> "ShamelaGPT 3" (the optional `ownerId`
+//  attribute on ConversationEntity). Adding an optional attribute is a lightweight
+//  change, but only if EVERY model version still ships in the bundle: Core Data locates
+//  the source model by the version hashes recorded in the store, and if it cannot find
+//  one it fails to open the store and CoreDataStack calls fatalError. These tests fail
+//  loudly if a future change edits a shipped model in place instead of adding a version.
+//
+//  The v1 -> v3 case is not hypothetical padding: an install that has not been opened
+//  since before the reasoning release skips a version, and Core Data has to infer a
+//  mapping across both hops in one go.
 //
 
 import XCTest
@@ -32,10 +37,11 @@ final class CoreDataMigrationTests: XCTestCase {
     }
 
     func testBothModelVersionsShipInTheBundle() throws {
-        // The previous version must remain in the bundle. Without it an installed app
-        // has no source model to migrate from.
+        // Every superseded version must remain in the bundle. Without one, an installed
+        // app sitting on it has no source model to migrate from.
         XCTAssertNotNil(try? modelURL(named: "ShamelaGPT"), "The v1 model must still ship")
-        XCTAssertNotNil(try? modelURL(named: "ShamelaGPT 2"), "The v2 model must ship")
+        XCTAssertNotNil(try? modelURL(named: "ShamelaGPT 2"), "The v2 model must still ship")
+        XCTAssertNotNil(try? modelURL(named: "ShamelaGPT 3"), "The v3 model must ship")
     }
 
     func testCurrentModelAddsOptionalReasoningAttribute() throws {
@@ -101,6 +107,100 @@ final class CoreDataMigrationTests: XCTestCase {
         messages[1].setValue("Weighing the evidence", forKey: "reasoning")
         try context.save()
         XCTAssertEqual(messages[1].value(forKey: "reasoning") as? String, "Weighing the evidence")
+    }
+
+    // MARK: - v3: per-user conversation scoping
+
+    func testCurrentModelAddsOptionalOwnerIdAttribute() throws {
+        let destination = try managedObjectModel(named: "ShamelaGPT 3")
+        let conversationEntity = try XCTUnwrap(destination.entitiesByName["ConversationEntity"])
+        let ownerId = try XCTUnwrap(
+            conversationEntity.attributesByName["ownerId"],
+            "ConversationEntity should declare `ownerId`"
+        )
+
+        XCTAssertEqual(ownerId.attributeType, .stringAttributeType)
+        // Non-optional would make this a heavyweight migration: every existing row would
+        // violate the model the instant the store opened, and there is no honest default
+        // to give them anyway.
+        XCTAssertTrue(ownerId.isOptional, "`ownerId` must be optional so existing rows stay valid")
+
+        let v2 = try managedObjectModel(named: "ShamelaGPT 2")
+        XCTAssertNil(v2.entitiesByName["ConversationEntity"]?.attributesByName["ownerId"],
+                     "The v2 model must be left untouched")
+        let v1 = try managedObjectModel(named: "ShamelaGPT")
+        XCTAssertNil(v1.entitiesByName["ConversationEntity"]?.attributesByName["ownerId"],
+                     "The v1 model must be left untouched")
+    }
+
+    func testMappingModelToCurrentVersionCanBeInferred() throws {
+        let destination = try managedObjectModel(named: "ShamelaGPT 3")
+
+        // Both hops, including the skip-a-version case. If either throws, the change is no
+        // longer lightweight and would need a hand-written mapping model.
+        for sourceName in ["ShamelaGPT", "ShamelaGPT 2"] {
+            let source = try managedObjectModel(named: sourceName)
+            let mapping = try NSMappingModel.inferredMappingModel(
+                forSourceModel: source,
+                destinationModel: destination
+            )
+            XCTAssertFalse(
+                mapping.entityMappings.isEmpty,
+                "An inferred mapping model should cover the entities for \(sourceName) -> v3"
+            )
+        }
+    }
+
+    func testMigrationToCurrentVersionPreservesRowsAndLeavesOwnerNil() throws {
+        let destination = try managedObjectModel(named: "ShamelaGPT 3")
+
+        for sourceName in ["ShamelaGPT", "ShamelaGPT 2"] {
+            let storeURL = temporaryDirectory.appendingPathComponent("\(sourceName).sqlite")
+            let source = try managedObjectModel(named: sourceName)
+
+            // Given - a store written by a shipped build, on an older model
+            try writeLegacyStore(at: storeURL, using: source)
+
+            // When - the app opens it with the current model, exactly as CoreDataStack does
+            let coordinator = NSPersistentStoreCoordinator(managedObjectModel: destination)
+            _ = try coordinator.addPersistentStore(
+                ofType: NSSQLiteStoreType,
+                configurationName: nil,
+                at: storeURL,
+                options: [
+                    NSMigratePersistentStoresAutomaticallyOption: true,
+                    NSInferMappingModelAutomaticallyOption: true
+                ]
+            )
+
+            let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+            context.persistentStoreCoordinator = coordinator
+
+            // Then - nothing is dropped
+            let conversations = try context.fetch(NSFetchRequest<NSManagedObject>(entityName: "ConversationEntity"))
+            let messages = try context.fetch(NSFetchRequest<NSManagedObject>(entityName: "MessageEntity"))
+            XCTAssertEqual(conversations.count, 1, "Migration from \(sourceName) must not drop conversations")
+            XCTAssertEqual(messages.count, 2, "Migration from \(sourceName) must not drop messages")
+            XCTAssertEqual(conversations.first?.value(forKey: "title") as? String, "Existing conversation")
+
+            // And the rows land unowned. They predate scoping, so the app has no evidence
+            // about who wrote them; claiming them for whoever signs in next is exactly the
+            // leak this attribute exists to prevent.
+            XCTAssertNil(
+                conversations.first?.value(forKey: "ownerId"),
+                "Rows written before scoping must migrate in as unowned"
+            )
+
+            // And the migrated store both accepts the attribute and can be filtered on it
+            conversations.first?.setValue("firebase-uid-a", forKey: "ownerId")
+            try context.save()
+
+            let request = NSFetchRequest<NSManagedObject>(entityName: "ConversationEntity")
+            request.predicate = NSPredicate(format: "ownerId == %@", "firebase-uid-b")
+            XCTAssertEqual(try context.count(for: request), 0, "A different owner must match nothing")
+            request.predicate = NSPredicate(format: "ownerId == %@", "firebase-uid-a")
+            XCTAssertEqual(try context.count(for: request), 1)
+        }
     }
 
     // MARK: - Helpers
