@@ -214,24 +214,6 @@ struct InputBarView: View {
         }
     }
 
-    private var cameraButton: some View {
-        let isCameraEnabled = !isRecording && !isProcessingOCR
-
-        return Button(action: onCameraTap) {
-            Image(systemName: "camera.fill")
-                .font(.system(size: 22))
-                .foregroundColor(isCameraEnabled ? AppTheme.Colors.primary : AppTheme.Colors.tertiaryText)
-                .frame(width: 40, height: 40)
-        }
-        .disabled(!isCameraEnabled)
-        .scaleEffect(isCameraEnabled ? 1.0 : 0.9)
-        .animation(AppTheme.Animation.quick, value: isCameraEnabled)
-        .accessibilityLabel(Text(LocalizationKeys.cameraAccessibilityLabel.localizedKey))
-        .accessibilityIdentifier(AccessibilityID.Chat.cameraButton)
-        .accessibilityHint(Text(LocalizationKeys.cameraAccessibilityHint.localizedKey))
-        .accessibilityAddTraits(.isButton)
-    }
-
     private var microphoneButton: some View {
         Button(action: onMicrophoneTap) {
             ZStack {

@@ -33,7 +33,6 @@ enum UITestID {
 
     enum Chat {
         static let messageInputField = "messageInputField"
-        static let cameraButton = "cameraButton"
         static let micButton = "micButton"
         static let sendButton = "sendButton"
         static let attachmentMenu = "chatAttachmentMenu"

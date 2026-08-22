@@ -16,13 +16,14 @@ final class OCRUITests: LocalizedUITestCase {
     private var takePhotoLabel: String { localized("imagePicker.takePhoto") }
     private var chooseFromLibraryLabel: String { localized("imagePicker.chooseFromLibrary") }
     private var cancelLabel: String { localized("common.cancel") }
+    private var addPhotoLabel: String { localized("composer.addPhoto") }
     private var permissionRequiredLabel: String { localized("error.permissionRequired") }
     private var openSettingsLabel: String { localized("error.openSettings") }
     private var sendForFactCheckLabel: String { localized("ocr.sendForFactCheck") }
     private var doneLabel: String { localized("done") }
     private var okLabel: String { localized("common.ok") }
 
-    // MARK: - Camera Button Tests
+    // MARK: - Photo Capture Entry Point
 
     private func launchToChat(overrides: [String: String] = [:], includeReset: Bool = true) {
         UITestLauncher.launch(app: app, includeReset: includeReset, overrides: overrides)
@@ -33,19 +34,28 @@ final class OCRUITests: LocalizedUITestCase {
         )
     }
 
-    func testCameraButtonVisible() throws {
+    // The composer stopped carrying a bare camera icon when the input bar became a
+    // single capsule; capture moved into the "+" menu alongside the thinking toggle.
+    // Asserting on a top-level `cameraButton` therefore could not pass any more, so
+    // this checks the control a user actually has to reach instead.
+    func testPhotoCaptureActionIsAvailable() throws {
         launchToChat()
-        let cameraButton = app.buttons[UITestID.Chat.cameraButton]
-        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5), "Camera button should be visible")
-        XCTAssertTrue(cameraButton.isHittable, "Camera button should be tappable")
+
+        let attachmentMenu = app.buttons[UITestID.Chat.attachmentMenu]
+        XCTAssertTrue(attachmentMenu.waitForExistence(timeout: 5), "Attachment menu should be visible")
+        XCTAssertTrue(attachmentMenu.isHittable, "Attachment menu should be tappable")
+        attachmentMenu.tap()
+
+        XCTAssertTrue(
+            photoCaptureMenuItem.waitForExistence(timeout: 5),
+            "Composer menu should offer photo capture"
+        )
     }
 
     func testImageSourceSheetShowsOptions() throws {
         launchToChat()
 
-        let cameraButton = app.buttons[UITestID.Chat.cameraButton]
-        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
-        tapCameraButton(cameraButton)
+        XCTAssertTrue(openImageSourcePicker(), "Photo capture should be reachable from the composer menu")
 
         XCTAssertTrue(
             waitForImageSourceSheet(timeout: 5),
@@ -62,9 +72,7 @@ final class OCRUITests: LocalizedUITestCase {
     func testCameraPermissionDeniedShowsGuidance() throws {
         launchToChat(overrides: ["SIMULATE_CAMERA_PERMISSION_DENIED": "true"])
 
-        let cameraButton = app.buttons[UITestID.Chat.cameraButton]
-        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
-        tapCameraButton(cameraButton)
+        XCTAssertTrue(openImageSourcePicker(), "Photo capture should be reachable from the composer menu")
 
         let permissionTitle = app.staticTexts[permissionRequiredLabel]
         let settingsButton = app.buttons[openSettingsLabel]
@@ -78,9 +86,7 @@ final class OCRUITests: LocalizedUITestCase {
     func testImageSourceOptionsProgressToOCRConfirmation() throws {
         launchToChat(overrides: ["SIMULATE_OCR_SUCCESS": "true"])
 
-        let cameraButton = app.buttons[UITestID.Chat.cameraButton]
-        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
-        tapCameraButton(cameraButton)
+        XCTAssertTrue(openImageSourcePicker(), "Photo capture should be reachable from the composer menu")
 
         XCTAssertTrue(waitForImageSourceSheet(timeout: 5), "Image source sheet should appear")
         let cameraOption = app.buttons[takePhotoLabel]
@@ -95,7 +101,7 @@ final class OCRUITests: LocalizedUITestCase {
         confirmationCancelButton.tap()
 
         XCTAssertTrue(app.textViews[UITestID.Chat.messageInputField].waitForExistence(timeout: 4))
-        tapCameraButton(cameraButton)
+        XCTAssertTrue(openImageSourcePicker(), "Photo capture should be reachable from the composer menu")
         XCTAssertTrue(waitForImageSourceSheet(timeout: 5), "Image source sheet should appear")
         let photoLibraryOption = app.buttons[chooseFromLibraryLabel]
         XCTAssertTrue(photoLibraryOption.waitForExistence(timeout: 3), "Choose from library option should be available")
@@ -109,9 +115,7 @@ final class OCRUITests: LocalizedUITestCase {
     func testCancelImageSelectionWorks() throws {
         launchToChat()
 
-        let cameraButton = app.buttons[UITestID.Chat.cameraButton]
-        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
-        tapCameraButton(cameraButton)
+        XCTAssertTrue(openImageSourcePicker(), "Photo capture should be reachable from the composer menu")
         XCTAssertTrue(waitForImageSourceSheet(timeout: 5), "Image source sheet should appear")
 
         let cancelButton = app.buttons[cancelLabel]
@@ -207,9 +211,7 @@ final class OCRUITests: LocalizedUITestCase {
     func testOCRNoTextFoundShowsError() throws {
         launchToChat(overrides: ["SIMULATE_OCR_NO_TEXT": "true"])
 
-        let cameraButton = app.buttons[UITestID.Chat.cameraButton]
-        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
-        tapCameraButton(cameraButton)
+        XCTAssertTrue(openImageSourcePicker(), "Photo capture should be reachable from the composer menu")
         XCTAssertTrue(waitForImageSourceSheet(timeout: 5), "Image source sheet should appear")
         XCTAssertTrue(selectAnyImageSource(), "An image source option should be selectable")
 
@@ -220,9 +222,7 @@ final class OCRUITests: LocalizedUITestCase {
     func testOCRInvalidImageShowsError() throws {
         launchToChat(overrides: ["SIMULATE_OCR_INVALID_IMAGE": "true"])
 
-        let cameraButton = app.buttons[UITestID.Chat.cameraButton]
-        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
-        tapCameraButton(cameraButton)
+        XCTAssertTrue(openImageSourcePicker(), "Photo capture should be reachable from the composer menu")
         XCTAssertTrue(waitForImageSourceSheet(timeout: 5), "Image source sheet should appear")
         XCTAssertTrue(selectAnyImageSource(), "An image source option should be selectable")
 
@@ -233,9 +233,7 @@ final class OCRUITests: LocalizedUITestCase {
     func testOCRErrorDismissible() throws {
         launchToChat(overrides: ["SIMULATE_OCR_ERROR": "true"])
 
-        let cameraButton = app.buttons[UITestID.Chat.cameraButton]
-        XCTAssertTrue(cameraButton.waitForExistence(timeout: 5))
-        tapCameraButton(cameraButton)
+        XCTAssertTrue(openImageSourcePicker(), "Photo capture should be reachable from the composer menu")
         XCTAssertTrue(waitForImageSourceSheet(timeout: 5), "Image source sheet should appear")
         XCTAssertTrue(selectAnyImageSource(), "An image source option should be selectable")
 
@@ -259,9 +257,7 @@ final class OCRUITests: LocalizedUITestCase {
     private func openOCRConfirmation(overrides: [String: String], expectedText: String? = nil) -> Bool {
         launchToChat(overrides: overrides)
 
-        let cameraButton = app.buttons[UITestID.Chat.cameraButton]
-        guard cameraButton.waitForExistence(timeout: 5) else { return false }
-        tapCameraButton(cameraButton)
+        guard openImageSourcePicker() else { return false }
 
         guard waitForImageSourceSheet(timeout: 5) else { return false }
         guard selectAnyImageSource() else { return false }
@@ -339,12 +335,33 @@ final class OCRUITests: LocalizedUITestCase {
         return app.textViews.matching(predicate).firstMatch
     }
 
-    /// Reliably taps the camera button, retrying with a coordinate tap if needed.
-    private func tapCameraButton(_ button: XCUIElement) {
-        if button.isHittable {
-            button.tap()
+    /// Opens the composer's "+" menu and picks photo capture, which is the only way
+    /// into the OCR flow now that the bare camera button is gone.
+    @discardableResult
+    private func openImageSourcePicker() -> Bool {
+        let attachmentMenu = app.buttons[UITestID.Chat.attachmentMenu]
+        guard attachmentMenu.waitForExistence(timeout: 5) else { return false }
+
+        if attachmentMenu.isHittable {
+            attachmentMenu.tap()
         } else {
-            button.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            attachmentMenu.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         }
+
+        let photoAction = photoCaptureMenuItem
+        guard photoAction.waitForExistence(timeout: 5) else { return false }
+        photoAction.tap()
+        return true
+    }
+
+    /// SwiftUI surfaces `Menu` rows as buttons on iPhone and as menu items elsewhere,
+    /// so accept either rather than assuming one presentation.
+    private var photoCaptureMenuItem: XCUIElement {
+        let predicate = NSPredicate(format: "label == %@", addPhotoLabel)
+        let button = app.buttons.matching(predicate).firstMatch
+        if button.exists {
+            return button
+        }
+        return app.menuItems.matching(predicate).firstMatch
     }
 }
