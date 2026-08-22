@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Export settings for an App Store / TestFlight upload.
+	     Used as: xcodebuild -exportArchive -exportOptionsPlist ExportOptions.plist -->
+	<key>method</key>
+	<string>app-store-connect</string>
+
+	<key>teamID</key>
+	<string>SSTKXHNR6U</string>
+
+	<!-- Matches CODE_SIGN_STYLE = Automatic in the project. Xcode resolves the
+	     distribution certificate and provisioning profiles for the app and both
+	     extensions; nothing here needs to name them explicitly. -->
+	<key>signingStyle</key>
+	<string>automatic</string>
+
+	<!-- Upload dSYMs so App Store Connect can symbolicate crash reports. The archive
+	     produces three (app plus the two extensions) and they are useless after the
+	     fact if not sent with the build. -->
+	<key>uploadSymbols</key>
+	<true/>
+
+	<!-- Leave bitcode off: Apple stopped accepting it, and enabling it here fails
+	     the export rather than doing anything useful. -->
+	<key>uploadBitcode</key>
+	<false/>
+
+	<!-- App Store builds are thinned by Apple, not at export time. -->
+	<key>thinning</key>
+	<string>&lt;none&gt;</string>
+
+	<!-- Keep Swift symbols out of the shipped binary; crash symbolication uses the
+	     dSYMs uploaded above instead. -->
+	<key>stripSwiftSymbols</key>
+	<true/>
+
+	<!-- Do not auto-manage the build number. It is set explicitly via
+	     CURRENT_PROJECT_VERSION so the app and both extensions stay in lockstep —
+	     a mismatch between them is rejected at upload. -->
+	<key>manageAppVersionAndBuildNumber</key>
+	<false/>
+</dict>
+</plist>
