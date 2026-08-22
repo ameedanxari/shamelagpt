@@ -504,6 +504,60 @@ final class APIClient: APIClientProtocol {
         return Int(raw)
     }
 
+    // MARK: - Authenticated Route Guard
+
+    /// The only routes the backend serves without a bearer token.
+    ///
+    /// Deliberately an allowlist of exact paths rather than prefix matching: anything not
+    /// listed counts as authenticated, so a newly added endpoint fails loudly the first
+    /// time it is called without a session instead of quietly returning 403.
+    private static let unauthenticatedPaths: Set<String> = [
+        "/api/health",
+        "/api/auth/login",
+        "/api/auth/signup",
+        "/api/auth/refresh",
+        "/api/auth/google",
+        "/api/auth/apple",
+        "/api/auth/forgot-password",
+        "/api/guest/chat",
+        "/api/guest/chat/stream"
+    ]
+
+    /// Refuses to dispatch an authenticated route while there is no session.
+    ///
+    /// Guest is a distinct auth state, not "signed in with nothing in it". Sending an
+    /// authenticated request without a token produces a 403 — a *successful* HTTP
+    /// exchange, so it raises no exception, no 5xx and no crash report, and the failure
+    /// stays invisible until a user reports that something silently does nothing.
+    ///
+    /// `assertionFailure` makes that loud during development and compiles out of release
+    /// builds; the throw keeps release behaviour honest by failing before the round trip
+    /// rather than after it. 403 is reused rather than given its own case so existing
+    /// `isUnauthorized` handling continues to treat it as a session problem.
+    private func assertAuthorizedRoute(url: URL, method: String) throws {
+        guard !Self.unauthenticatedPaths.contains(url.path) else { return }
+        // A client with no token provider at all is not wired for auth — SwiftUI previews
+        // and unit tests exercising a route's encoding in isolation. Both production
+        // constructions in DependencyContainer pass one, so the case worth catching is a
+        // *wired* client reporting no session, which is precisely the guest state.
+        guard let authTokenProvider else { return }
+        guard authTokenProvider() == nil else { return }
+
+        let message = """
+            Refusing to send \(method) \(url.path) with no session. This route requires \
+            authentication; the caller should check the session state first, or the path \
+            belongs in unauthenticatedPaths.
+            """
+        AppLogger.network.logError(message)
+        // Trapping is the point during development, but it would also abort the test
+        // process before a test could observe the throw, so it is skipped under XCTest.
+        // The log and the thrown error still apply in every environment.
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+            assertionFailure(message)
+        }
+        throw NetworkError.httpError(statusCode: 403)
+    }
+
     // MARK: - Private Methods
 
     /// Performs a network request and decodes the response
@@ -513,6 +567,8 @@ final class APIClient: APIClientProtocol {
         body: Encodable? = nil,
         allowAuthRetry: Bool = true
     ) async throws -> T {
+        try assertAuthorizedRoute(url: url, method: method)
+
         var request = URLRequest(url: url)
         request.httpMethod = method
 
@@ -633,6 +689,8 @@ final class APIClient: APIClientProtocol {
         body: Encodable,
         allowAuthRetry: Bool = true
     ) async throws -> AsyncThrowingStream<String, Error> {
+        try assertAuthorizedRoute(url: url, method: "POST")
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         if let token = authTokenProvider?() {

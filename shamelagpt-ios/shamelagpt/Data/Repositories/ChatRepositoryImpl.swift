@@ -19,6 +19,9 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
     private let apiClient: APIClientProtocol?
     private let networkMonitor: NetworkMonitorProtocol?
     private let freshnessStore: ConversationSyncFreshnessStore
+    /// Reports whether a signed-in session exists. Guest is a distinct auth state, so
+    /// the sync path must be able to tell "no account" from "account with no data".
+    private let isAuthenticated: (() -> Bool)?
 
     private let conversationsSubject = CurrentValueSubject<[Conversation], Never>([])
 
@@ -40,7 +43,8 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         messageDAO: MessageDAO = MessageDAO(),
         apiClient: APIClientProtocol? = nil,
         networkMonitor: NetworkMonitorProtocol? = nil,
-        freshnessStore: ConversationSyncFreshnessStore = ConversationSyncFreshnessStore()
+        freshnessStore: ConversationSyncFreshnessStore = ConversationSyncFreshnessStore(),
+        isAuthenticated: (() -> Bool)? = nil
     ) {
         self.coreDataStack = coreDataStack
         self.conversationDAO = conversationDAO
@@ -48,6 +52,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         self.apiClient = apiClient
         self.networkMonitor = networkMonitor
         self.freshnessStore = freshnessStore
+        self.isAuthenticated = isAuthenticated
     }
 
     // MARK: - Conversation Operations
@@ -236,6 +241,13 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         guard let apiClient = apiClient,
               let networkMonitor = networkMonitor,
               networkMonitor.isConnected else { return }
+        // Guests have no server-side conversation list, so this authenticated route would
+        // 403. Skipping is not a silent swallow: the transport now refuses such requests
+        // outright, and reaching it from here would trip that assertion in development.
+        if let isAuthenticated, !isAuthenticated() {
+            AppLogger.network.logDebug("Skipping conversation sync: no authenticated session")
+            return
+        }
         guard freshnessStore.shouldSyncConversations(forceRefresh: forceRefresh) else {
             return
         }
