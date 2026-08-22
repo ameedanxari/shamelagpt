@@ -196,7 +196,11 @@ class MockURLProtocol: URLProtocol {
 
         let isStreamEndpoint = urlString.contains("/api/chat/stream")
             || urlString.contains("/api/guest/chat/stream")
-            || urlString.contains("/api/confirm-fact-check")
+            // The real endpoint is `api/chat/confirm-factcheck` (see APIClient). The old
+            // spelling matched nothing, so fact-check confirmations fell through to the
+            // plain-JSON chat branch and the SSE parser saw a stream with no events —
+            // "Fact-check stream ended before completion", and the message rolled back.
+            || urlString.contains("/api/chat/confirm-factcheck")
 
         guard isStreamEndpoint else {
             return false
@@ -560,6 +564,14 @@ class MockURLProtocol: URLProtocol {
             return MockURLProtocol.successResponse(json: [:], statusCode: 200, delay: delay)
         }
 
+        // POST /api/conversations — the first message of every authenticated conversation
+        // goes through here before a single byte is streamed. Leaving it unstubbed meant
+        // falling through to the catch-all 404, so `sendMessage` threw, rolled the
+        // optimistic bubble back and raised the error banner instead of ever streaming.
+        if method == "POST", pathComponents.last == "conversations" {
+            return mockCreatedConversationResponse(delay: delay)
+        }
+
         if method != "GET" {
             return nil
         }
@@ -568,6 +580,53 @@ class MockURLProtocol: URLProtocol {
         let data = try? JSONSerialization.data(withJSONObject: conversations)
         let response = MockURLProtocol.httpResponse(statusCode: 200)
         return MockResponse(data: data, response: response, delay: delay)
+    }
+
+    /// Mocks conversation creation, echoing back the requested title so history entries
+    /// stay recognisable. Each call mints a fresh id because the app persists it locally
+    /// and then uses it for `/messages` and `/share` lookups.
+    private func mockCreatedConversationResponse(delay: TimeInterval) -> MockResponse? {
+        let title = requestBodyJSON()?["title"] as? String ?? "New Conversation"
+        let id = "ui-test-conversation-\(UUID().uuidString.prefix(8))"
+
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let timestamp = formatter.string(from: Date())
+
+        return MockURLProtocol.successResponse(
+            json: [
+                "id": id,
+                "thread_id": "thread-\(id)",
+                "title": title,
+                "created_at": timestamp,
+                "updated_at": timestamp
+            ],
+            statusCode: 200,
+            delay: delay
+        )
+    }
+
+    /// URLSession moves a request body into `httpBodyStream` once it is on the wire, so
+    /// reading `httpBody` alone loses it for anything larger than a trivial payload.
+    private func requestBodyJSON() -> [String: Any]? {
+        var body = request.httpBody
+
+        if body == nil, let stream = request.httpBodyStream {
+            stream.open()
+            defer { stream.close() }
+            var collected = Data()
+            let bufferSize = 1024
+            var buffer = [UInt8](repeating: 0, count: bufferSize)
+            while stream.hasBytesAvailable {
+                let read = stream.read(&buffer, maxLength: bufferSize)
+                guard read > 0 else { break }
+                collected.append(buffer, count: read)
+            }
+            body = collected
+        }
+
+        guard let body, !body.isEmpty else { return nil }
+        return try? JSONSerialization.jsonObject(with: body) as? [String: Any]
     }
 
     /// Mocks the conversation sharing endpoints. A PUT is treated as "share it",
