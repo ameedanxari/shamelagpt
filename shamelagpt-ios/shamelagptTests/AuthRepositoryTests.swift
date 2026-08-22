@@ -264,8 +264,8 @@ final class AuthRepositoryTests: XCTestCase {
 
     // MARK: - Logout Clears Local Data
 
-    /// Conversations are cached with no owner column, so anything left behind after logout
-    /// is readable by the next person to use the device.
+    /// Owner scoping hides one account's cache from the next, but hiding is not removing —
+    /// the bytes are still on disk. Logout still has to delete them.
     func testLogoutClearsLocallyCachedConversationsAndMessages() async throws {
         // Given - user A is signed in and has history on the device
         let coreDataStack = TestCoreDataStack()

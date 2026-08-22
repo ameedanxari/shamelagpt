@@ -30,8 +30,12 @@ final class CoreDataStack: @unchecked Sendable {
 
         // Lightweight migration. The model is versioned inside ShamelaGPT.xcdatamodeld
         // ("ShamelaGPT" -> "ShamelaGPT 2", which adds the optional `reasoning` attribute
-        // to MessageEntity). Every change so far is additive and optional, so Core Data
-        // can infer the mapping model instead of us shipping a heavyweight one.
+        // to MessageEntity, -> "ShamelaGPT 3", which adds the optional `ownerId`
+        // attribute to ConversationEntity). Every change so far is additive and optional,
+        // so Core Data can infer the mapping model instead of us shipping a heavyweight one.
+        // Every superseded version stays in the bundle: Core Data finds the source model by
+        // the version hashes recorded in the store, so an install still on v1 needs v1 to
+        // migrate from.
         // These two flags default to true on descriptions NSPersistentContainer creates,
         // but the in-memory branch above replaces the descriptions wholesale, so set them
         // explicitly rather than relying on which branch ran.

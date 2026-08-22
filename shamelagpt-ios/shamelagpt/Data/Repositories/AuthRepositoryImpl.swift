@@ -126,7 +126,13 @@ final class AuthRepositoryImpl: AuthRepository {
 
     func getCurrentUser() async throws -> UserResponse {
         do {
-            return try await apiClient.getCurrentUser()
+            let user = try await apiClient.getCurrentUser()
+            // The canonical "who am I", so it is also where an unknown identity gets
+            // resolved. Sessions that predate conversation scoping have a valid token and
+            // no recorded owner; this is what fills that in without asking anyone to log
+            // in again.
+            sessionManager.setCurrentUserId(user.firebaseUid)
+            return user
         } catch {
             throw normalizeError(error)
         }
@@ -207,12 +213,16 @@ final class AuthRepositoryImpl: AuthRepository {
 
     func logout() async {
         AppLogger.auth.logInfo("logout called")
+        // Clears the recorded user id along with the tokens, so nothing that runs after
+        // this point can still resolve an owner and read the cache.
         sessionManager.clearSession()
         sessionManager.clearCredentials()
 
-        // Conversations are cached with no owner column, so whatever stays on disk is
-        // readable by the next person to use the device — including photographed documents
-        // held in `imageData`. The server copy is authoritative and comes back through
+        // Owner scoping already hides these rows from the next account, but hiding is not
+        // the same as removing: the bytes are still on disk, photographed documents in
+        // `imageData` included. Scoping is the backstop for the paths that never reach this
+        // method — an expired or revoked session, a wipe that throws — not a replacement
+        // for it. The server copy is authoritative and comes back through
         // `syncRemoteConversations` the next time History loads for a signed-in user.
         do {
             try await chatRepository?.clearLocalData()
@@ -265,6 +275,19 @@ final class AuthRepositoryImpl: AuthRepository {
             refreshToken: response.refreshToken,
             expiresInSeconds: parsed ?? Self.defaultSessionLifetime
         )
+
+        // Before the cache warm-up, not after: the sync files every conversation it pulls
+        // under whoever is signed in, and if that runs first they all land under the
+        // previous owner — or under nobody — and are invisible a moment later.
+        //
+        // Only overwrite when the payload actually names someone. A response missing the
+        // key must not erase an identity we already have; the alternative is a signed-in
+        // user whose History silently empties because their rows no longer match.
+        if let firebaseUid = response.firebaseUserId {
+            sessionManager.setCurrentUserId(firebaseUid)
+        } else {
+            AppLogger.auth.logWarning("auth response carried no firebaseUid; conversation owner unresolved")
+        }
 
         // Every successful auth path lands here — login, signup, Google, Apple and a
         // startup token refresh — so it is the one place that knows a session now exists.

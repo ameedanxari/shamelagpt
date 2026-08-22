@@ -22,6 +22,13 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
     /// Reports whether a signed-in session exists. Guest is a distinct auth state, so
     /// the sync path must be able to tell "no account" from "account with no data".
     private let isAuthenticated: (() -> Bool)?
+    /// Who the cache currently belongs to, read fresh on every call because it changes
+    /// underneath a long-lived repository — sign-in, sign-out, expiry.
+    ///
+    /// Defaults to "nobody" rather than "everybody". If this is ever left unwired the app
+    /// shows an empty History, which is visible and harmless; the opposite default would
+    /// silently serve one account's conversations to the next person to sign in.
+    private let currentOwnerId: () -> String?
 
     private let conversationsSubject = CurrentValueSubject<[Conversation], Never>([])
 
@@ -44,7 +51,8 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         apiClient: APIClientProtocol? = nil,
         networkMonitor: NetworkMonitorProtocol? = nil,
         freshnessStore: ConversationSyncFreshnessStore = ConversationSyncFreshnessStore(),
-        isAuthenticated: (() -> Bool)? = nil
+        isAuthenticated: (() -> Bool)? = nil,
+        currentOwnerId: @escaping () -> String? = { nil }
     ) {
         self.coreDataStack = coreDataStack
         self.conversationDAO = conversationDAO
@@ -53,6 +61,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         self.networkMonitor = networkMonitor
         self.freshnessStore = freshnessStore
         self.isAuthenticated = isAuthenticated
+        self.currentOwnerId = currentOwnerId
     }
 
     // MARK: - Conversation Operations
@@ -70,6 +79,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
                 ConversationRequest(title: title)
             )
         }
+        let ownerId = currentOwnerId()
         return try await context.perform {
             let id = remoteConversation?.id ?? UUID().uuidString
             let entity = self.conversationDAO.create(
@@ -77,6 +87,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
                 threadId: remoteConversation?.threadId,
                 title: remoteConversation?.title ?? title,
                 isLocalOnly: isLocalOnly,
+                ownerId: ownerId,
                 in: context
             )
 
@@ -100,9 +111,10 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
     func fetchAllConversations() async throws -> [Conversation] {
         let context = coreDataStack.viewContext
+        let ownerId = currentOwnerId()
 
         return try await context.perform { [conversationDAO] in
-            let entities = try conversationDAO.fetchAll(from: context)
+            let entities = try conversationDAO.fetchAll(ownedBy: ownerId, from: context)
             // Include messages so history and previews reflect accurate counts/content
             return ConversationMapper.toDomainModels(entities, includeMessages: true)
         }
@@ -111,9 +123,10 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
     func fetchConversation(byId id: String) async throws -> Conversation? {
         AppLogger.database.logDebug("Fetching conversation by ID: \(id)")
         let context = coreDataStack.viewContext
+        let ownerId = currentOwnerId()
 
         return try await context.perform { [conversationDAO] in
-            guard let entity = try conversationDAO.fetch(byId: id, from: context) else {
+            guard let entity = try conversationDAO.fetch(byId: id, ownedBy: ownerId, from: context) else {
                 AppLogger.database.logWarning("Conversation not found in database: \(id)")
                 return nil
             }
@@ -125,9 +138,10 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
     func fetchConversation(byThreadId threadId: String) async throws -> Conversation? {
         let context = coreDataStack.viewContext
+        let ownerId = currentOwnerId()
 
         return try await context.perform { [conversationDAO] in
-            guard let entity = try conversationDAO.fetch(byThreadId: threadId, from: context) else {
+            guard let entity = try conversationDAO.fetch(byThreadId: threadId, ownedBy: ownerId, from: context) else {
                 return nil
             }
             return ConversationMapper.toDomainModel(entity, includeMessages: true)
@@ -137,9 +151,14 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
     func fetchMostRecentEmptyConversation(includeLocalOnly: Bool = false) async throws -> Conversation? {
         AppLogger.database.logDebug("Fetching most recent empty conversation (includeLocalOnly=\(includeLocalOnly))")
         let context = coreDataStack.viewContext
+        let ownerId = currentOwnerId()
 
         return try await context.perform { [conversationDAO] in
-            guard let entity = try conversationDAO.fetchMostRecentEmpty(from: context, includeLocalOnly: includeLocalOnly) else {
+            guard let entity = try conversationDAO.fetchMostRecentEmpty(
+                from: context,
+                includeLocalOnly: includeLocalOnly,
+                ownedBy: ownerId
+            ) else {
                 AppLogger.database.logInfo("No empty conversations found")
                 return nil
             }
@@ -150,9 +169,10 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
     func updateConversationTitle(id: String, title: String) async throws {
         let context = coreDataStack.viewContext
+        let ownerId = currentOwnerId()
 
         try await context.perform { [conversationDAO, coreDataStack] in
-            guard let entity = try conversationDAO.fetch(byId: id, from: context) else {
+            guard let entity = try conversationDAO.fetch(byId: id, ownedBy: ownerId, from: context) else {
                 throw CoreDataError.notFound
             }
 
@@ -164,9 +184,10 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
     func updateConversationThreadId(id: String, threadId: String) async throws {
         let context = coreDataStack.viewContext
+        let ownerId = currentOwnerId()
 
         try await context.perform { [conversationDAO, coreDataStack] in
-            guard let entity = try conversationDAO.fetch(byId: id, from: context) else {
+            guard let entity = try conversationDAO.fetch(byId: id, ownedBy: ownerId, from: context) else {
                 throw CoreDataError.notFound
             }
 
@@ -178,9 +199,10 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
     func deleteConversation(id: String) async throws {
         let context = coreDataStack.viewContext
+        let ownerId = currentOwnerId()
 
         try await context.perform { [conversationDAO, coreDataStack] in
-            try conversationDAO.delete(byId: id, from: context)
+            try conversationDAO.delete(byId: id, ownedBy: ownerId, from: context)
             try coreDataStack.save(context: context)
             self.notifyConversationsChanged()
         }
@@ -195,9 +217,12 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
     func deleteAllConversations() async throws {
         let context = coreDataStack.viewContext
+        // Scoped: this is "delete my history", triggered by a person who can only speak
+        // for their own account. The unscoped sweep belongs to `clearLocalData()`.
+        let ownerId = currentOwnerId()
 
         try await context.perform { [conversationDAO, coreDataStack] in
-            try conversationDAO.deleteAll(from: context)
+            try conversationDAO.deleteAll(ownedBy: ownerId, from: context)
             try coreDataStack.save(context: context)
             self.notifyConversationsChanged()
         }
@@ -213,7 +238,11 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         let context = coreDataStack.viewContext
 
         try await context.perform { [conversationDAO, messageDAO, coreDataStack] in
-            let existing = try conversationDAO.fetchAll(from: context)
+            // Unscoped on purpose. Owner scoping keeps other people's rows out of sight,
+            // but logout is about the device, not the account: anything still on disk here
+            // — another owner's leftovers, rows written before scoping existed — has no
+            // reason to outlive the session that could have explained it.
+            let existing = try conversationDAO.fetchAllIgnoringOwner(from: context)
             // Local-only conversations (guest chats, anything created offline) were never
             // pushed to the server, so this wipe destroys them for good. That is the
             // intended trade: logging out means removing this person's data from the
@@ -248,7 +277,12 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
             AppLogger.network.logDebug("Skipping conversation sync: no authenticated session")
             return
         }
-        guard freshnessStore.shouldSyncConversations(forceRefresh: forceRefresh) else {
+        let ownerId = currentOwnerId()
+        // Freshness is per owner. "Synced two minutes ago" is a statement about somebody's
+        // cache, and it says nothing about the person asking now — a session that expired
+        // and was replaced by a different account leaves a marker that is both recent and
+        // about the wrong user, which would hold History empty until the TTL ran out.
+        guard freshnessStore.shouldSyncConversations(forceRefresh: forceRefresh, owner: ownerId) else {
             return
         }
 
@@ -270,12 +304,18 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
                         "Unparseable timestamp for conversation \(remote.id); sorting it oldest"
                     )
                 }
+                // The server listed this conversation for the account that is signed in, so
+                // stamping the owner here is an authoritative statement, not a guess. It is
+                // also how a row written before scoping existed gets adopted: it keeps its
+                // id, so the upsert finds it and files it under its rightful owner instead
+                // of leaving it stranded.
                 _ = conversationDAO.upsert(
                     id: remote.id,
                     threadId: remote.threadId,
                     title: remote.title ?? "New Chat",
                     createdAt: createdAt ?? .distantPast,
                     updatedAt: updatedAt ?? createdAt ?? .distantPast,
+                    ownerId: ownerId,
                     in: context
                 )
                 // Deliberately no markAsUpdated here. That sets updatedAt to now, which is
@@ -288,7 +328,7 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         }
 
         notifyConversationsChanged()
-        freshnessStore.markConversationsSynced()
+        freshnessStore.markConversationsSynced(owner: ownerId)
 
         // Message bodies are deliberately not fetched here. The list endpoint returns only
         // ids, titles and timestamps, which is all History renders, so a sync costs one
@@ -308,10 +348,12 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         reasoning: String?
     ) async throws -> Message {
         let context = coreDataStack.viewContext
+        let ownerId = currentOwnerId()
 
         return try await context.perform { [conversationDAO, messageDAO, coreDataStack, self] in
             guard let conversationEntity = try conversationDAO.fetch(
                 byId: conversationId,
+                ownedBy: ownerId,
                 from: context
             ) else {
                 throw CoreDataError.notFound
@@ -353,10 +395,12 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
         isFactCheckMessage: Bool
     ) async throws -> Message {
         let context = coreDataStack.viewContext
+        let ownerId = currentOwnerId()
 
         return try await context.perform {
             guard let conversationEntity = try self.conversationDAO.fetch(
                 byId: conversationId,
+                ownedBy: ownerId,
                 from: context
             ) else {
                 throw CoreDataError.notFound
@@ -397,6 +441,25 @@ final class ChatRepositoryImpl: ChatRepository, @unchecked Sendable {
 
     func fetchMessages(forConversation conversationId: String, forceRefresh: Bool = false) async throws -> [Message] {
         let context = coreDataStack.viewContext
+        let ownerId = currentOwnerId()
+
+        // Messages are keyed by conversation id, so scoping conversations alone would still
+        // hand over the bodies to anyone holding an id — and the UI does hold one across a
+        // sign-out, in restored navigation state. A conversation that is on this device but
+        // belongs to somebody else reads as empty, and never reaches the network.
+        let belongsToSomeoneElse: Bool = try await context.perform { [conversationDAO] in
+            guard try conversationDAO.fetchIgnoringOwner(byId: conversationId, from: context) != nil else {
+                // Not cached at all: unchanged behaviour, the remote fetch below decides.
+                return false
+            }
+            return try conversationDAO.fetch(byId: conversationId, ownedBy: ownerId, from: context) == nil
+        }
+        if belongsToSomeoneElse {
+            AppLogger.database.logWarning(
+                "Refusing to read messages for a conversation owned by another account (owner=\(AppLogger.redactedId(ownerId)))"
+            )
+            return []
+        }
 
         // First fetch locally
         let localMessages: [Message] = try await context.perform { [messageDAO] in

@@ -12,6 +12,29 @@ struct AuthResponse: Codable, Equatable {
     let refreshToken: String
     let expiresIn: String
     let user: [String: AnyCodable]
+
+    /// The Firebase uid inside the untyped user payload.
+    ///
+    /// Read from `firebaseUid` and nothing else. The payload also carries a database `id`,
+    /// and falling back to it would be worse than returning nil: `GET /api/auth/me` reports
+    /// identity as `UserResponse.firebaseUid`, so a fallback would let one account be filed
+    /// under two different owners depending on which call resolved it first, and the cache
+    /// written under one would be invisible under the other.
+    ///
+    /// The key is `firebase_uid` on the wire and stays that way here.
+    /// `.convertFromSnakeCase` rewrites *coding* keys, which are generated from a type's
+    /// properties — it does not touch the keys of a dictionary decoded as `[String: _]`,
+    /// because there are no properties to match them against. Verified against the live
+    /// payload, whose user object is:
+    /// `id, firebase_uid, email, display_name, mode_preference, created_at, updated_at, last_login`
+    ///
+    /// Both spellings are read so this keeps working if the payload is ever decoded by a
+    /// path that does convert, or the backend switches to camelCase.
+    var firebaseUserId: String? {
+        let value = (user["firebase_uid"] ?? user["firebaseUid"])?.value as? String
+        guard let value, !value.isEmpty else { return nil }
+        return value
+    }
 }
 
 /// Type-erased codable to keep parity with dynamic user payload
